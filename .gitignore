@@ -1,0 +1,8 @@
+.DS_Store
+# CodeCov generated files
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+# Documenter generated files
+/docs/build/
+/docs/site/
