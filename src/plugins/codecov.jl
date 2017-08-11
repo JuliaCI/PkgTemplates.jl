@@ -1,0 +1,62 @@
+"""
+    CodeCov(;config_file::AbstractString="") -> CodeCov
+
+Add CodeCov to a template's plugins to enable CodeCov coverage reports.
+
+# Keyword Arguments:
+* `config_file::AbstractString`: Path to a custom `.codecov.yml`.
+"""
+struct CodeCov <: Plugin
+    gitignore_files::Vector{AbstractString}
+    config_file::AbstractString
+
+    function CodeCov(;config_file::AbstractString="")
+        config_file = isempty(config_file) ?
+            joinpath(DEFAULTS_DIR, "codecov.yml") : config_file
+        if !isfile(abspath(config_file))
+            throw(ArgumentError("File $config_file does not exist"))
+        end
+        new(["*.jl.cov", "*.jl.*.cov", "*.jl.mem"], config_file)
+    end
+end
+
+function ==(a::CodeCov, b::CodeCov)
+    return a.gitignore_files == b.gitignore_files &&
+        a.config_file == b.config_file
+end
+
+"""
+    badges(plugin::CodeCov, pkg_name::AbstractString, t::Template) -> String
+
+Return Markdown badges for the current package.
+
+# Arguments
+* `plugin::CodeCov`: plugin whose badges we are generating.
+* `t::Template`: Template configuration options.
+* `pkg_name::AbstractString`: Name of the package.
+"""
+function badges(plugin::CodeCov, t::Template, pkg_name::AbstractString)
+    user = strip(URI(t.remote_prefix).path, '/')
+    return [
+        "[![codecov](https://codecov.io/gh/$user/$pkg_name.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$pkg_name.jl)"
+    ]
+end
+
+"""
+    gen_plugin(plugin::CodeCov, template::Template, pkg_name::AbstractString)
+
+Generate a .codecov.yml.
+
+# Arguments
+* `plugin::CodeCov`: Plugin whose files are being generated.
+* `template::Template`: Template configuration and plugins.
+* `pkg_name::AbstractString`: Name of the package.
+
+Returns an array of generated files ([".codecov.yml"]) for git to add.
+"""
+function gen_plugin(plugin::CodeCov, template::Template, pkg_name::AbstractString)
+    text = substitute(readstring(plugin.config_file), pkg_name, template)
+    pkg_dir = joinpath(template.path, pkg_name)
+    gen_file(joinpath(pkg_dir, ".codecov.yml"), text)
+    return [".codecov.yml"]
+end

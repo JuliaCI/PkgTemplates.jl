@@ -9,7 +9,9 @@ makedocs(
     repo="https://github.com/christopher-dG/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",
     authors="Invenia Technical Computing Corporation",
-    assets=[],
+    assets=[
+        "assets/invenia.css",
+    ],
 )
 
 deploydocs(

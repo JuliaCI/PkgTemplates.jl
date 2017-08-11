@@ -1,0 +1,17 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+os:
+  - linux
+  - osx
+julia:
+  - {{VERSION}}
+  - nightly
+notifications:
+  email: false
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"; coverage=true)'
+{{#AFTER}}after_success:
+  {{#CODECOV}}- julia -e 'cd(Pkg.dir("{{PKGNAME}}")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'{{/CODECOV}}
+  {{#DOCUMENTER}}- julia -e 'Pkg.add("Documenter")'
+  - julia -e 'cd(Pkg.dir("{{PKGNAME}}")); include(joinpath("docs", "make.jl"))'{{/DOCUMENTER}}{{/AFTER}}
