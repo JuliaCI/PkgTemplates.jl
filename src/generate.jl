@@ -77,7 +77,7 @@ Generate a README with badges for each enabled plugin.
 * `pkg_dir::AbstractString`: The package directory.
 * `t::Template`: The template whose README we are generating.
 
-Returns the name of the generated file "README.md" for git-add.
+Returns the name of the generated file.
 """
 function gen_readme(pkg_dir::AbstractString, t::Template)
     pkg_name = basename(pkg_dir)
@@ -104,7 +104,7 @@ Generate a .gitignore from the list of enabled `plugins`.
 * `pkg_dir::AbstractString`: The package directory.
 * `plugins::Dict{DataType, Plugin}`: The enabled plugins.
 
-Returns the name of the generated file ".gitignore" for git-add.
+Returns the name of the generated file.
 """
 function gen_gitignore(pkg_dir::AbstractString, plugins::Dict{DataType,Plugin})
     text = ".DS_Store\n"
@@ -119,7 +119,7 @@ function gen_gitignore(pkg_dir::AbstractString, plugins::Dict{DataType,Plugin})
 end
 
 """
-    gen_license(pkg_dir, license, authors, years) -> String
+    gen_license(pkg_dir, license, authors, years) -> Union{String, Void}
 
 Creates a license file for the package.
 
@@ -129,7 +129,8 @@ Creates a license file for the package.
 * `authors::AbstractString`: Author, or comma-delimited list of authors, of the package.
 * `years::AbstractString`: Copyright year or range of copyright years.
 
-Returns the name of the generated file "LICENSE" for git-add.
+Returns the name of the generated file, or `nothing` in the case that
+no license is generated.
 """
 function gen_license(
     pkg_dir::AbstractString,
@@ -156,7 +157,7 @@ Creates the module entrypoint ("src/\$pkg_name.jl") in `pkg_dir`.
 # Arguments
 * `pkg_dir::AbstractString`: The package directory.
 
-Returns the name of the generated directory "src/" for git-add.
+Returns the name of the generated directory.
 """
 function gen_entrypoint(pkg_dir::AbstractString)
     pkg_name = basename(pkg_dir)
@@ -181,7 +182,7 @@ Create the requirements file in the package directory.
 * `pkg_dir::AbstractString`: The package directory.
 * `julia_version::VersionNumber`: The minimum Julia version to support.
 
-Returns the name of the generated file "REQUIRE" for git-add.
+Returns the name of the generated file.
 """
 function gen_require(pkg_dir::AbstractString, julia_version::VersionNumber)
     text = "julia $(version_floor(julia_version))\n"
@@ -198,7 +199,7 @@ Creates the test file "test/runtests.jl" in the package directory.
 # Arguments
 * `pkg_dir::AbstractString`: The package directory.
 
-Returns the name of the generated directory "test/" for git-add.
+Returns the name of the generated directory.
 """
 function gen_tests(pkg_dir::AbstractString)
     text = """
@@ -256,7 +257,7 @@ end
         template::AbstractString,
         pkg_name::AbstractString,
         pkg_template::Template;
-        view::Dict{String, String}=Dict{String, String}(),
+        view::Dict{String, Any}=Dict{String, Any}(),
     )
 
 Replace placeholders in `template`. The input string is not modified.
@@ -265,7 +266,7 @@ Replace placeholders in `template`. The input string is not modified.
 * `template::AbstractString`: Template string to make replacements in.
 * `pkg_name::AbstractString`: Name of the package being created.
 * `pkg_template::Template`: The package template in use.
-* `view::Dict{String, String}=Dict{String, String}()`: Additional values to be substituted.
+* `view::Dict{String, Any}=Dict{String, Any}()`: Additional values to be substituted.
 
 Returns the text with substitutions applied.
 """

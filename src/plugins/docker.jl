@@ -6,8 +6,10 @@ Docker image containing the package.
 
 # Keyword Arguments
 * `base_image::AbstractString="julia:latest"`: The base image used in the Dockerfile.
-* `dockerfile_file::AbstractString=""`: the path to the Dockerfile template to use.
-* `dockerignore_file::AbstractString=""`: the path to the .dockerignore template to use.
+* `dockerfile_file::Union{AbstractString, Void}=""`: The path to the Dockerfile template
+   to use. If `nothing` is supplied, then no file will be generated.
+* `dockerignore_file::Union{AbstractString, Void}=""`: The path to the .dockerignore
+  template to use. If `nothing` is supplied, then no file will be generated.
 * `system_pkgs::Vector{AbstractString}=String[]`: Linux system packages to install.
 * `python_pkgs::Vector{AbstractString}=String[]`: Python packages to install with `pip`.
 * `user_image::Bool=true`: Allows the Dockerfile to build a Julia system image which
@@ -33,35 +35,39 @@ struct Docker <: Plugin
 
     function Docker(;
         base_image="julia:latest",
-        dockerfile_file::AbstractString="",
-        dockerignore_file::AbstractString="",
+        dockerfile_file::Union{AbstractString, Void}="",
+        dockerignore_file::Union{AbstractString, Void}="",
         user_image::Bool=true,
-        system_pkgs=String[],
-        python_pkgs=String[],
+        system_pkgs::Vector{AbstractString}=String[],
+        python_pkgs::Vector{AbstractString}=String[],
     )
-        if isempty(dockerfile_file)
-            dockerfile_file = joinpath(DEFAULTS_DIR, "Dockerfile")
-        end
-        if !isfile(dockerfile_file)
-            throw(ArgumentError("File $dockerfile_file does not exist"))
+        if dockerfile_file != nothing
+            if isempty(dockerfile_file)
+                dockerfile_file = joinpath(DEFAULTS_DIR, "Dockerfile")
+            end
+            if !isfile(dockerfile_file)
+                throw(ArgumentError("File $dockerfile_file does not exist"))
+            end
         end
 
-        if isempty(dockerignore_file)
-            dockerignore_file = joinpath(DEFAULTS_DIR, "dockerignore")
-        end
-        if !isfile(dockerignore_file)
-            throw(ArgumentError("File $dockerignore_file does not exist"))
+        if dockerignore_file != nothing
+            if isempty(dockerignore_file)
+                dockerignore_file = joinpath(DEFAULTS_DIR, "dockerignore")
+            end
+            if !isfile(dockerignore_file)
+                throw(ArgumentError("File $dockerignore_file does not exist"))
+            end
         end
 
         new(
             base_image, dockerfile_file, dockerignore_file,
-             user_image, system_pkgs, python_pkgs, String[],
+            user_image, system_pkgs, python_pkgs, String[],
         )
     end
 end
 
 """
-    gen_plugin(plugin::Docker, template::Template, pkg_name::AbstractString)
+    gen_plugin(plugin::Docker, template::Template, pkg_name::AbstractString) -> Vector{String}
 
 Generate a Dockerfile for running an app-style package and generate dependency files of
 different sorts for installation within a Docker container.
@@ -72,28 +78,30 @@ different sorts for installation within a Docker container.
 * `template::Template`: Template configuration and plugins.
 * `pkg_name::AbstractString`: Name of the package.
 
-Returns an array of generated files for git to add.
+Returns an array of generated files.
 """
 function gen_plugin(plugin::Docker, template::Template, pkg_name::AbstractString)
     pkg_dir = joinpath(template.path, pkg_name)
+    return_files = String[]
 
-    text = substitute(readstring(plugin.dockerignore_file), pkg_name, template)
-    gen_file(joinpath(pkg_dir, ".dockerignore"), text)
+    if plugin.dockerignore_file != nothing
+        push!(return_files, ".dockerignore")
+        text = substitute(readstring(plugin.dockerignore_file), pkg_name, template)
+        gen_file(joinpath(pkg_dir, ".dockerignore"), text)
+    end
 
-    view = Dict(
-        "BASE_IMAGE" => plugin.base_image,
-        "MAINTAINER" => template.authors,
-        "!system" => !isempty(plugin.system_pkgs),
-        "!python" => !isempty(plugin.python_pkgs),
-        "!userimg" => !plugin.user_image,
-    )
-    text = substitute(readstring(plugin.dockerfile_file), pkg_name, template, view)
-    gen_file(joinpath(pkg_dir, "Dockerfile"), text)
-
-    return_files = String[
-        ".dockerignore",
-        "Dockerfile",
-    ]
+    if plugin.dockerfile_file != nothing
+        push!(return_files, "Dockerfile")
+        view = Dict(
+            "BASE_IMAGE" => plugin.base_image,
+            "MAINTAINER" => template.authors,
+            "!system" => !isempty(plugin.system_pkgs),
+            "!python" => !isempty(plugin.python_pkgs),
+            "!userimg" => !plugin.user_image,
+        )
+        text = substitute(readstring(plugin.dockerfile_file), pkg_name, template, view)
+        gen_file(joinpath(pkg_dir, "Dockerfile"), text)
+    end
 
     pkg_lists = Dict(
         "system-pkgs.txt" => plugin.system_pkgs,
@@ -110,5 +118,5 @@ function gen_plugin(plugin::Docker, template::Template, pkg_name::AbstractString
         push!(return_files, file_name)
     end
 
-    return return_files  
+    return return_files
 end

@@ -56,7 +56,7 @@ RUN REF=$(cat .git/HEAD | cut -d' ' -f2) && \
 # - BinDeps.jl runtime requirements: sudo, make, gcc, unzip, bzip2, xz, unzip
 #
 #   BinDeps runtime requirements are only used while other packages are being built which
-#   makes them safe to only be temporarily installed. When installing system libraries 
+#   makes them safe to only be temporarily installed. When installing system libraries
 #   BinDeps always uses "sudo" to install system packages and waits for user confirmation
 #   before installing a package. We'll both install "sudo" and always supply the `-y` flag
 #   to ensure that BinDeps installations work automatically. A good test to make sure

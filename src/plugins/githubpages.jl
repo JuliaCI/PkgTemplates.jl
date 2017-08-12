@@ -1,38 +1,37 @@
 """
-    GitHubPages(css_files::Union{String, Vector{AbstractString}}=String[]) -> GitHubPages
+    GitHubPages(; documenter_assets::Vector{AbstractString}=String[]) -> GitHubPages
 
 Add GitHubPages to a template's plugins to add Documenter.jl support via GitHub Pages.
 
 # Keyword Arguments
-* `css_files::Union{String, Vector{String}}=String[]`: Array of paths to custom CSS files.
+* `documenter_assets::Vector{String}=String[]`: Array of paths to Documenter asset files.
 """
 struct GitHubPages <: Documenter
     gitignore_files::Vector{AbstractString}
-    css_files::Vector{AbstractString}
+    documenter_assets::Vector{AbstractString}
 
-    function GitHubPages(;css_files::Union{String, Vector{String}}=String[])
-        if isa(css_files, String)
-            css_files = [css_files]
-        end
-        for file in css_files
+    function GitHubPages(; css_files::Vector{String}=String[])
+        for file in documenter_assets
             if !isfile(file)
                 throw(ArgumentError("Asset file $file does not exist"))
             end
         end
         # Windows Git recognizes these paths as well.
-        new(["/docs/build/", "/docs/site/"], css_files)
+        new(["/docs/build/", "/docs/site/"], documenter_assets)
     end
 end
 
 """
     badges(plugin::GitHubPages, pkg_name::AbstractString, t::Template) -> Vector{String}
 
-Return Markdown badges for the current package.
+Generate Markdown badges for the current package.
 
 # Arguments
 * `plugin::GitHubPages`: plugin whose badges we are generating.
 * `t::Template`: Template configuration options.
 * `pkg_name::AbstractString`: Name of the package.
+
+Returns an array of Markdown badges.
 """
 function badges(plugin::GitHubPages, t::Template, pkg_name::AbstractString)
     if haskey(t.plugins, TravisCI)
@@ -57,7 +56,7 @@ GitHub Pages.
 * `template::Template`: Template configuration and plugins.
 * `pkg_name::AbstractString`: Name of the package.
 
-Returns an array of generated directories (["docs"]) for git to add.
+Returns an array of generated directories.
 """
 function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractString)
     invoke(
