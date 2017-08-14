@@ -40,14 +40,14 @@ write(test_file, template_text)
     t = Template(remote_prefix="https://github.com/invenia"; authors=["Guy", "Gal"])
     @test t.authors == "Guy, Gal"
 
-    t = Template(remote_prefix="https://github.com/invenia"; path=joinpath("x", "y", "z"))
-    @test t.path == joinpath("x", "y", "z")
+    t = Template(remote_prefix="https://github.com/invenia"; path=test_file)
+    @test t.path == test_file
 
     t = Template(remote_prefix="https://github.com/invenia"; julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
 
-    t = Template(remote_prefix="https://github.com/invenia"; git_config=Dict("x" => "y"))
-    @test t.git_config == Dict("x" => "y")
+    t = Template(remote_prefix="https://github.com/invenia"; git_config=git_config)
+    @test t.git_config == git_config
 
     t = Template(
         remote_prefix="https://github.com/invenia",
@@ -56,5 +56,38 @@ write(test_file, template_text)
     @test Set(keys(t.plugins)) == Set([GitHubPages, TravisCI, AppVeyor, CodeCov])
     @test Set(values(t.plugins)) == Set([GitHubPages(), TravisCI(), AppVeyor(), CodeCov()])
 
+    @test_warn r".*" Template(;
+        remote_prefix="https://github.com/invenia",
+        plugins=[TravisCI(), TravisCI()],
+    )
 
+end
+
+@testset "Plugin creation" begin
+    p = AppVeyor()
+    @test isempty(p.gitignore_files)
+    @test p.config_file == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
+    p = AppVeyor(; config_file=nothing)
+    @test p.config_file == nothing
+    p = AppVeyor(; config_file=test_file)
+    @test p.config_file == test_file
+    @test_throws ArgumentError AppVeyor(; config_file=fake_path)
+
+    p = TravisCI()
+    @test isempty(p.gitignore_files)
+    @test p.config_file == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
+    p = TravisCI(; config_file=nothing)
+    @test p.config_file == nothing
+    p = TravisCI(; config_file=test_file)
+    @test p.config_file == test_file
+    @test_throws ArgumentError TravisCI(; config_file=fake_path)
+
+    p = CodeCov()
+    @test p.gitignore_files == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
+    @test p.config_file == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
+    p = CodeCov(; config_file=nothing)
+    @test p.config_file == nothing
+    p = CodeCov(; config_file=test_file)
+    @test p.config_file == test_file
+    @test_throws ArgumentError CodeCov(; config_file=fake_path)
 end
