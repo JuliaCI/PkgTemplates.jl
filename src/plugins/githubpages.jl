@@ -22,18 +22,18 @@ Add GitHubPages to a template's plugins to add Documenter.jl support via GitHub 
 end
 
 """
-    badges(plugin::GitHubPages, pkg_name::AbstractString, t::Template) -> Vector{String}
+    badges(\_::GitHubPages, pkg_name::AbstractString, t::Template) -> Vector{String}
 
 Generate Markdown badges for the current package.
 
 # Arguments
-* `plugin::GitHubPages`: plugin whose badges we are generating.
+* `_::GitHubPages`: plugin whose badges we are generating.
 * `t::Template`: Template configuration options.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-function badges(plugin::GitHubPages, t::Template, pkg_name::AbstractString)
+function badges(_::GitHubPages, t::Template, pkg_name::AbstractString)
     if haskey(t.plugins, TravisCI)
         user = strip(URI(t.remote_prefix).path, '/')
         return [

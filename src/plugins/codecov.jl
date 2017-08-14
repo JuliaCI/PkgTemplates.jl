@@ -9,9 +9,9 @@ Add CodeCov to a template's plugins to enable CodeCov coverage reports.
 """
 @auto_hash_equals struct CodeCov <: Plugin
     gitignore_files::Vector{AbstractString}
-    config_file::AbstractString
+    config_file::Union{AbstractString, Void}
 
-    function CodeCov(; config_file::AbstractString="")
+    function CodeCov(; config_file::Union{AbstractString, Void}="")
         if config_file != nothing
             if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "codecov.yml")
@@ -25,18 +25,18 @@ Add CodeCov to a template's plugins to enable CodeCov coverage reports.
 end
 
 """
-    badges(plugin::CodeCov, pkg_name::AbstractString, t::Template) -> Vector{String}
+    badges(\_::CodeCov, pkg_name::AbstractString, t::Template) -> Vector{String}
 
 Generate Markdown badges for the current package.
 
 # Arguments
-* `plugin::CodeCov`: plugin whose badges we are generating.
+* `_::CodeCov`: plugin whose badges we are generating.
 * `t::Template`: Template configuration options.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-function badges(plugin::CodeCov, t::Template, pkg_name::AbstractString)
+function badges(_::CodeCov, t::Template, pkg_name::AbstractString)
     user = strip(URI(t.remote_prefix).path, '/')
     return [
         "[![codecov](https://codecov.io/gh/$user/$pkg_name.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$pkg_name.jl)"
