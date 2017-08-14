@@ -15,8 +15,10 @@ Generate the "docs" directory with files common to all Documenter subtypes.
 * `pkg_name::AbstractString`: Name of the package.
 """
 function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractString)
-    info("Adding Documenter.jl")
-    Pkg.add("Documenter")
+    if Pkg.installed("Documenter") == nothing
+        info("Adding Documenter.jl")
+        Pkg.add("Documenter")
+    end
     path = joinpath(template.path, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
