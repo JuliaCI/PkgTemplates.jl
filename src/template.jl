@@ -45,7 +45,12 @@ Records common information used to generate a package.
             throw(ArgumentError("Must specify remote_prefix::AbstractString"))
         end
         years = string(years)
-        if isa(authors, Array)
+
+        # If an explicitly supplied git config contains a name and the author name was not
+        # explicitly supplied, then take the git config's name as the author name.
+        if haskey(git_config, "user.name") && authors == LibGit2.getconfig("user.name", "")
+            authors = get(git_config, "user.name", LibGit2.getconfig("user.name", ""))
+        elseif isa(authors, Array)
             authors = join(authors, ", ")
         end
         if !endswith(remote_prefix, "/")

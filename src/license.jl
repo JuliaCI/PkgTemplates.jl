@@ -4,8 +4,8 @@
 Show all available license names.
 """
 function show_license()
-    for k in sort!(collect(keys(LICENSES)))
-        println("$k: $(LICENSES[k])")
+    for (k, v) in LICENSES
+        println("$k: $v")
     end
 end
 
@@ -19,7 +19,7 @@ Shows the text of a given `license`.
   The list of available licenses can be shown with `show_license()`.
 """
 function show_license(license::AbstractString)
-    print(read_license(license))
+    println(read_license(license))
 end
 
 """
@@ -34,9 +34,9 @@ Returns the license text.
 """
 function read_license(license::AbstractString)
     path = joinpath(LICENSE_DIR, license)
-    if !isfile(path)
-        throw(ArgumentError("License '$license' is not available"))
+    if isfile(path)
+        return string(readchomp(path))
     else
-        return readstring(path)
+        throw(ArgumentError("License '$license' is not available"))
     end
 end

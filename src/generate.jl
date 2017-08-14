@@ -217,7 +217,7 @@ end
 """
     gen_file(file_path::AbstractString, text::AbstractString) -> Void
 
-Create a new file containing some given text.
+Create a new file containing some given text. Always ends the file with a newline.
 
 # Arguments
 * `file::AbstractString`: Path to the file to be created.
