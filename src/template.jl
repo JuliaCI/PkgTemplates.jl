@@ -14,8 +14,9 @@ Records common information used to generate a package.
   available licenses, or to print out a particular license's text.
 * `authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", "")`: Names that
   appear on the license. Supply a string for one author, and an array for multiple.
-* `years::Union{AbstractString, Array}=string(Dates.year(Dates.today()))`: Copyright years
-  on the license. Can be supplied by an Int, or a string such as "2016 - 2017".
+* `years::Union{Int, AbstractString}=string(Dates.year(Dates.today()))`: Copyright years
+  on the license. Can be supplied by a number, or a string such as "2016 - 2017".
+* `path::AbstractString=Pkg.dir()`: Directory in which the package will go.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `git_config::Dict{String, String}=Dict{String, String}()`: Git configuration options.
 * `plugins::Vector{Plugin}`: A list of `Plugin`s that the package will include.
@@ -35,6 +36,7 @@ Records common information used to generate a package.
         license::Union{AbstractString, Void}=nothing,
         authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", ""),
         years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
+        path::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
         git_config::Dict{String, String}=Dict{String, String}(),
         plugins::Vector{P}=Vector{Plugin}(),
@@ -42,7 +44,6 @@ Records common information used to generate a package.
         if isempty(remote_prefix)
             throw(ArgumentError("Must specify remote_prefix::AbstractString"))
         end
-        path = Pkg.dir()
         years = string(years)
         if isa(authors, Array)
             authors = join(authors, ", ")
