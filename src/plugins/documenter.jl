@@ -15,6 +15,7 @@ Generate the "docs" directory with files common to all Documenter subtypes.
 * `pkg_name::AbstractString`: Name of the package.
 """
 function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractString)
+    info("Adding Documenter.jl")
     Pkg.add("Documenter")
     path = joinpath(template.path, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
@@ -24,22 +25,20 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
         for file in plugin.assets
             cp(file, joinpath(docs_dir, "assets", basename(file)))
         end
-    end
-    if isempty(plugin.assets)
-        assets = "[]"
-    else
         # We want something that looks like the following:
         # [
         #         assets/file1,
         #         assets/file2,
         #     ]
-
         const TAB = repeat(" ", 4)
         assets = "[\n"
         for file in plugin.assets
-            assets *= """$(TAB^2)"assets/$file",\n"""
+            assets *= """$(TAB^2)"assets/$(basename(file))",\n"""
         end
         assets *= "$TAB]"
+
+    else
+        assets = "[]"
     end
     user = strip(URI(template.remote_prefix).path, '/')
     text = """
@@ -59,7 +58,9 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
         """
 
     gen_file(joinpath(dirname(docs_dir), "make.jl"), text)
-    touch(joinpath(docs_dir,  "index.md"))
+    open(joinpath(docs_dir,  "index.md"), "w") do fp
+        write(fp, "# $pkg_name")
+    end
     readme_path = ""
     try
         readme_path = joinpath(template.path, pkg_name, "README.md")

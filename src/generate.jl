@@ -17,7 +17,9 @@ function generate(pkg_name::AbstractString, t::Template; force::Bool=false)
     if force && ispath(pkg_dir)
         rm(pkg_dir; recursive=true)
     elseif ispath(pkg_dir)
-        error("A package already exists at $pkg_dir, use force=true to overwrite it.")
+        throw(ArgumentError(
+            "A directory already exists at $pkg_dir, use force=true to overwrite it."
+        ))
     end
 
     # Initialize the repo and configure it.
@@ -29,7 +31,7 @@ function generate(pkg_name::AbstractString, t::Template; force::Bool=false)
         LibGit2.set!(cfg, key, val)
     end
     info("Finished configuring git")
-    url = "$(t.remote_prefix)$pkg_name.jl.git"
+    url = "$(t.remote_prefix)$pkg_name.jl"
     LibGit2.commit(repo, "Empty initial commit")
     info("Made initial empty commit")
     LibGit2.set_remote_url(repo, url)
@@ -286,7 +288,7 @@ function substitute(
         d["DOCUMENTER"] = true
         d["AFTER"] = true
     end
-    if haskey(t.plugins, CodeCov)
+    if haskey(pkg_template.plugins, CodeCov)
         d["CODECOV"] = true
         d["AFTER"] = true
     end
