@@ -1,24 +1,23 @@
 """
-    GitHubPages(; documenter_assets::Vector{AbstractString}=String[]) -> GitHubPages
+    GitHubPages(; assets::Vector{AbstractString}=String[]) -> GitHubPages
 
 Add GitHubPages to a template's plugins to add Documenter.jl support via GitHub Pages.
 
 # Keyword Arguments
-* `documenter_assets::Vector{String}=String[]`: Array of paths to Documenter asset files.
+* `assets::Vector{String}=String[]`: Array of paths to Documenter asset files.
 """
-struct GitHubPages <: Documenter
 @auto_hash_equals struct GitHubPages <: Documenter
     gitignore_files::Vector{AbstractString}
-    documenter_assets::Vector{AbstractString}
+    assets::Vector{AbstractString}
 
-    function GitHubPages(; css_files::Vector{String}=String[])
-        for file in documenter_assets
+    function GitHubPages(; assets::Vector{String}=String[])
+        for file in assets
             if !isfile(file)
                 throw(ArgumentError("Asset file $file does not exist"))
             end
         end
         # Windows Git recognizes these paths as well.
-        new(["/docs/build/", "/docs/site/"], documenter_assets)
+        new(["/docs/build/", "/docs/site/"], assets)
     end
 end
 

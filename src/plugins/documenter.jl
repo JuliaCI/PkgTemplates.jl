@@ -19,13 +19,13 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
     path = joinpath(template.path, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
-    if !isempty(plugin.css_files)
+    if !isempty(plugin.assets)
         mkpath(joinpath(docs_dir, "assets"))
-        for file in plugin.css_files
+        for file in plugin.assets
             cp(file, joinpath(docs_dir, "assets", basename(file)))
         end
     end
-    if isempty(plugin.css_files)
+    if isempty(plugin.assets)
         assets = "[]"
     else
         # We want something that looks like the following:
@@ -36,7 +36,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
 
         const TAB = repeat(" ", 4)
         assets = "[\n"
-        for file in plugin.css_files
+        for file in plugin.assets
             assets *= """$(TAB^2)"assets/$file",\n"""
         end
         assets *= "$TAB]"
