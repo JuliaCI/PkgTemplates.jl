@@ -7,7 +7,7 @@ Add AppVeyor to a template's plugins to add AppVeyor CI support.
 * `config_file::Union{AbstractString, Void}`: Path to a custom `.appveyor.yml`.
   If `nothing` is supplied, then no file will be generated.
 """
-struct AppVeyor <: Plugin
+@auto_hash_equals struct AppVeyor <: Plugin
     gitignore_files::Vector{AbstractString}
     config_file::Union{AbstractString, Void}
 
@@ -22,11 +22,6 @@ struct AppVeyor <: Plugin
         end
         new(AbstractString[], config_file)
     end
-end
-
-function ==(a::AppVeyor, b::AppVeyor)
-    return a.gitignore_files == b.gitignore_files &&
-        a.config_file == b.config_file
 end
 
 """

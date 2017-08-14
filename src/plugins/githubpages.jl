@@ -7,6 +7,7 @@ Add GitHubPages to a template's plugins to add Documenter.jl support via GitHub 
 * `documenter_assets::Vector{String}=String[]`: Array of paths to Documenter asset files.
 """
 struct GitHubPages <: Documenter
+@auto_hash_equals struct GitHubPages <: Documenter
     gitignore_files::Vector{AbstractString}
     documenter_assets::Vector{AbstractString}
 

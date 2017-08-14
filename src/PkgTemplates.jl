@@ -1,6 +1,6 @@
 module PkgTemplates
 
-import Base.==
+using AutoHashEquals
 using Mustache
 using URIParser
 

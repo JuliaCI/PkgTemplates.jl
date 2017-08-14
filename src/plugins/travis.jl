@@ -7,7 +7,7 @@ Add TravisCI to a template's plugins to add Travis CI support.
 * `config_file::AbstractString`: Path to a custom `.travis.yml`.
   If `nothing` is supplied, then no file will be generated.
 """
-struct TravisCI <: Plugin
+@auto_hash_equals struct TravisCI <: Plugin
     gitignore_files::Vector{AbstractString}
     config_file::Union{AbstractString, Void}
 
@@ -22,11 +22,6 @@ struct TravisCI <: Plugin
         end
         new(AbstractString[], config_file)
     end
-end
-
-function ==(a::TravisCI, b::TravisCI)
-    return a.gitignore_files == b.gitignore_files &&
-        a.config_file == b.config_file
 end
 
 """

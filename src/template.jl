@@ -20,7 +20,7 @@ Records common information used to generate a package.
 * `git_config::Dict{String, String}=Dict{String, String}()`: Git configuration options.
 * `plugins::Vector{Plugin}`: A list of `Plugin`s that the package will include.
 """
-struct Template
+@auto_hash_equals struct Template
     remote_prefix::AbstractString
     license::Union{AbstractString, Void}
     authors::Union{AbstractString, Array}

@@ -7,7 +7,7 @@ Add CodeCov to a template's plugins to enable CodeCov coverage reports.
 * `config_file::AbstractString`: Path to a custom `.codecov.yml`.
   If `nothing` is supplied, then no file will be generated.
 """
-struct CodeCov <: Plugin
+@auto_hash_equals struct CodeCov <: Plugin
     gitignore_files::Vector{AbstractString}
     config_file::AbstractString
 
@@ -22,11 +22,6 @@ struct CodeCov <: Plugin
         end
         new(["*.jl.cov", "*.jl.*.cov", "*.jl.mem"], config_file)
     end
-end
-
-function ==(a::CodeCov, b::CodeCov)
-    return a.gitignore_files == b.gitignore_files &&
-        a.config_file == b.config_file
 end
 
 """
