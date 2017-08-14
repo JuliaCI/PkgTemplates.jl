@@ -55,11 +55,15 @@ Records common information used to generate a package.
             throw(ArgumentError("License '$license' is not available"))
         end
 
-        plugins = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
+
+        plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
+        if (length(plugins) != length(plugin_dict))
+            warn("Plugin list contained duplicates, only the last of each type was kept")
+        end
 
         new(
-            remote_prefix, license, authors, years,
-            path, julia_version, git_config, plugins,
+            remote_prefix, license, authors, years, path,
+            julia_version, git_config, plugin_dict,
         )
     end
 end
