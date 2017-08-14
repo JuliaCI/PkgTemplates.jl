@@ -4,7 +4,7 @@ import Base.==
 using Mustache
 using URIParser
 
-export generate, show_license, Template, GitHubPages, Docker, AppVeyor, TravisCI, CodeCov
+export generate, show_license, Template, GitHubPages, AppVeyor, TravisCI, CodeCov
 
 abstract type Plugin end
 
@@ -15,7 +15,6 @@ include(joinpath("plugins", "documenter.jl"))
 include(joinpath("plugins", "appveyor.jl"))
 include(joinpath("plugins", "codecov.jl"))
 include(joinpath("plugins", "travis.jl"))
-include(joinpath("plugins", "docker.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 
 
