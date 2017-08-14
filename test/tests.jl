@@ -49,6 +49,9 @@ write(test_file, template_text)
     t = Template(remote_prefix="https://github.com/invenia"; git_config=git_config)
     @test t.git_config == git_config
 
+    t = Template(remote_prefix="https://github.com/invenia"; git_config=git_config)
+    @test t.authors == get(git_config, "user.name", "ERROR")
+
     t = Template(
         remote_prefix="https://github.com/invenia",
         plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov()],
@@ -90,4 +93,79 @@ end
     p = CodeCov(; config_file=test_file)
     @test p.config_file == test_file
     @test_throws ArgumentError CodeCov(; config_file=fake_path)
+end
+
+@testset "File generation" begin
+    t = Template(;
+        remote_prefix="https://github.com/invenia",
+        license="MPL",
+        git_config=git_config,
+        plugins=[TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
+    )
+
+    temp_file = tempname()
+    gen_file(temp_file, "Hello, world")
+    @test isfile(temp_file)
+    @test readstring(temp_file) == "Hello, world\n"
+    rm(temp_file)
+
+    mktempdir() do temp_dir
+        @test gen_readme(temp_dir, t) == "README.md"
+        @test isfile(joinpath(temp_dir, "README.md"))
+        readme = readchomp(joinpath(temp_dir, "README.md"))
+        @test contains(readme, "# $(basename(temp_dir))")
+        for p in values(t.plugins)
+            @test contains(readme, join(badges(p, t, basename(temp_dir)), "\n"))
+        end
+        # Check the order of the badges.
+        @test search(readme, "github.io").start <
+            search(readme, "travis").start <
+            search(readme, "appveyor").start <
+            search(readme, "codecov").start
+    end
+
+    mktempdir() do temp_dir
+        @test gen_gitignore(temp_dir, t.plugins) == ".gitignore"
+        @test isfile(joinpath(temp_dir, ".gitignore"))
+        gitignore = readstring(joinpath(temp_dir, ".gitignore"))
+        @test contains(gitignore, ".DS_Store")
+        for p in values(t.plugins)
+            for entry in p.gitignore_files
+                @test contains(gitignore, entry)
+            end
+        end
+    end
+
+    mktempdir() do temp_dir
+        @test gen_license(temp_dir, t.license, t.authors, t.years) == "LICENSE"
+        @test isfile(joinpath(temp_dir, "LICENSE"))
+        license = readchomp(joinpath(temp_dir, "LICENSE"))
+        @test contains(license, t.authors)
+        @test contains(license, t.years)
+        @test contains(license, read_license(t.license))
+    end
+
+    mktempdir() do temp_dir
+        @test gen_entrypoint(temp_dir) == "src/"
+        @test isdir(joinpath(temp_dir, "src"))
+        @test isfile(joinpath(temp_dir, "src", "$(basename(temp_dir)).jl"))
+        entrypoint = readchomp(joinpath(temp_dir, "src", "$(basename(temp_dir)).jl"))
+        @test contains(entrypoint, "module $(basename(temp_dir))")
+    end
+
+    mktempdir() do temp_dir
+        @test gen_require(temp_dir, t.julia_version) == "REQUIRE"
+        @test isfile(joinpath(temp_dir, "REQUIRE"))
+        vf = version_floor(t.julia_version)
+        @test readchomp(joinpath(temp_dir, "REQUIRE")) == "julia $vf"
+    end
+
+    mktempdir() do temp_dir
+        @test gen_tests(temp_dir) == "test/"
+        @test isdir(joinpath(temp_dir, "test"))
+        @test isfile(joinpath(temp_dir, "test", "runtests.jl"))
+        runtests = readchomp(joinpath(temp_dir, "test", "runtests.jl"))
+        @test contains(runtests, "using $(basename(temp_dir))")
+        @test contains(runtests, "using Base.Test")
+    end
 end
