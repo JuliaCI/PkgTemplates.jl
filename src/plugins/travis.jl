@@ -25,21 +25,20 @@ Add TravisCI to a template's plugins to add Travis CI support.
 end
 
 """
-    badges(\_::TravisCI, pkg_name::AbstractString, t::Template) -> Vector{String}
+    badges(\_::TravisCI, user::AbstractString, pkg_name::AbstractString) -> Vector{String}
 
 Generate Markdown badges for the current package.
 
 # Arguments
 * `_::TravisCI`: plugin whose badges we are generating.
-* `t::Template`: Template configuration and plugins.
+* `user::AbstractString`: GitHub username of the package creator.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-function badges(_::TravisCI, t::Template, pkg_name::AbstractString)
-    user = strip(URI(t.remote_prefix).path, '/')
+function badges(_::TravisCI, user::AbstractString, pkg_name::AbstractString)
     return [
-        "[![Build Status](https://travis-ci.org/$user/$pkg_name.jl.svg?branch=master)](https://travis-ci.org/$user/$pkg_name.jl)"
+"[![Build Status](https://travis-ci.org/$user/$pkg_name.jl.svg?branch=master)](https://travis-ci.org/$user/$pkg_name.jl)"
     ]
 end
 

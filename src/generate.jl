@@ -1,5 +1,10 @@
 """
-    generate(pkg_name::AbstractString, t::Template) -> Void
+    generate(
+        pkg_name::AbstractString,
+        t::Template;
+        force::Bool=false,
+        ssh::Bool=false,
+    ) -> Void
 
 Generate a package from a template.
 
@@ -9,8 +14,15 @@ Generate a package from a template.
 
 # Keyword Arguments
 * `force::Bool=false`: Whether or not to overwrite old packages with the same name.
+* `ssh::Bool=false`: Whether or not to use SSH for the remote.
 """
-function generate(pkg_name::AbstractString, t::Template; force::Bool=false)
+function generate(
+    pkg_name::AbstractString,
+    t::Template;
+    force::Bool=false,
+    ssh::Bool=false,
+)
+
     pkg_name = Pkg.splitjl(pkg_name)
     pkg_dir = joinpath(t.path, pkg_name)
 
@@ -31,11 +43,13 @@ function generate(pkg_name::AbstractString, t::Template; force::Bool=false)
         LibGit2.set!(cfg, key, val)
     end
     info("Finished configuring git")
-    url = "$(t.remote_prefix)$pkg_name.jl"
     LibGit2.commit(repo, "Empty initial commit")
     info("Made initial empty commit")
-    LibGit2.set_remote_url(repo, url)
-    info("Set remote origin to $url")
+    rmt = ssh ? "git@$(t.host):$(t.user)/$pkg_name.jl.git" :
+        "https://$(t.host)/$(t.user)/$pkg_name.jl"
+
+    LibGit2.set_remote_url(repo, rmt)
+    info("Set remote origin to $rmt")
 
     # Create the gh-pages branch if necessary.
     if haskey(t.plugins, GitHubPages)
@@ -89,7 +103,7 @@ function gen_readme(pkg_dir::AbstractString, t::Template)
     ordering = [GitHubPages, TravisCI, AppVeyor, CodeCov]
     for plugin_type in ordering
         if haskey(t.plugins, plugin_type)
-            text *= "\n" * join(badges(t.plugins[plugin_type], t, pkg_name), "\n")
+            text *= "\n" * join(badges(t.plugins[plugin_type], t.user, pkg_name), "\n")
         end
     end
 

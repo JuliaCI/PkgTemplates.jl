@@ -4,11 +4,11 @@
 Records common information used to generate a package.
 
 # Keyword Arguments
-* `remote_prefix::AbstractString`: The base url for the remote repository. e.g.
-  "https://github.com/username/". This will be used with the package name to set the url
-  for the remote repository, as well as to determine the account's username. Failing to
-  specify this will cause an error. This is case-sensitive for some plugins, so take care
-  to enter it correctly.
+* `user::AbstractString=LibGit2.getconfig("github.username", "")`: GitHub username.
+  If left as default and there is no value configured, an error will be thrown.
+  Alternatively, you can add a value to `git_config["github.username"]` to set your
+  username. This is case-sensitive for some plugins, so take care to enter it correctly.
+* `host::AbstractString="github.com"`: Code hosting service where your package will reside.
 * `license::Union{AbstractString, Void}=nothing`: Name of the package licsense. If
   no license is specified, no license is created. `show_license` can be used to list all
   available licenses, or to print out a particular license's text.
@@ -22,7 +22,8 @@ Records common information used to generate a package.
 * `plugins::Vector{Plugin}`: A list of `Plugin`s that the package will include.
 """
 @auto_hash_equals struct Template
-    remote_prefix::AbstractString
+    user::AbstractString
+    host::AbstractString
     license::Union{AbstractString, Void}
     authors::Union{AbstractString, Array}
     years::AbstractString
@@ -31,8 +32,9 @@ Records common information used to generate a package.
     git_config::Dict{String, String}
     plugins::Dict{DataType, Plugin}
 
-    function Template{P <: Plugin}(;
-        remote_prefix::AbstractString="",
+    function Template(;
+        user::AbstractString=LibGit2.getconfig("github.username", ""),
+        host::AbstractString="https://github.com",
         license::Union{AbstractString, Void}=nothing,
         authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", ""),
         years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
@@ -40,11 +42,20 @@ Records common information used to generate a package.
         julia_version::VersionNumber=VERSION,
         git_config::Dict{String, String}=Dict{String, String}(),
         plugins::Vector{P}=Vector{Plugin}(),
-    )
-        if isempty(remote_prefix)
-            throw(ArgumentError("Must specify remote_prefix::AbstractString"))
+    ) where P <: Plugin
+        # If no username was set or found, look for one in the supplied git config.
+        if isempty(user) && (!haskey(git_config, "github.username") ||
+            isempty(git_config["github.username"]))
+            throw(ArgumentError("No GitHub username found, set one with user=username"))
+        elseif isempty(user)
+            user = git_config["github.username"]
         end
-        years = string(years)
+
+        host = URI(startswith(host, "https://") ? host : "https://$host").host
+
+        if license != nothing && !isfile(joinpath(LICENSE_DIR, license))
+            throw(ArgumentError("License '$license' is not available"))
+        end
 
         # If an explicitly supplied git config contains a name and the author name was not
         # explicitly supplied, then take the git config's name as the author name.
@@ -53,13 +64,8 @@ Records common information used to generate a package.
         elseif isa(authors, Array)
             authors = join(authors, ", ")
         end
-        if !endswith(remote_prefix, "/")
-            remote_prefix *= "/"
-        end
-        if license != nothing && !isfile(joinpath(LICENSE_DIR, license))
-            throw(ArgumentError("License '$license' is not available"))
-        end
 
+        years = string(years)
 
         plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
         if (length(plugins) != length(plugin_dict))
@@ -67,8 +73,8 @@ Records common information used to generate a package.
         end
 
         new(
-            remote_prefix, license, authors, years, path,
-            julia_version, git_config, plugin_dict,
+            user, host, license, authors, years, path,
+            julia_version, git_config, plugin_dict
         )
     end
 end

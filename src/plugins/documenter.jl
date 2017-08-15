@@ -40,9 +40,8 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
         assets_string *= "$TAB]"
 
     else
-        assets = "[]"
+        assets_string = "[]"
     end
-    user = strip(URI(template.remote_prefix).path, '/')
     text = """
         using Documenter, $pkg_name
 
@@ -52,7 +51,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
             pages=[
                 "Home" => "index.md",
             ],
-            repo="$(template.remote_prefix)$pkg_name.jl/blob/{commit}{path}#L{line}",
+            repo="https://github.com/$(template.user)/$pkg_name.jl/blob/{commit}{path}#L{line}",
             sitename="$pkg_name.jl",
             authors="$(template.authors)",
             assets=$assets_string,

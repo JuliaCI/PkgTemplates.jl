@@ -1,7 +1,7 @@
-const invenia_url = "https://github.com/invenia"
 const git_config = Dict(
     "user.name" => "Tester McTestFace",
     "user.email" => "email@web.site",
+    "github.username" => "TesterMcTestFace",
 )
 
 const fake_path = joinpath(tempdir(), tempdir())
@@ -17,8 +17,8 @@ template_text = """
 write(test_file, template_text)
 
 @testset "Template creation" begin
-    t = Template(remote_prefix=invenia_url)
-    @test t.remote_prefix == "$invenia_url/"
+    t = Template(; user="invenia")
+    @test t.user == "invenia"
     @test t.license == nothing
     @test t.years == string(Dates.year(Dates.today()))
     @test t.authors == LibGit2.getconfig("user.name", "")
@@ -27,44 +27,47 @@ write(test_file, template_text)
     @test isempty(t.git_config)
     @test isempty(t.plugins)
 
-    t = Template(remote_prefix=invenia_url; license="MIT")
+    t = Template(; user="invenia", license="MIT")
     @test t.license == "MIT"
 
-    t = Template(remote_prefix=invenia_url; years=2014)
+    t = Template(; user="invenia", years=2014)
     @test t.years == "2014"
-    t = Template(remote_prefix=invenia_url; years="2014-2015")
+    t = Template(user="invenia", years="2014-2015")
     @test t.years == "2014-2015"
 
-    t = Template(remote_prefix=invenia_url; authors="Some Guy")
+    t = Template(; user="invenia", authors="Some Guy")
     @test t.authors == "Some Guy"
-    t = Template(remote_prefix=invenia_url; authors=["Guy", "Gal"])
+    t = Template(; user="invenia", authors=["Guy", "Gal"])
     @test t.authors == "Guy, Gal"
 
-    t = Template(remote_prefix=invenia_url; path=test_file)
+    t = Template(; user="invenia", path=test_file)
     @test t.path == test_file
 
-    t = Template(remote_prefix=invenia_url; julia_version=v"0.1.2")
+    t = Template(; user="invenia", julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
 
-    t = Template(remote_prefix=invenia_url; git_config=git_config)
+    t = Template(; user="invenia", git_config=git_config)
     @test t.git_config == git_config
 
-    t = Template(remote_prefix=invenia_url; git_config=git_config)
+    t = Template(; user="invenia", git_config=git_config)
     @test t.authors == git_config["user.name"]
 
-    t = Template(
-        remote_prefix=invenia_url,
+    t = Template(; git_config=git_config)
+    @test t.user == "TesterMcTestFace"
+
+    t = Template(;
+        user="invenia",
         plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov()],
     )
     @test Set(keys(t.plugins)) == Set([GitHubPages, TravisCI, AppVeyor, CodeCov])
     @test Set(values(t.plugins)) == Set([GitHubPages(), TravisCI(), AppVeyor(), CodeCov()])
 
     @test_warn r".*" Template(;
-        remote_prefix=invenia_url,
+        user="invenia",
         plugins=[TravisCI(), TravisCI()],
     )
     @test_throws ArgumentError Template()
-    @test_throws ArgumentError Template(; remote_prefix=invenia_url, license="FakeLicense")
+    @test_throws ArgumentError Template(; user="invenia", license="FakeLicense")
 end
 
 @testset "Plugin creation" begin
@@ -98,7 +101,7 @@ end
 
 @testset "File generation" begin
     t = Template(;
-        remote_prefix=invenia_url,
+        user="invenia",
         license="MPL",
         git_config=git_config,
         plugins=[TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
@@ -116,7 +119,7 @@ end
         readme = readchomp(joinpath(temp_dir, "README.md"))
         @test contains(readme, "# $(basename(temp_dir))")
         for p in values(t.plugins)
-            @test contains(readme, join(badges(p, t, basename(temp_dir)), "\n"))
+            @test contains(readme, join(badges(p, t.user, basename(temp_dir)), "\n"))
         end
         # Check the order of the badges.
         @test search(readme, "github.io").start <
@@ -172,7 +175,7 @@ end
 end
 
 @testset "Package generation" begin
-    t = Template(; remote_prefix=invenia_url)
+    t = Template(; user="invenia")
     generate("TestPkg", t)
     @test !isfile(Pkg.dir("TestPkg", "LICENSE"))
     @test isfile(Pkg.dir("TestPkg", "README.md"))
@@ -183,15 +186,30 @@ end
     @test isdir(Pkg.dir("TestPkg", "test"))
     @test isfile(Pkg.dir("TestPkg", "test", "runtests.jl"))
     repo = LibGit2.GitRepo(Pkg.dir("TestPkg"))
+    remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
+    branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
     @test LibGit2.getconfig(repo, "user.name", "") == LibGit2.getconfig("user.name", "")
-    branches = [LibGit2.name(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
-    @test in("refs/heads/master", branches)
-    @test !in("refs/heads/gh-pages", branches)
+    @test LibGit2.url(remote) == "https://github.com/invenia/TestPkg.jl"
+    @test in("master", branches)
+    @test !in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
     rm(Pkg.dir("TestPkg"); recursive=true)
 
+    generate("TestPkg", t; ssh=true)
+    repo = LibGit2.GitRepo(Pkg.dir("TestPkg"))
+    remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
+    @test LibGit2.url(remote) == "git@github.com:invenia/TestPkg.jl.git"
+    rm(Pkg.dir("TestPkg"); recursive=true)
+
+    t = Template(; user="invenia", host="gitlab.com")
+    generate("TestPkg", t)
+    repo = LibGit2.GitRepo(Pkg.dir("TestPkg"))
+    remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
+    @test LibGit2.url(remote) == "https://gitlab.com/invenia/TestPkg.jl"
+    rm(Pkg.dir("TestPkg"); recursive=true)
+
     t = Template(;
-        remote_prefix=invenia_url,
+        user="invenia",
         license="MIT",
         git_config=git_config,
         plugins=[AppVeyor(), GitHubPages(), CodeCov(), TravisCI()],
@@ -208,8 +226,8 @@ end
     @test isfile(Pkg.dir("TestPkg", "docs", "src", "index.md"))
     repo = LibGit2.GitRepo(Pkg.dir("TestPkg"))
     @test LibGit2.getconfig(repo, "user.name", "") == git_config["user.name"]
-    branches = [LibGit2.name(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
-    @test in("refs/heads/gh-pages", branches)
+    branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
+    @test in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
     rm(Pkg.dir("TestPkg"); recursive=true)
 
@@ -222,7 +240,7 @@ end
 @testset "Plugin generation" begin
     mktempdir() do temp_dir
         pkg_dir = joinpath(temp_dir, "TestPkg")
-        t = Template(; remote_prefix=invenia_url, path=temp_dir)
+        t = Template(; user="invenia", path=temp_dir)
 
         p = TravisCI()
         @test gen_plugin(p, t, "TestPkg") == [".travis.yml"]
@@ -293,7 +311,7 @@ end
 end
 
 @testset "Mustache substitution" begin
-    t = Template(; remote_prefix=invenia_url)
+    t = Template(; user="invenia")
     view = Dict{String, Any}("OTHER" => false)
 
     text = substitute(template_text, "TestPkg", t; view=view)

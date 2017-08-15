@@ -30,14 +30,13 @@ end
 Generate Markdown badges for the current package.
 
 # Arguments
-* `_::CodeCov`: plugin whose badges we are generating.
-* `t::Template`: Template configuration options.
+* `_::CodeCov`: Plugin whose badges we are generating.
+* `user::AbstractString`: GitHub username of the package creator.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-function badges(_::CodeCov, t::Template, pkg_name::AbstractString)
-    user = strip(URI(t.remote_prefix).path, '/')
+function badges(_::CodeCov, user::AbstractString, pkg_name::AbstractString)
     return [
         "[![CodeCov](https://codecov.io/gh/$user/$pkg_name.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$pkg_name.jl)"
     ]

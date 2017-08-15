@@ -22,19 +22,18 @@ Add GitHubPages to a template's plugins to add Documenter.jl support via GitHub 
 end
 
 """
-    badges(\_::GitHubPages, pkg_name::AbstractString, t::Template) -> Vector{String}
+    badges(\_::GitHubPages, user::AbstractString, pkg_name::AbstractString) -> Vector{String}
 
 Generate Markdown badges for the current package.
 
 # Arguments
 * `_::GitHubPages`: plugin whose badges we are generating.
-* `t::Template`: Template configuration options.
+* `user::AbstractString`: GitHub username of the package creator.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-function badges(_::GitHubPages, t::Template, pkg_name::AbstractString)
-    user = strip(URI(t.remote_prefix).path, '/')
+function badges(_::GitHubPages, user::AbstractString, pkg_name::AbstractString)
     return [
         "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$pkg_name.jl/stable)"
         "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$pkg_name.jl/latest)"
@@ -61,14 +60,13 @@ function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractS
     )
     if haskey(template.plugins, TravisCI)
         docs_src = joinpath(template.path, pkg_name, "docs", "src")
-        user = strip(URI(template.remote_prefix).path, '/')
         open(joinpath(dirname(docs_src), "make.jl"), "a") do file
             write(
                 file,
                 """
 
                 deploydocs(
-                    repo="github.com/$user/$pkg_name.jl",
+                    repo="github.com/$(template.user)/$pkg_name.jl",
                     target="build",
                     julia="0.6",
                     deps=nothing,

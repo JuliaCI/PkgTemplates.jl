@@ -25,19 +25,18 @@ Add AppVeyor to a template's plugins to add AppVeyor CI support.
 end
 
 """
-    badges(\_::AppVeyor, pkg_name::AbstractString, t::Template) -> Vector{String}
+    badges(\_::AppVeyor, user::AbstractString, pkg_name::AbstractString) -> Vector{String}
 
 Generate Markdown badges for the current package.
 
 # Arguments
 * `_::AppVeyor`: Plugin whose badges we are generating.
-* `t::Template`: Template configuration options.
+* `user::AbstractString`: GitHub username of the package creator.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-function badges(_::AppVeyor, t::Template, pkg_name::AbstractString)
-    user = strip(URI(t.remote_prefix).path, '/')
+function badges(_::AppVeyor, user::AbstractString, pkg_name::AbstractString)
     return [
         "[![Build Status](https://ci.appveyor.com/api/projects/status/github/$user/$pkg_name.jl?svg=true)](https://ci.appveyor.com/project/$user/$pkg_name-jl)"
     ]
