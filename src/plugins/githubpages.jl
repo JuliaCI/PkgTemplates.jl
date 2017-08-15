@@ -34,22 +34,18 @@ Generate Markdown badges for the current package.
 Returns an array of Markdown badges.
 """
 function badges(_::GitHubPages, t::Template, pkg_name::AbstractString)
-    if haskey(t.plugins, TravisCI)
-        user = strip(URI(t.remote_prefix).path, '/')
-        return [
-            "[![stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$pkg_name.jl/stable)"
-            "[![latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$pkg_name.jl/latest)"
-        ]
-    end
-    return String[]
+    user = strip(URI(t.remote_prefix).path, '/')
+    return [
+        "[![stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$pkg_name.jl/stable)"
+        "[![latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$pkg_name.jl/latest)"
+    ]
 end
-
 
 """
     gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractString)
 
-Generate the "docs" folder and set up direct HTML output from Documenter to be pushed to
-GitHub Pages.
+Generate the "docs" directory and set up direct HTML output from Documenter to be pushed
+to GitHub Pages.
 
 # Arguments
 * `plugin::GitHubPages`: Plugin whose files are being generated.
