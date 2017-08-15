@@ -51,7 +51,7 @@ to GitHub Pages.
 * `template::Template`: Template configuration and plugins.
 * `pkg_name::AbstractString`: Name of the package.
 
-Returns an array of generated directories.
+Returns an array of generated file/directory names.
 """
 function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractString)
     invoke(
@@ -59,7 +59,7 @@ function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractS
         plugin, template, pkg_name
     )
     if haskey(template.plugins, TravisCI)
-        docs_src = joinpath(template.path, pkg_name, "docs", "src")
+        docs_src = joinpath(template.temp_dir, pkg_name, "docs", "src")
         open(joinpath(dirname(docs_src), "make.jl"), "a") do file
             write(
                 file,

@@ -16,7 +16,7 @@ Records common information used to generate a package.
   appear on the license. Supply a string for one author, and an array for multiple.
 * `years::Union{Int, AbstractString}=string(Dates.year(Dates.today()))`: Copyright years
   on the license. Can be supplied by a number, or a string such as "2016 - 2017".
-* `path::AbstractString=Pkg.dir()`: Directory in which the package will go.
+* `dir::AbstractString=Pkg.dir()`: Directory in which the package will go.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `git_config::Dict{String, String}=Dict{String, String}()`: Git configuration options.
 * `plugins::Vector{Plugin}`: A list of `Plugin`s that the package will include.
@@ -27,7 +27,8 @@ Records common information used to generate a package.
     license::Union{AbstractString, Void}
     authors::Union{AbstractString, Array}
     years::AbstractString
-    path::AbstractString
+    dir::AbstractString
+    temp_dir::AbstractString
     julia_version::VersionNumber
     git_config::Dict{String, String}
     plugins::Dict{DataType, Plugin}
@@ -38,7 +39,7 @@ Records common information used to generate a package.
         license::Union{AbstractString, Void}=nothing,
         authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", ""),
         years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
-        path::AbstractString=Pkg.dir(),
+        dir::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
         git_config::Dict{String, String}=Dict{String, String}(),
         plugins::Vector{P}=Vector{Plugin}(),
@@ -67,13 +68,15 @@ Records common information used to generate a package.
 
         years = string(years)
 
+        temp_dir = mktempdir()
+
         plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
         if (length(plugins) != length(plugin_dict))
             warn("Plugin list contained duplicates, only the last of each type was kept")
         end
 
         new(
-            user, host, license, authors, years, path,
+            user, host, license, authors, years, dir, temp_dir,
             julia_version, git_config, plugin_dict
         )
     end

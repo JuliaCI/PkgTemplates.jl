@@ -25,7 +25,7 @@ Add CodeCov to a template's plugins to enable CodeCov coverage reports.
 end
 
 """
-    badges(\_::CodeCov, pkg_name::AbstractString, t::Template) -> Vector{String}
+    badges(\_::CodeCov, user::AbstractString, pkg_name::AbstractString) -> Vector{String}
 
 Generate Markdown badges for the current package.
 
@@ -52,14 +52,13 @@ Generate a .codecov.yml.
 * `template::Template`: Template configuration and plugins.
 * `pkg_name::AbstractString`: Name of the package.
 
-Returns an array of generated files.
+Returns an array of generated file/directory names.
 """
 function gen_plugin(plugin::CodeCov, template::Template, pkg_name::AbstractString)
     if plugin.config_file == nothing
         return String[]
     end
     text = substitute(readstring(plugin.config_file), pkg_name, template)
-    pkg_dir = joinpath(template.path, pkg_name)
-    gen_file(joinpath(pkg_dir, ".codecov.yml"), text)
+    gen_file(joinpath(template.temp_dir, pkg_name, ".codecov.yml"), text)
     return [".codecov.yml"]
 end

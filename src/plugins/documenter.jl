@@ -19,7 +19,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
         info("Adding Documenter.jl")
         Pkg.add("Documenter")
     end
-    path = joinpath(template.path, pkg_name)
+    path = joinpath(template.temp_dir, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
     if !isempty(plugin.assets)
@@ -62,11 +62,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
     open(joinpath(docs_dir,  "index.md"), "w") do fp
         write(fp, "# $pkg_name")
     end
-    readme_path = ""
-    try
-        readme_path = joinpath(template.path, pkg_name, "README.md")
-    catch
-    end
+    readme_path = joinpath(template.temp_dir, pkg_name, "README.md")
     if isfile(readme_path)
         cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
     end

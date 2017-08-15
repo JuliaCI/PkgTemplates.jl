@@ -52,14 +52,13 @@ Generate a .travis.yml.
 * `template::Template`: Template configuration and plugins.
 * `pkg_name::AbstractString`: Name of the package.
 
-Returns an array of generated files.
+Returns an array of generated file/directory names.
 """
 function gen_plugin(plugin::TravisCI, template::Template, pkg_name::AbstractString)
     if plugin.config_file == nothing
         return String[]
     end
     text = substitute(readstring(plugin.config_file), pkg_name, template)
-    pkg_dir = joinpath(template.path, pkg_name)
-    gen_file(joinpath(pkg_dir, ".travis.yml"), text)
+    gen_file(joinpath(template.temp_dir, pkg_name, ".travis.yml"), text)
     return [".travis.yml"]
 end
