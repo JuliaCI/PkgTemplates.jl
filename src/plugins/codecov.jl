@@ -39,7 +39,7 @@ Returns an array of Markdown badges.
 function badges(_::CodeCov, t::Template, pkg_name::AbstractString)
     user = strip(URI(t.remote_prefix).path, '/')
     return [
-        "[![codecov](https://codecov.io/gh/$user/$pkg_name.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$pkg_name.jl)"
+        "[![CodeCov](https://codecov.io/gh/$user/$pkg_name.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$pkg_name.jl)"
     ]
 end
 

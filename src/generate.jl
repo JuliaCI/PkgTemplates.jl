@@ -89,7 +89,7 @@ function gen_readme(pkg_dir::AbstractString, t::Template)
     ordering = [GitHubPages, TravisCI, AppVeyor, CodeCov]
     for plugin_type in ordering
         if haskey(t.plugins, plugin_type)
-            text *= join(badges(t.plugins[plugin_type], t, pkg_name), "\n") * "\n"
+            text *= "\n" * join(badges(t.plugins[plugin_type], t, pkg_name), "\n")
         end
     end
 

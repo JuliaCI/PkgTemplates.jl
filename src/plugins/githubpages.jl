@@ -36,8 +36,8 @@ Returns an array of Markdown badges.
 function badges(_::GitHubPages, t::Template, pkg_name::AbstractString)
     user = strip(URI(t.remote_prefix).path, '/')
     return [
-        "[![stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$pkg_name.jl/stable)"
-        "[![latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$pkg_name.jl/latest)"
+        "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$pkg_name.jl/stable)"
+        "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$pkg_name.jl/latest)"
     ]
 end
 

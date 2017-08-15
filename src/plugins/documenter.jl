@@ -33,11 +33,11 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
         #         assets/file2,
         #     ]
         const TAB = repeat(" ", 4)
-        assets = "[\n"
-        for file in plugin.assets
-            assets *= """$(TAB^2)"assets/$(basename(file))",\n"""
+        assets_string = "[\n"
+        for asset in plugin.assets
+            assets_string *= """$(TAB^2)"assets/$(basename(asset))",\n"""
         end
-        assets *= "$TAB]"
+        assets_string *= "$TAB]"
 
     else
         assets = "[]"
@@ -55,7 +55,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
             repo="$(template.remote_prefix)$pkg_name.jl/blob/{commit}{path}#L{line}",
             sitename="$pkg_name.jl",
             authors="$(template.authors)",
-            assets=$assets,
+            assets=$assets_string,
         )
         """
 

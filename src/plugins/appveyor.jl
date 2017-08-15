@@ -39,7 +39,7 @@ Returns an array of Markdown badges.
 function badges(_::AppVeyor, t::Template, pkg_name::AbstractString)
     user = strip(URI(t.remote_prefix).path, '/')
     return [
-        "[![Build status](https://ci.appveyor.com/api/projects/status/github/$user/$pkg_name.jl?svg=true)](https://ci.appveyor.com/project/$user/$pkg_name-jl)"
+        "[![Build Status](https://ci.appveyor.com/api/projects/status/github/$user/$pkg_name.jl?svg=true)](https://ci.appveyor.com/project/$user/$pkg_name-jl)"
     ]
 end
 
