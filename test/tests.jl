@@ -7,9 +7,8 @@ const git_config = Dict(
 const fake_path = joinpath(tempdir(), tempdir())
 const test_file = tempname()
 template_text = """
-            Hello, world
-            {{PKGNAME}}
-            {{VERSION}}}
+            PKGNAME: {{PKGNAME}}
+            VERSION: {{VERSION}}}
             {{#DOCUMENTER}}Documenter{{/DOCUMENTER}}
             {{#CODECOV}}CodeCov{{/CODECOV}}
             {{#AFTER}}After{{/AFTER}}
@@ -51,7 +50,7 @@ write(test_file, template_text)
     @test t.git_config == git_config
 
     t = Template(remote_prefix=invenia_url; git_config=git_config)
-    @test t.authors == get(git_config, "user.name", "ERROR")
+    @test t.authors == git_config["user.name"]
 
     t = Template(
         remote_prefix=invenia_url,
@@ -64,7 +63,8 @@ write(test_file, template_text)
         remote_prefix=invenia_url,
         plugins=[TravisCI(), TravisCI()],
     )
-
+    @test_throws ArgumentError Template()
+    @test_throws ArgumentError Template(; remote_prefix=invenia_url, license="FakeLicense")
 end
 
 @testset "Plugin creation" begin
@@ -172,14 +172,9 @@ end
 end
 
 @testset "Package generation" begin
-    t = Template(;
-        remote_prefix=invenia_url,
-        license="MIT",
-        plugins=[AppVeyor(), GitHubPages(), CodeCov(), TravisCI()],
-    )
-
+    t = Template(; remote_prefix=invenia_url)
     generate("TestPkg", t)
-    @test isfile(Pkg.dir("TestPkg", "LICENSE"))
+    @test !isfile(Pkg.dir("TestPkg", "LICENSE"))
     @test isfile(Pkg.dir("TestPkg", "README.md"))
     @test isfile(Pkg.dir("TestPkg", "REQUIRE"))
     @test isfile(Pkg.dir("TestPkg", ".gitignore"))
@@ -187,6 +182,23 @@ end
     @test isfile(Pkg.dir("TestPkg", "src", "TestPkg.jl"))
     @test isdir(Pkg.dir("TestPkg", "test"))
     @test isfile(Pkg.dir("TestPkg", "test", "runtests.jl"))
+    repo = LibGit2.GitRepo(Pkg.dir("TestPkg"))
+    @test LibGit2.getconfig(repo, "user.name", "") == LibGit2.getconfig("user.name", "")
+    branches = [LibGit2.name(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
+    @test in("refs/heads/master", branches)
+    @test !in("refs/heads/gh-pages", branches)
+    @test !LibGit2.isdirty(repo)
+    rm(Pkg.dir("TestPkg"); recursive=true)
+
+    t = Template(;
+        remote_prefix=invenia_url,
+        license="MIT",
+        git_config=git_config,
+        plugins=[AppVeyor(), GitHubPages(), CodeCov(), TravisCI()],
+    )
+
+    generate("TestPkg", t)
+    @test isfile(Pkg.dir("TestPkg", "LICENSE"))
     @test isfile(Pkg.dir("TestPkg", ".travis.yml"))
     @test isfile(Pkg.dir("TestPkg", ".appveyor.yml"))
     @test isfile(Pkg.dir("TestPkg", ".codecov.yml"))
@@ -195,14 +207,16 @@ end
     @test isdir(Pkg.dir("TestPkg", "docs", "src"))
     @test isfile(Pkg.dir("TestPkg", "docs", "src", "index.md"))
     repo = LibGit2.GitRepo(Pkg.dir("TestPkg"))
+    @test LibGit2.getconfig(repo, "user.name", "") == git_config["user.name"]
     branches = [LibGit2.name(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
-    @test in("refs/heads/master", branches)
     @test in("refs/heads/gh-pages", branches)
     @test !LibGit2.isdirty(repo)
     rm(Pkg.dir("TestPkg"); recursive=true)
 
     mkdir(Pkg.dir("TestPkg"))
     @test_throws ArgumentError generate("TestPkg", t)
+    generate("TestPkg", t; force=true)
+    @test isfile(Pkg.dir("TestPkg", "README.md"))
 end
 
 @testset "Plugin generation" begin
@@ -267,5 +281,65 @@ end
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
         @test contains(make, "deploydocs")
         rm(joinpath(pkg_dir, "docs"); recursive=true)
+        @test_throws ArgumentError GitHubPages(; assets=[fake_path])
     end
+end
+
+@testset "Version floor" begin
+    @test version_floor(v"1.0.0") == "1.0"
+    @test version_floor(v"1.0.1") == "1.0"
+    @test version_floor(v"1.0.1-pre") == "1.0"
+    @test version_floor(v"1.0.0-pre") == "1.0-"
+end
+
+@testset "Mustache substitution" begin
+    t = Template(; remote_prefix=invenia_url)
+    view = Dict{String, Any}("OTHER" => false)
+
+    text = substitute(template_text, "TestPkg", t; view=view)
+    @test contains(text, "PKGNAME: TestPkg")
+    @test contains(text, "VERSION: $(t.julia_version.major).$(t.julia_version.minor)")
+    @test !contains(text, "Documenter")
+    @test !contains(text, "After")
+    @test !contains(text, "Other")
+
+    t.plugins[GitHubPages] = GitHubPages()
+    text = substitute(template_text, "TestPkg", t; view=view)
+    @test contains(text, "Documenter")
+    @test contains(text, "After")
+    empty!(t.plugins)
+
+    t.plugins[CodeCov] = CodeCov()
+    text = substitute(template_text, "TestPkg", t; view=view)
+    @test contains(text, "CodeCov")
+    @test contains(text, "After")
+    empty!(t.plugins)
+
+    view["OTHER"] = true
+    text = substitute(template_text, "TestPkg", t; view=view)
+    @test contains(text, "Other")
+end
+
+@testset "License display" begin
+    # TODO: Figure out how to not close pipes so frequently and find out if
+    # my conversion from UInt8[] to String is using the right method.
+    old_stdout = STDOUT
+    out_read, out_write = redirect_stdout()
+    show_license()
+    close(out_write)
+    licenses = join([Char(c) for c in readavailable(out_read)])
+    close(out_read)
+    out_read, out_write = redirect_stdout()
+    show_license("MIT")
+    close(out_write)
+    mit = join([Char(c) for c in readavailable(out_read)])
+    close(out_read)
+    redirect_stdout(old_stdout)
+
+    for (short, long) in LICENSES
+        @test contains(licenses, "$short: $long")
+    end
+    @test strip(mit) == strip(read_license("MIT"))
+    @test strip(read_license("MIT")) == strip(readstring(joinpath(LICENSE_DIR, "MIT")))
+    @test_throws ArgumentError read_license("FakeLicense")
 end
