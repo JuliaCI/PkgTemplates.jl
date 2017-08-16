@@ -203,6 +203,12 @@ end
     @test LibGit2.url(remote) == "https://gitlab.com/invenia/TestPkg.jl"
     rm(Pkg.dir(test_pkg); recursive=true)
 
+    temp_dir = mktempdir()
+    t = Template(; user="invenia", dir=temp_dir)
+    generate(test_pkg, t)
+    @test isdir(joinpath(temp_dir, test_pkg))
+    rm(temp_dir; recursive=true)
+
     t = Template(;
         user="invenia",
         license="MIT",
