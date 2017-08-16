@@ -53,7 +53,8 @@ write(test_file, template_text)
     @test t.authors == git_config["user.name"]
 
     t = Template(; git_config=git_config)
-    @test t.user == "TesterMcTestFace"
+    @test t.user == git_config["github.username"]
+    @test t.authors == git_config["user.name"]
 
     t = Template(;
         user="invenia",
@@ -62,11 +63,16 @@ write(test_file, template_text)
     @test Set(keys(t.plugins)) == Set([GitHubPages, TravisCI, AppVeyor, CodeCov])
     @test Set(values(t.plugins)) == Set([GitHubPages(), TravisCI(), AppVeyor(), CodeCov()])
 
-    @test_warn r".*" Template(;
+    @test_warn r".+" Template(;
         user="invenia",
         plugins=[TravisCI(), TravisCI()],
     )
-    @test_throws ArgumentError Template()
+    if isempty(LibGit2.getconfig("github.username", ""))
+        @test_throws ArgumentError Template()
+    else
+        t = Template()
+        @test t.user == LibGit2.getconfig("github.username", "")
+    end
     @test_throws ArgumentError Template(; user="invenia", license="FakeLicense")
 end
 

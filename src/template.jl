@@ -4,16 +4,19 @@
 Records common information used to generate a package.
 
 # Keyword Arguments
-* `user::AbstractString=LibGit2.getconfig("github.username", "")`: GitHub username.
-  If left as default and there is no value configured, an error will be thrown.
-  Alternatively, you can add a value to `git_config["github.username"]` to set your
-  username. This is case-sensitive for some plugins, so take care to enter it correctly.
-* `host::AbstractString="github.com"`: Code hosting service where your package will reside.
-* `license::Union{AbstractString, Void}=nothing`: Name of the package licsense. If
+* `user::AbstractString="")`: GitHub username. If left  unset, it will try to take the
+  value of a supplied git config's "github.username" key, then the global git config's
+  value. If neither is set, an `ArgumentError` is thrown.
+  **This is case-sensitive for some plugins, so take care to enter it correctly.**
+* `host::AbstractString="github.com"`: URL to the code hosting service where your package
+  will reside.
+* `license::Union{AbstractString, Void}=nothing`: Name of the package license. If
   no license is specified, no license is created. [`show_license`](@ref) can be used to
   list all available licenses, or to print out a particular license's text.
-* `authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", "")`: Names that
-  appear on the license. Supply a string for one author, and an array for multiple.
+* `authors::Union{AbstractString, Array}=""`: Names that appear on the license. Supply a
+  string for one author, and an array for multiple. Similarly to `user`, it will try to
+  take the value of a supplied git config's "user.name" key, then the global git config's
+  value, if it is left unset
 * `years::Union{Int, AbstractString}=string(Dates.year(Dates.today()))`: Copyright years
   on the license. Can be supplied by a number, or a string such as "2016 - 2017".
 * `dir::AbstractString=Pkg.dir()`: Directory in which the package will go.
@@ -34,22 +37,26 @@ Records common information used to generate a package.
     plugins::Dict{DataType, Plugin}
 
     function Template(;
-        user::AbstractString=LibGit2.getconfig("github.username", ""),
+        user::AbstractString="",
         host::AbstractString="https://github.com",
         license::Union{AbstractString, Void}=nothing,
-        authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", ""),
+        authors::Union{AbstractString, Array}="",
         years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
         dir::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
         git_config::Dict=Dict(),
         plugins::Vector{P}=Vector{Plugin}(),
     ) where P <: Plugin
-        # If no username was set or found, look for one in the supplied git config.
-        if isempty(user) && (!haskey(git_config, "github.username") ||
-            isempty(git_config["github.username"]))
+        # If no username was set, look for one in a supplied git config,
+        # and then in the global git config.
+        if isempty(user)
+            user = get(
+                git_config, "github.username",
+                LibGit2.getconfig("github.username", ""),
+            )
+        end
+        if isempty(user)
             throw(ArgumentError("No GitHub username found, set one with user=username"))
-        elseif isempty(user)
-            user = git_config["github.username"]
         end
 
         host = URI(startswith(host, "https://") ? host : "https://$host").host
@@ -58,9 +65,9 @@ Records common information used to generate a package.
             throw(ArgumentError("License '$license' is not available"))
         end
 
-        # If an explicitly supplied git config contains a name and the author name was not
-        # explicitly supplied, then take the git config's name as the author name.
-        if haskey(git_config, "user.name") && authors == LibGit2.getconfig("user.name", "")
+        # If no author was set, look for one in the supplied git config,
+        # and then in the global git config.
+        if isempty(authors)
             authors = get(git_config, "user.name", LibGit2.getconfig("user.name", ""))
         elseif isa(authors, Array)
             authors = join(authors, ", ")
