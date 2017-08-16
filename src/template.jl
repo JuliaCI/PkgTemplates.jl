@@ -23,6 +23,13 @@ Records common information used to generate a package.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `git_config::Dict{String, String}=Dict{String, String}()`: Git configuration options.
 * `plugins::Vector{Plugin}`: A list of `Plugin`s that the package will include.
+
+**Note**: When you create a `Template`, a temporary directory is created with
+`mktempdir()`. This directory will be removed after you call [`generate`](@ref).
+Creating multiple packages in succession with the same instance of a template will still
+work, but there is a miniscule chance of another process sharing the temporary directory,
+which could result in the created package repository containing untracked files that
+don't belong.
 """
 @auto_hash_equals struct Template
     user::AbstractString
