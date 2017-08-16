@@ -18,6 +18,7 @@ write(test_file, template_text)
 
 @testset "Template creation" begin
     t = Template(; user="invenia")
+    rm(t.temp_dir; recursive=true)
     @test t.user == "invenia"
     @test t.license == nothing
     @test t.years == string(Dates.year(Dates.today()))
@@ -28,31 +29,42 @@ write(test_file, template_text)
     @test isempty(t.plugins)
 
     t = Template(; user="invenia", license="MIT")
+    rm(t.temp_dir; recursive=true)
     @test t.license == "MIT"
 
     t = Template(; user="invenia", years=2014)
+    rm(t.temp_dir; recursive=true)
     @test t.years == "2014"
     t = Template(user="invenia", years="2014-2015")
+    rm(t.temp_dir; recursive=true)
     @test t.years == "2014-2015"
 
     t = Template(; user="invenia", authors="Some Guy")
+    rm(t.temp_dir; recursive=true)
     @test t.authors == "Some Guy"
+
     t = Template(; user="invenia", authors=["Guy", "Gal"])
+    rm(t.temp_dir; recursive=true)
     @test t.authors == "Guy, Gal"
 
     t = Template(; user="invenia", dir=test_file)
+    rm(t.temp_dir; recursive=true)
     @test t.dir == test_file
 
     t = Template(; user="invenia", julia_version=v"0.1.2")
+    rm(t.temp_dir; recursive=true)
     @test t.julia_version == v"0.1.2"
 
     t = Template(; user="invenia", git_config=git_config)
+    rm(t.temp_dir; recursive=true)
     @test t.git_config == git_config
 
     t = Template(; user="invenia", git_config=git_config)
+    rm(t.temp_dir; recursive=true)
     @test t.authors == git_config["user.name"]
 
     t = Template(; git_config=git_config)
+    rm(t.temp_dir; recursive=true)
     @test t.user == git_config["github.username"]
     @test t.authors == git_config["user.name"]
 
@@ -60,17 +72,21 @@ write(test_file, template_text)
         user="invenia",
         plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov()],
     )
+    rm(t.temp_dir; recursive=true)
     @test Set(keys(t.plugins)) == Set([GitHubPages, TravisCI, AppVeyor, CodeCov])
     @test Set(values(t.plugins)) == Set([GitHubPages(), TravisCI(), AppVeyor(), CodeCov()])
 
-    @test_warn r".+" Template(;
+    @test_warn r".+" t = Template(;
         user="invenia",
         plugins=[TravisCI(), TravisCI()],
     )
+    rm(t.temp_dir; recursive=true)
+
     if isempty(LibGit2.getconfig("github.username", ""))
         @test_throws ArgumentError Template()
     else
         t = Template()
+        rm(t.temp_dir; recursive=true)
         @test t.user == LibGit2.getconfig("github.username", "")
     end
     @test_throws ArgumentError Template(; user="invenia", license="FakeLicense")
@@ -173,6 +189,8 @@ end
     rm(joinpath(pkg_dir, "test"); recursive=true)
     @test contains(runtests, "using $test_pkg")
     @test contains(runtests, "using Base.Test")
+
+    rm(t.temp_dir; recursive=true)
 end
 
 @testset "Package generation" begin
@@ -221,7 +239,6 @@ end
         git_config=git_config,
         plugins=[AppVeyor(), GitHubPages(), CodeCov(), TravisCI()],
     )
-
     generate(test_pkg, t)
     @test isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, ".travis.yml"))
@@ -249,6 +266,7 @@ end
     readme = readstring(Pkg.dir(test_pkg, "README.md"))
     index = readstring(Pkg.dir(test_pkg, "docs", "src", "index.md"))
     @test readme == index
+    rm(Pkg.dir(test_pkg); recursive=true)
 end
 
 @testset "Plugin generation" begin
@@ -313,6 +331,8 @@ end
     @test contains(make, "deploydocs")
     rm(joinpath(pkg_dir, "docs"); recursive=true)
     @test_throws ArgumentError GitHubPages(; assets=[fake_path])
+
+    rm(t.temp_dir; recursive=true)
 end
 
 @testset "Version floor" begin
@@ -324,6 +344,7 @@ end
 
 @testset "Mustache substitution" begin
     t = Template(; user="invenia")
+    rm(t.temp_dir; recursive=true)
     view = Dict{String, Any}("OTHER" => false)
 
     text = substitute(template_text, test_pkg, t; view=view)
@@ -351,18 +372,13 @@ end
 end
 
 @testset "License display" begin
-    # TODO: Figure out how to not close pipes so frequently and find out if
-    # my conversion from UInt8[] to String is using the right method.
     old_stdout = STDOUT
     out_read, out_write = redirect_stdout()
     show_license()
-    close(out_write)
-    licenses = join([Char(c) for c in readavailable(out_read)])
-    close(out_read)
-    out_read, out_write = redirect_stdout()
+    licenses = join(Char(c) for c in readavailable(out_read))
     show_license("MIT")
+    mit = join(Char(c) for c in readavailable(out_read))
     close(out_write)
-    mit = join([Char(c) for c in readavailable(out_read)])
     close(out_read)
     redirect_stdout(old_stdout)
 
@@ -373,3 +389,5 @@ end
     @test strip(read_license("MIT")) == strip(readstring(joinpath(LICENSE_DIR, "MIT")))
     @test_throws ArgumentError read_license("FakeLicense")
 end
+
+rm(test_file)
