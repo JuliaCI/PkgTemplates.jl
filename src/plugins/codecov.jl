@@ -1,10 +1,10 @@
 """
-    CodeCov(; config_file::AbstractString="") -> CodeCov
+    CodeCov(; config_file::Union{AbstractString, Void}="") -> CodeCov
 
 Add CodeCov to a template's plugins to enable CodeCov coverage reports.
 
 # Keyword Arguments:
-* `config_file::AbstractString`: Path to a custom `.codecov.yml`.
+* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.codecov.yml`.
   If `nothing` is supplied, then no file will be generated.
 """
 @auto_hash_equals struct CodeCov <: Plugin

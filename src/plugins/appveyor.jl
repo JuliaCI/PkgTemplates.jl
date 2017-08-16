@@ -1,10 +1,10 @@
 """
-    AppVeyor(; config_file::AbstractString="") -> AppVeyor
+    AppVeyor(; config_file::Union{AbstractString, Void}="") -> AppVeyor
 
 Add AppVeyor to a template's plugins to add AppVeyor CI support.
 
 # Keyword Arguments
-* `config_file::Union{AbstractString, Void}`: Path to a custom `.appveyor.yml`.
+* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.appveyor.yml`.
   If `nothing` is supplied, then no file will be generated.
 """
 @auto_hash_equals struct AppVeyor <: Plugin

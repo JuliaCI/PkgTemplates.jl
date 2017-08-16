@@ -10,8 +10,8 @@ Records common information used to generate a package.
   username. This is case-sensitive for some plugins, so take care to enter it correctly.
 * `host::AbstractString="github.com"`: Code hosting service where your package will reside.
 * `license::Union{AbstractString, Void}=nothing`: Name of the package licsense. If
-  no license is specified, no license is created. `show_license` can be used to list all
-  available licenses, or to print out a particular license's text.
+  no license is specified, no license is created. [`show_license`](@ref) can be used to
+  list all available licenses, or to print out a particular license's text.
 * `authors::Union{AbstractString, Array}=LibGit2.getconfig("user.name", "")`: Names that
   appear on the license. Supply a string for one author, and an array for multiple.
 * `years::Union{Int, AbstractString}=string(Dates.year(Dates.today()))`: Copyright years

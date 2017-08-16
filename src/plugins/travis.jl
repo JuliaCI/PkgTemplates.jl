@@ -1,10 +1,10 @@
 """
-    TravisCI(; config_file::AbstractString="") -> TravisCI
+    TravisCI(; config_file::Union{AbstractString, Void}="") -> TravisCI
 
 Add TravisCI to a template's plugins to add Travis CI support.
 
 # Keyword Arguments:
-* `config_file::AbstractString`: Path to a custom `.travis.yml`.
+* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.travis.yml`.
   If `nothing` is supplied, then no file will be generated.
 """
 @auto_hash_equals struct TravisCI <: Plugin

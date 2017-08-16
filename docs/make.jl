@@ -5,6 +5,9 @@ makedocs(
     format=:html,
     pages=[
         "Home" => "index.md",
+        "Package Generation" => "pages/package_generation.md",
+        "Plugins" => "pages/plugins.md",
+        "Licenses" => "pages/licenses.md",
     ],
     repo="https://github.com/christopher-dG/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",
