@@ -30,7 +30,7 @@ Records common information used to generate a package.
     dir::AbstractString
     temp_dir::AbstractString
     julia_version::VersionNumber
-    git_config::Dict{String, String}
+    git_config::Dict
     plugins::Dict{DataType, Plugin}
 
     function Template(;
@@ -41,7 +41,7 @@ Records common information used to generate a package.
         years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
         dir::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
-        git_config::Dict{String, String}=Dict{String, String}(),
+        git_config::Dict=Dict(),
         plugins::Vector{P}=Vector{Plugin}(),
     ) where P <: Plugin
         # If no username was set or found, look for one in the supplied git config.
