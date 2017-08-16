@@ -57,12 +57,12 @@ function generate(
 
     # Generate the files.
     files = vcat(
-        gen_license(pkg_name, t),
         gen_entrypoint(pkg_name, t),
-        gen_require(temp_pkg_dir, t),
         gen_tests(pkg_name, t),
+        gen_require(temp_pkg_dir, t),
         gen_readme(pkg_name, t),
         gen_gitignore(pkg_name, t),
+        gen_license(pkg_name, t),
         vcat(collect(gen_plugin(plugin, t, pkg_name) for plugin in values(t.plugins))...),
     )
 
