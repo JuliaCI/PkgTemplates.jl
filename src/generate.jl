@@ -95,9 +95,7 @@ Returns an array of generated file/directory names.
 """
 function gen_readme(pkg_name::AbstractString, template::Template)
     text = "# $pkg_name\n"
-    # We want badges to be laid out: docs -> CI -> coverage.
-    ordering = [GitHubPages, TravisCI, AppVeyor, CodeCov]
-    for plugin_type in ordering
+    for plugin_type in BADGE_ORDER
         if haskey(template.plugins, plugin_type)
             text *= "\n"
             text *= join(

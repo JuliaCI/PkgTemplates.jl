@@ -30,5 +30,6 @@ const LICENSES = Dict(
     "LGPL-2.1+" => "Lesser GNU Public License, Version 2.1+",
     "LGPL-3.0+" => "Lesser GNU Public License, Version 3.0+"
 )
+const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, CodeCov]
 
 end
