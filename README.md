@@ -25,7 +25,7 @@ julia> using PkgTemplates
 
 julia> t = Template(; user="invenia")
 
-julia> generate("MyPkg", t; force=true)
+julia> generate("MyPkg", t)
 INFO: Initialized git repo at /tmp/tmpvaHVki/MyPkg
 INFO: Made initial empty commit
 INFO: Set remote origin to https://github.com/invenia/MyPkg.jl

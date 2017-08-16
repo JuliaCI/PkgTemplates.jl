@@ -8,6 +8,7 @@ makedocs(
         "Package Generation" => "pages/package_generation.md",
         "Plugins" => "pages/plugins.md",
         "Licenses" => "pages/licenses.md",
+        "Index" => "pages/index.md"
     ],
     repo="https://github.com/christopher-dG/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",
