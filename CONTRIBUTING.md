@@ -33,7 +33,7 @@ end
 
 You can also add patterns like `*.key`, etc. to this array. Note that Windows
 Git also recognizes `/` as a path separator in `.gitignore`, so there's no
-pneed for `joinpath`.
+need for `joinpath`.
 
 Suppose that `MyPlugin` also has a configuration file at the root of the repo.
 We're going to put a default `myplugin.yml` in `defaults`, but we also want
