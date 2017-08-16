@@ -16,8 +16,8 @@ Add TravisCI to a template's plugins to add Travis CI support.
             if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "travis.yml")
             end
-            if !isfile(abspath(config_file))
-                throw(ArgumentError("File $config_file does not exist"))
+            if !isfile(config_file)
+                throw(ArgumentError("File $(abspath(config_file)) does not exist"))
             end
         end
         new(AbstractString[], config_file)

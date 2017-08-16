@@ -13,7 +13,7 @@ Add GitHubPages to a template's plugins to add Documenter.jl support via GitHub 
     function GitHubPages(; assets::Vector{String}=String[])
         for file in assets
             if !isfile(file)
-                throw(ArgumentError("Asset file $file does not exist"))
+                throw(ArgumentError("Asset file $(abspath(file)) does not exist"))
             end
         end
         # Windows Git recognizes these paths as well.

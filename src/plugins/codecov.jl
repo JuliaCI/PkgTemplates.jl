@@ -16,8 +16,8 @@ Add CodeCov to a template's plugins to enable CodeCov coverage reports.
             if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "codecov.yml")
             end
-            if !isfile(abspath(config_file))
-                throw(ArgumentError("File $config_file does not exist"))
+            if !isfile(config_file)
+                throw(ArgumentError("File $(abspath(config_file)) does not exist"))
             end
         end
         new(["*.jl.cov", "*.jl.*.cov", "*.jl.mem"], config_file)

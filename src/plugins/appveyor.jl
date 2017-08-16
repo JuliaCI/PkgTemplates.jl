@@ -16,8 +16,8 @@ Add AppVeyor to a template's plugins to add AppVeyor CI support.
             if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "appveyor.yml")
             end
-            if !isfile(abspath(config_file))
-                throw(ArgumentError("File $config_file does not exist"))
+            if !isfile(config_file)
+                throw(ArgumentError("File $(abspath(config_file)) does not exist"))
             end
         end
         new(AbstractString[], config_file)
