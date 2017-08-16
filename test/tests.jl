@@ -242,6 +242,13 @@ end
     @test_throws ArgumentError generate(test_pkg, t)
     generate(test_pkg, t; force=true)
     @test isfile(Pkg.dir(test_pkg, "README.md"))
+    rm(Pkg.dir(test_pkg); recursive=true)
+
+    t = Template(; user="invenia", plugins=[GitHubPages()])
+    generate(test_pkg, t)
+    readme = readstring(Pkg.dir(test_pkg, "README.md"))
+    index = readstring(Pkg.dir(test_pkg, "docs", "src", "index.md"))
+    @test readme == index
 end
 
 @testset "Plugin generation" begin
