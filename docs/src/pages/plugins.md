@@ -4,8 +4,9 @@ CurrentModule = PkgTemplates
 
 # Plugins
 
-For information on writing your own plugins, see
-[CONTRIBUTING.md](https://github.com/invenia/PkgTemplates.jl/tree/master/CONTRIBUTING.md).
+Plugins are the driver for `PkgTemplates`'s customization and extension. This page
+describes plugins that already exist; for information on writing your own plugins, see the
+[plugin development guide](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html).
 
 ## TravisCI
 
@@ -23,6 +24,12 @@ AppVeyor
 
 ```@docs
 CodeCov
+```
+
+## Coveralls
+
+```@docs
+Coveralls
 ```
 
 ## Documenter

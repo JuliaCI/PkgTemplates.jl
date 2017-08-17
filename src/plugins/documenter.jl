@@ -1,19 +1,9 @@
 """
-Add a Documenter subtype to a template's plugins to add support for
-[Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
-"""
+Add a `Documenter` subtype to a template's plugins to add support for documentation
+generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
+ """
 abstract type Documenter <: CustomPlugin end
 
-"""
-    gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractString) -> Void
-
-Generate the "docs" directory with files common to all Documenter subtypes.
-
-# Arguments
-* `plugin::Documenter`: Plugin whose files are being generated.
-* `template::Template`: Template configuration and plugins.
-* `pkg_name::AbstractString`: Name of the package.
-"""
 function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractString)
     if Pkg.installed("Documenter") == nothing
         info("Adding Documenter.jl")

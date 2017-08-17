@@ -33,5 +33,6 @@ build_script:
 
 test_script:
   - C:\projects\julia\bin\julia -e "Pkg.test(\"PkgTemplates\")"
+
 after_script:
   - C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"AppVeyorTesting\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"

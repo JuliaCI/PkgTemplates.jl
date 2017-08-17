@@ -1,7 +1,9 @@
 """
     Coveralls(; config_file::Union{AbstractString, Void}="") -> Coveralls
 
-Add Coveralls to a template's plugins to enable Coveralls coverage reports.
+Add `Coveralls` to a template's plugins to optionally add a `.coveralls.yml` configuration
+file to generated repositories, and an appropriate badge to the README. Also updates the
+`.gitignore` accordingly.
 
 # Keyword Arguments:
 * `config_file::Union{AbstractString, Void}=nothing`: Path to a custom `.coveralls.yml`.
@@ -11,7 +13,7 @@ Add Coveralls to a template's plugins to enable Coveralls coverage reports.
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{AbstractString}
+    badges::Vector{Vector{AbstractString}}
     view::Dict{String, Any}
 
     function Coveralls(; config_file::Union{AbstractString, Void}=nothing)
@@ -22,7 +24,13 @@ Add Coveralls to a template's plugins to enable Coveralls coverage reports.
             ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"],
             config_file,
             ".coveralls.yml",
-            ["[![Coveralls](https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master)](https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master)"],
+            [
+                [
+                    "Coveralls",
+                    "https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master",
+                    "https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master",
+                ],
+            ],
             Dict{String, Any}(),
         )
     end

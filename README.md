@@ -85,5 +85,11 @@ Information on each keyword as well as plugin types can be found in the
 `PkgTemplates` is similar in functionality to `PkgDev`'s `generate` function.
 However, `PkgTemplates` offers more customizability in templates and more
 extensibility via plugins. For the package registration and release management
-features that `PkgTemplates` lacks, you are encouraged to use
+features that `PkgTemplates` doesn't include, you are encouraged to use
 [AttoBot](https://github.com/apps/attobot) instead.
+
+## Contributing
+
+It's extremely easy to extend `PkgTemplates` with new plugins. To get started,
+check out the
+[plugin development guide](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html).

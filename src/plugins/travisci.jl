@@ -1,7 +1,8 @@
 """
     TravisCI(; config_file::Union{AbstractString, Void}="") -> GenericPlugin
 
-Add TravisCI to a template's plugins to add Travis CI support.
+Add `TravisCI` to a template's plugins to add a `.travis.yml` configuration file to
+generated repositories, and an appropriate badge to the README.
 
 # Keyword Arguments:
 * `config_file::Union{AbstractString, Void}=""`: Path to a custom `.travis.yml`.
@@ -11,7 +12,7 @@ Add TravisCI to a template's plugins to add Travis CI support.
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{AbstractString}
+    badges::Vector{Vector{AbstractString}}
     view::Dict{String, Any}
 
     function TravisCI(; config_file::Union{AbstractString, Void}="")
@@ -26,7 +27,13 @@ Add TravisCI to a template's plugins to add Travis CI support.
             [],
             config_file,
             ".travis.yml",
-            ["[![Build Status](https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master)](https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl)"],
+            [
+                [
+                    "Build Status",
+                    "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
+                    "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
+                ],
+            ],
             Dict{String, Any}(),
         )
     end

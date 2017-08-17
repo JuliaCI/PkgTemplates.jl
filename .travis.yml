@@ -12,8 +12,6 @@ script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia -e 'Pkg.clone(pwd()); Pkg.build("PkgTemplates"); Pkg.test("PkgTemplates"; coverage=true)'
 after_success:
-  # push coverage results to CodeCov
   - julia -e 'cd(Pkg.dir("PkgTemplates")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
-  # build documentation
   - julia -e 'Pkg.add("Documenter")'
   - julia -e 'cd(Pkg.dir("PkgTemplates")); include(joinpath("docs", "make.jl"))'

@@ -1,7 +1,8 @@
 """
     AppVeyor(; config_file::Union{AbstractString, Void}="") -> GenericPlugin
 
-Add AppVeyor to a template's plugins to add AppVeyor CI support.
+Add `AppVeyor` to a template's plugins to add a `.appveyor.yml` configuration file to
+generated repositories, and an appropriate badge to the README.
 
 # Keyword Arguments
 * `config_file::Union{AbstractString, Void}=""`: Path to a custom `.appveyor.yml`.
@@ -11,7 +12,7 @@ Add AppVeyor to a template's plugins to add AppVeyor CI support.
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{AbstractString}
+    badges::Vector{Vector{AbstractString}}
     view::Dict{String, Any}
 
     function AppVeyor(; config_file::Union{AbstractString, Void}="")
@@ -26,7 +27,13 @@ Add AppVeyor to a template's plugins to add AppVeyor CI support.
             [],
             config_file,
             ".appveyor.yml",
-            ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true)](https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl)"],
+            [
+                [
+                    "Build Status",
+                    "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true",
+                    "https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl",
+                ],
+            ],
             Dict{String, Any}(),
         )
     end

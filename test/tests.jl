@@ -1,3 +1,12 @@
+struct Foo <: GenericPlugin
+    gitignore::Vector{AbstractString}
+    src::Nullable{AbstractString}
+    dest::AbstractString
+    badges::Vector{Vector{AbstractString}}
+    view::Dict{String, Any}
+    Foo() = new([], @__FILE__, "", [["foo", "bar", "baz"]], Dict{String, Any}())
+end
+
 const git_config = Dict(
     "user.name" => "Tester McTestFace",
     "user.email" => "email@web.site",
@@ -11,6 +20,7 @@ template_text = """
             VERSION: {{VERSION}}}
             {{#DOCUMENTER}}Documenter{{/DOCUMENTER}}
             {{#CODECOV}}CodeCov{{/CODECOV}}
+            {{#CODECOV}}Coveralls{{/CODECOV}}
             {{#AFTER}}After{{/AFTER}}
             {{#OTHER}}Other{{/OTHER}}
             """
@@ -70,11 +80,15 @@ write(test_file, template_text)
 
     t = Template(;
         user="invenia",
-        plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov()],
+        plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()],
     )
     rm(t.temp_dir; recursive=true)
-    @test Set(keys(t.plugins)) == Set([GitHubPages, TravisCI, AppVeyor, CodeCov])
-    @test Set(values(t.plugins)) == Set([GitHubPages(), TravisCI(), AppVeyor(), CodeCov()])
+    @test Set(keys(t.plugins)) == Set(
+        [GitHubPages, TravisCI, AppVeyor, CodeCov, Coveralls]
+    )
+    @test Set(values(t.plugins)) == Set(
+        [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()]
+    )
 
     @test_warn r".+" t = Template(;
         user="invenia",
@@ -97,7 +111,11 @@ end
     @test isempty(p.gitignore)
     @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
     @test p.dest == ".appveyor.yml"
-    @test p.badges == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true)](https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl)"]
+    @test p.badges == [[
+        "Build Status",
+        "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true",
+        "https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl",
+    ]]
     @test isempty(p.view)
     p = AppVeyor(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -109,7 +127,11 @@ end
     @test isempty(p.gitignore)
     @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
     @test p.dest == ".travis.yml"
-    @test p.badges == ["[![Build Status](https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master)](https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl)"]
+    @test p.badges == [[
+        "Build Status",
+        "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
+        "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
+    ]]
     @test isempty(p.view)
     p = TravisCI(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -121,7 +143,11 @@ end
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
     @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
     @test p.dest == ".codecov.yml"
-    @test p.badges == ["[![CodeCov](https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl)"]
+    @test p.badges == [[
+        "CodeCov",
+        "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
+        "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
+    ]]
     @test isempty(p.view)
     p = CodeCov(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -133,7 +159,11 @@ end
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
     @test_throws NullException get(p.src)
     @test p.dest == ".coveralls.yml"
-    @test p.badges == ["[![Coveralls](https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master)](https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master)"]
+    @test p.badges == [[
+        "Coveralls",
+        "https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master",
+        "https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master",
+    ]]
     @test isempty(p.view)
     p = Coveralls(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -176,7 +206,7 @@ end
         user="invenia",
         license="MPL",
         git_config=git_config,
-        plugins=[TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
+        plugins=[Coveralls(), TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
     )
     pkg_dir = joinpath(t.temp_dir, test_pkg)
 
@@ -198,7 +228,14 @@ end
     @test search(readme, "github.io").start <
         search(readme, "travis").start <
         search(readme, "appveyor").start <
-        search(readme, "codecov").start
+        search(readme, "codecov").start <
+        search(readme, "coveralls").start
+    # Plugins with badges but not in BADGE_ORDER should appear at the far right side.
+    t.plugins[Foo] = Foo()
+    gen_readme(test_pkg, t)
+    readme = readchomp(joinpath(pkg_dir, "README.md"))
+    rm(joinpath(pkg_dir, "README.md"))
+    @test search(readme, "coveralls").start < search(readme, "baz").start
 
     @test gen_gitignore(test_pkg, t) == [".gitignore"]
     @test isfile(joinpath(pkg_dir, ".gitignore"))
@@ -326,6 +363,38 @@ end
     p = TravisCI()
     @test gen_plugin(p, t, test_pkg) == [".travis.yml"]
     @test isfile(joinpath(pkg_dir, ".travis.yml"))
+    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
+    @test !contains(travis, "after_success")
+    @test !contains(travis, "Codecov.submit")
+    @test !contains(travis, "Coveralls.submit")
+    @test !contains(travis, "Pkg.add(\"Documenter\")")
+    rm(joinpath(pkg_dir, ".travis.yml"))
+    t.plugins[CodeCov] = CodeCov()
+    gen_plugin(p, t, test_pkg)
+    delete!(t.plugins, CodeCov)
+    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
+    @test contains(travis, "after_success")
+    @test contains(travis, "Codecov.submit")
+    @test !contains(travis, "Coveralls.submit")
+    @test !contains(travis, "Pkg.add(\"Documenter\")")
+    rm(joinpath(pkg_dir, ".travis.yml"))
+    t.plugins[Coveralls] = Coveralls()
+    gen_plugin(p, t, test_pkg)
+    delete!(t.plugins, Coveralls)
+    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
+    @test contains(travis, "after_success")
+    @test contains(travis, "Coveralls.submit")
+    @test !contains(travis, "Codecov.submit")
+    @test !contains(travis, "Pkg.add(\"Documenter\")")
+    rm(joinpath(pkg_dir, ".travis.yml"))
+    t.plugins[GitHubPages] = GitHubPages()
+    gen_plugin(p, t, test_pkg)
+    delete!(t.plugins, GitHubPages)
+    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
+    @test contains(travis, "after_success")
+    @test contains(travis, "Pkg.add(\"Documenter\")")
+    @test !contains(travis, "Codecov.submit")
+    @test !contains(travis, "Coveralls.submit")
     rm(joinpath(pkg_dir, ".travis.yml"))
     p = TravisCI(; config_file=nothing)
     @test isempty(gen_plugin(p, t, test_pkg))
@@ -335,6 +404,26 @@ end
     p = AppVeyor()
     @test gen_plugin(p, t, test_pkg) == [".appveyor.yml"]
     @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
+    appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
+    @test !contains(appveyor, "after_script")
+    @test !contains(appveyor, "Codecov.submit")
+    @test !contains(appveyor, "Coveralls.submit")
+    rm(joinpath(pkg_dir, ".appveyor.yml"))
+    t.plugins[CodeCov] = CodeCov()
+    gen_plugin(p, t, test_pkg)
+    delete!(t.plugins, CodeCov)
+    appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
+    @test contains(appveyor, "after_script")
+    @test contains(appveyor, "Codecov.submit")
+    @test !contains(appveyor, "Coveralls.submit")
+    rm(joinpath(pkg_dir, ".appveyor.yml"))
+    t.plugins[Coveralls] = Coveralls()
+    gen_plugin(p, t, test_pkg)
+    delete!(t.plugins, Coveralls)
+    appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
+    @test contains(appveyor, "after_script")
+    @test contains(appveyor, "Coveralls.submit")
+    @test !contains(appveyor, "Codecov.submit")
     rm(joinpath(pkg_dir, ".appveyor.yml"))
     p = AppVeyor(; config_file=nothing)
     @test isempty(gen_plugin(p, t, test_pkg))
@@ -393,12 +482,25 @@ end
 end
 
 @testset "Mustache substitution" begin
+    view = Dict{String, Any}()
+    text = substitute(template_text, view)
+    @test !contains(text, "PKGNAME: $test_pkg")
+    @test !contains(text, "Documenter")
+    @test !contains(text, "CodeCov")
+    @test !contains(text, "Coveralls")
+    @test !contains(text, "After")
+    @test !contains(text, "Other")
+    view["PKGNAME"] = test_pkg
+    view["OTHER"] = true
+    text = substitute(template_text, view)
+    @test contains(text, "PKGNAME: $test_pkg")
+    @test contains(text, "Other")
+
     t = Template(; user="invenia")
     rm(t.temp_dir; recursive=true)
-    p = Coveralls()
-    view = Dict{String, Any}("OTHER" => false)
+    view["OTHER"] = false
 
-    text = substitute(template_text, t, test_pkg; view=view)
+    text = substitute(template_text, t; view=view)
     @test contains(text, "PKGNAME: $test_pkg")
     @test contains(text, "VERSION: $(t.julia_version.major).$(t.julia_version.minor)")
     @test !contains(text, "Documenter")
@@ -406,25 +508,25 @@ end
     @test !contains(text, "Other")
 
     t.plugins[GitHubPages] = GitHubPages()
-    text = substitute(template_text, t, test_pkg; view=view)
+    text = substitute(template_text, t; view=view)
     @test contains(text, "Documenter")
     @test contains(text, "After")
     empty!(t.plugins)
 
     t.plugins[CodeCov] = CodeCov()
-    text = substitute(template_text, t, test_pkg; view=view)
+    text = substitute(template_text, t; view=view)
     @test contains(text, "CodeCov")
     @test contains(text, "After")
     empty!(t.plugins)
 
+    t.plugins[CodeCov] = Coveralls()
+    text = substitute(template_text, t; view=view)
+    @test contains(text, "Coveralls")
+    @test contains(text, "After")
+    empty!(t.plugins)
+
     view["OTHER"] = true
-    text = substitute(template_text, t, test_pkg; view=view)
-    @test contains(text, "Other")
-
-    text = substitute(template_text, p, test_pkg)
-    @test contains(text, "PKGNAME: $test_pkg")
-
-    text = substitute(template_text, p, test_pkg; view=view)
+    text = substitute(template_text, t; view=view)
     @test contains(text, "Other")
 end
 
