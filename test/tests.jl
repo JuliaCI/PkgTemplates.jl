@@ -83,42 +83,92 @@ write(test_file, template_text)
     rm(t.temp_dir; recursive=true)
 
     if isempty(LibGit2.getconfig("github.username", ""))
-        @test_throws ArgumentError Template()
+        @test_throws ArgumentError t = Template()
     else
         t = Template()
         rm(t.temp_dir; recursive=true)
         @test t.user == LibGit2.getconfig("github.username", "")
     end
-    @test_throws ArgumentError Template(; user="invenia", license="FakeLicense")
+    @test_throws ArgumentError t = Template(; user="invenia", license="FakeLicense")
 end
 
 @testset "Plugin creation" begin
     p = AppVeyor()
-    @test isempty(p.gitignore_files)
-    @test p.config_file == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
+    @test isempty(p.gitignore)
+    @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
+    @test p.dest == ".appveyor.yml"
+    @test p.badges == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true)](https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl)"]
+    @test isempty(p.view)
     p = AppVeyor(; config_file=nothing)
-    @test p.config_file == nothing
+    @test_throws NullException get(p.src)
     p = AppVeyor(; config_file=test_file)
-    @test p.config_file == test_file
-    @test_throws ArgumentError AppVeyor(; config_file=fake_path)
+    @test get(p.src) == test_file
+    @test_throws ArgumentError p = AppVeyor(; config_file=fake_path)
 
     p = TravisCI()
-    @test isempty(p.gitignore_files)
-    @test p.config_file == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
+    @test isempty(p.gitignore)
+    @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
+    @test p.dest == ".travis.yml"
+    @test p.badges == ["[![Build Status](https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master)](https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl)"]
+    @test isempty(p.view)
     p = TravisCI(; config_file=nothing)
-    @test p.config_file == nothing
+    @test_throws NullException get(p.src)
     p = TravisCI(; config_file=test_file)
-    @test p.config_file == test_file
-    @test_throws ArgumentError TravisCI(; config_file=fake_path)
+    @test get(p.src) == test_file
+    @test_throws ArgumentError p = TravisCI(; config_file=fake_path)
 
     p = CodeCov()
-    @test p.gitignore_files == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-    @test p.config_file == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
+    @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
+    @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
+    @test p.dest == ".codecov.yml"
+    @test p.badges == ["[![CodeCov](https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl)"]
+    @test isempty(p.view)
     p = CodeCov(; config_file=nothing)
-    @test p.config_file == nothing
+    @test_throws NullException get(p.src)
     p = CodeCov(; config_file=test_file)
-    @test p.config_file == test_file
-    @test_throws ArgumentError CodeCov(; config_file=fake_path)
+    @test get(p.src) == test_file
+    @test_throws ArgumentError p = CodeCov(; config_file=fake_path)
+
+    p = Coveralls()
+    @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
+    @test_throws NullException get(p.src)
+    @test p.dest == ".coveralls.yml"
+    @test p.badges == ["[![Coveralls](https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master)](https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master)"]
+    @test isempty(p.view)
+    p = Coveralls(; config_file=nothing)
+    @test_throws NullException get(p.src)
+    p = Coveralls(; config_file=test_file)
+    @test get(p.src) == test_file
+    @test_throws ArgumentError p = Coveralls(; config_file=fake_path)
+
+    p = GitHubPages()
+    @test p.gitignore == ["/docs/build/", "/docs/site/"]
+    @test isempty(p.assets)
+    p = GitHubPages(; assets=[test_file])
+    @test p.assets == [test_file]
+    @test_throws ArgumentError p = GitHubPages(; assets=[fake_path])
+end
+
+@testset "Badge generation" begin
+    user = git_config["github.username"]
+
+    p = AppVeyor()
+    @test badges(p, user, test_pkg) == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/$user/$test_pkg.jl?svg=true)](https://ci.appveyor.com/project/$user/$test_pkg-jl)"]
+
+    p = TravisCI()
+    @test badges(p, user, test_pkg) == ["[![Build Status](https://travis-ci.org/$user/$test_pkg.jl.svg?branch=master)](https://travis-ci.org/$user/$test_pkg.jl)"]
+
+    p = CodeCov()
+    @test badges(p, user, test_pkg) == ["[![CodeCov](https://codecov.io/gh/$user/$test_pkg.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$test_pkg.jl)"]
+
+    p = Coveralls()
+    @test badges(p, user, test_pkg) == ["[![Coveralls](https://coveralls.io/repos/github/$user/$test_pkg.jl/badge.svg?branch=master)](https://coveralls.io/github/$user/$test_pkg.jl?branch=master)"]
+
+    p = GitHubPages()
+    @test badges(p, user, test_pkg) ==  [
+        "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$test_pkg.jl/stable)"
+        "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$test_pkg.jl/latest)"
+    ]
 end
 
 @testset "File generation" begin
@@ -156,7 +206,7 @@ end
     rm(joinpath(pkg_dir, ".gitignore"))
     @test contains(gitignore, ".DS_Store")
     for p in values(t.plugins)
-        for entry in p.gitignore_files
+        for entry in p.gitignore
             @test contains(gitignore, entry)
         end
     end
@@ -201,14 +251,14 @@ end
     @test isfile(Pkg.dir(test_pkg, "REQUIRE"))
     @test isfile(Pkg.dir(test_pkg, ".gitignore"))
     @test isdir(Pkg.dir(test_pkg, "src"))
-    @test isfile(Pkg.dir(test_pkg, "src", "TestPkg.jl"))
+    @test isfile(Pkg.dir(test_pkg, "src", "$test_pkg.jl"))
     @test isdir(Pkg.dir(test_pkg, "test"))
     @test isfile(Pkg.dir(test_pkg, "test", "runtests.jl"))
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
     @test LibGit2.getconfig(repo, "user.name", "") == LibGit2.getconfig("user.name", "")
-    @test LibGit2.url(remote) == "https://github.com/invenia/TestPkg.jl"
+    @test LibGit2.url(remote) == "https://github.com/invenia/$test_pkg.jl"
     @test in("master", branches)
     @test !in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
@@ -217,14 +267,14 @@ end
     generate(test_pkg, t; ssh=true)
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
-    @test LibGit2.url(remote) == "git@github.com:invenia/TestPkg.jl.git"
+    @test LibGit2.url(remote) == "git@github.com:invenia/$test_pkg.jl.git"
     rm(Pkg.dir(test_pkg); recursive=true)
 
     t = Template(; user="invenia", host="gitlab.com")
     generate(test_pkg, t)
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
-    @test LibGit2.url(remote) == "https://gitlab.com/invenia/TestPkg.jl"
+    @test LibGit2.url(remote) == "https://gitlab.com/invenia/$test_pkg.jl"
     rm(Pkg.dir(test_pkg); recursive=true)
 
     temp_dir = mktempdir()
@@ -237,7 +287,7 @@ end
         user="invenia",
         license="MIT",
         git_config=git_config,
-        plugins=[AppVeyor(), GitHubPages(), CodeCov(), TravisCI()],
+        plugins=[AppVeyor(), GitHubPages(), Coveralls(), CodeCov(), TravisCI()],
     )
     generate(test_pkg, t)
     @test isfile(Pkg.dir(test_pkg, "LICENSE"))
@@ -310,7 +360,7 @@ end
     @test isdir(joinpath(pkg_dir, "docs", "src"))
     @test isfile(joinpath(pkg_dir, "docs", "src", "index.md"))
     index = readchomp(joinpath(pkg_dir, "docs", "src", "index.md"))
-    @test index == "# TestPkg"
+    @test index == "# $test_pkg"
     rm(joinpath(pkg_dir, "docs"); recursive=true)
     p = GitHubPages(; assets=[test_file])
     @test gen_plugin(p, t, test_pkg) == ["docs/"]
@@ -345,29 +395,36 @@ end
 @testset "Mustache substitution" begin
     t = Template(; user="invenia")
     rm(t.temp_dir; recursive=true)
+    p = Coveralls()
     view = Dict{String, Any}("OTHER" => false)
 
-    text = substitute(template_text, test_pkg, t; view=view)
-    @test contains(text, "PKGNAME: TestPkg")
+    text = substitute(template_text, t, test_pkg; view=view)
+    @test contains(text, "PKGNAME: $test_pkg")
     @test contains(text, "VERSION: $(t.julia_version.major).$(t.julia_version.minor)")
     @test !contains(text, "Documenter")
     @test !contains(text, "After")
     @test !contains(text, "Other")
 
     t.plugins[GitHubPages] = GitHubPages()
-    text = substitute(template_text, test_pkg, t; view=view)
+    text = substitute(template_text, t, test_pkg; view=view)
     @test contains(text, "Documenter")
     @test contains(text, "After")
     empty!(t.plugins)
 
     t.plugins[CodeCov] = CodeCov()
-    text = substitute(template_text, test_pkg, t; view=view)
+    text = substitute(template_text, t, test_pkg; view=view)
     @test contains(text, "CodeCov")
     @test contains(text, "After")
     empty!(t.plugins)
 
     view["OTHER"] = true
-    text = substitute(template_text, test_pkg, t; view=view)
+    text = substitute(template_text, t, test_pkg; view=view)
+    @test contains(text, "Other")
+
+    text = substitute(template_text, p, test_pkg)
+    @test contains(text, "PKGNAME: $test_pkg")
+
+    text = substitute(template_text, p, test_pkg; view=view)
     @test contains(text, "Other")
 end
 
@@ -387,7 +444,7 @@ end
     end
     @test strip(mit) == strip(read_license("MIT"))
     @test strip(read_license("MIT")) == strip(readstring(joinpath(LICENSE_DIR, "MIT")))
-    @test_throws ArgumentError read_license("FakeLicense")
+    @test_throws ArgumentError read_license(fake_path)
 end
 
 rm(test_file)

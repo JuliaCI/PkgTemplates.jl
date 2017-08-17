@@ -120,9 +120,12 @@ Returns an array of generated file/directory names.
 """
 function gen_gitignore(pkg_name::AbstractString, template::Template)
     text = ".DS_Store\n"
-    for plugin in values(template.plugins)
-        if !isempty(plugin.gitignore_files)
-            text *= join(plugin.gitignore_files, "\n") * "\n"
+    seen = []
+    patterns = vcat([plugin.gitignore for plugin in values(template.plugins)]...)
+    for pattern in patterns
+        if !in(pattern, seen)
+            text *= "$pattern\n"
+            push!(seen, pattern)
         end
     end
 
@@ -262,8 +265,8 @@ end
 """
     substitute(
         template::AbstractString,
-        pkg_name::AbstractString,
         pkg_template::Template;
+        pkg_name::AbstractString,
         view::Dict{String, Any}=Dict{String, Any}(),
     ) -> String
 
@@ -271,22 +274,23 @@ Replace placeholders in `template`. The input string is not modified.
 
 # Arguments:
 * `template::AbstractString`: Template string to make replacements in.
-* `pkg_name::AbstractString`: Name of the package being created.
 * `pkg_template::Template`: The package template in use.
+* `pkg_name::AbstractString`: Name of the package being created.
 * `view::Dict{String, Any}=Dict{String, Any}()`: Additional values to be substituted.
 
 Returns the text with substitutions applied.
 """
 function substitute(
     template::AbstractString,
-    pkg_name::AbstractString,
-    pkg_template::Template;
+    pkg_template::Template,
+    pkg_name::AbstractString;
     view::Dict{String, Any}=Dict{String, Any}(),
 )
-    # Don't use version_floor here because we don't want the trailing '-' on prereleases.
     d = merge!(Dict{String, Any}(), view)
     d["PKGNAME"] = pkg_name
+    d["USER"] = pkg_template.user
     v = pkg_template.julia_version
+    # Don't use version_floor here because we don't want the trailing '-' on prereleases.
     d["VERSION"] = "$(v.major).$(v.minor)"
     # d["AFTER"] is true whenever something needs to occur in a CI "after_script".
     if any(isa(p, Documenter) for p in values(pkg_template.plugins))
@@ -298,4 +302,31 @@ function substitute(
         d["AFTER"] = true
     end
     return render(template, d)
+end
+
+"""
+    substitute(
+        template::AbstractString,
+        pkg_plugin::Plugin;
+        pkg_name::AbstractString,
+        view::Dict{String, Any}=Dict{String, Any}(),
+    ) -> String
+
+Replace placeholders in `template`. The input string is not modified.
+
+# Arguments:
+* `template::AbstractString`: Template string to make replacements in.
+* `pkg_plugin::Plugin`: The plugin in use.
+* `pkg_name::AbstractString`: Name of the package being created.
+* `view::Dict{String, Any}=Dict{String, Any}()`: Additional values to be substituted.
+
+Returns the text with substitutions applied.
+"""
+function substitute(
+    template::AbstractString,
+    pkg_plugin::Plugin,
+    pkg_name::AbstractString;
+    view::Dict{String, Any}=Dict{String, Any}(),
+)
+    return render(template, merge(Dict("PKGNAME" => pkg_name), view))
 end

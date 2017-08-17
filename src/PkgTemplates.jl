@@ -4,17 +4,20 @@ using AutoHashEquals
 using Mustache
 using URIParser
 
-export generate, show_license, Template, GitHubPages, AppVeyor, TravisCI, CodeCov
+export generate, show_license, Template, GitHubPages, AppVeyor, TravisCI,
+    CodeCov, Coveralls
 
 abstract type Plugin end
 
 include("license.jl")
 include("template.jl")
 include("generate.jl")
+include("plugin.jl")
 include(joinpath("plugins", "documenter.jl"))
+include(joinpath("plugins", "coveralls.jl"))
 include(joinpath("plugins", "appveyor.jl"))
 include(joinpath("plugins", "codecov.jl"))
-include(joinpath("plugins", "travis.jl"))
+include(joinpath("plugins", "travisci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 
 
@@ -30,6 +33,6 @@ const LICENSES = Dict(
     "LGPL-2.1+" => "Lesser GNU Public License, Version 2.1+",
     "LGPL-3.0+" => "Lesser GNU Public License, Version 3.0+"
 )
-const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, CodeCov]
+const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, CodeCov, Coveralls]
 
 end

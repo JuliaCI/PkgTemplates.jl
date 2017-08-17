@@ -2,7 +2,7 @@
 Add a Documenter subtype to a template's plugins to add support for
 [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 """
-abstract type Documenter <: Plugin end
+abstract type Documenter <: CustomPlugin end
 
 """
     gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractString) -> Void
