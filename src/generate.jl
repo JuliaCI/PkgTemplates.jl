@@ -93,6 +93,9 @@ Returns an array of generated file/directory names.
 """
 function gen_readme(pkg_name::AbstractString, template::Template)
     text = "# $pkg_name\n"
+    remaining = copy(collect(keys(template.plugins)))
+
+    # Generate the ordered badges first, then add any remaining ones to the right.
     for plugin_type in BADGE_ORDER
         if haskey(template.plugins, plugin_type)
             text *= "\n"
@@ -100,7 +103,15 @@ function gen_readme(pkg_name::AbstractString, template::Template)
                 badges(template.plugins[plugin_type], template.user, pkg_name),
                 "\n",
             )
+            deleteat!(remaining, findin(remaining, plugin_type))
         end
+    end
+    for plugin_type in remaining
+        text *= "\n"
+        text *= join(
+            badges(template.plugins[plugin_type], template.user, pkg_name),
+            "\n",
+        )
     end
 
     gen_file(joinpath(template.temp_dir, pkg_name, "README.md"), text)

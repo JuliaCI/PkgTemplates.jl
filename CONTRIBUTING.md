@@ -2,126 +2,135 @@
 
 The best way to contribute to `PkgTemplates` is by adding new plugins.
 
-Plugins are pretty simple. They're defined as subtypes to `Plugin`, in their
-own file inside `src/plugins`. Let's create one, called `MyPlugin`, in
+There are two main types of plugins:
+[`GenericPlugin`](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugins.html#GenericPlugin-1)s
+and
+[`CustomPlugin`](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugins.html#CustomPlugin-1)s.
+
+## Writing a Generic Plugin
+
+As the name suggests, generic plugins are simpler than custom ones, and as
+such are extremely easy to implement. They have the ability to add patterns
+the the generated `.gitignore`, as well as create a single configuration file.
+We're going to define a new generic plugin `MyPlugin` in
 `src/plugins/myplugin.jl`:
 
 ```julia
-@auto_hash_equals struct MyPlugin <: Plugin end
-```
-
-The `@auto_hash_equals` macro means we don't have to implement `==` or `hash`
-ourselves ([ref](https://github.com/andrewcooke/AutoHashEquals.jl)).
-
-All plugins need at least one attribute: `gitignore_files`. This is a
-`Vector{AbstractString}`, of which each entry will be inserted in the
-`.gitignore` of generated packages that use this plugin.
-
-Maybe the service that `MyPlugin` is associated with creates a directory
-called `secrets`, containing top secret data. In that case, `gitignore_files`
-should contain that string:
-
-```julia
-@auto_hash_equals struct MyPlugin <: Plugin
-    gitignore_files::Vector{AbstractString}
-
-    function MyPlugin()
-        new(["/secrets"])
-    end
-end
-```
-
-You can also add patterns like `*.key`, etc. to this array. Note that Windows
-Git also recognizes `/` as a path separator in `.gitignore`, so there's no
-need for `joinpath`.
-
-Suppose that `MyPlugin` also has a configuration file at the root of the repo.
-We're going to put a default `myplugin.yml` in `defaults`, but we also want
-to let users supply their own, or choose to not use one at all:
-
-```julia
-@auto_hash_equals struct MyPlugin <: Plugin
-    gitignore_files::Vector{AbstractString}
-    config_file::Union{AbstractString, Void}
+@auto_hash_equals struct MyPlugin <: GenericPlugin
+    gitignore::Vector{AbstractString}
+    src::Nullable{AbstractString}
+    dest::AbstractString
+    badges::Vector{AbstractString}
+    view::Dict{String, Any}
 
     function MyPlugin(; config_file::Union{AbstractString, Void}="")
         if config_file != nothing
             if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "myplugin.yml")
-            end
-            if !isfile(config_file)
+            elseif !isfile(config_file)
                 throw(ArgumentError("File $(abspath(config_file)) does not exist"))
             end
         end
-        new(["/secrets"], config_file)
+        new([], config_file, ".myplugin.yml", [], Dict{String, Any}())
     end
 end
 ```
 
-Now to actually create this configuration file at package generation time,
-we need a `gen_plugin` method. This method looks like this:
+That's all there is to it! Let's take a better look at what we've done:
+
+* The plugin has five attributes, these must be exactly as they are.
+  * `gitignore` is the array of patterns to add the the generated package's
+    `.gitignore`, we chose not to add any with this plugin.
+  * `src` is the location of the config file we're going to copy into the
+    generated package repository. If this is `nothing`, no config file will be
+    generated. This came from the `config_file` keyword argument, which
+    defaulted to an empty string. That's because we've placed a default
+    config file at `defaults/myplugin.yml`.
+  * `dest` is the path to our generated config file, relative to the root of
+    the package repository. In this example, the file will go in
+    `.myplugin.yml` at the root of the repository.
+  * `badges` is an array of Markdown-formatted badge strings to be displayed
+    on the package's README. We chose not to include any here. TODO talk about
+    `substitute`.
+  * `view` is a dictionary of additional replacements to `substitute`.
+
+Plenty of services like
+[`TravisCI`](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugins.html#TravisCI-1)
+and
+[`CodeCov`](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugins.html#CodeCov-1)
+follow this format, so generic plugins should be able to get you pretty far.
+
+## Writing a Custom Plugin
+
+When a service doesn't follow the pattern demonstrated above, it's time to write a custom
+plugin. These are still pretty simple, needing at most two additional methods. Let's create
+a custom plugin called `Gamble` in `src/plugins/gamble.jl` that only generates a file if
+you get lucky enough:
 
 ```julia
-function gen_plugin(plugin::MyPlugin, template::Template, pkg_name::AbstractString)
-    if plugin.config_file == nothing
+@auto_hash_equals struct Gamble <: CustomPlugin
+    gitignore:Vector{AbstractString}
+    src::AbstractString
+    success::Bool
+
+    function Gamble(config_file::AbstractString)
+        if !isfile(config_file)
+            throw(ArgumentError("File $(abspath(config_file)) does not exist"))
+        end
+        success = rand() > 0.8
+        println(success ? "Congratulations!" : "Maybe next time.")
+        new([], config_file, success)
+    end
+end
+
+function badges(plugin: Gamble, user::AbstractString, pkg_name::AbstractString)
+    if plugin.success
+        return ["[![You won!](https://i.imgur.com/poker-chip)](https://pokerstars.net)"]
+    else
         return String[]
     end
-    text = substitute(readstring(plugin.config_file), pkg_name, template)
-    gen_file(joinpath(template.temp_dir, pkg_name, ".myplugin.yml"))
-    return [".myplugin.yml"]
+end
+
+function gen_plugin(plugin::Gamble, template::Template, pkg_name::AbstractString)
+    if plugin.success
+        text = substitute(readstring(plugin.src), template, pkg_name)
+        gen_file(joinpath(t.temp_dir, ".gambler.yml"), text)
+        return [".gambler.yml"]
+    else
+        return String[]
+    end
 end
 ```
 
-There are a few things to note here:
+With that, we've got everything we need. Note that this plugin still has a `gitignore`
+attribute; it's required for all plugins. Let's look at the extra methods we implemented:
 
-* We use the `substitute` function on the config file's text.
-  * More on that [later](#template-substitution).
-* We use the `gen_file` function to create the file.
-  * It takes two arguments: the path to the file to be generated,
-    and the text to be written.
-* We place our file in `template.temp_dir`.
-  * `template.temp_dir` is where all file generation takes place, files are
-    only moved to their final location at the end of package generation
-    to avoid leftovers in the case of an error.
-* We return an array containing at most the name of our generated file.
-  * This array should contain all root-level files or directories that were
-    created. If we created `myplugin/foo` and `myplugin/bar`, we'd only need
-    to return `["myplugin/"]`. If nothing is created, then we return an
-    empty array.
+#### `gen_plugin`
 
-We've got the essentials now, but perhaps `MyPlugin` has a web interface
-that we want to access from the repo's homepage. We'll do this by adding a
-badge to the README:
+We read the text from the plugin's source file, and then we run it through the `substitute`
+function (more on that [later](#template-substitution)).
 
-```julia
-function badges(_::MyPlugin, user::AbstractString, pkg_name::AbstractString)
-    return [
-        "[![MyPlugin](https://myplugin.com/badges/$user/$pkg_name.jl)](https://myplugin.com/$user/$pkg_name.jl)"
-    ]
-end
-```
+Next, we use `gen_file` to write the text, with substitutions applied, to the destination
+file in `t.temp_dir`. Generating our repository in a temp directory means we're not stuck
+with leftovers in the case of an error.
 
-This method should return an array of Markdown-formatted strings that display
-badges and link to somewhere relevant. Note that a plugin can have any number
-of badges. The Markdown syntax is as follows:
+This function returns an array of all the root-level files or directories
+that were created. If both `foo/bar` and `foo/baz` were created, we only need
+to return `["foo/"]`.
 
-```
-[![Hover Text](https://badge-image.url)](https://link.url)
-```
+#### `badges`
 
-Badges for just about everything can be found at
-[Shields.io](https://shields.io/).
+This function returns an array of Markdown-formatted badges to be displayed on
+the package README. You can find badges and Markdown strings for just about
+everything on [Shields.io](https://shields.io).
 
-We're not done yet though, we need to add the plugin type to the list of
-badge-enabled plugins. We want `MyPlugin`'s badge to be displayed on the far
-right side, so we're going to add `MyPlugin` to the end of `BADGE_ORDER` in
-`src/PkgTemplates.jl`.
+This will do the trick, but if we want our badge to appear at a specific
+position in the README, we need to edit `BADGE_ORDER` in
+[`src/PkgTemplates.jl`(https://github.com/invenia/PkgTemplates.jl/blob/master/src/PkgTemplates.jl).
+Say we want our badge to appear before all others, we'll add `Gamble` to the
+beginning of the array.
 
-```julia
-const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, CodeCov, MyPlugin]
-```
-
-And we're done! We've just created a nifty new plugin.
+That's all there is to it! We've just created a nifty custom plugin.
 
 ***
 
