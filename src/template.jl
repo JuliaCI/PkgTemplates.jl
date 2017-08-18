@@ -21,10 +21,16 @@ Records common information used to generate a package.
   on the license. Can be supplied by a number, or a string such as "2016 - 2017".
 * `dir::AbstractString=Pkg.dir()`: Directory in which the package will go.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
+* `requirements::Vector{String}=String[]`: Package requirements. If there are duplicate
+  requirements with different versions, i.e. ["PkgTemplates", "PkgTemplates 0.1"],
+  an `ArgumentError` is thrown.
+  Each entry in this array will be copied into the `REQUIRE` file of packages generated
+  with this template.
 * `git_config::Dict{String, String}=Dict{String, String}()`: Git configuration options.
-* `plugins::Vector{Plugin}`: A list of `Plugin`s that the package will include.
+* `plugins::Plugin[]`: A list of `Plugin`s that the package will include.
 
-**Note**: When you create a `Template`, a temporary directory is created with
+# Notes
+When you create a `Template`, a temporary directory is created with
 `mktempdir()`. This directory will be removed after you call [`generate`](@ref).
 Creating multiple packages in succession with the same instance of a template will still
 work, but there is a miniscule chance of another process sharing the temporary directory,
@@ -40,6 +46,7 @@ don't belong.
     dir::AbstractString
     temp_dir::AbstractString
     julia_version::VersionNumber
+    requirements::Vector{AbstractString}
     git_config::Dict
     plugins::Dict{DataType, Plugin}
 
@@ -51,8 +58,9 @@ don't belong.
         years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
         dir::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
+        requirements::Vector{String}=String[],
         git_config::Dict=Dict(),
-        plugins::Vector{P}=Vector{Plugin}(),
+        plugins::Vector{P}=Plugin[],
     ) where P <: Plugin
         # If no username was set, look for one in a supplied git config,
         # and then in the global git config.
@@ -84,6 +92,17 @@ don't belong.
 
         temp_dir = mktempdir()
 
+        requirements_dedup = collect(Set(requirements))
+        diff = length(requirements) - length(requirements_dedup)
+        names = [tokens[1] for tokens in split.(requirements_dedup)]
+        if length(names) > length(Set(names))
+            throw(ArgumentError(
+                "requirements contains duplicate packages with conflicting versions"
+            ))
+        elseif diff > 0
+            warn("Removed $(diff) duplicate$(diff == 1 ? "" : "s") from requirements")
+        end
+
         plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
         if (length(plugins) != length(plugin_dict))
             warn("Plugin list contained duplicates, only the last of each type was kept")
@@ -91,7 +110,7 @@ don't belong.
 
         new(
             user, host, license, authors, years, dir, temp_dir,
-            julia_version, git_config, plugin_dict
+            julia_version, requirements_dedup, git_config, plugin_dict
         )
     end
 end

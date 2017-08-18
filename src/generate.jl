@@ -144,6 +144,7 @@ Returns an array of generated file/directory names.
 """
 function gen_require(pkg_name::AbstractString, template::Template)
     text = "julia $(version_floor(template.julia_version))\n"
+    text *= join(template.requirements, "\n")
 
     gen_file(joinpath(template.temp_dir, pkg_name, "REQUIRE"), text)
     return ["REQUIRE"]

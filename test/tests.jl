@@ -67,6 +67,18 @@ write(test_file, template_text)
     rm(t.temp_dir; recursive=true)
     @test t.julia_version == v"0.1.2"
 
+    t = Template(; user="invenia", requirements=["$test_pkg 0.1"])
+    rm(t.temp_dir; recursive=true)
+    @test t.requirements == ["$test_pkg 0.1"]
+    @test_warn r".+" t = Template(; user="invenia", requirements=[test_pkg, test_pkg])
+    rm(t.temp_dir; recursive=true)
+    @test t.requirements == [test_pkg]
+    @test_throws ArgumentError t = Template(;
+        user="invenia",
+        requirements=[test_pkg, "$test_pkg 0.1"]
+    )
+    rm(t.temp_dir; force=true, recursive=true)
+
     t = Template(; user="invenia", git_config=git_config)
     rm(t.temp_dir; recursive=true)
     @test t.git_config == git_config
@@ -102,10 +114,11 @@ write(test_file, template_text)
         @test_throws ArgumentError t = Template()
     else
         t = Template()
-        rm(t.temp_dir; recursive=true)
         @test t.user == LibGit2.getconfig("github.username", "")
     end
+    rm(t.temp_dir; force=true, recursive=true)
     @test_throws ArgumentError t = Template(; user="invenia", license="FakeLicense")
+    rm(t.temp_dir; force=true, recursive=true)
 end
 
 @testset "Plugin creation" begin
@@ -226,6 +239,7 @@ end
     t = Template(;
         user="invenia",
         license="MPL",
+        requirements=[test_pkg],
         git_config=git_config,
         plugins=[Coveralls(), TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
     )
@@ -287,7 +301,7 @@ end
     @test gen_require(test_pkg, t) == ["REQUIRE"]
     @test isfile(joinpath(pkg_dir, "REQUIRE"))
     vf = version_floor(t.julia_version)
-    @test readchomp(joinpath(pkg_dir, "REQUIRE")) == "julia $vf"
+    @test readchomp(joinpath(pkg_dir, "REQUIRE")) == "julia $vf\n$test_pkg"
     rm(joinpath(pkg_dir, "REQUIRE"))
 
     @test gen_tests(test_pkg, t) == ["test/"]
