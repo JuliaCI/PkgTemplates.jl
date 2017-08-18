@@ -8,37 +8,37 @@ Plugins are the driver for `PkgTemplates`'s customization and extension. This pa
 describes plugins that already exist; for information on writing your own plugins, see the
 [plugin development guide](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html).
 
-## TravisCI
+## `TravisCI`
 
 ```@docs
 TravisCI
 ```
 
-## AppVeyor
+## `AppVeyor`
 
 ```@docs
 AppVeyor
 ```
 
-## CodeCov
+## `CodeCov`
 
 ```@docs
 CodeCov
 ```
 
-## Coveralls
+## `Coveralls`
 
 ```@docs
 Coveralls
 ```
 
-## Documenter
+## `Documenter`
 
 ```@docs
 Documenter
 ```
 
-## GitHubPages
+## `GitHubPages`
 
 ```@docs
 GitHubPages

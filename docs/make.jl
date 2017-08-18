@@ -9,7 +9,7 @@ makedocs(
         "Plugins" => "pages/plugins.md",
         "Plugin Development" => "pages/plugin_development.md",
         "Licenses" => "pages/licenses.md",
-        "Index" => "pages/index.md"
+        "Index" => "pages/index.md",
     ],
     repo="https://github.com/christopher-dG/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",

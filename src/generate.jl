@@ -9,7 +9,7 @@
 Generate a package from a template.
 
 # Arguments
-* `pkg_name::AbstractString`: Name of the package.
+* `pkg_name::AbstractString`: Name of the package (with or without trailing ".jl").
 * `t::Template`: The template from which to generate the package.
 
 # Keyword Arguments
@@ -84,6 +84,72 @@ function generate(
 end
 
 """
+    gen_entrypoint(pkg_name::AbstractString, template::Template) -> Vector{String}
+
+Create the module entrypoint in the temp package directory.
+
+# Arguments
+* `pkg_name::AbstractString`: Name of the package.
+* `template::Template`: The template whose entrypoint we are generating.
+
+Returns an array of generated file/directory names.
+"""
+function gen_entrypoint(pkg_name::AbstractString, template::Template)
+    text = """
+        module $pkg_name
+
+        # Package code goes here.
+
+        end
+        """
+
+    gen_file(joinpath(template.temp_dir, pkg_name, "src", "$pkg_name.jl"), text)
+    return ["src/"]
+end
+
+"""
+    gen_tests(pkg_name::AbstractString, template::Template) -> Vector{String}
+
+Create the test directory and entrypoint in the temp package directory.
+
+# Arguments
+* `pkg_name::AbstractString`: Name of the package.
+* `template::Template`: The template whose tests we are generating.
+
+Returns an array of generated file/directory names.
+"""
+function gen_tests(pkg_name::AbstractString, template::Template)
+    text = """
+        using $pkg_name
+        using Base.Test
+
+        # Write your own tests here.
+        @test 1 == 2
+        """
+
+    gen_file(joinpath(template.temp_dir, pkg_name, "test", "runtests.jl"), text)
+    return ["test/"]
+end
+
+"""
+    gen_require(pkg_name::AbstractString, template::Template) -> Vector{String}
+
+Create the `REQUIRE` file in the temp package directory.
+
+# Arguments
+* `pkg_name::AbstractString`: Name of the package.
+* `template::Template`: The template whose REQUIRE we are generating.
+
+Returns an array of generated file/directory names.
+"""
+function gen_require(pkg_name::AbstractString, template::Template)
+    text = "julia $(version_floor(template.julia_version))\n"
+
+    gen_file(joinpath(template.temp_dir, pkg_name, "REQUIRE"), text)
+    return ["REQUIRE"]
+end
+
+"""
     gen_readme(pkg_name::AbstractString, template::Template) -> Vector{String}
 
 Create a README in the temp package directory with badges for each enabled plugin.
@@ -124,7 +190,7 @@ end
 """
     gen_gitignore(pkg_name::AbstractString, template::Template) -> Vector{String}
 
-Create a .gitignore in the temp package directory.
+Create a `.gitignore` in the temp package directory.
 
 # Arguments
 * `pkg_name::AbstractString`: Name of the package.
@@ -150,7 +216,7 @@ end
 """
     gen_license(pkg_name::AbstractString, template::Template) -> Vector{String}
 
-Create a LICENSE in the temp package directory.
+Create a license in the temp package directory.
 
 # Arguments
 * `pkg_name::AbstractString`: Name of the package.
@@ -168,72 +234,6 @@ function gen_license(pkg_name::AbstractString, template::Template)
 
     gen_file(joinpath(template.temp_dir, pkg_name, "LICENSE"), text)
     return ["LICENSE"]
-end
-
-"""
-    gen_entrypoint(pkg_name::AbstractString, template::Template) -> Vector{String}
-
-Create the module entrypoint in the temp package directory.
-
-# Arguments
-* `pkg_name::AbstractString`: Name of the package.
-* `template::Template`: The template whose entrypoint we are generating.
-
-Returns an array of generated file/directory names.
-"""
-function gen_entrypoint(pkg_name::AbstractString, template::Template)
-    text = """
-        module $pkg_name
-
-        # Package code goes here.
-
-        end
-        """
-
-    gen_file(joinpath(template.temp_dir, pkg_name, "src", "$pkg_name.jl"), text)
-    return ["src/"]
-end
-
-"""
-    gen_require(pkg_name::AbstractString, template::Template) -> Vector{String}
-
-Create the REQUIRE file in the temp package directory.
-
-# Arguments
-* `pkg_name::AbstractString`: Name of the package.
-* `template::Template`: The template whose REQUIRE we are generating.
-
-Returns an array of generated file/directory names.
-"""
-function gen_require(pkg_name::AbstractString, template::Template)
-    text = "julia $(version_floor(template.julia_version))\n"
-
-    gen_file(joinpath(template.temp_dir, pkg_name, "REQUIRE"), text)
-    return ["REQUIRE"]
-end
-
-"""
-    gen_tests(pkg_name::AbstractString, template::Template) -> Vector{String}
-
-Create the test directory and entrypoint in the temp package directory.
-
-# Arguments
-* `pkg_name::AbstractString`: Name of the package.
-* `template::Template`: The template whose tests we are generating.
-
-Returns an array of generated file/directory names.
-"""
-function gen_tests(pkg_name::AbstractString, template::Template)
-    text = """
-        using $pkg_name
-        using Base.Test
-
-        # Write your own tests here.
-        @test 1 == 2
-        """
-
-    gen_file(joinpath(template.temp_dir, pkg_name, "test", "runtests.jl"), text)
-    return ["test/"]
 end
 
 """
@@ -279,13 +279,7 @@ end
 """
     substitute(template::AbstractString, view::Dict{String, Any}) -> String
 
-Replace placeholders in a template string. The input string is not modified.
-
-# Arguments
-* `template::AbstracString`: Template string in which to make replacements.
-* `view::Dict{String, Any}`: (Placeholder => value) pairs.
-
-Returns the template string with replacements applied.
+Replace placeholders in `template` with values in `view`. `template` is not modified.
 
 # Notes
 Due to a bug in `Mustache`, conditionals often insert undesired newlines (more detail
@@ -321,8 +315,8 @@ substitute(template::AbstractString, view::Dict{String, Any}) = render(template,
         view::Dict{String, Any}=Dict{String, Any}(),
     ) -> String
 
-Replace placeholders in template string, using some default replacements based on the
-package template. The input string is not modified.
+Replace placeholders in `template`, using some default replacements based on the
+`pkg_template` and additional ones in `view`. `template` is not modified.
 """
 function substitute(
     template::AbstractString,

@@ -21,7 +21,7 @@ GenericPlugin
 CustomPlugin
 ```
 
-### CustomPlugin required methods
+### `CustomPlugin` required methods
 
 #### `gen_plugin`
 
@@ -35,27 +35,33 @@ gen_plugin
 badges
 ```
 
-## Helper Functions
+## Helper Types/Functions
 
-#### gen_file
+#### `gen_file`
 
 ```@docs
 gen_file
 ```
 
-#### substitute
+#### `substitute`
 
 ```@docs
 substitute
 ```
 
-#### badge
+#### `Badge`
 
 ```@docs
-badge
+Badge
 ```
 
-#### version_floor
+#### `format`
+
+```@docs
+format
+```
+
+#### `version_floor`
 
 ```@docs
 version_floor

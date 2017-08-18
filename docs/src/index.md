@@ -44,8 +44,8 @@ MyPkg.jl
 /home/degraafc/.julia/v0.6/MyPkg/test:
 runtests.jl
 ```
-However, we can also configure a number of keyword arguments to `Template` and
-`generate`:
+However, we can also configure a number of keyword arguments to [`Template`](@ref) and
+[`generate`](@ref):
 
 ```julia-repl
 julia> t = Template(;
