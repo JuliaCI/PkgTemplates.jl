@@ -34,7 +34,7 @@ function generate(
 
     if !force && ispath(pkg_dir)
         throw(ArgumentError(
-            "Something already exists at $pkg_dir, use force=true to overwrite it."
+            "Path '$pkg_dir' already exists, use force=true to overwrite it."
         ))
     end
 

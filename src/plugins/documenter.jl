@@ -35,7 +35,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
     text = """
         using Documenter, $pkg_name
 
-        makedocs(
+        makedocs(;
             modules=[$pkg_name],
             format=:html,
             pages=[

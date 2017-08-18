@@ -50,7 +50,7 @@ function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractS
                 file,
                 """
 
-                deploydocs(
+                deploydocs(;
                     repo="github.com/$(template.user)/$pkg_name.jl",
                     target="build",
                     julia="0.6",

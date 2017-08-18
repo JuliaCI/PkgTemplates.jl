@@ -9,6 +9,7 @@ end
 struct Bar <: CustomPlugin end
 struct Baz <: Plugin end
 
+const me = "christopher-dG"
 const git_config = Dict(
     "user.name" => "Tester McTestFace",
     "user.email" => "email@web.site",
@@ -29,9 +30,9 @@ template_text = """
 write(test_file, template_text)
 
 @testset "Template creation" begin
-    t = Template(; user="invenia")
+    t = Template(; user=me)
     rm(t.temp_dir; recursive=true)
-    @test t.user == "invenia"
+    @test t.user == me
     @test t.license == nothing
     @test t.years == string(Dates.year(Dates.today()))
     @test t.authors == LibGit2.getconfig("user.name", "")
@@ -40,50 +41,50 @@ write(test_file, template_text)
     @test isempty(t.git_config)
     @test isempty(t.plugins)
 
-    t = Template(; user="invenia", license="MIT")
+    t = Template(; user=me, license="MIT")
     rm(t.temp_dir; recursive=true)
     @test t.license == "MIT"
 
-    t = Template(; user="invenia", years=2014)
+    t = Template(; user=me, years=2014)
     rm(t.temp_dir; recursive=true)
     @test t.years == "2014"
-    t = Template(user="invenia", years="2014-2015")
+    t = Template(user=me, years="2014-2015")
     rm(t.temp_dir; recursive=true)
     @test t.years == "2014-2015"
 
-    t = Template(; user="invenia", authors="Some Guy")
+    t = Template(; user=me, authors="Some Guy")
     rm(t.temp_dir; recursive=true)
     @test t.authors == "Some Guy"
 
-    t = Template(; user="invenia", authors=["Guy", "Gal"])
+    t = Template(; user=me, authors=["Guy", "Gal"])
     rm(t.temp_dir; recursive=true)
     @test t.authors == "Guy, Gal"
 
-    t = Template(; user="invenia", dir=test_file)
+    t = Template(; user=me, dir=test_file)
     rm(t.temp_dir; recursive=true)
     @test t.dir == test_file
 
-    t = Template(; user="invenia", julia_version=v"0.1.2")
+    t = Template(; user=me, julia_version=v"0.1.2")
     rm(t.temp_dir; recursive=true)
     @test t.julia_version == v"0.1.2"
 
-    t = Template(; user="invenia", requirements=["$test_pkg 0.1"])
+    t = Template(; user=me, requirements=["$test_pkg 0.1"])
     rm(t.temp_dir; recursive=true)
     @test t.requirements == ["$test_pkg 0.1"]
-    @test_warn r".+" t = Template(; user="invenia", requirements=[test_pkg, test_pkg])
+    @test_warn r".+" t = Template(; user=me, requirements=[test_pkg, test_pkg])
     rm(t.temp_dir; recursive=true)
     @test t.requirements == [test_pkg]
     @test_throws ArgumentError t = Template(;
-        user="invenia",
+        user=me,
         requirements=[test_pkg, "$test_pkg 0.1"]
     )
     rm(t.temp_dir; force=true, recursive=true)
 
-    t = Template(; user="invenia", git_config=git_config)
+    t = Template(; user=me, git_config=git_config)
     rm(t.temp_dir; recursive=true)
     @test t.git_config == git_config
 
-    t = Template(; user="invenia", git_config=git_config)
+    t = Template(; user=me, git_config=git_config)
     rm(t.temp_dir; recursive=true)
     @test t.authors == git_config["user.name"]
 
@@ -93,7 +94,7 @@ write(test_file, template_text)
     @test t.authors == git_config["user.name"]
 
     t = Template(;
-        user="invenia",
+        user=me,
         plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()],
     )
     rm(t.temp_dir; recursive=true)
@@ -105,7 +106,7 @@ write(test_file, template_text)
     )
 
     @test_warn r".+" t = Template(;
-        user="invenia",
+        user=me,
         plugins=[TravisCI(), TravisCI()],
     )
     rm(t.temp_dir; recursive=true)
@@ -117,7 +118,7 @@ write(test_file, template_text)
         @test t.user == LibGit2.getconfig("github.username", "")
     end
     rm(t.temp_dir; force=true, recursive=true)
-    @test_throws ArgumentError t = Template(; user="invenia", license="FakeLicense")
+    @test_throws ArgumentError t = Template(; user=me, license="FakeLicense")
     rm(t.temp_dir; force=true, recursive=true)
 end
 
@@ -237,7 +238,7 @@ end
 
 @testset "File generation" begin
     t = Template(;
-        user="invenia",
+        user=me,
         license="MPL",
         requirements=[test_pkg],
         git_config=git_config,
@@ -316,7 +317,7 @@ end
 end
 
 @testset "Package generation" begin
-    t = Template(; user="invenia")
+    t = Template(; user=me)
     generate(test_pkg, t)
     @test !isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, "README.md"))
@@ -330,7 +331,7 @@ end
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
     @test LibGit2.getconfig(repo, "user.name", "") == LibGit2.getconfig("user.name", "")
-    @test LibGit2.url(remote) == "https://github.com/invenia/$test_pkg.jl"
+    @test LibGit2.url(remote) == "https://github.com/$me/$test_pkg.jl"
     @test in("master", branches)
     @test !in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
@@ -339,24 +340,24 @@ end
     generate(test_pkg, t; ssh=true)
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
-    @test LibGit2.url(remote) == "git@github.com:invenia/$test_pkg.jl.git"
+    @test LibGit2.url(remote) == "git@github.com:$me/$test_pkg.jl.git"
     rm(Pkg.dir(test_pkg); recursive=true)
 
-    t = Template(; user="invenia", host="gitlab.com")
+    t = Template(; user=me, host="gitlab.com")
     generate(test_pkg, t)
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
-    @test LibGit2.url(remote) == "https://gitlab.com/invenia/$test_pkg.jl"
+    @test LibGit2.url(remote) == "https://gitlab.com/$me/$test_pkg.jl"
     rm(Pkg.dir(test_pkg); recursive=true)
 
     temp_dir = mktempdir()
-    t = Template(; user="invenia", dir=temp_dir)
+    t = Template(; user=me, dir=temp_dir)
     generate(test_pkg, t)
     @test isdir(joinpath(temp_dir, test_pkg))
     rm(temp_dir; recursive=true)
 
     t = Template(;
-        user="invenia",
+        user=me,
         license="MIT",
         git_config=git_config,
         plugins=[AppVeyor(), GitHubPages(), Coveralls(), CodeCov(), TravisCI()],
@@ -383,7 +384,7 @@ end
     @test isfile(Pkg.dir(test_pkg, "README.md"))
     rm(Pkg.dir(test_pkg); recursive=true)
 
-    t = Template(; user="invenia", plugins=[GitHubPages()])
+    t = Template(; user=me, plugins=[GitHubPages()])
     generate(test_pkg, t)
     readme = readstring(Pkg.dir(test_pkg, "README.md"))
     index = readstring(Pkg.dir(test_pkg, "docs", "src", "index.md"))
@@ -392,7 +393,7 @@ end
 end
 
 @testset "Plugin generation" begin
-    t = Template(; user="invenia")
+    t = Template(; user=me)
     pkg_dir = joinpath(t.temp_dir, test_pkg)
 
     p = TravisCI()
@@ -539,7 +540,7 @@ end
     @test contains(text, "PKGNAME: $test_pkg")
     @test contains(text, "Other")
 
-    t = Template(; user="invenia")
+    t = Template(; user=me)
     rm(t.temp_dir; recursive=true)
     view["OTHER"] = false
 

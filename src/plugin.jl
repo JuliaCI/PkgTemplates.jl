@@ -38,7 +38,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
         new(
             ["*.mgp"],
             config_file,
-            ".mypugin.yml",
+            ".myplugin.yml",
             [
                 Badge(
                     "My Plugin",
