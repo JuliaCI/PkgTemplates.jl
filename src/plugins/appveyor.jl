@@ -1,5 +1,5 @@
 """
-    AppVeyor(; config_file::Union{AbstractString, Void}="") -> GenericPlugin
+    AppVeyor(; config_file::Union{AbstractString, Void}="") -> AppVeyor
 
 Add `AppVeyor` to a template's plugins to add a `.appveyor.yml` configuration file to
 generated repositories, and an appropriate badge to the README.

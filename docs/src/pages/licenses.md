@@ -18,6 +18,6 @@ show_license
 
 #### `read_license`
 
-````@docs
+```@docs
 read_license
 ```

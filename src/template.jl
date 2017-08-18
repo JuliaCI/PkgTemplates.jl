@@ -9,7 +9,10 @@ Records common information used to generate a package.
   value. If neither is set, an `ArgumentError` is thrown.
   **This is case-sensitive for some plugins, so take care to enter it correctly.**
 * `host::AbstractString="github.com"`: URL to the code hosting service where your package
-  will reside.
+  will reside. Note that while hosts other than GitHub won't cause errors, they are not
+  officially supported and they will cause certain plugins will produce incorrect output.
+  For example, [`AppVeyor`](@ref)'s badge image will point to a GitHub-specific URL,
+  regardless of the value of `host`.
 * `license::Union{AbstractString, Void}=nothing`: Name of the package license. If
   no license is specified, no license is created. [`show_license`](@ref) can be used to
   list all available licenses, or to print out a particular license's text.

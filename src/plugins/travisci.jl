@@ -1,5 +1,5 @@
 """
-    TravisCI(; config_file::Union{AbstractString, Void}="") -> GenericPlugin
+    TravisCI(; config_file::Union{AbstractString, Void}="") -> TravisCI
 
 Add `TravisCI` to a template's plugins to add a `.travis.yml` configuration file to
 generated repositories, and an appropriate badge to the README.

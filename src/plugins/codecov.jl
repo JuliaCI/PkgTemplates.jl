@@ -1,5 +1,5 @@
 """
-    CodeCov(; config_file::Union{AbstractString, Void}="") -> GenericPlugin
+    CodeCov(; config_file::Union{AbstractString, Void}="") -> CodeCov
 
 Add `CodeCov` to a template's plugins to add a `.codecov.yml` configuration file to
 generated repositories, and an appropriate badge to the README. Also updates the
