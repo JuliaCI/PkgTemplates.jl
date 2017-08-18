@@ -426,6 +426,7 @@ end
     @test gen_plugin(p, t, test_pkg) == [".appveyor.yml"]
     @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
     appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
+    @test !contains(appveyor, "coverage=true")
     @test !contains(appveyor, "after_script")
     @test !contains(appveyor, "Codecov.submit")
     @test !contains(appveyor, "Coveralls.submit")
@@ -434,6 +435,7 @@ end
     gen_plugin(p, t, test_pkg)
     delete!(t.plugins, CodeCov)
     appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
+    @test contains(appveyor, "coverage=true")
     @test contains(appveyor, "after_script")
     @test contains(appveyor, "Codecov.submit")
     @test !contains(appveyor, "Coveralls.submit")
@@ -442,6 +444,7 @@ end
     gen_plugin(p, t, test_pkg)
     delete!(t.plugins, Coveralls)
     appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
+    @test contains(appveyor, "coverage=true")
     @test contains(appveyor, "after_script")
     @test contains(appveyor, "Coveralls.submit")
     @test !contains(appveyor, "Codecov.submit")
