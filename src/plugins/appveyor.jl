@@ -12,7 +12,7 @@ generated repositories, and an appropriate badge to the README.
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{Vector{AbstractString}}
+    badges::Vector{Badge}
     view::Dict{String, Any}
 
     function AppVeyor(; config_file::Union{AbstractString, Void}="")
@@ -28,11 +28,11 @@ generated repositories, and an appropriate badge to the README.
             config_file,
             ".appveyor.yml",
             [
-                [
+                Badge(
                     "Build Status",
                     "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true",
                     "https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl",
-                ],
+                )
             ],
             Dict{String, Any}(),
         )

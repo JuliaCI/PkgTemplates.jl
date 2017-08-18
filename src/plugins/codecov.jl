@@ -13,7 +13,7 @@ generated repositories, and an appropriate badge to the README. Also updates the
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{Vector{AbstractString}}
+    badges::Vector{Badge}
     view::Dict{String, Any}
 
     function CodeCov(; config_file::Union{AbstractString, Void}="")
@@ -29,11 +29,11 @@ generated repositories, and an appropriate badge to the README. Also updates the
             config_file,
             ".codecov.yml",
             [
-                [
+                Badge(
                     "CodeCov",
                     "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
                     "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
-                ],
+                ),
             ],
             Dict{String, Any}(),
         )

@@ -25,8 +25,16 @@ end
 
 function badges(_::GitHubPages, user::AbstractString, pkg_name::AbstractString)
     return [
-        badge("Stable", "https://img.shields.io/badge/docs-stable-blue.svg", "https://$user.github.io/$pkg_name.jl/stable")
-        badge("Latest", "https://img.shields.io/badge/docs-latest-blue.svg", "https://$user.github.io/$pkg_name.jl/latest")
+        format(Badge(
+            "Stable",
+            "https://img.shields.io/badge/docs-stable-blue.svg",
+            "https://$user.github.io/$pkg_name.jl/stable"
+        )),
+        format(Badge(
+            "Latest",
+            "https://img.shields.io/badge/docs-latest-blue.svg",
+            "https://$user.github.io/$pkg_name.jl/latest"
+        )),
     ]
 end
 

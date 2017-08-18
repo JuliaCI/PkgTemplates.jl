@@ -10,10 +10,9 @@ Generic plugins are plugins that add any number of patterns to the generated pac
   to an empty string, there should be a default file in `defaults` that will be copied.
 * `dest::AbstractString`: Path to the generated file, relative to the root of the generated
   package repository.
-* `badges::Vector{Vector{AbstractString}}`: Array of arrays containing information to
-  create a Markdown-formatted badge from the plugin. Each entry is of the form
-  `[hover_text, image_url, link_url]`. Entries will be run through [`substitute`](@ref),
-  so they may contain placeholder values.
+* `badges::Vector{Badge}`: Array of [`Badge`](@ref)s containing information used to
+  create Markdown-formatted badges from the plugin. Entries will be run through
+  [`substitute`](@ref), so they may contain placeholder values.
 * `view::Dict{String, Any}`: Additional substitutions to make in both the plugin's badges
   and its associated file. See [`substitute`](@ref) for details.
 
@@ -23,7 +22,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{Vector{AbstractString}}
+    badges::Vector{Badge}
     view::Dict{String, Any}
 
     function MyPlugin(; config_file::Union{AbstractString, Void}="")
@@ -41,11 +40,11 @@ Generic plugins are plugins that add any number of patterns to the generated pac
             config_file,
             ".mypugin.yml",
             [
-                [
+                Badge(
                     "My Plugin",
                     "https://myplugin.com/badge-{{YEAR}}.png",
                     "https://myplugin.com/{{USER}}/{{PKGNAME}}.jl",
-                ],
+                ),
             ],
             Dict{String, Any}("YEAR" => Dates.year(Dates.now())),
         )
@@ -100,11 +99,11 @@ choose.
     )
         if plugin.lucky
             return [
-                badge(
+                format(Badge(
                     "You got lucky!",
                     "https://myplugin.com/badge.png",
                     "https://myplugin.com/\$user/\$pkg_name.jl",
-                ),
+                )),
             ]
         else
             return String[]
@@ -115,9 +114,35 @@ end
 
 This plugin doesn't do much, but it demonstrates how [`gen_plugin`](@ref) and
 [`badges`](@ref) can be implemented using [`substitute`](@ref), [`gen_file`](@ref),
-and [`badge`](@ref).
+[`Badge`](@ref), and [`format`](@ref).
 """
 abstract type CustomPlugin <: Plugin end
+
+"""
+    Badge(hover::AbstractString, image::AbstractString, link::AbstractString) -> Badge
+
+A `Badge` contains the data necessary to generate a Markdown badge.
+
+# Arguments
+* `hover::AbstractString`: Text to appear when the mouse is hovered over the badge.
+* `image::AbstractString`: URL to the image to display.
+* `link::AbstractString`: URL to go to upon clicking the badge.
+"""
+@auto_hash_equals struct Badge
+    hover::AbstractString
+    image::AbstractString
+    link::AbstractString
+    function Badge(hover::AbstractString, image::AbstractString, link::AbstractString)
+        new(hover, image, link)
+    end
+end
+
+"""
+    format(b::Badge)
+
+Return `badge`'s data formatted as a Markdown string.
+"""
+format(b::Badge) = "[![$(b.hover)]($(b.image))]($(b.link))"
 
 """
     gen_plugin(plugin::Plugin, template::Template, pkg_name::AbstractString) -> Vector{String}
@@ -165,19 +190,5 @@ badges(plugin::Plugin, user::AbstractString, pkg_name::AbstractString) = String[
 function badges(plugin::GenericPlugin, user::AbstractString, pkg_name::AbstractString)
     # Give higher priority to replacements defined in the plugin's view.
     view = merge(Dict("USER" => user, "PKGNAME" => pkg_name), plugin.view)
-    return [badge([substitute(part, view) for part in b]...) for b in plugin.badges]
-end
-
-"""
-    badge(hover::AbstractString, image::AbstractString, image::AbstractString) -> String
-
-Format a single Markdown badge.
-
-# Arguments
-* `hover::AbstractString`: Text to appear when the mouse is hovered over the badge.
-* `image::AbstractString`: URL to the image to display.
-* `link::AbstractString`: URL to go to upon clicking the badge.
-"""
-function badge(hover::AbstractString, image::AbstractString, link::AbstractString)
-    return "[![$hover]($image)]($link)"
+    return [substitute(format(badge), view) for badge in plugin.badges]
 end

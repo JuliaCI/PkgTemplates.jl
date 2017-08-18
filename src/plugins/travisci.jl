@@ -12,7 +12,7 @@ generated repositories, and an appropriate badge to the README.
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{Vector{AbstractString}}
+    badges::Vector{Badge}
     view::Dict{String, Any}
 
     function TravisCI(; config_file::Union{AbstractString, Void}="")
@@ -28,11 +28,11 @@ generated repositories, and an appropriate badge to the README.
             config_file,
             ".travis.yml",
             [
-                [
+                Badge(
                     "Build Status",
                     "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
                     "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
-                ],
+                ),
             ],
             Dict{String, Any}(),
         )

@@ -13,7 +13,7 @@ file to generated repositories, and an appropriate badge to the README. Also upd
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{Vector{AbstractString}}
+    badges::Vector{Badge}
     view::Dict{String, Any}
 
     function Coveralls(; config_file::Union{AbstractString, Void}=nothing)
@@ -25,11 +25,11 @@ file to generated repositories, and an appropriate badge to the README. Also upd
             config_file,
             ".coveralls.yml",
             [
-                [
+                Badge(
                     "Coveralls",
                     "https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master",
                     "https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master",
-                ],
+                ),
             ],
             Dict{String, Any}(),
         )
