@@ -1,36 +1,16 @@
 """
-    show_license() -> Void
+    show_license([license::AbstractString]) -> Void
 
-Show all available license names.
+Show all available license names, or prints the text of `license`.
 """
-function show_license()
-    for (k, v) in LICENSES
-        println("$k: $v")
-    end
-end
-
-"""
-    show_license(license::AbstractString) -> Void
-
-Shows the text of a given `license`.
-
-# Arguments
-* `license::AbstractString`: Name of the license to be shown.
-  The list of available licenses can be shown with `show_license()`.
-"""
-function show_license(license::AbstractString)
-    println(read_license(license))
-end
+show_license() = println(join(["$k: $v" for (k, v) in LICENSES], "\n"))
+show_license(license::AbstractString) = println(read_license(license))
 
 """
     read_license(licence::AbstractString) -> String
 
-Read the contents of the named `license`. Errors if it is not found.
-
-# Arguments
-* `license::AbstractString`: Name of the license to read.
-
-Returns the license text.
+Returns the contents of `license`. Errors if it is not found. Use [`show_license`](@ref) to
+view available licenses.
 """
 function read_license(license::AbstractString)
     path = joinpath(LICENSE_DIR, license)
