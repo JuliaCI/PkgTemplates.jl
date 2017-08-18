@@ -2,10 +2,12 @@ struct Foo <: GenericPlugin
     gitignore::Vector{AbstractString}
     src::Nullable{AbstractString}
     dest::AbstractString
-    badges::Vector{Vector{AbstractString}}
+    badges::Vector{Badge}
     view::Dict{String, Any}
-    Foo() = new([], @__FILE__, "", [["foo", "bar", "baz"]], Dict{String, Any}())
+    Foo() = new([], @__FILE__, fake_path, [Badge("foo", "bar", "baz")], Dict{String, Any}())
 end
+struct Bar <: CustomPlugin end
+struct Baz <: Plugin end
 
 const git_config = Dict(
     "user.name" => "Tester McTestFace",
@@ -111,11 +113,13 @@ end
     @test isempty(p.gitignore)
     @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
     @test p.dest == ".appveyor.yml"
-    @test p.badges == [[
-        "Build Status",
-        "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true",
-        "https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl",
-    ]]
+    @test p.badges == [
+        Badge(
+            "Build Status",
+            "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true",
+            "https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl",
+        ),
+    ]
     @test isempty(p.view)
     p = AppVeyor(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -127,11 +131,13 @@ end
     @test isempty(p.gitignore)
     @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
     @test p.dest == ".travis.yml"
-    @test p.badges == [[
-        "Build Status",
-        "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
-        "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
-    ]]
+    @test p.badges == [
+        Badge(
+            "Build Status",
+            "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
+            "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
+        ),
+    ]
     @test isempty(p.view)
     p = TravisCI(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -143,11 +149,13 @@ end
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
     @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
     @test p.dest == ".codecov.yml"
-    @test p.badges == [[
-        "CodeCov",
-        "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
-        "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
-    ]]
+    @test p.badges == [
+        Badge(
+            "CodeCov",
+            "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
+            "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
+        )
+    ]
     @test isempty(p.view)
     p = CodeCov(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -159,11 +167,13 @@ end
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
     @test_throws NullException get(p.src)
     @test p.dest == ".coveralls.yml"
-    @test p.badges == [[
-        "Coveralls",
-        "https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master",
-        "https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master",
-    ]]
+    @test p.badges == [
+        Badge(
+            "Coveralls",
+            "https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master",
+            "https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master",
+        )
+    ]
     @test isempty(p.view)
     p = Coveralls(; config_file=nothing)
     @test_throws NullException get(p.src)
@@ -182,6 +192,12 @@ end
 @testset "Badge generation" begin
     user = git_config["github.username"]
 
+    badge = Badge("A", "B", "C")
+    @test badge.hover == "A"
+    @test badge.image == "B"
+    @test badge.link == "C"
+    @test format(badge) == "[![A](B)](C)"
+
     p = AppVeyor()
     @test badges(p, user, test_pkg) == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/$user/$test_pkg.jl?svg=true)](https://ci.appveyor.com/project/$user/$test_pkg-jl)"]
 
@@ -199,6 +215,11 @@ end
         "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$test_pkg.jl/stable)"
         "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$test_pkg.jl/latest)"
     ]
+
+    p = Bar()
+    @test isempty(badges(p, user, test_pkg))
+    p = Baz()
+    @test isempty(badges(p, user, test_pkg))
 end
 
 @testset "File generation" begin
@@ -470,6 +491,11 @@ end
     @test contains(make, "deploydocs")
     rm(joinpath(pkg_dir, "docs"); recursive=true)
     @test_throws ArgumentError GitHubPages(; assets=[fake_path])
+
+    p = Bar()
+    @test isempty(gen_plugin(p, t, test_pkg))
+    p = Baz()
+    @test isempty(gen_plugin(p, t, test_pkg))
 
     rm(t.temp_dir; recursive=true)
 end
