@@ -21,8 +21,8 @@ include(joinpath("plugins", "travisci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 
 
-const DEFAULTS_DIR = Pkg.dir("PkgTemplates", "defaults")
-const LICENSE_DIR = Pkg.dir("PkgTemplates", "licenses")
+const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
+const LICENSE_DIR = normpath(joinpath(@__DIR__, "..", "licenses"))
 const LICENSES = Dict(
     "MIT" => "MIT \"Expat\" License",
     "BSD" => "Simplified \"2-clause\" BSD License",
