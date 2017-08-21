@@ -93,6 +93,10 @@ test/runtests.jl
 Information on each keyword as well as plugin types can be found in the
 [documentation](https://christopher-dG.github.io/PkgTemplates.jl/stable).
 
+If that looks like a lot of work, you can also create templates interactively:
+
+[![asciicast](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8.png)](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8)
+
 ## Comparison to [PkgDev](https://github.com/JuliaLang/PkgDev.jl)
 
 `PkgTemplates` is similar in functionality to `PkgDev`'s `generate` function.

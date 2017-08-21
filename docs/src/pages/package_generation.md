@@ -11,6 +11,7 @@ Creating new packages with `PkgTemplates` revolves around creating a new
 
 ```@docs
 Template
+interactive_template
 ```
 
 ## `generate`

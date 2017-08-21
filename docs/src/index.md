@@ -53,6 +53,10 @@ generate("MyPkg", t; force=true, ssh=true)
 cd(joinpath(t.dir, "MyPkg")); run(`git ls-tree -r --name-only HEAD`)
 ```
 
+If that looks like a lot of work, you can also create templates interactively:
+
+[![asciicast](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8.png)](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8)
+
 ## Comparison to [PkgDev](https://github.com/JuliaLang/PkgDev.jl)
 
 `PkgTemplates` is similar in functionality to `PkgDev`'s `generate` function.

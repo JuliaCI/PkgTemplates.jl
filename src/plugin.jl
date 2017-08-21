@@ -8,6 +8,9 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 * `src::Nullable{AbstractString}`: Path to the file that will be copied into the generated
   package repository. If set to `nothing`, no file will be generated. When this defaults
   to an empty string, there should be a default file in `defaults` that will be copied.
+  That file's name is usually the same as the plugin's name, except in all lowercase and
+  with the `.yml` extension. If this is not the case, an `interactive` method needs to be
+  implemented to call `interactive(; file="other-filename.ext")`.
 * `dest::AbstractString`: Path to the generated file, relative to the root of the generated
   package repository.
 * `badges::Vector{Badge}`: Array of [`Badge`](@ref)s containing information used to
@@ -28,7 +31,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
     function MyPlugin(; config_file::Union{AbstractString, Void}="")
         if config_file != nothing
             if isempty(config_file)
-                config_file = joinpath(DEFAULTS_DIR, "myplugin.yml")
+                config_file = joinpath(DEFAULTS_DIR, "my-plugin.toml")
             elseif !isfile(config_file)
                 throw(ArgumentError(
                     "File \$(abspath(config_file)) does not exist"
@@ -46,15 +49,19 @@ Generic plugins are plugins that add any number of patterns to the generated pac
                     "https://myplugin.com/{{USER}}/{{PKGNAME}}.jl",
                 ),
             ],
-            Dict{String, Any}("YEAR" => Dates.year(Dates.now())),
+            Dict{String, Any}("YEAR" => Dates.year(now()),
         )
     end
 end
+
+interactive(plugin_type::Type{MyPlugin}) = interactive(plugin_type; file="my-plugin.toml")
 ```
 
-The above plugin ignores files ending with `.mgp`, copies `defaults/myplugin.yml` by
+The above plugin ignores files ending with `.mgp`, copies `defaults/my-plugin.toml` by
 default, and creates a badge that links to the project on its own site, using the default
-substitutions with one addition: `{{YEAR}} => Dates.year(Dates.now())`.
+substitutions with one addition: `{{YEAR}} => Dates.year(now()`. Since the default
+config template file doesn't follow the generic naming convention, we added another
+`interactive` method to correct the assumed filename.
 """
 abstract type GenericPlugin <: Plugin end
 
@@ -193,6 +200,16 @@ function badges(plugin::GenericPlugin, user::AbstractString, pkg_name::AbstractS
     return [substitute(format(badge), view) for badge in plugin.badges]
 end
 
+"""
+    interactive(
+        plugin_type::Type{P <: Plugin};
+        file::Union{AbstractString, Void},
+    ) -> Union{Plugin, Void}
+
+Interactively create a plugin of type `plugin_type`, where `file` is the plugin type's
+default config template with a non-standard name (for `MyPlugin`, this is anything but
+"myplugin.yml").
+"""
 function interactive(
     plugin_type::Type{P};
     file::Union{AbstractString, Void}="",

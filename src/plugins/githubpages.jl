@@ -65,6 +65,6 @@ function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractS
 end
 
 function interactive(plugin_type::Type{GitHubPages})
-    print("Enter any Documenter assets files for GitHubPages (separated by spaces) []")
+    print("Enter any Documenter asset files for GitHubPages (separated by spaces) []: ")
     return GitHubPages(; assets=String.(split(readline())))
 end

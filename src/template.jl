@@ -2,7 +2,7 @@
     Template(; kwargs...) -> Template
 
 Records common information used to generate a package. If you don't wish to manually
-create a template, you can use [`interactive`](@ref) instead.
+create a template, you can use [`interactive_template`](@ref) instead.
 
 # Keyword Arguments
 * `user::AbstractString="")`: GitHub username. If left  unset, it will try to take the
@@ -122,10 +122,10 @@ end
 """
     interactive_template() -> Template
 
-Interactively generate a [`Template`](@ref).
+Interactively create a [`Template`](@ref).
 """
-function interactive()
-    info("Generating template... default values are shown in [brackets]")
+function interactive_template()
+    info("Default values are shown in [brackets]")
     # Getting the leaf types in a separate thread eliminates an awkward wait after
     # "Select plugins" is printed.
     plugin_types = @spawn leaves(Plugin)
@@ -197,13 +197,12 @@ function interactive()
     kwargs[:git_config] = git_config
 
     println("Select plugins:")
-    plugin_types = fetch(plugin_types)
+    # Only include plugin types which have an `interactive` method.
+    plugin_types = filter(t -> method_exists(interactive, (Type{t},)), fetch(plugin_types))
     type_names = map(t -> split(string(t), ".")[end], plugin_types)
     menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
     selected = collect(request(menu))
-    kwargs[:plugins] = Vector{Plugin}(
-        map(t -> interactive(t), getindex(plugin_types, selected)),
-    )
+    kwargs[:plugins] = map(t -> interactive(t), getindex(plugin_types, selected))
 
     return Template(; kwargs...)
 end
