@@ -1,10 +1,10 @@
 """
-    show_license([license::AbstractString]) -> Void
+    show_license([license::AbstractString]; io=STDOUT) -> Void
 
 Show all available license names, or prints the text of `license`.
 """
-show_license() = println(join(["$k: $v" for (k, v) in LICENSES], "\n"))
-show_license(license::AbstractString) = println(read_license(license))
+show_license(; io=STDOUT) = println(io, join(["$k: $v" for (k, v) in LICENSES], "\n"))
+show_license(license::AbstractString; io=STDOUT) = println(io, read_license(license))
 
 """
     read_license(licence::AbstractString) -> String
