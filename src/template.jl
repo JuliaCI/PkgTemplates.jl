@@ -1,7 +1,8 @@
 """
     Template(; kwargs...) -> Template
 
-Records common information used to generate a package.
+Records common information used to generate a package. If you don't wish to manually
+create a template, you can use [`interactive`](@ref) instead.
 
 # Keyword Arguments
 * `user::AbstractString="")`: GitHub username. If left  unset, it will try to take the
@@ -20,8 +21,8 @@ Records common information used to generate a package.
   string for one author, and an array for multiple. Similarly to `user`, it will try to
   take the value of a supplied git config's "user.name" key, then the global git config's
   value, if it is left unset
-* `years::Union{Int, AbstractString}=string(Dates.year(Dates.today()))`: Copyright years
-  on the license. Can be supplied by a number, or a string such as "2016 - 2017".
+* `years::Union{Int, AbstractString}=Dates.year(now())`: Copyright years on the license.
+  Can be supplied by a number, or a string such as "2016 - 2017".
 * `dir::AbstractString=Pkg.dir()`: Directory in which the package will go.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `requirements::Vector{String}=String[]`: Package requirements. If there are duplicate
@@ -58,7 +59,7 @@ don't belong.
         host::AbstractString="https://github.com",
         license::Union{AbstractString, Void}=nothing,
         authors::Union{AbstractString, Array}="",
-        years::Union{Int, AbstractString}=string(Dates.year(Dates.today())),
+        years::Union{Int, AbstractString}=Dates.year(now()),
         dir::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
         requirements::Vector{String}=String[],
@@ -117,3 +118,99 @@ don't belong.
         )
     end
 end
+
+"""
+    interactive_template() -> Template
+
+Interactively generate a [`Template`](@ref).
+"""
+function interactive()
+    info("Generating template... default values are shown in [brackets]")
+    # Getting the leaf types in a separate thread eliminates an awkward wait after
+    # "Select plugins" is printed.
+    plugin_types = @spawn leaves(Plugin)
+    kwargs = Dict{Symbol, Any}()
+
+    default_user = LibGit2.getconfig("github.username", "")
+    print("Enter your username [$(isempty(default_user) ? "REQUIRED" : default_user)]: ")
+    user = readline()
+    kwargs[:user] = if !isempty(user)
+        user
+    elseif !isempty(default_user)
+        default_user
+    else
+        throw(ArgumentError("Username is required"))
+    end
+
+    default_host = "github.com"
+    print("Enter the code hosting service [$default_host]: ")
+    host = readline()
+    kwargs[:host] = isempty(host) ? default_host : host
+
+    println("Select a license:")
+    io = IOBuffer()
+    show_license(; io=io)
+    licenses = [nothing => nothing, collect(LICENSES)...]
+    menu = RadioMenu(["None", split(String(take!(io)), "\n")...])
+    # If the user breaks out of the menu with C-c, the result is -1, the absolute value of
+    # which correponds to no license.
+    kwargs[:license] = licenses[abs(request(menu))].first
+
+    default_authors = LibGit2.getconfig("user.name", "")
+    default_str = isempty(default_authors) ? "None" : default_authors
+    print("Enter the package author(s) [$default_str]: ")
+    authors = readline()
+    kwargs[:authors] = isempty(authors) ? default_authors : authors
+
+    default_years = Dates.year(now())
+    print("Enter the copyright year(s) [$default_years]: ")
+    years = readline()
+    kwargs[:years] = isempty(years) ? default_years : years
+
+    default_dir = Pkg.dir()
+    print("Enter the path to the package directory [$default_dir]: ")
+    dir = readline()
+    kwargs[:dir] = isempty(dir) ? default_dir : dir
+
+    default_julia_version = VERSION
+    print("Enter the minimum Julia version [$default_julia_version]: ")
+    julia_version = readline()
+    kwargs[:julia_version] = if isempty(julia_version)
+        default_julia_version
+    else
+        VersionNumber(julia_version)
+    end
+
+    print("Enter any Julia package requirements, (separated by spaces) []: ")
+    requirements = String.(split(readline()))
+
+    git_config = Dict()
+    print("Enter any Git key-value pairs (one at a time, separated by spaces) [None]: ")
+    while true
+        tokens = split(readline())
+        isempty(tokens) && break
+        if haskey(git_config, tokens[1])
+            warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
+        end
+        git_config[tokens[1]] = tokens[2]
+    end
+    kwargs[:git_config] = git_config
+
+    println("Select plugins:")
+    plugin_types = fetch(plugin_types)
+    type_names = map(t -> split(string(t), ".")[end], plugin_types)
+    menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
+    selected = collect(request(menu))
+    kwargs[:plugins] = Vector{Plugin}(
+        map(t -> interactive(t), getindex(plugin_types, selected)),
+    )
+
+    return Template(; kwargs...)
+end
+
+"""
+    leaves(t:Type) -> Vector{DataType}
+
+Get all concrete subtypes of `t`.
+"""
+leaves(t::Type) = isleaftype(t) ? t : vcat(leaves.(subtypes(t))...)

@@ -1,4 +1,5 @@
 julia 0.6
 AutoHashEquals
 Mustache
+TerminalMenus
 URIParser

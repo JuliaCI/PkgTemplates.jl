@@ -2,9 +2,10 @@ module PkgTemplates
 
 using AutoHashEquals
 using Mustache
+using TerminalMenus
 using URIParser
 
-export generate, show_license, Template, GitHubPages, AppVeyor, TravisCI,
+export generate, interactive, show_license, Template, GitHubPages, AppVeyor, TravisCI,
     CodeCov, Coveralls
 
 abstract type Plugin end
@@ -19,7 +20,6 @@ include(joinpath("plugins", "appveyor.jl"))
 include(joinpath("plugins", "codecov.jl"))
 include(joinpath("plugins", "travisci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
-
 
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
 const LICENSE_DIR = normpath(joinpath(@__DIR__, "..", "licenses"))

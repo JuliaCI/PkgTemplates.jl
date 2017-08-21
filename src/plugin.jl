@@ -192,3 +192,29 @@ function badges(plugin::GenericPlugin, user::AbstractString, pkg_name::AbstractS
     view = merge(Dict("USER" => user, "PKGNAME" => pkg_name), plugin.view)
     return [substitute(format(badge), view) for badge in plugin.badges]
 end
+
+function interactive(
+    plugin_type::Type{P};
+    file::Union{AbstractString, Void}="",
+) where P <: GenericPlugin
+    plugin_name = String(split(string(plugin_type), ".")[end])
+    # By default, we expect the default plugin file template for a plugin called
+    # "MyPlugin" to be called "myplugin.yml".
+    fn = file != nothing && isempty(file) ? "$(lowercase(plugin_name)).yml" : file
+    default_config_file = fn == nothing ? fn : joinpath(DEFAULTS_DIR, fn)
+    print("Enter the config template filename for $plugin_name (\"None\" for no file) ")
+    if default_config_file == nothing
+        print("[None]: ")
+    else
+        print("[$(replace(default_config_file, homedir(), "~"))]: ")
+    end
+    config_file = readline()
+    config_file = if config_file == "None"
+        nothing
+    elseif isempty(config_file)
+        default_config_file
+    else
+        config_file
+    end
+    return plugin_type(; config_file=config_file)
+end
