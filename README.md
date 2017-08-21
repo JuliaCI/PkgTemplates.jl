@@ -51,7 +51,7 @@ julia> t = Template(;
            license="MIT",
            authors=["Chris de Graaf", "Invenia Technical Computing Corporation"],
            years="2016-2017",
-           dir=joinpath(ENV["HOME"], "code"),
+           dir=joinpath(homedir(), "code"),
            julia_version=v"0.5.2",
            requirements=["PkgTemplates"],
            git_config=Dict("diff.renames" => true),
@@ -60,7 +60,7 @@ julia> t = Template(;
                CodeCov(; config_file=nothing),
                Coveralls(),
                AppVeyor(),
-               GitHubPages(; assets=[joinpath(ENV["HOME"], "invenia.css")]),
+               GitHubPages(; assets=[joinpath(homedir(), "invenia.css")]),
            ],
        )
 

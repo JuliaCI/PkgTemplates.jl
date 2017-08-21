@@ -6,11 +6,7 @@
         ssh::Bool=false,
     ) -> Void
 
-Generate a package from a template.
-
-# Arguments
-* `pkg_name::AbstractString`: Name of the package (with or without trailing ".jl").
-* `t::Template`: The template from which to generate the package.
+Generate a package names `pkg_name` from `template`.
 
 # Keyword Arguments
 * `force::Bool=false`: Whether or not to overwrite old packages with the same name.
