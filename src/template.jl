@@ -14,7 +14,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
   officially supported and they will cause certain plugins will produce incorrect output.
   For example, [`AppVeyor`](@ref)'s badge image will point to a GitHub-specific URL,
   regardless of the value of `host`.
-* `license::Union{AbstractString, Void}=nothing`: Name of the package license. If
+* `license::Union{AbstractString, Void}="MIT"`: Name of the package license. If
   no license is specified, no license is created. [`show_license`](@ref) can be used to
   list all available licenses, or to print out a particular license's text.
 * `authors::Union{AbstractString, Array}=""`: Names that appear on the license. Supply a
@@ -57,7 +57,7 @@ don't belong.
     function Template(;
         user::AbstractString="",
         host::AbstractString="https://github.com",
-        license::Union{AbstractString, Void}=nothing,
+        license::Union{AbstractString, Void}="MIT",
         authors::Union{AbstractString, Array}="",
         years::Union{Int, AbstractString}=Dates.year(now()),
         dir::AbstractString=Pkg.dir(),
