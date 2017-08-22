@@ -33,7 +33,7 @@ write(test_file, template_text)
     t = Template(; user=me)
     rm(t.temp_dir; recursive=true)
     @test t.user == me
-    @test t.license == nothing
+    @test t.license == "MIT"
     @test t.years == string(Dates.year(Dates.today()))
     @test t.authors == LibGit2.getconfig("user.name", "")
     @test t.dir == Pkg.dir()
@@ -41,9 +41,13 @@ write(test_file, template_text)
     @test isempty(t.git_config)
     @test isempty(t.plugins)
 
-    t = Template(; user=me, license="MIT")
+    t = Template(; user=me, license=nothing)
     rm(t.temp_dir; recursive=true)
-    @test t.license == "MIT"
+    @test t.license == nothing
+
+    t = Template(; user=me, license="MPL")
+    rm(t.temp_dir; recursive=true)
+    @test t.license == "MPL"
 
     t = Template(; user=me, years=2014)
     rm(t.temp_dir; recursive=true)
@@ -319,7 +323,7 @@ end
 @testset "Package generation" begin
     t = Template(; user=me)
     generate(test_pkg, t)
-    @test !isfile(Pkg.dir(test_pkg, "LICENSE"))
+    @test isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, "README.md"))
     @test isfile(Pkg.dir(test_pkg, "REQUIRE"))
     @test isfile(Pkg.dir(test_pkg, ".gitignore"))
@@ -358,12 +362,12 @@ end
 
     t = Template(;
         user=me,
-        license="MIT",
+        license=nothing,
         git_config=git_config,
         plugins=[AppVeyor(), GitHubPages(), Coveralls(), CodeCov(), TravisCI()],
     )
     generate(test_pkg, t)
-    @test isfile(Pkg.dir(test_pkg, "LICENSE"))
+    @test !isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, ".travis.yml"))
     @test isfile(Pkg.dir(test_pkg, ".appveyor.yml"))
     @test isfile(Pkg.dir(test_pkg, ".codecov.yml"))
