@@ -13,7 +13,7 @@ const me = "christopher-dG"
 const git_config = Dict(
     "user.name" => "Tester McTestFace",
     "user.email" => "email@web.site",
-    "github.username" => "TesterMcTestFace",
+    "github.user" => "TesterMcTestFace",
 )
 const test_pkg = "TestPkg"
 const fake_path = bin(hash("/this/file/does/not/exist"))
@@ -94,7 +94,7 @@ write(test_file, template_text)
 
     t = Template(; git_config=git_config)
     rm(t.temp_dir; recursive=true)
-    @test t.user == git_config["github.username"]
+    @test t.user == git_config["github.user"]
     @test t.authors == git_config["user.name"]
 
     t = Template(;
@@ -115,11 +115,11 @@ write(test_file, template_text)
     )
     rm(t.temp_dir; recursive=true)
 
-    if isempty(LibGit2.getconfig("github.username", ""))
+    if isempty(LibGit2.getconfig("github.user", ""))
         @test_throws ArgumentError t = Template()
     else
         t = Template()
-        @test t.user == LibGit2.getconfig("github.username", "")
+        @test t.user == LibGit2.getconfig("github.user", "")
     end
     rm(t.temp_dir; force=true, recursive=true)
     @test_throws ArgumentError t = Template(; user=me, license="FakeLicense")
@@ -208,7 +208,7 @@ end
 end
 
 @testset "Badge generation" begin
-    user = git_config["github.username"]
+    user = git_config["github.user"]
 
     badge = Badge("A", "B", "C")
     @test badge.hover == "A"

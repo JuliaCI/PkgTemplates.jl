@@ -6,7 +6,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
 
 # Keyword Arguments
 * `user::AbstractString="")`: GitHub username. If left  unset, it will try to take the
-  value of a supplied git config's "github.username" key, then the global git config's
+  value of a supplied git config's "github.user" key, then the global git config's
   value. If neither is set, an `ArgumentError` is thrown.
   **This is case-sensitive for some plugins, so take care to enter it correctly.**
 * `host::AbstractString="github.com"`: URL to the code hosting service where your package
@@ -70,8 +70,8 @@ don't belong.
         # and then in the global git config.
         if isempty(user)
             user = get(
-                git_config, "github.username",
-                LibGit2.getconfig("github.username", ""),
+                git_config, "github.user",
+                LibGit2.getconfig("github.user", ""),
             )
         end
         if isempty(user)
@@ -132,7 +132,7 @@ function interactive_template(; fast::Bool=false)
     plugin_types = @spawn leaves(Plugin)
     kwargs = Dict{Symbol, Any}()
 
-    default_user = LibGit2.getconfig("github.username", "")
+    default_user = LibGit2.getconfig("github.user", "")
     print("Enter your username [$(isempty(default_user) ? "REQUIRED" : default_user)]: ")
     user = readline()
     kwargs[:user] = if !isempty(user)
