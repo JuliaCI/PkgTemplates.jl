@@ -93,9 +93,14 @@ test/runtests.jl
 Information on each keyword as well as plugin types can be found in the
 [documentation](https://christopher-dG.github.io/PkgTemplates.jl/stable).
 
-If that looks like a lot of work, you can also create templates interactively:
+If that looks like a lot of work, you can also create templates interactively
+with `interactive_template`:
 
 [![asciicast](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8.png)](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8)
+
+And if that's **still** too much work for you, you can call
+`interactive_template` with `fast=true` to use default values for everything
+but username and plugin selection.
 
 ## Comparison to [PkgDev](https://github.com/JuliaLang/PkgDev.jl)
 

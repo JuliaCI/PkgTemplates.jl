@@ -7,7 +7,8 @@ CurrentModule = PkgTemplates
 The best and easiest way to contribute to `PkgTemplates` is to write new
 plugins.
 
-There are two types of plugins: [`GenericPlugin`](@ref)s and [`CustomPlugin`](@ref)s.
+There are two types of plugins: [`GenericPlugin`](@ref)s and
+[`CustomPlugin`](@ref)s.
 
 ## Generic Plugins
 
@@ -30,8 +31,9 @@ gen_plugin
 interactive
 ```
 
-**Note**: [`interactive`](@ref) is not strictly required, however without it, your custom
-plugin will not be available when creating templates with [`interactive_template`](@ref).
+**Note**: [`interactive`](@ref) is not strictly required, however without it,
+your custom plugin will not be available when creating templates with
+[`interactive_template`](@ref).
 
 #### `badges`
 

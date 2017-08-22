@@ -27,8 +27,8 @@ generate("MyPkg", t)
 cd(joinpath(t.dir, "MyPkg")); run(`git ls-tree -r --name-only HEAD`)
 ```
 
-However, we can also configure a number of keyword arguments to [`Template`](@ref) and
-[`generate`](@ref):
+However, we can also configure a number of keyword arguments to
+[`Template`](@ref) and [`generate`](@ref):
 
 ```@repl
 using PkgTemplates
@@ -53,9 +53,14 @@ generate("MyPkg", t; force=true, ssh=true)
 cd(joinpath(t.dir, "MyPkg")); run(`git ls-tree -r --name-only HEAD`)
 ```
 
-If that looks like a lot of work, you can also create templates interactively:
+If that looks like a lot of work, you can also create templates interactively
+with [`interactive_template`](@ref):
 
 [![asciicast](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8.png)](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8)
+
+And if that's **still** too much work for you, you can call
+`interactive_template` with `fast=true` to use default values for everything
+but username and plugin selection.
 
 ## Comparison to [PkgDev](https://github.com/JuliaLang/PkgDev.jl)
 
