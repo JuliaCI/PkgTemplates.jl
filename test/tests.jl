@@ -4,7 +4,9 @@ struct Foo <: GenericPlugin
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
-    Foo() = new([], @__FILE__, fake_path, [Badge("foo", "bar", "baz")], Dict{String, Any}())
+    function Foo(; config_file=test_file)
+        new([], @__FILE__, config_file, [Badge("foo", "bar", "baz")], Dict{String, Any}())
+    end
 end
 struct Bar <: CustomPlugin end
 struct Baz <: Plugin end
@@ -124,6 +126,63 @@ write(test_file, template_text)
     rm(t.temp_dir; force=true, recursive=true)
     @test_throws ArgumentError t = Template(; user=me, license="FakeLicense")
     rm(t.temp_dir; force=true, recursive=true)
+end
+
+@testset "Interactive template creation" begin
+    old_stdin = STDIN
+    in_read, in_write = redirect_stdin()
+    write(in_write, "$me\n\n\r\n\n\n\n\n\nd")
+    t = interactive_template()
+    rm(t.temp_dir; recursive=true)
+    @test t.user == me
+    @test t.host == "github.com"
+    @test t.license == nothing
+    @test t.authors == LibGit2.getconfig("user.name", "")
+    @test t.years == string(Dates.year(now()))
+    @test t.dir == Pkg.dir()
+    @test t.julia_version == VERSION
+    @test isempty(t.requirements)
+    @test isempty(t.git_config)
+    @test isempty(t.plugins)
+
+    if isempty(LibGit2.getconfig("github.user", ""))
+        write(in_write, "\n")
+        @test_throws ArgumentError t = interactive_template()
+        rm(t.temp_dir; force=true, recursive=true)
+    end
+
+    write(in_write, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
+    t = interactive_template()
+    rm(t.temp_dir; recursive=true)
+    @test t.user == me
+    @test t.host == "gitlab.com"
+    # Not sure if the order the licenses are displayed is consistent.
+    @test t.license != nothing
+    @test t.authors == me
+    @test t.years == "2016"
+    @test t.dir == test_file
+    @test t.julia_version == v"0.5.0"
+    @test Set(t.requirements) == Set(["X", "Y"])
+    @test t.git_config == Dict("A" => "B")
+    # Like above, not sure which plugins this will generate.
+    @test length(t.plugins) == 2
+
+    write(in_write, "$me\nd")
+    t = interactive_template(; fast=true)
+    rm(t.temp_dir; recursive=true)
+    @test t.user == me
+    @test t.host == "github.com"
+    @test t.license == "MIT"
+    @test t.authors == LibGit2.getconfig("user.name", "")
+    @test t.years == string(Dates.year(now()))
+    @test t.dir == Pkg.dir()
+    @test t.julia_version == VERSION
+    @test isempty(t.requirements)
+    @test isempty(t.git_config)
+    @test isempty(t.plugins)
+
+    redirect_stdin(old_stdin)
+    println()
 end
 
 @testset "Plugin creation" begin
