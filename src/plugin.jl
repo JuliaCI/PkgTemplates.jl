@@ -10,7 +10,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
   to an empty string, there should be a default file in `defaults` that will be copied.
   That file's name is usually the same as the plugin's name, except in all lowercase and
   with the `.yml` extension. If this is not the case, an `interactive` method needs to be
-  implemented to call `interactive(; file="other-filename.ext")`.
+  implemented to call `interactive(; file="file.ext")`.
 * `dest::AbstractString`: Path to the generated file, relative to the root of the generated
   package repository.
 * `badges::Vector{Badge}`: Array of [`Badge`](@ref)s containing information used to
@@ -59,16 +59,16 @@ interactive(plugin_type::Type{MyPlugin}) = interactive(plugin_type; file="my-plu
 
 The above plugin ignores files ending with `.mgp`, copies `defaults/my-plugin.toml` by
 default, and creates a badge that links to the project on its own site, using the default
-substitutions with one addition: `{{YEAR}} => Dates.year(now()`. Since the default
-config template file doesn't follow the generic naming convention, we added another
-`interactive` method to correct the assumed filename.
+substitutions with one addition: `{{YEAR}} => Dates.year(now()`. Since the default config
+template file doesn't follow the generic naming convention, we added another `interactive`
+method to correct the assumed filename.
 """
 abstract type GenericPlugin <: Plugin end
 
 """
 Custom plugins are plugins whose behaviour does not follow the [`GenericPlugin`](@ref)
-pattern. They can implement [`gen_plugin`](@ref) and [`badges`](@ref) in any way they
-choose.
+pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
+[`interactive`](@ref) in any way they choose.
 
 # Attributes
 * `gitignore::Vector{AbstractString}`: Array of patterns to be added to the `.gitignore` of
@@ -117,11 +117,21 @@ choose.
         end
     end
 end
+
+interactive(plugin_type::Type{MyPlugin}) = MyPlugin()
 ```
 
-This plugin doesn't do much, but it demonstrates how [`gen_plugin`](@ref) and
-[`badges`](@ref) can be implemented using [`substitute`](@ref), [`gen_file`](@ref),
-[`Badge`](@ref), and [`format`](@ref).
+This plugin doesn't do much, but it demonstrates how [`gen_plugin`](@ref), [`badges`](@ref)
+and [`interactive`](@ref) can be implemented using [`substitute`](@ref),
+[`gen_file`](@ref), [`Badge`](@ref), and [`format`](@ref).
+
+# Defining Template Files
+Often, the contents of the config file that your plugin generates depends on variables like
+the package name, the user's username, etc. Template files (which are stored in `defaults`)
+can use [here](https://github.com/jverzani/Mustache.jl)'s syntax to define replacements.
+
+**Note**: Due to a bug in `Mustache`, conditionals can insert undesired newlines
+(more detail [here](https://github.com/jverzani/Mustache.jl/issues/47)).
 """
 abstract type CustomPlugin <: Plugin end
 
@@ -203,7 +213,7 @@ end
 """
     interactive(
         plugin_type::Type{P <: Plugin};
-        file::Union{AbstractString, Void},
+        file::Union{AbstractString, Void}="",
     ) -> Union{Plugin, Void}
 
 Interactively create a plugin of type `plugin_type`, where `file` is the plugin type's

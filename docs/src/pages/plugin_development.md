@@ -21,7 +21,7 @@ GenericPlugin
 CustomPlugin
 ```
 
-### `CustomPlugin` required methods
+### `CustomPlugin` Required Methods
 
 #### `gen_plugin`
 
@@ -30,8 +30,8 @@ gen_plugin
 interactive
 ```
 
-**Note**: `interactive` is not strictly required, however without it, your custom plugin
-will not be available when creating templates with [`interactive_template`](@ref).
+**Note**: [`interactive`](@ref) is not strictly required, however without it, your custom
+plugin will not be available when creating templates with [`interactive_template`](@ref).
 
 #### `badges`
 

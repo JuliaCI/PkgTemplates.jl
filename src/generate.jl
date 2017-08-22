@@ -282,31 +282,13 @@ end
 """
     substitute(template::AbstractString, view::Dict{String, Any}) -> String
 
-Replace placeholders in `template` with values in `view`. `template` is not modified.
+Replace placeholders in `template` with values in `view` via
+[`Mustache`](https://github.com/jverzani/Mustache.jl). `template` is not modified.
 
-# Notes
-Due to a bug in `Mustache`, conditionals often insert undesired newlines (more detail
-[here](https://github.com/jverzani/Mustache.jl/issues/47)).
+For information on how to structure `template`, see "Defining Template Files" section in
+[Custom Plugins](@ref).
 
-For example:
-```
-A
-{{#B}}B{{/B}}
-C
-```
-
-When `view` doesn't have a `"B"` key (or it does, but it's false), this becomes
-`"A\\n\\nC"` We can get around this by writing ugly template files, like so:
-
-```
-A{{#B}}
-B{{/B}}
-C
-```
-
-In this case, the result is `"A\\nB\\nC"`, like we want it to be.
-
-Also note that conditionals without a corresponding key in `view` won't error,
+**Note**: Conditionals in `template` without a corresponding key in `view` won't error,
 but will simply be evaluated as false.
 """
 substitute(template::AbstractString, view::Dict{String, Any}) = render(template, view)
