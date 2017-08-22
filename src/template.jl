@@ -120,11 +120,12 @@ don't belong.
 end
 
 """
-    interactive_template() -> Template
+    interactive_template(; fast::Bool) -> Template
 
-Interactively create a [`Template`](@ref).
+Interactively create a [`Template`](@ref). If `fast` is set, defaults will be assumed for
+all values except username and plugins.
 """
-function interactive_template()
+function interactive_template(; fast::Bool=false)
     info("Default values are shown in [brackets]")
     # Getting the leaf types in a separate thread eliminates an awkward wait after
     # "Select plugins" is printed.
@@ -142,59 +143,87 @@ function interactive_template()
         throw(ArgumentError("Username is required"))
     end
 
-    default_host = "github.com"
-    print("Enter the code hosting service [$default_host]: ")
-    host = readline()
-    kwargs[:host] = isempty(host) ? default_host : host
-
-    println("Select a license:")
-    io = IOBuffer()
-    show_license(; io=io)
-    licenses = [nothing => nothing, collect(LICENSES)...]
-    menu = RadioMenu(["None", split(String(take!(io)), "\n")...])
-    # If the user breaks out of the menu with C-c, the result is -1, the absolute value of
-    # which correponds to no license.
-    kwargs[:license] = licenses[abs(request(menu))].first
-
-    default_authors = LibGit2.getconfig("user.name", "")
-    default_str = isempty(default_authors) ? "None" : default_authors
-    print("Enter the package author(s) [$default_str]: ")
-    authors = readline()
-    kwargs[:authors] = isempty(authors) ? default_authors : authors
-
-    default_years = Dates.year(now())
-    print("Enter the copyright year(s) [$default_years]: ")
-    years = readline()
-    kwargs[:years] = isempty(years) ? default_years : years
-
-    default_dir = Pkg.dir()
-    print("Enter the path to the package directory [$default_dir]: ")
-    dir = readline()
-    kwargs[:dir] = isempty(dir) ? default_dir : dir
-
-    default_julia_version = VERSION
-    print("Enter the minimum Julia version [$default_julia_version]: ")
-    julia_version = readline()
-    kwargs[:julia_version] = if isempty(julia_version)
-        default_julia_version
+    kwargs[:host] = if fast
+        "https://github.com"
     else
-        VersionNumber(julia_version)
+        default_host = "github.com"
+        print("Enter the code hosting service [$default_host]: ")
+        host = readline()
+        isempty(host) ? default_host : host
     end
 
-    print("Enter any Julia package requirements, (separated by spaces) []: ")
-    requirements = String.(split(readline()))
+    kwargs[:license] = if fast
+        "MIT"
+    else
+        println("Select a license:")
+        io = IOBuffer()
+        show_license(; io=io)
+        licenses = [nothing => nothing, collect(LICENSES)...]
+        menu = RadioMenu(["None", split(String(take!(io)), "\n")...])
+        # If the user breaks out of the menu with C-c, the result is -1, the absolute
+        # value of which correponds to no license.
+        licenses[abs(request(menu))].first
+    end
 
-    git_config = Dict()
-    print("Enter any Git key-value pairs (one at a time, separated by spaces) [None]: ")
-    while true
-        tokens = split(readline())
-        isempty(tokens) && break
-        if haskey(git_config, tokens[1])
-            warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
+    kwargs[:authors] = if fast
+        LibGit2.getconfig("user.name", "")
+    else
+        default_authors = LibGit2.getconfig("user.name", "")
+        default_str = isempty(default_authors) ? "None" : default_authors
+        print("Enter the package author(s) [$default_str]: ")
+        authors = readline()
+        isempty(authors) ? default_authors : authors
+    end
+
+    kwargs[:years] = if fast
+        Dates.year(now())
+    else
+        default_years = Dates.year(now())
+        print("Enter the copyright year(s) [$default_years]: ")
+        years = readline()
+        isempty(years) ? default_years : years
+    end
+
+    kwargs[:dir] = if fast
+        Pkg.dir()
+    else
+        default_dir = Pkg.dir()
+        print("Enter the path to the package directory [$default_dir]: ")
+        dir = readline()
+        isempty(dir) ? default_dir : dir
+    end
+
+    kwargs[:julia_version] = if fast
+        VERSION
+    else
+        default_julia_version = VERSION
+        print("Enter the minimum Julia version [$default_julia_version]: ")
+        julia_version = readline()
+        isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
+    end
+
+    kwargs[:requirements] = if fast
+        String[]
+    else
+        print("Enter any Julia package requirements, (separated by spaces) []: ")
+        String.(split(readline()))
+    end
+
+    kwargs[:git_config] = if fast
+        Dict()
+    else
+        git_config = Dict()
+        print("Enter any Git key-value pairs (one at a time, separated by spaces) [None]: ")
+        while true
+            tokens = split(readline())
+            isempty(tokens) && break
+            if haskey(git_config, tokens[1])
+                warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
+            end
+            git_config[tokens[1]] = tokens[2]
         end
-        git_config[tokens[1]] = tokens[2]
+        git_config
     end
-    kwargs[:git_config] = git_config
 
     println("Select plugins:")
     # Only include plugin types which have an `interactive` method.
@@ -202,7 +231,9 @@ function interactive_template()
     type_names = map(t -> split(string(t), ".")[end], plugin_types)
     menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
     selected = collect(request(menu))
-    kwargs[:plugins] = map(t -> interactive(t), getindex(plugin_types, selected))
+    kwargs[:plugins] = Vector{Plugin}(
+        map(t -> interactive(t), getindex(plugin_types, selected))
+    )
 
     return Template(; kwargs...)
 end
