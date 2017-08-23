@@ -4,12 +4,17 @@ generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
  """
 abstract type Documenter <: CustomPlugin end
 
-function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractString)
+function gen_plugin(
+    plugin::Documenter,
+    template::Template,
+    dir::AbstractString,
+    pkg_name::AbstractString,
+)
     if Pkg.installed("Documenter") == nothing
         info("Adding Documenter.jl")
         Pkg.add("Documenter")
     end
-    path = joinpath(template.temp_dir, pkg_name)
+    path = joinpath(dir, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
     if !isempty(plugin.assets)
@@ -52,7 +57,7 @@ function gen_plugin(plugin::Documenter, template::Template, pkg_name::AbstractSt
     open(joinpath(docs_dir,  "index.md"), "w") do fp
         write(fp, "# $pkg_name")
     end
-    readme_path = joinpath(template.temp_dir, pkg_name, "README.md")
+    readme_path = joinpath(dir, pkg_name, "README.md")
     if isfile(readme_path)
         cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
     end

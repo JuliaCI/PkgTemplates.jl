@@ -49,7 +49,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
                     "https://myplugin.com/{{USER}}/{{PKGNAME}}.jl",
                 ),
             ],
-            Dict{String, Any}("YEAR" => Dates.year(now()),
+            Dict{String, Any}("YEAR" => Dates.year(Dates.today())),
         )
     end
 end
@@ -59,9 +59,9 @@ interactive(plugin_type::Type{MyPlugin}) = interactive(plugin_type; file="my-plu
 
 The above plugin ignores files ending with `.mgp`, copies `defaults/my-plugin.toml` by
 default, and creates a badge that links to the project on its own site, using the default
-substitutions with one addition: `{{YEAR}} => Dates.year(now()`. Since the default config
-template file doesn't follow the generic naming convention, we added another `interactive`
-method to correct the assumed filename.
+substitutions with one addition: `{{YEAR}} => Dates.year(Dates.today())`. Since the default
+config template file doesn't follow the generic naming convention, we added another
+`interactive` method to correct the assumed filename.
 """
 abstract type GenericPlugin <: Plugin end
 
@@ -86,14 +86,15 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
     function gen_plugin(
         plugin::MyPlugin,
         template::Template,
+        dir::AbstractString,
         pkg_name::AbstractString
     )
         if plugin.lucky
             text = substitute(
-                "You got lucky with {{PKGNAME}}, {{USER}}!"),
+                "You got lucky with {{PKGNAME}}, {{USER}}!",
                 template,
             )
-            gen_file(joinpath(template.temp_dir, ".myplugin.yml"), text)
+            gen_file(joinpath(dir, ".myplugin.yml"), text)
         else
             println("Maybe next time.")
         end
@@ -149,9 +150,6 @@ A `Badge` contains the data necessary to generate a Markdown badge.
     hover::AbstractString
     image::AbstractString
     link::AbstractString
-    function Badge(hover::AbstractString, image::AbstractString, link::AbstractString)
-        new(hover, image, link)
-    end
 end
 
 """
@@ -162,20 +160,39 @@ Return `badge`'s data formatted as a Markdown string.
 format(b::Badge) = "[![$(b.hover)]($(b.image))]($(b.link))"
 
 """
-    gen_plugin(plugin::Plugin, template::Template, pkg_name::AbstractString) -> Vector{String}
+    gen_plugin(
+        plugin::Plugin,
+        template::Template,
+        dir::AbstractString,
+        pkg_name::AbstractString
+    ) -> Vector{String}
 
 Generate any files associated with a plugin.
 
 # Arguments
 * `plugin::Plugin`: Plugin whose files are being generated.
 * `template::Template`: Template configuration.
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of generated file/directory names.
 """
-gen_plugin(plugin::Plugin, template::Template, pkg_name::AbstractString) = String[]
+function gen_plugin(
+    plugin::Plugin,
+    template::Template,
+    dir::AbstractString,
+    pkg_name::AbstractString,
+)
+    return String[]
+end
 
-function gen_plugin(plugin::GenericPlugin, template::Template, pkg_name::AbstractString)
+function gen_plugin(
+    plugin::GenericPlugin,
+    template::Template,
+    dir::AbstractString,
+    pkg_name::AbstractString,
+)
     src = try
         get(plugin.src)
     catch
@@ -186,7 +203,7 @@ function gen_plugin(plugin::GenericPlugin, template::Template, pkg_name::Abstrac
         template;
         view=merge(Dict("PKGNAME" => pkg_name), plugin.view),
     )
-    gen_file(joinpath(template.temp_dir, pkg_name, plugin.dest), text)
+    gen_file(joinpath(dir, pkg_name, plugin.dest), text)
     return [plugin.dest]
 end
 
@@ -214,16 +231,16 @@ end
     interactive(
         plugin_type::Type{P <: Plugin};
         file::Union{AbstractString, Void}="",
-    ) -> Union{Plugin, Void}
+    ) -> Plugin
 
 Interactively create a plugin of type `plugin_type`, where `file` is the plugin type's
 default config template with a non-standard name (for `MyPlugin`, this is anything but
 "myplugin.yml").
 """
 function interactive(
-    plugin_type::Type{P};
+    plugin_type::Type{<:GenericPlugin};
     file::Union{AbstractString, Void}="",
-) where P <: GenericPlugin
+)
     plugin_name = String(split(string(plugin_type), ".")[end])
     # By default, we expect the default plugin file template for a plugin called
     # "MyPlugin" to be called "myplugin.yml".

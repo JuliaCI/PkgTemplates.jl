@@ -5,7 +5,7 @@ Records common information used to generate a package. If you don't wish to manu
 create a template, you can use [`interactive_template`](@ref) instead.
 
 # Keyword Arguments
-* `user::AbstractString="")`: GitHub username. If left  unset, it will try to take the
+* `user::AbstractString=""`: GitHub username. If left  unset, it will try to take the
   value of a supplied git config's "github.user" key, then the global git config's
   value. If neither is set, an `ArgumentError` is thrown.
   **This is case-sensitive for some plugins, so take care to enter it correctly.**
@@ -14,15 +14,16 @@ create a template, you can use [`interactive_template`](@ref) instead.
   officially supported and they will cause certain plugins will produce incorrect output.
   For example, [`AppVeyor`](@ref)'s badge image will point to a GitHub-specific URL,
   regardless of the value of `host`.
-* `license::Union{AbstractString, Void}="MIT"`: Name of the package license. If
-  no license is specified, no license is created. [`show_license`](@ref) can be used to
-  list all available licenses, or to print out a particular license's text.
-* `authors::Union{AbstractString, Array}=""`: Names that appear on the license. Supply a
-  string for one author, and an array for multiple. Similarly to `user`, it will try to
-  take the value of a supplied git config's "user.name" key, then the global git config's
-  value, if it is left unset
-* `years::Union{Int, AbstractString}=Dates.year(now())`: Copyright years on the license.
-  Can be supplied by a number, or a string such as "2016 - 2017".
+* `license::AbstractString="MIT"`: Name of the package license. If an empty string is
+  given, no license is created. [`available_licenses`](@ref) can be used to list all
+  available licenses, and [`show_license`](@ref) can be used to print out a particular
+  license's text.
+* `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the
+  license. Supply a string for one author, and an array for multiple. Similarly to `user`,
+  it will try to take the value of a supplied git config's "user.name" key, then the global
+  git config's value, if it is left unset.
+* `years::Union{Integer, AbstractString}=Dates.year(Dates.today())`: Copyright years on the
+  license. Can be supplied by a number, or a string such as "2016 - 2017".
 * `dir::AbstractString=Pkg.dir()`: Directory in which the package will go.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `requirements::Vector{String}=String[]`: Package requirements. If there are duplicate
@@ -30,49 +31,37 @@ create a template, you can use [`interactive_template`](@ref) instead.
   an `ArgumentError` is thrown.
   Each entry in this array will be copied into the `REQUIRE` file of packages generated
   with this template.
-* `git_config::Dict{String, String}=Dict{String, String}()`: Git configuration options.
+* `gitconfig::Dict{String, String}=Dict{String, String}()`: Git configuration options.
 * `plugins::Plugin[]`: A list of `Plugin`s that the package will include.
-
-# Notes
-When you create a `Template`, a temporary directory is created with
-`mktempdir()`. This directory will be removed after you call [`generate`](@ref).
-Creating multiple packages in succession with the same instance of a template will still
-work, but there is a miniscule chance of another process sharing the temporary directory,
-which could result in the created package repository containing untracked files that
-don't belong.
 """
 @auto_hash_equals struct Template
     user::AbstractString
     host::AbstractString
-    license::Union{AbstractString, Void}
-    authors::Union{AbstractString, Array}
+    license::AbstractString
+    authors::AbstractString
     years::AbstractString
     dir::AbstractString
-    temp_dir::AbstractString
     julia_version::VersionNumber
     requirements::Vector{AbstractString}
-    git_config::Dict
+    gitconfig::Dict
     plugins::Dict{DataType, Plugin}
 
     function Template(;
         user::AbstractString="",
         host::AbstractString="https://github.com",
         license::Union{AbstractString, Void}="MIT",
-        authors::Union{AbstractString, Array}="",
-        years::Union{Int, AbstractString}=Dates.year(now()),
+        authors::Union{AbstractString, Vector{<:AbstractString}}="",
+        years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
         dir::AbstractString=Pkg.dir(),
         julia_version::VersionNumber=VERSION,
-        requirements::Vector{String}=String[],
-        git_config::Dict=Dict(),
-        plugins::Vector{P}=Plugin[],
-    ) where P <: Plugin
+        requirements::Vector{<:AbstractString}=String[],
+        gitconfig::Dict=Dict(),
+        plugins::Vector{<:Plugin}=Plugin[],
+    )
         # If no username was set, look for one in a supplied git config,
         # and then in the global git config.
         if isempty(user)
-            user = get(
-                git_config, "github.user",
-                LibGit2.getconfig("github.user", ""),
-            )
+            user = get(gitconfig, "github.user", LibGit2.getconfig("github.user", ""))
         end
         if isempty(user)
             throw(ArgumentError("No GitHub username found, set one with user=username"))
@@ -80,21 +69,19 @@ don't belong.
 
         host = URI(startswith(host, "https://") ? host : "https://$host").host
 
-        if license != nothing && !isfile(joinpath(LICENSE_DIR, license))
+        if !isempty(license) && !isfile(joinpath(LICENSE_DIR, license))
             throw(ArgumentError("License '$license' is not available"))
         end
 
         # If no author was set, look for one in the supplied git config,
         # and then in the global git config.
         if isempty(authors)
-            authors = get(git_config, "user.name", LibGit2.getconfig("user.name", ""))
-        elseif isa(authors, Array)
+            authors = get(gitconfig, "user.name", LibGit2.getconfig("user.name", ""))
+        elseif isa(authors, Vector)
             authors = join(authors, ", ")
         end
 
         years = string(years)
-
-        temp_dir = mktempdir()
 
         requirements_dedup = collect(Set(requirements))
         diff = length(requirements) - length(requirements_dedup)
@@ -113,8 +100,8 @@ don't belong.
         end
 
         new(
-            user, host, license, authors, years, dir, temp_dir,
-            julia_version, requirements_dedup, git_config, plugin_dict
+            user, host, license, authors, years, dir, julia_version,
+            requirements_dedup, gitconfig, plugin_dict,
         )
     end
 end
@@ -157,10 +144,10 @@ function interactive_template(; fast::Bool=false)
     else
         println("Select a license:")
         io = IOBuffer()
-        show_license(; io=io)
-        licenses = [nothing => nothing, collect(LICENSES)...]
+        available_licenses(io)
+        licenses = ["" => "", collect(LICENSES)...]
         menu = RadioMenu(["None", split(String(take!(io)), "\n")...])
-        # If the user breaks out of the menu with C-c, the result is -1, the absolute
+        # If the user breaks out of the menu with Ctrl-c, the result is -1, the absolute
         # value of which correponds to no license.
         licenses[abs(request(menu))].first
     end
@@ -176,9 +163,9 @@ function interactive_template(; fast::Bool=false)
     end
 
     kwargs[:years] = if fast
-        Dates.year(now())
+        Dates.year(Dates.today())
     else
-        default_years = Dates.year(now())
+        default_years = Dates.year(Dates.today())
         print("Enter the copyright year(s) [$default_years]: ")
         years = readline()
         isempty(years) ? default_years : years
@@ -209,20 +196,20 @@ function interactive_template(; fast::Bool=false)
         String.(split(readline()))
     end
 
-    kwargs[:git_config] = if fast
+    kwargs[:gitconfig] = if fast
         Dict()
     else
-        git_config = Dict()
+        gitconfig = Dict()
         print("Enter any Git key-value pairs (one at a time, separated by spaces) [None]: ")
         while true
             tokens = split(readline())
             isempty(tokens) && break
-            if haskey(git_config, tokens[1])
+            if haskey(gitconfig, tokens[1])
                 warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
             end
-            git_config[tokens[1]] = tokens[2]
+            gitconfig[tokens[1]] = tokens[2]
         end
-        git_config
+        gitconfig
     end
 
     println("Select plugins:")
@@ -243,4 +230,4 @@ end
 
 Get all concrete subtypes of `t`.
 """
-leaves(t::Type) = isleaftype(t) ? t : vcat(leaves.(subtypes(t))...)
+leaves(t::Type)::Vector{DataType} = isleaftype(t) ? [t] : vcat(leaves.(subtypes(t))...)

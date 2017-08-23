@@ -7,8 +7,6 @@ julia:
   - nightly
 notifications:
   email: false
-before_script:
-  - cp docs/src/assets/invenia.css $HOME
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia -e 'Pkg.clone(pwd()); Pkg.test("PkgTemplates"; coverage=true)'

@@ -38,13 +38,18 @@ function badges(_::GitHubPages, user::AbstractString, pkg_name::AbstractString)
     ]
 end
 
-function gen_plugin(plugin::GitHubPages, template::Template, pkg_name::AbstractString)
+function gen_plugin(
+    plugin::GitHubPages,
+    template::Template,
+    dir::AbstractString,
+    pkg_name::AbstractString,
+)
     invoke(
-        gen_plugin, Tuple{Documenter, Template, AbstractString},
-        plugin, template, pkg_name
+        gen_plugin, Tuple{Documenter, Template, AbstractString, AbstractString},
+        plugin, template, dir, pkg_name,
     )
     if haskey(template.plugins, TravisCI)
-        docs_src = joinpath(template.temp_dir, pkg_name, "docs", "src")
+        docs_src = joinpath(dir, pkg_name, "docs", "src")
         open(joinpath(dirname(docs_src), "make.jl"), "a") do file
             write(
                 file,

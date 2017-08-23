@@ -40,7 +40,7 @@ t = Template(;
     dir=joinpath(homedir(), "code"),
     julia_version=v"0.5.2",
     requirements=["PkgTemplates"],
-    git_config=Dict("diff.renames" => true),
+    gitconfig=Dict("diff.renames" => true),
     plugins=[
         TravisCI(),
         CodeCov(; config_file=nothing),

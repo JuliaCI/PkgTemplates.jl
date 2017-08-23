@@ -12,7 +12,7 @@ struct Bar <: CustomPlugin end
 struct Baz <: Plugin end
 
 const me = "christopher-dG"
-const git_config = Dict(
+const gitconfig = Dict(
     "user.name" => "Tester McTestFace",
     "user.email" => "email@web.site",
     "github.user" => "TesterMcTestFace",
@@ -20,12 +20,12 @@ const git_config = Dict(
 const test_pkg = "TestPkg"
 const fake_path = bin(hash("/this/file/does/not/exist"))
 const test_file = tempname()
-template_text = """
+const template_text = """
             PKGNAME: {{PKGNAME}}
             VERSION: {{VERSION}}}
             {{#DOCUMENTER}}Documenter{{/DOCUMENTER}}
             {{#CODECOV}}CodeCov{{/CODECOV}}
-            {{#CODECOV}}Coveralls{{/CODECOV}}
+            {{#COVERALLS}}Coveralls{{/COVERALLS}}
             {{#AFTER}}After{{/AFTER}}
             {{#OTHER}}Other{{/OTHER}}
             """
@@ -33,77 +33,61 @@ write(test_file, template_text)
 
 @testset "Template creation" begin
     t = Template(; user=me)
-    rm(t.temp_dir; recursive=true)
     @test t.user == me
     @test t.license == "MIT"
     @test t.years == string(Dates.year(Dates.today()))
     @test t.authors == LibGit2.getconfig("user.name", "")
     @test t.dir == Pkg.dir()
     @test t.julia_version == VERSION
-    @test isempty(t.git_config)
+    @test isempty(t.gitconfig)
     @test isempty(t.plugins)
 
-    t = Template(; user=me, license=nothing)
-    rm(t.temp_dir; recursive=true)
-    @test t.license == nothing
+    t = Template(; user=me, license="")
+    @test t.license == ""
 
     t = Template(; user=me, license="MPL")
-    rm(t.temp_dir; recursive=true)
     @test t.license == "MPL"
 
     t = Template(; user=me, years=2014)
-    rm(t.temp_dir; recursive=true)
     @test t.years == "2014"
     t = Template(user=me, years="2014-2015")
-    rm(t.temp_dir; recursive=true)
     @test t.years == "2014-2015"
 
     t = Template(; user=me, authors="Some Guy")
-    rm(t.temp_dir; recursive=true)
     @test t.authors == "Some Guy"
 
     t = Template(; user=me, authors=["Guy", "Gal"])
-    rm(t.temp_dir; recursive=true)
     @test t.authors == "Guy, Gal"
 
     t = Template(; user=me, dir=test_file)
-    rm(t.temp_dir; recursive=true)
     @test t.dir == test_file
 
     t = Template(; user=me, julia_version=v"0.1.2")
-    rm(t.temp_dir; recursive=true)
     @test t.julia_version == v"0.1.2"
 
     t = Template(; user=me, requirements=["$test_pkg 0.1"])
-    rm(t.temp_dir; recursive=true)
     @test t.requirements == ["$test_pkg 0.1"]
     @test_warn r".+" t = Template(; user=me, requirements=[test_pkg, test_pkg])
-    rm(t.temp_dir; recursive=true)
     @test t.requirements == [test_pkg]
     @test_throws ArgumentError t = Template(;
         user=me,
         requirements=[test_pkg, "$test_pkg 0.1"]
     )
-    rm(t.temp_dir; force=true, recursive=true)
 
-    t = Template(; user=me, git_config=git_config)
-    rm(t.temp_dir; recursive=true)
-    @test t.git_config == git_config
+    t = Template(; user=me, gitconfig=gitconfig)
+    @test t.gitconfig == gitconfig
 
-    t = Template(; user=me, git_config=git_config)
-    rm(t.temp_dir; recursive=true)
-    @test t.authors == git_config["user.name"]
+    t = Template(; user=me, gitconfig=gitconfig)
+    @test t.authors == gitconfig["user.name"]
 
-    t = Template(; git_config=git_config)
-    rm(t.temp_dir; recursive=true)
-    @test t.user == git_config["github.user"]
-    @test t.authors == git_config["user.name"]
+    t = Template(; gitconfig=gitconfig)
+    @test t.user == gitconfig["github.user"]
+    @test t.authors == gitconfig["user.name"]
 
     t = Template(;
         user=me,
         plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()],
     )
-    rm(t.temp_dir; recursive=true)
     @test Set(keys(t.plugins)) == Set(
         [GitHubPages, TravisCI, AppVeyor, CodeCov, Coveralls]
     )
@@ -115,7 +99,6 @@ write(test_file, template_text)
         user=me,
         plugins=[TravisCI(), TravisCI()],
     )
-    rm(t.temp_dir; recursive=true)
 
     if isempty(LibGit2.getconfig("github.user", ""))
         @test_throws ArgumentError t = Template()
@@ -123,9 +106,7 @@ write(test_file, template_text)
         t = Template()
         @test t.user == LibGit2.getconfig("github.user", "")
     end
-    rm(t.temp_dir; force=true, recursive=true)
     @test_throws ArgumentError t = Template(; user=me, license="FakeLicense")
-    rm(t.temp_dir; force=true, recursive=true)
 end
 
 @testset "Interactive template creation" begin
@@ -133,52 +114,49 @@ end
     in_read, in_write = redirect_stdin()
     write(in_write, "$me\n\n\r\n\n\n\n\n\nd")
     t = interactive_template()
-    rm(t.temp_dir; recursive=true)
     @test t.user == me
     @test t.host == "github.com"
-    @test t.license == nothing
+    @test isempty(t.license)
     @test t.authors == LibGit2.getconfig("user.name", "")
-    @test t.years == string(Dates.year(now()))
+    @test t.years == string(Dates.year(Dates.today()))
     @test t.dir == Pkg.dir()
     @test t.julia_version == VERSION
     @test isempty(t.requirements)
-    @test isempty(t.git_config)
+    @test isempty(t.gitconfig)
     @test isempty(t.plugins)
 
     if isempty(LibGit2.getconfig("github.user", ""))
         write(in_write, "\n")
         @test_throws ArgumentError t = interactive_template()
-        rm(t.temp_dir; force=true, recursive=true)
     end
 
     write(in_write, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
     t = interactive_template()
-    rm(t.temp_dir; recursive=true)
     @test t.user == me
     @test t.host == "gitlab.com"
     # Not sure if the order the licenses are displayed is consistent.
-    @test t.license != nothing
+    @test !isempty(t.license)
     @test t.authors == me
     @test t.years == "2016"
     @test t.dir == test_file
     @test t.julia_version == v"0.5.0"
     @test Set(t.requirements) == Set(["X", "Y"])
-    @test t.git_config == Dict("A" => "B")
+    @test t.gitconfig == Dict("A" => "B")
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
 
     write(in_write, "$me\nd")
     t = interactive_template(; fast=true)
-    rm(t.temp_dir; recursive=true)
     @test t.user == me
     @test t.host == "github.com"
     @test t.license == "MIT"
     @test t.authors == LibGit2.getconfig("user.name", "")
-    @test t.years == string(Dates.year(now()))
+    # I guess this could technically break if it runs on New Year's Eve...
+    @test t.years == string(Dates.year(Dates.today()))
     @test t.dir == Pkg.dir()
     @test t.julia_version == VERSION
     @test isempty(t.requirements)
-    @test isempty(t.git_config)
+    @test isempty(t.gitconfig)
     @test isempty(t.plugins)
 
     redirect_stdin(old_stdin)
@@ -199,7 +177,7 @@ end
     ]
     @test isempty(p.view)
     p = AppVeyor(; config_file=nothing)
-    @test_throws NullException get(p.src)
+    @test isnull(p.src)
     p = AppVeyor(; config_file=test_file)
     @test get(p.src) == test_file
     @test_throws ArgumentError p = AppVeyor(; config_file=fake_path)
@@ -217,7 +195,7 @@ end
     ]
     @test isempty(p.view)
     p = TravisCI(; config_file=nothing)
-    @test_throws NullException get(p.src)
+    @test isnull(p.src)
     p = TravisCI(; config_file=test_file)
     @test get(p.src) == test_file
     @test_throws ArgumentError p = TravisCI(; config_file=fake_path)
@@ -235,14 +213,14 @@ end
     ]
     @test isempty(p.view)
     p = CodeCov(; config_file=nothing)
-    @test_throws NullException get(p.src)
+    @test isnull(p.src)
     p = CodeCov(; config_file=test_file)
     @test get(p.src) == test_file
     @test_throws ArgumentError p = CodeCov(; config_file=fake_path)
 
     p = Coveralls()
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-    @test_throws NullException get(p.src)
+    @test isnull(p.src)
     @test p.dest == ".coveralls.yml"
     @test p.badges == [
         Badge(
@@ -253,7 +231,7 @@ end
     ]
     @test isempty(p.view)
     p = Coveralls(; config_file=nothing)
-    @test_throws NullException get(p.src)
+    @test isnull(p.src)
     p = Coveralls(; config_file=test_file)
     @test get(p.src) == test_file
     @test_throws ArgumentError p = Coveralls(; config_file=fake_path)
@@ -267,7 +245,7 @@ end
 end
 
 @testset "Badge generation" begin
-    user = git_config["github.user"]
+    user = gitconfig["github.user"]
 
     badge = Badge("A", "B", "C")
     @test badge.hover == "A"
@@ -304,10 +282,11 @@ end
         user=me,
         license="MPL",
         requirements=[test_pkg],
-        git_config=git_config,
+        gitconfig=gitconfig,
         plugins=[Coveralls(), TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
     )
-    pkg_dir = joinpath(t.temp_dir, test_pkg)
+    temp_dir = mktempdir()
+    pkg_dir = joinpath(temp_dir, test_pkg)
 
     temp_file = tempname()
     gen_file(temp_file, "Hello, world")
@@ -315,7 +294,7 @@ end
     @test readstring(temp_file) == "Hello, world\n"
     rm(temp_file)
 
-    @test gen_readme(test_pkg, t) == ["README.md"]
+    @test gen_readme(temp_dir, test_pkg, t) == ["README.md"]
     @test isfile(joinpath(pkg_dir, "README.md"))
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
@@ -331,12 +310,12 @@ end
         search(readme, "coveralls").start
     # Plugins with badges but not in BADGE_ORDER should appear at the far right side.
     t.plugins[Foo] = Foo()
-    gen_readme(test_pkg, t)
+    gen_readme(temp_dir, test_pkg, t)
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
     @test search(readme, "coveralls").start < search(readme, "baz").start
 
-    @test gen_gitignore(test_pkg, t) == [".gitignore"]
+    @test gen_gitignore(temp_dir, test_pkg, t) == [".gitignore"]
     @test isfile(joinpath(pkg_dir, ".gitignore"))
     gitignore = readstring(joinpath(pkg_dir, ".gitignore"))
     rm(joinpath(pkg_dir, ".gitignore"))
@@ -347,7 +326,7 @@ end
         end
     end
 
-    @test gen_license(test_pkg, t) == ["LICENSE"]
+    @test gen_license(temp_dir, test_pkg, t) == ["LICENSE"]
     @test isfile(joinpath(pkg_dir, "LICENSE"))
     license = readchomp(joinpath(pkg_dir, "LICENSE"))
     rm(joinpath(pkg_dir, "LICENSE"))
@@ -355,20 +334,20 @@ end
     @test contains(license, t.years)
     @test contains(license, read_license(t.license))
 
-    @test gen_entrypoint(test_pkg, t) == ["src/"]
+    @test gen_entrypoint(temp_dir, test_pkg, t) == ["src/"]
     @test isdir(joinpath(pkg_dir, "src"))
     @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
     entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
     rm(joinpath(pkg_dir, "src"); recursive=true)
     @test contains(entrypoint, "module $test_pkg")
 
-    @test gen_require(test_pkg, t) == ["REQUIRE"]
+    @test gen_require(temp_dir, test_pkg, t) == ["REQUIRE"]
     @test isfile(joinpath(pkg_dir, "REQUIRE"))
     vf = version_floor(t.julia_version)
     @test readchomp(joinpath(pkg_dir, "REQUIRE")) == "julia $vf\n$test_pkg"
     rm(joinpath(pkg_dir, "REQUIRE"))
 
-    @test gen_tests(test_pkg, t) == ["test/"]
+    @test gen_tests(temp_dir, test_pkg, t) == ["test/"]
     @test isdir(joinpath(pkg_dir, "test"))
     @test isfile(joinpath(pkg_dir, "test", "runtests.jl"))
     runtests = readchomp(joinpath(pkg_dir, "test", "runtests.jl"))
@@ -376,11 +355,11 @@ end
     @test contains(runtests, "using $test_pkg")
     @test contains(runtests, "using Base.Test")
 
-    rm(t.temp_dir; recursive=true)
+    rm(dirname(pkg_dir); recursive=true)
 end
 
 @testset "Package generation" begin
-    t = Template(; user=me)
+    t = Template(; user=me, gitconfig=gitconfig)
     generate(test_pkg, t)
     @test isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, "README.md"))
@@ -393,7 +372,7 @@ end
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
-    @test LibGit2.getconfig(repo, "user.name", "") == LibGit2.getconfig("user.name", "")
+    @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
     @test LibGit2.url(remote) == "https://github.com/$me/$test_pkg.jl"
     @test in("master", branches)
     @test !in("gh-pages", branches)
@@ -406,7 +385,7 @@ end
     @test LibGit2.url(remote) == "git@github.com:$me/$test_pkg.jl.git"
     rm(Pkg.dir(test_pkg); recursive=true)
 
-    t = Template(; user=me, host="gitlab.com")
+    t = Template(; user=me, host="gitlab.com", gitconfig=gitconfig)
     generate(test_pkg, t)
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
@@ -414,18 +393,19 @@ end
     rm(Pkg.dir(test_pkg); recursive=true)
 
     temp_dir = mktempdir()
-    t = Template(; user=me, dir=temp_dir)
+    t = Template(; user=me, dir=temp_dir, gitconfig=gitconfig)
     generate(test_pkg, t)
     @test isdir(joinpath(temp_dir, test_pkg))
     rm(temp_dir; recursive=true)
 
     t = Template(;
         user=me,
-        license=nothing,
-        git_config=git_config,
+        license="",
+        gitconfig=gitconfig,
         plugins=[AppVeyor(), GitHubPages(), Coveralls(), CodeCov(), TravisCI()],
     )
     generate(test_pkg, t)
+    @test isdir(joinpath(Pkg.dir(), test_pkg))
     @test !isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, ".travis.yml"))
     @test isfile(Pkg.dir(test_pkg, ".appveyor.yml"))
@@ -435,7 +415,7 @@ end
     @test isdir(Pkg.dir(test_pkg, "docs", "src"))
     @test isfile(Pkg.dir(test_pkg, "docs", "src", "index.md"))
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
-    @test LibGit2.getconfig(repo, "user.name", "") == git_config["user.name"]
+    @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
     branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
     @test in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
@@ -447,7 +427,7 @@ end
     @test isfile(Pkg.dir(test_pkg, "README.md"))
     rm(Pkg.dir(test_pkg); recursive=true)
 
-    t = Template(; user=me, plugins=[GitHubPages()])
+    t = Template(; user=me, gitconfig=gitconfig, plugins=[GitHubPages()])
     generate(test_pkg, t)
     readme = readstring(Pkg.dir(test_pkg, "README.md"))
     index = readstring(Pkg.dir(test_pkg, "docs", "src", "index.md"))
@@ -457,10 +437,11 @@ end
 
 @testset "Plugin generation" begin
     t = Template(; user=me)
-    pkg_dir = joinpath(t.temp_dir, test_pkg)
+    temp_dir = mktempdir()
+    pkg_dir = joinpath(temp_dir, test_pkg)
 
     p = TravisCI()
-    @test gen_plugin(p, t, test_pkg) == [".travis.yml"]
+    @test gen_plugin(p, t, temp_dir, test_pkg) == [".travis.yml"]
     @test isfile(joinpath(pkg_dir, ".travis.yml"))
     travis = readstring(joinpath(pkg_dir, ".travis.yml"))
     @test !contains(travis, "after_success")
@@ -469,7 +450,7 @@ end
     @test !contains(travis, "Pkg.add(\"Documenter\")")
     rm(joinpath(pkg_dir, ".travis.yml"))
     t.plugins[CodeCov] = CodeCov()
-    gen_plugin(p, t, test_pkg)
+    gen_plugin(p, t, temp_dir, test_pkg)
     delete!(t.plugins, CodeCov)
     travis = readstring(joinpath(pkg_dir, ".travis.yml"))
     @test contains(travis, "after_success")
@@ -478,7 +459,7 @@ end
     @test !contains(travis, "Pkg.add(\"Documenter\")")
     rm(joinpath(pkg_dir, ".travis.yml"))
     t.plugins[Coveralls] = Coveralls()
-    gen_plugin(p, t, test_pkg)
+    gen_plugin(p, t, temp_dir, test_pkg)
     delete!(t.plugins, Coveralls)
     travis = readstring(joinpath(pkg_dir, ".travis.yml"))
     @test contains(travis, "after_success")
@@ -487,7 +468,7 @@ end
     @test !contains(travis, "Pkg.add(\"Documenter\")")
     rm(joinpath(pkg_dir, ".travis.yml"))
     t.plugins[GitHubPages] = GitHubPages()
-    gen_plugin(p, t, test_pkg)
+    gen_plugin(p, t, temp_dir, test_pkg)
     delete!(t.plugins, GitHubPages)
     travis = readstring(joinpath(pkg_dir, ".travis.yml"))
     @test contains(travis, "after_success")
@@ -496,12 +477,12 @@ end
     @test !contains(travis, "Coveralls.submit")
     rm(joinpath(pkg_dir, ".travis.yml"))
     p = TravisCI(; config_file=nothing)
-    @test isempty(gen_plugin(p, t, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
     @test !isfile(joinpath(pkg_dir, ".travis.yml"))
     @test_throws ArgumentError TravisCI(; config_file=fake_path)
 
     p = AppVeyor()
-    @test gen_plugin(p, t, test_pkg) == [".appveyor.yml"]
+    @test gen_plugin(p, t, temp_dir, test_pkg) == [".appveyor.yml"]
     @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
     appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
     @test !contains(appveyor, "coverage=true")
@@ -510,7 +491,7 @@ end
     @test !contains(appveyor, "Coveralls.submit")
     rm(joinpath(pkg_dir, ".appveyor.yml"))
     t.plugins[CodeCov] = CodeCov()
-    gen_plugin(p, t, test_pkg)
+    gen_plugin(p, t, temp_dir, test_pkg)
     delete!(t.plugins, CodeCov)
     appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
     @test contains(appveyor, "coverage=true")
@@ -519,7 +500,7 @@ end
     @test !contains(appveyor, "Coveralls.submit")
     rm(joinpath(pkg_dir, ".appveyor.yml"))
     t.plugins[Coveralls] = Coveralls()
-    gen_plugin(p, t, test_pkg)
+    gen_plugin(p, t, temp_dir, test_pkg)
     delete!(t.plugins, Coveralls)
     appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
     @test contains(appveyor, "coverage=true")
@@ -528,21 +509,21 @@ end
     @test !contains(appveyor, "Codecov.submit")
     rm(joinpath(pkg_dir, ".appveyor.yml"))
     p = AppVeyor(; config_file=nothing)
-    @test isempty(gen_plugin(p, t, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
     @test !isfile(joinpath(pkg_dir, ".appveyor.yml"))
     @test_throws ArgumentError AppVeyor(; config_file=fake_path)
 
     p = CodeCov()
-    @test gen_plugin(p, t, test_pkg) == [".codecov.yml"]
+    @test gen_plugin(p, t, temp_dir, test_pkg) == [".codecov.yml"]
     @test isfile(joinpath(pkg_dir, ".codecov.yml"))
     rm(joinpath(pkg_dir, ".codecov.yml"))
     p = CodeCov(; config_file=nothing)
-    @test isempty(gen_plugin(p, t, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
     @test !isfile(joinpath(pkg_dir, ".codecov.yml"))
     @test_throws ArgumentError CodeCov(; config_file=fake_path)
 
     p = GitHubPages()
-    @test gen_plugin(p, t, test_pkg) == ["docs/"]
+    @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
     @test isdir(joinpath(pkg_dir, "docs"))
     @test isfile(joinpath(pkg_dir, "docs", "make.jl"))
     make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
@@ -554,7 +535,7 @@ end
     @test index == "# $test_pkg"
     rm(joinpath(pkg_dir, "docs"); recursive=true)
     p = GitHubPages(; assets=[test_file])
-    @test gen_plugin(p, t, test_pkg) == ["docs/"]
+    @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
     make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
     @test contains(
         make,
@@ -567,18 +548,18 @@ end
     @test isfile(joinpath(pkg_dir, "docs", "src", "assets", basename(test_file)))
     rm(joinpath(pkg_dir, "docs"); recursive=true)
     t.plugins[TravisCI] = TravisCI()
-    @test gen_plugin(p, t, test_pkg) == ["docs/"]
+    @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
     make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
     @test contains(make, "deploydocs")
     rm(joinpath(pkg_dir, "docs"); recursive=true)
     @test_throws ArgumentError GitHubPages(; assets=[fake_path])
 
     p = Bar()
-    @test isempty(gen_plugin(p, t, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
     p = Baz()
-    @test isempty(gen_plugin(p, t, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
 
-    rm(t.temp_dir; recursive=true)
+    rm(dirname(pkg_dir); recursive=true)
 end
 
 @testset "Version floor" begin
@@ -604,7 +585,6 @@ end
     @test contains(text, "Other")
 
     t = Template(; user=me)
-    rm(t.temp_dir; recursive=true)
     view["OTHER"] = false
 
     text = substitute(template_text, t; view=view)
@@ -626,7 +606,7 @@ end
     @test contains(text, "After")
     empty!(t.plugins)
 
-    t.plugins[CodeCov] = Coveralls()
+    t.plugins[Coveralls] = Coveralls()
     text = substitute(template_text, t; view=view)
     @test contains(text, "Coveralls")
     @test contains(text, "After")
@@ -640,7 +620,7 @@ end
 @testset "License display" begin
     old_stdout = STDOUT
     out_read, out_write = redirect_stdout()
-    show_license()
+    available_licenses()
     licenses = join(Char(c) for c in readavailable(out_read))
     show_license("MIT")
     mit = join(Char(c) for c in readavailable(out_read))

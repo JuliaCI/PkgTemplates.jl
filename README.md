@@ -54,7 +54,7 @@ julia> t = Template(;
            dir=joinpath(homedir(), "code"),
            julia_version=v"0.5.2",
            requirements=["PkgTemplates"],
-           git_config=Dict("diff.renames" => true),
+           gitconfig=Dict("diff.renames" => true),
            plugins=[
                TravisCI(),
                CodeCov(; config_file=nothing),
@@ -102,13 +102,13 @@ And if that's **still** too much work for you, you can call
 `interactive_template` with `fast=true` to use default values for everything
 but username and plugin selection.
 
-## Comparison to [PkgDev](https://github.com/JuliaLang/PkgDev.jl)
+## Comparison to PkgDev
 
-`PkgTemplates` is similar in functionality to `PkgDev`'s `generate` function.
-However, `PkgTemplates` offers more customizability in templates and more
-extensibility via plugins. For the package registration and release management
-features that `PkgTemplates` doesn't include, you are encouraged to use
-[AttoBot](https://github.com/apps/attobot) instead.
+`PkgTemplates` is similar in functionality to
+[`PkgDev`](https://github.com/JuliaLang/PkgDev.jl)'s `generate` function. However,
+`PkgTemplates` offers more customizability in templates and more extensibility via plugins.
+For the package registration and release management features that `PkgTemplates` doesn't
+include, you are encouraged to use [AttoBot](https://github.com/apps/attobot) instead.
 
 ## Contributing
 

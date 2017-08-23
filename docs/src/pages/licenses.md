@@ -8,6 +8,12 @@ CurrentModule = PkgTemplates
 are available for use with `PkgTemplates`, but if you see that one is missing,
 don't hesitate to open an issue or PR.
 
+## `available_licenses`
+
+```@docs
+available_licenses
+```
+
 ## `show_license`
 
 ```@docs

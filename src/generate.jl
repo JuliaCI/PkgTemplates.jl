@@ -13,8 +13,8 @@ Generate a package names `pkg_name` from `template`.
 * `ssh::Bool=false`: Whether or not to use SSH for the remote.
 
 # Notes
-The package is generated entirely in a temporary directory (`t.temp_dir`), and only moved
-into `joinpath(t.dir, pkg_name)` at the very end. In the case of an error, the temporary
+The package is generated entirely in a temporary directory and only moved into
+`joinpath(t.dir, pkg_name)` at the very end. In the case of an error, the temporary
 directory will contain leftovers, but the destination directory will remain untouched
 (this is especially helpful when `force=true`).
 """
@@ -24,9 +24,21 @@ function generate(
     force::Bool=false,
     ssh::Bool=false,
 )
+    mktempdir() do temp_dir
+        generate(pkg_name, t, temp_dir; force=force, ssh=ssh)
+    end
+end
+
+function generate(
+    pkg_name::AbstractString,
+    t::Template,
+    dir::AbstractString;
+    force::Bool=false,
+    ssh::Bool=false,
+)
     pkg_name = Pkg.splitjl(pkg_name)
     pkg_dir = joinpath(t.dir, pkg_name)
-    temp_pkg_dir = joinpath(t.temp_dir, pkg_name)
+    temp_pkg_dir = joinpath(dir, pkg_name)
 
     if !force && ispath(pkg_dir)
         throw(ArgumentError(
@@ -38,8 +50,8 @@ function generate(
     repo = LibGit2.init(temp_pkg_dir)
     info("Initialized git repo at $temp_pkg_dir")
     cfg = LibGit2.GitConfig(repo)
-    !isempty(t.git_config) && info("Applying git configuration")
-    for (key, val) in t.git_config
+    !isempty(t.gitconfig) && info("Applying git configuration")
+    for (key, val) in t.gitconfig
         LibGit2.set!(cfg, key, val)
     end
     LibGit2.commit(repo, "Empty initial commit")
@@ -62,13 +74,13 @@ function generate(
 
     # Generate the files.
     files = vcat(
-        gen_entrypoint(pkg_name, t),
-        gen_tests(pkg_name, t),
-        gen_require(temp_pkg_dir, t),
-        gen_readme(pkg_name, t),
-        gen_gitignore(pkg_name, t),
-        gen_license(pkg_name, t),
-        vcat(collect(gen_plugin(plugin, t, pkg_name) for plugin in values(t.plugins))...),
+    gen_entrypoint(dir, pkg_name, t),
+        gen_tests(dir, pkg_name, t),
+        gen_require(dir, pkg_name, t),
+        gen_readme(dir, pkg_name, t),
+        gen_gitignore(dir, pkg_name, t),
+        gen_license(dir, pkg_name, t),
+        vcat([gen_plugin(plugin, t, dir, pkg_name) for plugin in values(t.plugins)]...),
     )
 
     LibGit2.add!(repo, files...)
@@ -78,7 +90,7 @@ function generate(
     multiple_branches = length(collect(LibGit2.GitBranchIter(repo))) > 1
     info("Moving temporary package directory into $(t.dir)/")
     mv(temp_pkg_dir, pkg_dir; remove_destination=force)
-    rm(t.temp_dir; recursive=true)
+
     info("Finished")
     if multiple_branches
         warn("Remember to push all created branches to your remote: git push --all")
@@ -86,17 +98,23 @@ function generate(
 end
 
 """
-    gen_entrypoint(pkg_name::AbstractString, template::Template) -> Vector{String}
+    gen_entrypoint(
+        dir::AbstractString,
+        pkg_name::AbstractString,
+        template::Template,
+    ) -> Vector{String}
 
 Create the module entrypoint in the temp package directory.
 
 # Arguments
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 * `template::Template`: The template whose entrypoint we are generating.
 
 Returns an array of generated file/directory names.
 """
-function gen_entrypoint(pkg_name::AbstractString, template::Template)
+function gen_entrypoint(dir::AbstractString, pkg_name::AbstractString, template::Template)
     text = """
         module $pkg_name
 
@@ -105,22 +123,28 @@ function gen_entrypoint(pkg_name::AbstractString, template::Template)
         end
         """
 
-    gen_file(joinpath(template.temp_dir, pkg_name, "src", "$pkg_name.jl"), text)
+    gen_file(joinpath(dir, pkg_name, "src", "$pkg_name.jl"), text)
     return ["src/"]
 end
 
 """
-    gen_tests(pkg_name::AbstractString, template::Template) -> Vector{String}
+    gen_tests(
+        dir::AbstractString,
+        pkg_name::AbstractString,
+        template::Template,
+    ) -> Vector{String}
 
 Create the test directory and entrypoint in the temp package directory.
 
 # Arguments
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 * `template::Template`: The template whose tests we are generating.
 
 Returns an array of generated file/directory names.
 """
-function gen_tests(pkg_name::AbstractString, template::Template)
+function gen_tests(dir::AbstractString, pkg_name::AbstractString, template::Template)
     text = """
         using $pkg_name
         using Base.Test
@@ -129,44 +153,55 @@ function gen_tests(pkg_name::AbstractString, template::Template)
         @test 1 == 2
         """
 
-    gen_file(joinpath(template.temp_dir, pkg_name, "test", "runtests.jl"), text)
+    gen_file(joinpath(dir, pkg_name, "test", "runtests.jl"), text)
     return ["test/"]
 end
 
 """
-    gen_require(pkg_name::AbstractString, template::Template) -> Vector{String}
+    gen_require(
+        dir::AbstractString,
+        pkg_name::AbstractString,
+        template::Template,
+    ) -> Vector{String}
 
 Create the `REQUIRE` file in the temp package directory.
 
 # Arguments
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 * `template::Template`: The template whose REQUIRE we are generating.
 
 Returns an array of generated file/directory names.
 """
-function gen_require(pkg_name::AbstractString, template::Template)
+function gen_require(dir::AbstractString, pkg_name::AbstractString, template::Template)
     text = "julia $(version_floor(template.julia_version))\n"
     text *= join(template.requirements, "\n")
 
-    gen_file(joinpath(template.temp_dir, pkg_name, "REQUIRE"), text)
+    gen_file(joinpath(dir, pkg_name, "REQUIRE"), text)
     return ["REQUIRE"]
 end
 
 """
-    gen_readme(pkg_name::AbstractString, template::Template) -> Vector{String}
+    gen_readme(
+        dir::AbstractString,
+        pkg_name::AbstractString,
+        template::Template,
+    ) -> Vector{String}
 
 Create a README in the temp package directory with badges for each enabled plugin.
 
 # Arguments
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 * `template::Template`: The template whose README we are generating.
 
 Returns an array of generated file/directory names.
 """
-function gen_readme(pkg_name::AbstractString, template::Template)
+function gen_readme(dir::AbstractString, pkg_name::AbstractString, template::Template)
     text = "# $pkg_name\n"
-    remaining = copy(collect(keys(template.plugins)))
-
+    done = []
     # Generate the ordered badges first, then add any remaining ones to the right.
     for plugin_type in BADGE_ORDER
         if haskey(template.plugins, plugin_type)
@@ -175,10 +210,10 @@ function gen_readme(pkg_name::AbstractString, template::Template)
                 badges(template.plugins[plugin_type], template.user, pkg_name),
                 "\n",
             )
-            deleteat!(remaining, find(p -> p == plugin_type, remaining)[1])
+            push!(done, plugin_type)
         end
     end
-    for plugin_type in remaining
+    for plugin_type in setdiff(keys(template.plugins), done)
         text *= "\n"
         text *= join(
             badges(template.plugins[plugin_type], template.user, pkg_name),
@@ -186,56 +221,67 @@ function gen_readme(pkg_name::AbstractString, template::Template)
         )
     end
 
-    gen_file(joinpath(template.temp_dir, pkg_name, "README.md"), text)
+    gen_file(joinpath(dir, pkg_name, "README.md"), text)
     return ["README.md"]
 end
 
 """
-    gen_gitignore(pkg_name::AbstractString, template::Template) -> Vector{String}
+    gen_gitignore(
+        dir::AbstractString,
+        pkg_name::AbstractString,
+        template::Template,
+    ) -> Vector{String}
 
 Create a `.gitignore` in the temp package directory.
 
 # Arguments
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 * `template::Template`: The template whose .gitignore we are generating.
 
 Returns an array of generated file/directory names.
 """
-function gen_gitignore(pkg_name::AbstractString, template::Template)
-    text = ".DS_Store\n"
-    seen = []
+function gen_gitignore(dir::AbstractString, pkg_name::AbstractString, template::Template)
+    seen = [".DS_Store"]
     patterns = vcat([plugin.gitignore for plugin in values(template.plugins)]...)
     for pattern in patterns
         if !in(pattern, seen)
-            text *= "$pattern\n"
             push!(seen, pattern)
         end
     end
+    text = join(seen, "\n")
 
-    gen_file(joinpath(template.temp_dir, pkg_name, ".gitignore"), text)
+    gen_file(joinpath(dir, pkg_name, ".gitignore"), text)
     return [".gitignore"]
 end
 
 """
-    gen_license(pkg_name::AbstractString, template::Template) -> Vector{String}
+    gen_license(
+        dir::AbstractString,
+        pkg_name::AbstractString,
+        template::Template,
+    ) -> Vector{String}
 
 Create a license in the temp package directory.
 
 # Arguments
+* `dir::AbstractString`: The directory in which the files will be generated. Note that
+  this will be joined to `pkg_name`.
 * `pkg_name::AbstractString`: Name of the package.
 * `template::Template`: The template whose LICENSE we are generating.
 
 Returns an array of generated file/directory names.
 """
-function gen_license(pkg_name::AbstractString, template::Template)
-    if template.license == nothing
+function gen_license(dir::AbstractString, pkg_name::AbstractString, template::Template)
+    if isempty(template.license)
         return String[]
     end
 
     text = "Copyright (c) $(template.years) $(template.authors)\n"
     text *= read_license(template.license)
 
-    gen_file(joinpath(template.temp_dir, pkg_name, "LICENSE"), text)
+    gen_file(joinpath(dir, pkg_name, "LICENSE"), text)
     return ["LICENSE"]
 end
 
