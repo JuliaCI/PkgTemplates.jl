@@ -18,20 +18,20 @@ notifications:
 
 install:
   - ps: "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12"
-# Download most recent Julia Windows binary
+  # Download most recent Julia Windows binary
   - ps: (new-object net.webclient).DownloadFile(
         $env:JULIA_URL,
         "C:\projects\julia-binary.exe")
-# Run installer silently, output to C:\projects\julia
+  # Run installer silently, output to C:\projects\julia
   - C:\projects\julia-binary.exe /S /D=C:\projects\julia
 
 build_script:
-# Need to convert from shallow to complete for Pkg.clone to work
+  # Need to convert from shallow to complete for Pkg.clone to work
   - IF EXIST .git\shallow (git fetch --unshallow)
-  - C:\projects\julia\bin\julia -e "versioninfo(); Pkg.clone(pwd())"
+  - C:\projects\julia\bin\julia -e "versioninfo(); Pkg.clone(pwd(), \"PkgTemplates\")"
 
 test_script:
   - C:\projects\julia\bin\julia -e "Pkg.test(\"PkgTemplates\"; coverage=true)"
 
-after_script:
+after_test:
   - C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"AppVeyorTesting\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"

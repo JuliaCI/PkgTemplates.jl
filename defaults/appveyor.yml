@@ -33,6 +33,6 @@ build_script:
 test_script:
   - C:\projects\julia\bin\julia -e "Pkg.test(\"{{PKGNAME}}\"{{#AFTER}}; coverage=true{{/AFTER}})"{{#AFTER}}
 
-after_script:{{#CODECOV}}
+after_test:{{#CODECOV}}
   - C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"{{PKGNAME}}\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"{{/CODECOV}}{{#COVERALLS}}
   - C:\projects\julia\bin\julia -e "cd(Pkg.dir(\"{{PKGNAME}}\")); Pkg.add(\"Coverage\"); using Coverage; Coveralls.submit(process_folder())"{{/COVERALLS}}{{/AFTER}}
