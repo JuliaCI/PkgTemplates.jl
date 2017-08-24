@@ -110,9 +110,7 @@ write(test_file, template_text)
 end
 
 @testset "Interactive template creation" begin
-    old_stdin = STDIN
-    in_read, in_write = redirect_stdin()
-    write(in_write, "$me\n\n\r\n\n\n\n\n\nd")
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\n\n\nd")
     t = interactive_template()
     @test t.user == me
     @test t.host == "github.com"
@@ -126,11 +124,11 @@ end
     @test isempty(t.plugins)
 
     if isempty(LibGit2.getconfig("github.user", ""))
-        write(in_write, "\n")
+        write(STDIN.buffer, "\n")
         @test_throws ArgumentError t = interactive_template()
     end
 
-    write(in_write, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
+    write(STDIN.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
     t = interactive_template()
     @test t.user == me
     @test t.host == "gitlab.com"
@@ -145,7 +143,7 @@ end
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
 
-    write(in_write, "$me\nd")
+    write(STDIN.buffer, "$me\nd")
     t = interactive_template(; fast=true)
     @test t.user == me
     @test t.host == "github.com"
@@ -158,8 +156,6 @@ end
     @test isempty(t.requirements)
     @test isempty(t.gitconfig)
     @test isempty(t.plugins)
-
-    redirect_stdin(old_stdin)
     println()
 end
 
