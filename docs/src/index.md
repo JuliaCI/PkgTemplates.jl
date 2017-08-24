@@ -46,7 +46,7 @@ t = Template(;
         CodeCov(; config_file=nothing),
         Coveralls(),
         AppVeyor(),
-        GitHubPages(; assets=[joinpath(homedir(), "invenia.css")]),
+        GitHubPages(),
     ],
 )
 generate("MyPkg", t; force=true, ssh=true)
