@@ -60,7 +60,7 @@ julia> t = Template(;
                CodeCov(; config_file=nothing),
                Coveralls(),
                AppVeyor(),
-               GitHubPages(; assets=[joinpath(homedir(), "invenia.css")]),
+               GitHubPages(),
            ],
        )
 
@@ -84,7 +84,6 @@ LICENSE
 README.md
 REQUIRE
 docs/make.jl
-docs/src/assets/invenia.css
 docs/src/index.md
 src/MyPkg.jl
 test/runtests.jl
@@ -114,4 +113,4 @@ include, you are encouraged to use [AttoBot](https://github.com/apps/attobot) in
 
 It's extremely easy to extend `PkgTemplates` with new plugins. To get started,
 check out the
-[plugin development guide](https://chrostipher-dG.github.io/PkgTemplates.jl/stable/pages/plugin_development.html).
+[plugin development guide](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html).
