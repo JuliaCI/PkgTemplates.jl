@@ -3,7 +3,7 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://invenia.github.io/PkgTemplates.jl/stable)
 [![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://invenia.github.io/PkgTemplates.jl/latest)
 [![Build Status](https://travis-ci.org/invenia/PkgTemplates.jl.svg?branch=master)](https://travis-ci.org/invenia/PkgTemplates.jl)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/christopher-dG/PkgTemplates.jl?svg=true)](https://ci.appveyor.com/project/christopher-dG/PkgTemplates-jl)
+[![Build Status](https://ci.appveyor.com/api/projects/status/r24xamruqlm88uti?svg=true)](https://ci.appveyor.com/project/christopher-dG/PkgTemplates-jl)
 [![CodeCov](https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/PkgTemplates.jl)
 
 **PkgTemplates is a Julia package for creating new Julia packages in an easy,
@@ -77,7 +77,7 @@ INFO: Finished
 WARNING: Remember to push all created branches to your remote: git push --all
 
 julia> cd(joinpath(t.dir, "MyPkg")); run(`git ls-tree -r --name-only HEAD`)
-.appveyor.yml            
+.appveyor.yml
 .gitignore
 .travis.yml
 LICENSE
