@@ -517,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Licenses",
     "title": "PkgTemplates.available_licenses",
     "category": "Function",
-    "text": "available_licenses([io]) -> Void\n\nPrint the names of all available licenses.\n\n\n\n"
+    "text": "available_licenses([io::IO]) -> Void\n\nPrint the names of all available licenses.\n\n\n\n"
 },
 
 {
