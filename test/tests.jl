@@ -60,7 +60,7 @@ write(test_file, template_text)
     @test t.authors == "Guy, Gal"
 
     t = Template(; user=me, dir=test_file)
-    @test t.dir == test_file
+    @test t.dir == abspath(test_file)
 
     t = Template(; user=me, julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
@@ -376,6 +376,13 @@ end
     generate(test_pkg, t; force=true)
     @test isfile(Pkg.dir(test_pkg, "README.md"))
     rm(Pkg.dir(test_pkg); recursive=true)
+
+    # Note: These tests will leave temporary directories on disk.
+    temp_file = mktemp()[1]
+    t = Template(; user=me, dir=temp_file, gitconfig=gitconfig)
+    @test_warn r".+" generate(test_pkg, t)
+    t = Template(; user=me, dir=joinpath(temp_file, temp_file), gitconfig=gitconfig)
+    @test_warn r".+" generate(test_pkg, t)
 
     t = Template(; user=me, gitconfig=gitconfig, plugins=[GitHubPages()])
     generate(test_pkg, t)

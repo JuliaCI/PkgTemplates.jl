@@ -29,7 +29,7 @@
     @test !isempty(t.license)
     @test t.authors == me
     @test t.years == "2016"
-    @test t.dir == test_file
+    @test t.dir == abspath(test_file)
     @test t.julia_version == v"0.5.0"
     @test Set(t.requirements) == Set(["X", "Y"])
     @test t.gitconfig == Dict("A" => "B")

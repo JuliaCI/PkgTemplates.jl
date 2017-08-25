@@ -24,7 +24,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
   git config's value, if it is left unset.
 * `years::Union{Integer, AbstractString}=Dates.year(Dates.today())`: Copyright years on the
   license. Can be supplied by a number, or a string such as "2016 - 2017".
-* `dir::AbstractString=Pkg.dir()`: Directory in which the package will go.
+* `dir::AbstractString=Pkg.dir()`: Directory in which the package will go. Relative paths
+  are converted to absolute ones at template creation time.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `requirements::Vector{String}=String[]`: Package requirements. If there are duplicate
   requirements with different versions, i.e. ["PkgTemplates", "PkgTemplates 0.1"],
@@ -100,7 +101,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
         end
 
         new(
-            user, host, license, authors, years, dir, julia_version,
+            user, host, license, authors, years, abspath(dir), julia_version,
             requirements_dedup, gitconfig, plugin_dict,
         )
     end
