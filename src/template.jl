@@ -84,6 +84,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
 
         years = string(years)
 
+        dir = abspath(expanduser(dir))
+
         requirements_dedup = collect(Set(requirements))
         diff = length(requirements) - length(requirements_dedup)
         names = [tokens[1] for tokens in split.(requirements_dedup)]
@@ -101,7 +103,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
         end
 
         new(
-            user, host, license, authors, years, abspath(dir), julia_version,
+            user, host, license, authors, years, dir, julia_version,
             requirements_dedup, gitconfig, plugin_dict,
         )
     end

@@ -61,6 +61,10 @@ write(test_file, template_text)
 
     t = Template(; user=me, dir=test_file)
     @test t.dir == abspath(test_file)
+    if is_unix()  # ~ means temporary file on Windows, not $HOME.
+        t = Template(; user=me, dir="~/$(basename(test_file))")
+        @test t.dir == joinpath(homedir(), basename(test_file))
+    end
 
     t = Template(; user=me, julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
