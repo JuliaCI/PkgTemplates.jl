@@ -11,14 +11,14 @@ makedocs(;
         "Licenses" => "pages/licenses.md",
         "Index" => "pages/index.md",
     ],
-    repo="https://github.com/christopher-dG/PkgTemplates.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/invenia/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",
     authors="Chris de Graaf, Invenia Technical Computing Corporation",
     assets=[],
 )
 
 deploydocs(;
-    repo="github.com/christopher-dG/PkgTemplates.jl",
+    repo="github.com/invenia/PkgTemplates.jl",
     target="build",
     julia="0.6",
     deps=nothing,
