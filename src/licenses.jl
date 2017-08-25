@@ -11,7 +11,7 @@ const LICENSES = Dict(
 )
 
 """
-    available_licenses([io]) -> Void
+    available_licenses([io::IO]) -> Void
 
 Print the names of all available licenses.
 """
@@ -27,10 +27,10 @@ show_license(io::IO, license::AbstractString) = println(io, read_license(license
 show_license(license::AbstractString) = show_license(STDOUT, license)
 
 """
-    read_license(licence::AbstractString) -> String
+    read_license(license::AbstractString) -> String
 
-Returns the contents of `license`. Errors if it is not found. Use [`show_license`](@ref) to
-view available licenses.
+Returns the contents of `license`. Errors if it is not found. Use
+[`available_licenses`](@ref) to view available licenses.
 """
 function read_license(license::AbstractString)
     path = joinpath(LICENSE_DIR, license)

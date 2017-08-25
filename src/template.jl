@@ -110,7 +110,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
 end
 
 """
-    interactive_template(; fast::Bool) -> Template
+    interactive_template(; fast::Bool=false) -> Template
 
 Interactively create a [`Template`](@ref). If `fast` is set, defaults will be assumed for
 all values except username and plugins.
