@@ -155,7 +155,10 @@ function interactive_template(; fast::Bool=false)
         licenses[abs(request(menu))].first
     end
 
-    kwargs[:authors] = if fast
+    # We don't need to ask for authors or copyright years if there is no license,
+    # because the license is the only place that they matter.
+
+    kwargs[:authors] = if fast || isempty(kwargs[:license])
         LibGit2.getconfig("user.name", "")
     else
         default_authors = LibGit2.getconfig("user.name", "")
@@ -165,7 +168,7 @@ function interactive_template(; fast::Bool=false)
         isempty(authors) ? default_authors : authors
     end
 
-    kwargs[:years] = if fast
+    kwargs[:years] = if fast || isempty(kwargs[:license])
         Dates.year(Dates.today())
     else
         default_years = Dates.year(Dates.today())

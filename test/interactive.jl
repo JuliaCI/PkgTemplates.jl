@@ -1,9 +1,10 @@
 # TerminalMenus.jl has issues in environments without a TTY,
 # which seems to be the case in Travis CI OSX builds.
 # https://travis-ci.org/invenia/PkgTemplates.jl/jobs/267682403#L115
+# https://github.com/nick-paul/TerminalMenus.jl/issues/5
 
 @testset "Interactive template creation" begin
-    write(STDIN.buffer, "$me\n\n\r\n\n\n\n\n\nd")
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\nd")
     t = interactive_template()
     @test t.user == me
     @test t.host == "github.com"
