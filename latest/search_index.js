@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.interactive_template",
     "category": "Function",
-    "text": "interactive_template(; fast::Bool) -> Template\n\nInteractively create a Template. If fast is set, defaults will be assumed for all values except username and plugins.\n\n\n\n"
+    "text": "interactive_template(; fast::Bool=false) -> Template\n\nInteractively create a Template. If fast is set, defaults will be assumed for all values except username and plugins.\n\n\n\n"
 },
 
 {
@@ -557,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Licenses",
     "title": "PkgTemplates.read_license",
     "category": "Function",
-    "text": "read_license(licence::AbstractString) -> String\n\nReturns the contents of license. Errors if it is not found. Use show_license to view available licenses.\n\n\n\n"
+    "text": "read_license(license::AbstractString) -> String\n\nReturns the contents of license. Errors if it is not found. Use available_licenses to view available licenses.\n\n\n\n"
 },
 
 {
