@@ -19,7 +19,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
   available licenses, and [`show_license`](@ref) can be used to print out a particular
   license's text.
 * `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the
-  license. Supply a string for one author, and an array for multiple. Similarly to `user`,
+  license. Supply a string for one author or an array for multiple. Similarly to `user`,
   it will try to take the value of a supplied git config's "user.name" key, then the global
   git config's value, if it is left unset.
 * `years::Union{Integer, AbstractString}=Dates.year(Dates.today())`: Copyright years on the
@@ -27,13 +27,12 @@ create a template, you can use [`interactive_template`](@ref) instead.
 * `dir::AbstractString=Pkg.dir()`: Directory in which the package will go. Relative paths
   are converted to absolute ones at template creation time.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
-* `requirements::Vector{String}=String[]`: Package requirements. If there are duplicate
-  requirements with different versions, i.e. ["PkgTemplates", "PkgTemplates 0.1"],
-  an `ArgumentError` is thrown.
-  Each entry in this array will be copied into the `REQUIRE` file of packages generated
-  with this template.
-* `gitconfig::Dict{String, String}=Dict{String, String}()`: Git configuration options.
-* `plugins::Plugin[]`: A list of `Plugin`s that the package will include.
+* `requirements::Vector{<:AbstractString}=String[]`: Package requirements. If there are
+  duplicate requirements with different versions, i.e. ["PkgTemplates", "PkgTemplates
+  0.1"], an `ArgumentError` is thrown. Each entry in this array will be copied into the
+  `REQUIRE` file of packages generated with this template.
+* `gitconfig::Dict=Dict()`: Git configuration options.
+* `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
 @auto_hash_equals struct Template
     user::AbstractString

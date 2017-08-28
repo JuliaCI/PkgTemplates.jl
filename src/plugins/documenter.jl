@@ -46,7 +46,7 @@ function gen_plugin(
             pages=[
                 "Home" => "index.md",
             ],
-            repo="https://github.com/$(template.user)/$pkg_name.jl/blob/{commit}{path}#L{line}",
+            repo="https://$(template.host)/$(template.user)/$pkg_name.jl/blob/{commit}{path}#L{line}",
             sitename="$pkg_name.jl",
             authors="$(template.authors)",
             assets=$assets_string,
@@ -61,4 +61,10 @@ function gen_plugin(
     if isfile(readme_path)
         cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
     end
+end
+
+function interactive(plugin_type::Type{<:Documenter})
+    plugin_name = split(string(plugin_type), ".")[end]
+    print("Enter any Documenter asset files for $plugin_name (separated by spaces) []: ")
+    return plugin_type(; assets=String.(split(readline())))
 end

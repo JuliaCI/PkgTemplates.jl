@@ -1,5 +1,5 @@
 """
-    GitHubPages(; assets::Vector{AbstractString}=String[]) -> GitHubPages
+    GitHubPages(; assets::Vector{<:AbstractString}=String[]) -> GitHubPages
 
 Add `GitHubPages` to a template's plugins to add [Documenter](@ref) support via GitHub
 Pages, including automatic uploading of documentation from [`TravisCI`](@ref). Also
@@ -12,7 +12,7 @@ adds appropriate badges to the README, and updates the `.gitignore` accordingly.
     gitignore::Vector{AbstractString}
     assets::Vector{AbstractString}
 
-    function GitHubPages(; assets::Vector{String}=String[])
+    function GitHubPages(; assets::Vector{<:AbstractString}=String[])
         for file in assets
             if !isfile(file)
                 throw(ArgumentError("Asset file $(abspath(file)) does not exist"))
@@ -67,9 +67,4 @@ function gen_plugin(
         end
     end
     return ["docs/"]
-end
-
-function interactive(plugin_type::Type{GitHubPages})
-    print("Enter any Documenter asset files for GitHubPages (separated by spaces) []: ")
-    return GitHubPages(; assets=String.(split(readline())))
 end
