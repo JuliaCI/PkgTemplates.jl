@@ -73,7 +73,7 @@ write(test_file, template_text)
     @test t.requirements == ["$test_pkg 0.1"]
     @test_warn r".+" t = Template(; user=me, requirements=[test_pkg, test_pkg])
     @test t.requirements == [test_pkg]
-    @test_throws ArgumentError t = Template(;
+    @test_throws ArgumentError Template(;
         user=me,
         requirements=[test_pkg, "$test_pkg 0.1"]
     )
@@ -105,12 +105,12 @@ write(test_file, template_text)
     )
 
     if isempty(LibGit2.getconfig("github.user", ""))
-        @test_throws ArgumentError t = Template()
+        @test_throws ArgumentError Template()
     else
         t = Template()
         @test t.user == LibGit2.getconfig("github.user", "")
     end
-    @test_throws ArgumentError t = Template(; user=me, license="FakeLicense")
+    @test_throws ArgumentError Template(; user=me, license="FakeLicense")
 end
 
 if get(ENV, "TRAVIS_OS_NAME", "") != "osx"
@@ -134,7 +134,7 @@ end
     @test isnull(p.src)
     p = AppVeyor(; config_file=test_file)
     @test get(p.src) == test_file
-    @test_throws ArgumentError p = AppVeyor(; config_file=fake_path)
+    @test_throws ArgumentError AppVeyor(; config_file=fake_path)
 
     p = TravisCI()
     @test isempty(p.gitignore)
@@ -152,7 +152,7 @@ end
     @test isnull(p.src)
     p = TravisCI(; config_file=test_file)
     @test get(p.src) == test_file
-    @test_throws ArgumentError p = TravisCI(; config_file=fake_path)
+    @test_throws ArgumentError TravisCI(; config_file=fake_path)
 
     p = CodeCov()
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
@@ -170,7 +170,7 @@ end
     @test isnull(p.src)
     p = CodeCov(; config_file=test_file)
     @test get(p.src) == test_file
-    @test_throws ArgumentError p = CodeCov(; config_file=fake_path)
+    @test_throws ArgumentError CodeCov(; config_file=fake_path)
 
     p = Coveralls()
     @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
@@ -188,14 +188,14 @@ end
     @test isnull(p.src)
     p = Coveralls(; config_file=test_file)
     @test get(p.src) == test_file
-    @test_throws ArgumentError p = Coveralls(; config_file=fake_path)
+    @test_throws ArgumentError Coveralls(; config_file=fake_path)
 
     p = GitHubPages()
     @test p.gitignore == ["/docs/build/", "/docs/site/"]
     @test isempty(p.assets)
     p = GitHubPages(; assets=[test_file])
     @test p.assets == [test_file]
-    @test_throws ArgumentError p = GitHubPages(; assets=[fake_path])
+    @test_throws ArgumentError GitHubPages(; assets=[fake_path])
 end
 
 @testset "Badge generation" begin
@@ -309,7 +309,7 @@ end
     @test contains(runtests, "using $test_pkg")
     @test contains(runtests, "using Base.Test")
 
-    rm(dirname(pkg_dir); recursive=true)
+    rm(temp_dir; recursive=true)
 end
 
 @testset "Package generation" begin
@@ -387,6 +387,7 @@ end
     @test_warn r".+" generate(test_pkg, t)
     t = Template(; user=me, dir=joinpath(temp_file, temp_file), gitconfig=gitconfig)
     @test_warn r".+" generate(test_pkg, t)
+    rm(temp_file)
 
     t = Template(; user=me, gitconfig=gitconfig, plugins=[GitHubPages()])
     generate(test_pkg, t)
@@ -504,7 +505,7 @@ end
         assets=[
                 "assets/$(basename(test_file))",
             ]
-        """)
+        """),
     )
     @test isfile(joinpath(pkg_dir, "docs", "src", "assets", basename(test_file)))
     rm(joinpath(pkg_dir, "docs"); recursive=true)
@@ -520,7 +521,7 @@ end
     p = Baz()
     @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
 
-    rm(dirname(pkg_dir); recursive=true)
+    rm(temp_dir; recursive=true)
 end
 
 @testset "Version floor" begin

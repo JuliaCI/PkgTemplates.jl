@@ -10,10 +10,6 @@ function gen_plugin(
     dir::AbstractString,
     pkg_name::AbstractString,
 )
-    if Pkg.installed("Documenter") == nothing
-        info("Adding Documenter.jl")
-        Pkg.add("Documenter")
-    end
     path = joinpath(dir, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
