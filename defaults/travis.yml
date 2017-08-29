@@ -6,6 +6,10 @@ os:
 julia:
   - {{VERSION}}
   - nightly
+matrix:
+  allow_failures:
+    - julia: nightly
+  fast_finish: true
 notifications:
   email: false
 script:
