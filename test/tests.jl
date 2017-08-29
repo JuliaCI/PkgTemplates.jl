@@ -382,10 +382,11 @@ end
     rm(Pkg.dir(test_pkg); recursive=true)
 
     # Note: These tests will leave temporary directories on disk.
-    temp_file = mktemp()[1]
+    temp_file, fd = mktemp()
+    close(fd)
     t = Template(; user=me, dir=temp_file, gitconfig=gitconfig)
     @test_warn r".+" generate(test_pkg, t)
-    t = Template(; user=me, dir=joinpath(temp_file, temp_file), gitconfig=gitconfig)
+    t = Template(; user=me, dir=joinpath(temp_file, "file"), gitconfig=gitconfig)
     @test_warn r".+" generate(test_pkg, t)
     rm(temp_file)
 
