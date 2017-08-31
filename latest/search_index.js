@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.generate",
     "category": "Function",
-    "text": "generate(\n    pkg_name::AbstractString,\n    t::Template;\n    force::Bool=false,\n    ssh::Bool=false,\n) -> Void\n\nGenerate a package names pkg_name from template.\n\nKeyword Arguments\n\nforce::Bool=false: Whether or not to overwrite old packages with the same name.\nssh::Bool=false: Whether or not to use SSH for the remote.\n\nNotes\n\nThe package is generated entirely in a temporary directory and only moved into joinpath(t.dir, pkg_name) at the very end. In the case of an error, the temporary directory will contain leftovers, but the destination directory will remain untouched (this is especially helpful when force=true).\n\n\n\n"
+    "text": "generate(\n    pkg_name::AbstractString,\n    t::Template;\n    force::Bool=false,\n    ssh::Bool=false,\n) -> Void\n\nGenerate a package names pkg_name from template.\n\nKeyword Arguments\n\nforce::Bool=false: Whether or not to overwrite old packages with the same name.\nssh::Bool=false: Whether or not to use SSH for the remote.\nbackup_dir::AbstractString=\"\": Directory in which to store the generated package if t.dir is not a valid directory. If left unset, a temporary directory will be created.\n\nNotes\n\nThe package is generated entirely in a temporary directory and only moved into joinpath(t.dir, pkg_name) at the very end. In the case of an error, the temporary directory will contain leftovers, but the destination directory will remain untouched (this is especially helpful when force=true).\n\n\n\n"
 },
 
 {
