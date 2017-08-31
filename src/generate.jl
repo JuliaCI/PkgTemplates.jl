@@ -11,6 +11,8 @@ Generate a package names `pkg_name` from `template`.
 # Keyword Arguments
 * `force::Bool=false`: Whether or not to overwrite old packages with the same name.
 * `ssh::Bool=false`: Whether or not to use SSH for the remote.
+* `backup_dir::AbstractString=""`: Directory in which to store the generated package if
+  `t.dir` is not a valid directory. If left unset, a temporary directory will be created.
 
 # Notes
 The package is generated entirely in a temporary directory and only moved into
@@ -23,9 +25,10 @@ function generate(
     t::Template;
     force::Bool=false,
     ssh::Bool=false,
+    backup_dir::AbstractString="",
 )
     mktempdir() do temp_dir
-        generate(pkg_name, t, temp_dir; force=force, ssh=ssh)
+        generate(pkg_name, t, temp_dir; force=force, ssh=ssh, backup_dir=backup_dir)
     end
 end
 
@@ -35,6 +38,7 @@ function generate(
     dir::AbstractString;
     force::Bool=false,
     ssh::Bool=false,
+    backup_dir::AbstractString="",
 )
     pkg_name = Pkg.splitjl(pkg_name)
     pkg_dir = joinpath(t.dir, pkg_name)
@@ -92,11 +96,16 @@ function generate(
     try
         mkpath(dirname(pkg_dir))
         mv(temp_pkg_dir, pkg_dir; remove_destination=force)
-    catch  # Likely cause is that t.path can't be created (is a file, etc.).
-        # We need another temporary directory because temp_pkg_dir is about to be removed.
-        temp_dir = mktempdir()
-        mv(temp_pkg_dir, joinpath(temp_dir, pkg_name))
-        warn("$pkg_name couldn't be moved into $pkg_dir, left package in $temp_dir")
+    catch  # Likely cause is that t.dir can't be created (is a file, etc.).
+        # We're just going to trust that backup_dir is a valid directory.
+        backup_dir = if isempty(backup_dir)
+            mktempdir()
+        else
+            abspath(backup_dir)
+        end
+        mkpath(backup_dir)
+        mv(temp_pkg_dir, joinpath(backup_dir, pkg_name))
+        warn("$pkg_name couldn't be moved into $pkg_dir, left package in $backup_dir")
     end
 
     info("Finished")

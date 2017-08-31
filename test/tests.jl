@@ -381,13 +381,16 @@ end
     @test isfile(Pkg.dir(test_pkg, "README.md"))
     rm(Pkg.dir(test_pkg); recursive=true)
 
-    # Note: These tests will leave temporary directories on disk.
     temp_file, fd = mktemp()
     close(fd)
+    temp_dir = mktempdir()
     t = Template(; user=me, dir=temp_file, gitconfig=gitconfig)
-    @test_warn r".+" generate(test_pkg, t)
+    @test_warn r".+" generate(test_pkg, t; backup_dir=temp_dir)
+    rm(temp_dir; recursive=true)
+    temp_dir = mktempdir()
     t = Template(; user=me, dir=joinpath(temp_file, "file"), gitconfig=gitconfig)
-    @test_warn r".+" generate(test_pkg, t)
+    @test_warn r".+" generate(test_pkg, t; backup_dir=temp_dir)
+    rm(temp_dir; recursive=true)
     rm(temp_file)
 
     t = Template(; user=me, gitconfig=gitconfig, plugins=[GitHubPages()])
