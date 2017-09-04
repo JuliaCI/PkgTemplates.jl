@@ -20,6 +20,12 @@ TravisCI
 AppVeyor
 ```
 
+## `GitLabCI`
+
+```@docs
+GitLabCI
+```
+
 ## `CodeCov`
 
 ```@docs
