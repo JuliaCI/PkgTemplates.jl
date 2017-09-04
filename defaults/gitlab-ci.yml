@@ -1,0 +1,36 @@
+stages:
+  - test
+  - coverage
+
+.test_template: &test_template
+  stage: test
+  artifacts:
+    name: coverage
+    expire_in: 2 hours
+    paths:
+      - coverage/
+  tags:
+    - docker
+  script:
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"{{#GITLABCOVERAGE}}; coverage=true{{/GITLABCOVERAGE}})'
+    - cp -r $(julia -e 'print(Pkg.dir("{{PKGNAME}}", "src"))') coverage
+
+Julia {{VERSION}}:
+  image: julia:{{VERSION}}
+  <<: *test_template
+
+Julia nightly:
+  image: staticfloat/julia:nightly-x64
+  allow_failure: true
+  <<: *test_template{{#GITLABCOVERAGE}}
+
+"Coverage":
+  stage: coverage
+  image: julia:0.6
+  tags:
+    - docker
+  before_script:
+    - apt-get update && apt-get -y install git make unzip gcc bzip2
+  script:
+    - rm -rf src && mv coverage src
+    - julia -e 'Pkg.add("Coverage"); using Coverage; c, t = get_summary(process_folder()); @printf("Test Coverage %.2f%%\n", 100c/t)'{{/GITLABCOVERAGE}}

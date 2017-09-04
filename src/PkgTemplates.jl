@@ -7,7 +7,7 @@ using TerminalMenus
 using URIParser
 
 export generate, interactive_template, show_license, available_licenses, Template,
-    GitHubPages, AppVeyor, TravisCI, CodeCov, Coveralls
+    GitHubPages, AppVeyor, TravisCI, GitLabCI, CodeCov, Coveralls
 
 abstract type Plugin end
 
@@ -20,6 +20,7 @@ include(joinpath("plugins", "coveralls.jl"))
 include(joinpath("plugins", "appveyor.jl"))
 include(joinpath("plugins", "codecov.jl"))
 include(joinpath("plugins", "travisci.jl"))
+include(joinpath("plugins", "gitlabci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
