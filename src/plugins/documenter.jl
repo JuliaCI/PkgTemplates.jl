@@ -61,6 +61,6 @@ end
 
 function interactive(plugin_type::Type{<:Documenter})
     plugin_name = split(string(plugin_type), ".")[end]
-    print("Enter any Documenter asset files for $plugin_name (separated by spaces) []: ")
+    print("$plugin_name: Enter any Documenter asset files (separated by spaces) []: ")
     return plugin_type(; assets=String.(split(readline())))
 end

@@ -23,7 +23,7 @@ adds appropriate badges to the README, and updates the `.gitignore` accordingly.
     end
 end
 
-function badges(_::GitHubPages, user::AbstractString, pkg_name::AbstractString)
+function badges(::GitHubPages, user::AbstractString, pkg_name::AbstractString)
     return [
         format(Badge(
             "Stable",

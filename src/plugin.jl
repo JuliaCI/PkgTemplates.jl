@@ -94,7 +94,7 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
                 "You got lucky with {{PKGNAME}}, {{USER}}!",
                 template,
             )
-            gen_file(joinpath(dir, ".myplugin.yml"), text)
+            gen_file(joinpath(dir, pkg_name, ".myplugin.yml"), text)
         else
             println("Maybe next time.")
         end
@@ -246,14 +246,14 @@ function interactive(
     # "MyPlugin" to be called "myplugin.yml".
     fn = file != nothing && isempty(file) ? "$(lowercase(plugin_name)).yml" : file
     default_config_file = fn == nothing ? fn : joinpath(DEFAULTS_DIR, fn)
-    print("Enter the config template filename for $plugin_name (\"None\" for no file) ")
+    print("$plugin_name: Enter the config template filename (\"None\" for no file) ")
     if default_config_file == nothing
         print("[None]: ")
     else
         print("[$(replace(default_config_file, homedir(), "~"))]: ")
     end
     config_file = readline()
-    config_file = if config_file == "None"
+    config_file = if uppercase(config_file) == "NONE"
         nothing
     elseif isempty(config_file)
         default_config_file
