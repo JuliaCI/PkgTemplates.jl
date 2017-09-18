@@ -26,7 +26,7 @@
     t = interactive_template()
     @test t.user == me
     @test t.host == "gitlab.com"
-    # Not sure if the order the licenses are displayed is consistent.
+    # Not sure if the order the licenses are displayed in is consistent.
     @test !isempty(t.license)
     @test t.authors == me
     @test t.years == "2016"
