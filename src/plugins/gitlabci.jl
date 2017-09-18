@@ -30,7 +30,7 @@ generated repositories, and appropriate badge(s) to the README.
             Badge(
                 "Build Status",
                 "https://gitlab.com/{{USER}}/{{PKGNAME}}.jl/badges/master/build.svg",
-                "https://gitlab.com/{{USER}}/{{PKGNAME}}.jl/commits/master",
+                "https://gitlab.com/{{USER}}/{{PKGNAME}}.jl/pipelines",
             ),
         ]
         if coverage
