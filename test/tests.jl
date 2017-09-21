@@ -333,7 +333,7 @@ end
     @test !LibGit2.isdirty(repo)
     rm(Pkg.dir(test_pkg); recursive=true)
 
-    generate(test_pkg, t; ssh=true)
+    generate(t, test_pkg; ssh=true)  # Test the reversed-arguments method.
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     @test LibGit2.url(remote) == "git@github.com:$me/$test_pkg.jl.git"

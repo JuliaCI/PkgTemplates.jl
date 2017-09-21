@@ -114,6 +114,16 @@ function generate(
     end
 end
 
+function generate(
+    t::Template,
+    pkg_name::AbstractString;
+    force::Bool=false,
+    ssh::Bool=false,
+    backup_dir::AbstractString="",
+)
+    generate(pkg_name, t; force=force, ssh=ssh, backup_dir=backup_dir)
+end
+
 """
     generate_interactive(
         pkg_name::AbstractString;
