@@ -6,8 +6,9 @@ using Mustache
 using TerminalMenus
 using URIParser
 
-export generate, interactive_template, show_license, available_licenses, Template,
-    GitHubPages, AppVeyor, TravisCI, GitLabCI, CodeCov, Coveralls
+export generate, interactive_template, generate_interactive, show_license,
+    available_licenses, Template, GitHubPages, AppVeyor, TravisCI, GitLabCI, CodeCov,
+    Coveralls
 
 abstract type Plugin end
 

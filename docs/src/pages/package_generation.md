@@ -18,6 +18,7 @@ interactive_template
 
 ```@docs
 generate
+generate_interactive
 ```
 
 ## Helper Functions

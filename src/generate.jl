@@ -6,7 +6,7 @@
         ssh::Bool=false,
     ) -> Void
 
-Generate a package names `pkg_name` from `template`.
+Generate a package named `pkg_name` from `template`.
 
 # Keyword Arguments
 * `force::Bool=false`: Whether or not to overwrite old packages with the same name.
@@ -78,7 +78,7 @@ function generate(
 
     # Generate the files.
     files = vcat(
-    gen_entrypoint(dir, pkg_name, t),
+        gen_entrypoint(dir, pkg_name, t),
         gen_tests(dir, pkg_name, t),
         gen_require(dir, pkg_name, t),
         gen_readme(dir, pkg_name, t),
@@ -112,6 +112,35 @@ function generate(
     if multiple_branches
         warn("Remember to push all created branches to your remote: git push --all")
     end
+end
+
+"""
+    generate_interactive(
+        pkg_name::AbstractString;
+        force::Bool=false,
+        ssh::Bool=false,
+        backup_dir::AbstractString="",
+        fast::Bool=false,
+    ) -> Void
+
+Interactively create a template, and then generate a package with it. Arguments and
+keywords are used in the same way as in [`generate`](@ref) and
+[`interactive_template`](@ref).
+"""
+function generate_interactive(
+    pkg_name::AbstractString;
+    force::Bool=false,
+    ssh::Bool=false,
+    backup_dir::AbstractString="",
+    fast::Bool=false,
+)
+    generate(
+        pkg_name,
+        interactive_template(; fast=fast);
+        force=force,
+        ssh=ssh,
+        backup_dir=backup_dir,
+    )
 end
 
 """
