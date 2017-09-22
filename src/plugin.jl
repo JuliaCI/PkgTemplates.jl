@@ -41,7 +41,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
         new(
             ["*.mgp"],
             config_file,
-            ".myplugin.yml",
+            ".my-plugin.toml",
             [
                 Badge(
                     "My Plugin",
@@ -75,7 +75,6 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
   generated packages that use this plugin.
 
 # Example
-
 ```julia
 @auto_hash_equals struct MyPlugin <: CustomPlugin
     gitignore::Vector{AbstractString}
