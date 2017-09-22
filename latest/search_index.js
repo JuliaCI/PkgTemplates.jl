@@ -85,7 +85,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.generate",
     "category": "Function",
-    "text": "generate(\n    pkg_name::AbstractString,\n    t::Template;\n    force::Bool=false,\n    ssh::Bool=false,\n) -> Void\n\nGenerate a package names pkg_name from template.\n\nKeyword Arguments\n\nforce::Bool=false: Whether or not to overwrite old packages with the same name.\nssh::Bool=false: Whether or not to use SSH for the remote.\nbackup_dir::AbstractString=\"\": Directory in which to store the generated package if t.dir is not a valid directory. If left unset, a temporary directory will be created.\n\nNotes\n\nThe package is generated entirely in a temporary directory and only moved into joinpath(t.dir, pkg_name) at the very end. In the case of an error, the temporary directory will contain leftovers, but the destination directory will remain untouched (this is especially helpful when force=true).\n\n\n\n"
+    "text": "generate(\n    pkg_name::AbstractString,\n    t::Template;\n    force::Bool=false,\n    ssh::Bool=false,\n) -> Void\n\nGenerate a package named pkg_name from template.\n\nKeyword Arguments\n\nforce::Bool=false: Whether or not to overwrite old packages with the same name.\nssh::Bool=false: Whether or not to use SSH for the remote.\nbackup_dir::AbstractString=\"\": Directory in which to store the generated package if t.dir is not a valid directory. If left unset, a temporary directory will be created.\n\nNotes\n\nThe package is generated entirely in a temporary directory and only moved into joinpath(t.dir, pkg_name) at the very end. In the case of an error, the temporary directory will contain leftovers, but the destination directory will remain untouched (this is especially helpful when force=true).\n\n\n\n"
+},
+
+{
+    "location": "pages/package_generation.html#PkgTemplates.generate_interactive",
+    "page": "Package Generation",
+    "title": "PkgTemplates.generate_interactive",
+    "category": "Function",
+    "text": "generate_interactive(\n    pkg_name::AbstractString;\n    force::Bool=false,\n    ssh::Bool=false,\n    backup_dir::AbstractString=\"\",\n    fast::Bool=false,\n) -> Void\n\nInteractively create a template, and then generate a package with it. Arguments and keywords are used in the same way as in generate and interactive_template.\n\n\n\n"
 },
 
 {
@@ -93,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "generate",
     "category": "section",
-    "text": "generate"
+    "text": "generate\ngenerate_interactive"
 },
 
 {
@@ -249,6 +257,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/plugins.html#PkgTemplates.GitLabCI",
+    "page": "Plugins",
+    "title": "PkgTemplates.GitLabCI",
+    "category": "Type",
+    "text": "GitLabCI(; config_file::Union{AbstractString, Void}=\"\", coverage::Bool=true) -> GitLabCI\n\nAdd GitLabCI to a template's plugins to add a .gitlab-ci.yml configuration file to generated repositories, and appropriate badge(s) to the README.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=\"\": Path to a custom .gitlab-ci.yml. If nothing is supplied, no file will be generated.\ncoverage::Bool=true: Whether or not GitLab CI's built-in code coverage analysis should be enabled. If enabled, you must set a regex in your repo settings; use Test Coverage (d+.d+)%.\n\n\n\n"
+},
+
+{
+    "location": "pages/plugins.html#GitLabCI-1",
+    "page": "Plugins",
+    "title": "GitLabCI",
+    "category": "section",
+    "text": "GitLabCI"
+},
+
+{
     "location": "pages/plugins.html#PkgTemplates.CodeCov",
     "page": "Plugins",
     "title": "PkgTemplates.CodeCov",
@@ -333,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugin Development",
     "title": "PkgTemplates.GenericPlugin",
     "category": "Type",
-    "text": "Generic plugins are plugins that add any number of patterns to the generated package's .gitignore, and have at most one associated file to generate.\n\nAttributes\n\ngitignore::Vector{AbstractString}: Array of patterns to be added to the .gitignore of generated packages that use this plugin.\nsrc::Nullable{AbstractString}: Path to the file that will be copied into the generated package repository. If set to nothing, no file will be generated. When this defaults to an empty string, there should be a default file in defaults that will be copied. That file's name is usually the same as the plugin's name, except in all lowercase and with the .yml extension. If this is not the case, an interactive method needs to be implemented to call interactive(; file=\"file.ext\").\ndest::AbstractString: Path to the generated file, relative to the root of the generated package repository.\nbadges::Vector{Badge}: Array of Badges containing information used to create Markdown-formatted badges from the plugin. Entries will be run through substitute, so they may contain placeholder values.\nview::Dict{String, Any}: Additional substitutions to make in both the plugin's badges and its associated file. See substitute for details.\n\nExample\n\n@auto_hash_equals struct MyPlugin <: GenericPlugin\n    gitignore::Vector{AbstractString}\n    src::Nullable{AbstractString}\n    dest::AbstractString\n    badges::Vector{Badge}\n    view::Dict{String, Any}\n\n    function MyPlugin(; config_file::Union{AbstractString, Void}=\"\")\n        if config_file != nothing\n            if isempty(config_file)\n                config_file = joinpath(DEFAULTS_DIR, \"my-plugin.toml\")\n            elseif !isfile(config_file)\n                throw(ArgumentError(\n                    \"File $(abspath(config_file)) does not exist\"\n                ))\n            end\n        end\n        new(\n            [\"*.mgp\"],\n            config_file,\n            \".myplugin.yml\",\n            [\n                Badge(\n                    \"My Plugin\",\n                    \"https://myplugin.com/badge-{{YEAR}}.png\",\n                    \"https://myplugin.com/{{USER}}/{{PKGNAME}}.jl\",\n                ),\n            ],\n            Dict{String, Any}(\"YEAR\" => Dates.year(Dates.today())),\n        )\n    end\nend\n\ninteractive(plugin_type::Type{MyPlugin}) = interactive(plugin_type; file=\"my-plugin.toml\")\n\nThe above plugin ignores files ending with .mgp, copies defaults/my-plugin.toml by default, and creates a badge that links to the project on its own site, using the default substitutions with one addition: {{YEAR}} => Dates.year(Dates.today()). Since the default config template file doesn't follow the generic naming convention, we added another interactive method to correct the assumed filename.\n\n\n\n"
+    "text": "Generic plugins are plugins that add any number of patterns to the generated package's .gitignore, and have at most one associated file to generate.\n\nAttributes\n\ngitignore::Vector{AbstractString}: Array of patterns to be added to the .gitignore of generated packages that use this plugin.\nsrc::Nullable{AbstractString}: Path to the file that will be copied into the generated package repository. If set to nothing, no file will be generated. When this defaults to an empty string, there should be a default file in defaults that will be copied. That file's name is usually the same as the plugin's name, except in all lowercase and with the .yml extension. If this is not the case, an interactive method needs to be implemented to call interactive(; file=\"file.ext\").\ndest::AbstractString: Path to the generated file, relative to the root of the generated package repository.\nbadges::Vector{Badge}: Array of Badges containing information used to create Markdown-formatted badges from the plugin. Entries will be run through substitute, so they may contain placeholder values.\nview::Dict{String, Any}: Additional substitutions to make in both the plugin's badges and its associated file. See substitute for details.\n\nExample\n\n@auto_hash_equals struct MyPlugin <: GenericPlugin\n    gitignore::Vector{AbstractString}\n    src::Nullable{AbstractString}\n    dest::AbstractString\n    badges::Vector{Badge}\n    view::Dict{String, Any}\n\n    function MyPlugin(; config_file::Union{AbstractString, Void}=\"\")\n        if config_file != nothing\n            if isempty(config_file)\n                config_file = joinpath(DEFAULTS_DIR, \"my-plugin.toml\")\n            elseif !isfile(config_file)\n                throw(ArgumentError(\n                    \"File $(abspath(config_file)) does not exist\"\n                ))\n            end\n        end\n        new(\n            [\"*.mgp\"],\n            config_file,\n            \".my-plugin.toml\",\n            [\n                Badge(\n                    \"My Plugin\",\n                    \"https://myplugin.com/badge-{{YEAR}}.png\",\n                    \"https://myplugin.com/{{USER}}/{{PKGNAME}}.jl\",\n                ),\n            ],\n            Dict{String, Any}(\"YEAR\" => Dates.year(Dates.today())),\n        )\n    end\nend\n\ninteractive(plugin_type::Type{MyPlugin}) = interactive(plugin_type; file=\"my-plugin.toml\")\n\nThe above plugin ignores files ending with .mgp, copies defaults/my-plugin.toml by default, and creates a badge that links to the project on its own site, using the default substitutions with one addition: {{YEAR}} => Dates.year(Dates.today()). Since the default config template file doesn't follow the generic naming convention, we added another interactive method to correct the assumed filename.\n\n\n\n"
 },
 
 {
