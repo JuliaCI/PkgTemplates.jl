@@ -1,6 +1,6 @@
 stages:
-  - test
-  - coverage
+  - test{{#GITLABCOVERAGE}}
+  - coverage{{/GITLABCOVERAGE}}
 
 .test_template: &test_template
   stage: test
@@ -12,8 +12,8 @@ stages:
   tags:
     - docker
   script:
-    - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"{{#GITLABCOVERAGE}}; coverage=true{{/GITLABCOVERAGE}})'
-    - cp -r $(julia -e 'print(Pkg.dir("{{PKGNAME}}", "src"))') coverage
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"{{#GITLABCOVERAGE}}; coverage=true
+    - cp -r $(julia -e 'print(Pkg.dir("{{PKGNAME}}", "src"))') coverage{{/GITLABCOVERAGE}})'
 
 Julia {{VERSION}}:
   image: julia:{{VERSION}}
