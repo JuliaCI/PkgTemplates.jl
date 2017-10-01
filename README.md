@@ -101,6 +101,9 @@ And if that's **still** too much work for you, you can call
 `interactive_template` with `fast=true` to use default values for everything
 but username and plugin selection.
 
+You can also use `generate_interactive` to interactively generate a template and then
+immediately use it to create a new package.
+
 ## Comparison to PkgDev
 
 `PkgTemplates` is similar in functionality to
