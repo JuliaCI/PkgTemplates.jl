@@ -352,9 +352,9 @@ end
     old_stdout = STDOUT
     out_read, out_write = redirect_stdout()
     available_licenses()
-    licenses = join(Char(c) for c in readavailable(out_read))
+    licenses = String(readavailable(out_read))
     show_license("MIT")
-    mit = join(Char(c) for c in readavailable(out_read))
+    mit = String(readavailable(out_read))
     close(out_write)
     close(out_read)
     redirect_stdout(old_stdout)
@@ -365,6 +365,10 @@ end
     @test strip(mit) == strip(read_license("MIT"))
     @test strip(read_license("MIT")) == strip(readstring(joinpath(LICENSE_DIR, "MIT")))
     @test_throws ArgumentError read_license(fake_path)
+
+    for license in readdir(LICENSE_DIR)
+        @test haskey(LICENSES, license)
+    end
 end
 
 @testset "Plugins" begin
