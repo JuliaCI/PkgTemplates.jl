@@ -7,7 +7,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "Plugin creation" begin
         p = GitLabCI()
         @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-        @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "gitlab-ci.yml")
+        @test get(p.src, "") == joinpath(PkgTemplates.DEFAULTS_DIR, "gitlab-ci.yml")
         @test p.dest == ".gitlab-ci.yml"
         @test p.badges == [
 			Badge(
@@ -25,7 +25,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = GitLabCI(; config_file=nothing)
         @test isnull(p.src)
         p = GitLabCI(; config_file=test_file)
-        @test get(p.src) == test_file
+        @test get(p.src, "") == test_file
         @test_throws ArgumentError GitLabCI(; config_file=fake_path)
 		p = GitLabCI(; coverage=false)
 		@test p.badges == [

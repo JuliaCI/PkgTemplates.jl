@@ -7,7 +7,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "Plugin creation" begin
         p = CodeCov()
         @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-        @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
+        @test get(p.src, "") == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
         @test p.dest == ".codecov.yml"
         @test p.badges == [
             Badge(
@@ -20,7 +20,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = CodeCov(; config_file=nothing)
         @test isnull(p.src)
         p = CodeCov(; config_file=test_file)
-        @test get(p.src) == test_file
+        @test get(p.src, "") == test_file
         @test_throws ArgumentError CodeCov(; config_file=fake_path)
     end
 

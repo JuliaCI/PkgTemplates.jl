@@ -7,7 +7,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "Plugin creation" begin
         p = TravisCI()
         @test isempty(p.gitignore)
-        @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
+        @test get(p.src, "") == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
         @test p.dest == ".travis.yml"
         @test p.badges == [
             Badge(
@@ -20,7 +20,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = TravisCI(; config_file=nothing)
         @test isnull(p.src)
         p = TravisCI(; config_file=test_file)
-        @test get(p.src) == test_file
+        @test get(p.src, "") == test_file
         @test_throws ArgumentError TravisCI(; config_file=fake_path)
     end
 

@@ -20,7 +20,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = Coveralls(; config_file=nothing)
         @test isnull(p.src)
         p = Coveralls(; config_file=test_file)
-        @test get(p.src) == test_file
+        @test get(p.src, "") == test_file
         @test_throws ArgumentError Coveralls(; config_file=fake_path)
     end
 
