@@ -75,7 +75,7 @@ function interactive(plugin_type::Type{GitLabCI})
     kwargs[:coverage] = if isempty(coverage)
         true
     else
-        !in(uppercase(user_image), ["N", "NO", "FALSE", "NONE"])
+        !in(uppercase(coverage), ["N", "NO", "FALSE", "NONE"])
     end
 
     return GitLabCI(; kwargs...)
