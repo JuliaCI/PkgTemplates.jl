@@ -114,8 +114,14 @@ write(test_file, template_text)
 end
 
 if get(ENV, "TRAVIS_OS_NAME", "") != "osx"
-    include("interactive.jl")
+    include(joinpath("interactive", "interactive.jl"))
+else
+    info("Skipping tests that require TerminalMenus")
 end
+@testset "Interactive plugin creation" begin
+    include(joinpath("interactive", "plugins.jl"))
+end
+
 
 @testset "File generation" begin
     t = Template(;

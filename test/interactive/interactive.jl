@@ -37,6 +37,9 @@
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
 
+    write(STDIN.buffer, "$me\n\n\r\n\n\nA B\n A B\n\nd")
+    @test_warn r".+" interactive_template()
+
     write(STDIN.buffer, "$me\nd")
     t = interactive_template(; fast=true)
     @test t.user == me
@@ -51,4 +54,11 @@
     @test isempty(t.gitconfig)
     @test isempty(t.plugins)
     println()
+end
+
+@testset "Interactive package generation" begin
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\nd")
+    generate_interactive(test_pkg)
+    @test isdir(Pkg.dir(test_pkg))
+    rm(Pkg.dir(test_pkg); force=true, recursive=true)
 end
