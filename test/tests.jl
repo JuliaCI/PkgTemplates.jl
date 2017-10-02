@@ -117,120 +117,6 @@ if get(ENV, "TRAVIS_OS_NAME", "") != "osx"
     include("interactive.jl")
 end
 
-@testset "Plugin creation" begin
-    p = AppVeyor()
-    @test isempty(p.gitignore)
-    @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
-    @test p.dest == ".appveyor.yml"
-    @test p.badges == [
-        Badge(
-            "Build Status",
-            "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKGNAME}}.jl?svg=true",
-            "https://ci.appveyor.com/project/{{USER}}/{{PKGNAME}}-jl",
-        ),
-    ]
-    @test isempty(p.view)
-    p = AppVeyor(; config_file=nothing)
-    @test isnull(p.src)
-    p = AppVeyor(; config_file=test_file)
-    @test get(p.src) == test_file
-    @test_throws ArgumentError AppVeyor(; config_file=fake_path)
-
-    p = TravisCI()
-    @test isempty(p.gitignore)
-    @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "travis.yml")
-    @test p.dest == ".travis.yml"
-    @test p.badges == [
-        Badge(
-            "Build Status",
-            "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
-            "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
-        ),
-    ]
-    @test isempty(p.view)
-    p = TravisCI(; config_file=nothing)
-    @test isnull(p.src)
-    p = TravisCI(; config_file=test_file)
-    @test get(p.src) == test_file
-    @test_throws ArgumentError TravisCI(; config_file=fake_path)
-
-    p = CodeCov()
-    @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-    @test get(p.src) == joinpath(PkgTemplates.DEFAULTS_DIR, "codecov.yml")
-    @test p.dest == ".codecov.yml"
-    @test p.badges == [
-        Badge(
-            "CodeCov",
-            "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
-            "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
-        )
-    ]
-    @test isempty(p.view)
-    p = CodeCov(; config_file=nothing)
-    @test isnull(p.src)
-    p = CodeCov(; config_file=test_file)
-    @test get(p.src) == test_file
-    @test_throws ArgumentError CodeCov(; config_file=fake_path)
-
-    p = Coveralls()
-    @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-    @test isnull(p.src)
-    @test p.dest == ".coveralls.yml"
-    @test p.badges == [
-        Badge(
-            "Coveralls",
-            "https://coveralls.io/repos/github/{{USER}}/{{PKGNAME}}.jl/badge.svg?branch=master",
-            "https://coveralls.io/github/{{USER}}/{{PKGNAME}}.jl?branch=master",
-        )
-    ]
-    @test isempty(p.view)
-    p = Coveralls(; config_file=nothing)
-    @test isnull(p.src)
-    p = Coveralls(; config_file=test_file)
-    @test get(p.src) == test_file
-    @test_throws ArgumentError Coveralls(; config_file=fake_path)
-
-    p = GitHubPages()
-    @test p.gitignore == ["/docs/build/", "/docs/site/"]
-    @test isempty(p.assets)
-    p = GitHubPages(; assets=[test_file])
-    @test p.assets == [test_file]
-    @test_throws ArgumentError GitHubPages(; assets=[fake_path])
-end
-
-@testset "Badge generation" begin
-    user = gitconfig["github.user"]
-
-    badge = Badge("A", "B", "C")
-    @test badge.hover == "A"
-    @test badge.image == "B"
-    @test badge.link == "C"
-    @test format(badge) == "[![A](B)](C)"
-
-    p = AppVeyor()
-    @test badges(p, user, test_pkg) == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/$user/$test_pkg.jl?svg=true)](https://ci.appveyor.com/project/$user/$test_pkg-jl)"]
-
-    p = TravisCI()
-    @test badges(p, user, test_pkg) == ["[![Build Status](https://travis-ci.org/$user/$test_pkg.jl.svg?branch=master)](https://travis-ci.org/$user/$test_pkg.jl)"]
-
-    p = CodeCov()
-    @test badges(p, user, test_pkg) == ["[![CodeCov](https://codecov.io/gh/$user/$test_pkg.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$test_pkg.jl)"]
-
-    p = Coveralls()
-    @test badges(p, user, test_pkg) == ["[![Coveralls](https://coveralls.io/repos/github/$user/$test_pkg.jl/badge.svg?branch=master)](https://coveralls.io/github/$user/$test_pkg.jl?branch=master)"]
-
-    p = GitHubPages()
-    @test badges(p, user, test_pkg) ==  [
-        "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$test_pkg.jl/stable)"
-        "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$test_pkg.jl/latest)"
-    ]
-
-    p = Bar()
-    @test isempty(badges(p, user, test_pkg))
-    p = Baz()
-    @test isempty(badges(p, user, test_pkg))
-end
-
 @testset "File generation" begin
     t = Template(;
         user=me,
@@ -401,133 +287,6 @@ end
     rm(Pkg.dir(test_pkg); recursive=true)
 end
 
-@testset "Plugin generation" begin
-    t = Template(; user=me)
-    temp_dir = mktempdir()
-    pkg_dir = joinpath(temp_dir, test_pkg)
-
-    p = TravisCI()
-    @test gen_plugin(p, t, temp_dir, test_pkg) == [".travis.yml"]
-    @test isfile(joinpath(pkg_dir, ".travis.yml"))
-    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
-    @test !contains(travis, "after_success")
-    @test !contains(travis, "Codecov.submit")
-    @test !contains(travis, "Coveralls.submit")
-    @test !contains(travis, "Pkg.add(\"Documenter\")")
-    rm(joinpath(pkg_dir, ".travis.yml"))
-    t.plugins[CodeCov] = CodeCov()
-    gen_plugin(p, t, temp_dir, test_pkg)
-    delete!(t.plugins, CodeCov)
-    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
-    @test contains(travis, "after_success")
-    @test contains(travis, "Codecov.submit")
-    @test !contains(travis, "Coveralls.submit")
-    @test !contains(travis, "Pkg.add(\"Documenter\")")
-    rm(joinpath(pkg_dir, ".travis.yml"))
-    t.plugins[Coveralls] = Coveralls()
-    gen_plugin(p, t, temp_dir, test_pkg)
-    delete!(t.plugins, Coveralls)
-    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
-    @test contains(travis, "after_success")
-    @test contains(travis, "Coveralls.submit")
-    @test !contains(travis, "Codecov.submit")
-    @test !contains(travis, "Pkg.add(\"Documenter\")")
-    rm(joinpath(pkg_dir, ".travis.yml"))
-    t.plugins[GitHubPages] = GitHubPages()
-    gen_plugin(p, t, temp_dir, test_pkg)
-    delete!(t.plugins, GitHubPages)
-    travis = readstring(joinpath(pkg_dir, ".travis.yml"))
-    @test contains(travis, "after_success")
-    @test contains(travis, "Pkg.add(\"Documenter\")")
-    @test !contains(travis, "Codecov.submit")
-    @test !contains(travis, "Coveralls.submit")
-    rm(joinpath(pkg_dir, ".travis.yml"))
-    p = TravisCI(; config_file=nothing)
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
-    @test !isfile(joinpath(pkg_dir, ".travis.yml"))
-    @test_throws ArgumentError TravisCI(; config_file=fake_path)
-
-    p = AppVeyor()
-    @test gen_plugin(p, t, temp_dir, test_pkg) == [".appveyor.yml"]
-    @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
-    appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
-    @test !contains(appveyor, "coverage=true")
-    @test !contains(appveyor, "after_test")
-    @test !contains(appveyor, "Codecov.submit")
-    @test !contains(appveyor, "Coveralls.submit")
-    rm(joinpath(pkg_dir, ".appveyor.yml"))
-    t.plugins[CodeCov] = CodeCov()
-    gen_plugin(p, t, temp_dir, test_pkg)
-    delete!(t.plugins, CodeCov)
-    appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
-    @test contains(appveyor, "coverage=true")
-    @test contains(appveyor, "after_test")
-    @test contains(appveyor, "Codecov.submit")
-    @test !contains(appveyor, "Coveralls.submit")
-    rm(joinpath(pkg_dir, ".appveyor.yml"))
-    t.plugins[Coveralls] = Coveralls()
-    gen_plugin(p, t, temp_dir, test_pkg)
-    delete!(t.plugins, Coveralls)
-    appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
-    @test contains(appveyor, "coverage=true")
-    @test contains(appveyor, "after_test")
-    @test contains(appveyor, "Coveralls.submit")
-    @test !contains(appveyor, "Codecov.submit")
-    rm(joinpath(pkg_dir, ".appveyor.yml"))
-    p = AppVeyor(; config_file=nothing)
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
-    @test !isfile(joinpath(pkg_dir, ".appveyor.yml"))
-    @test_throws ArgumentError AppVeyor(; config_file=fake_path)
-
-    p = CodeCov()
-    @test gen_plugin(p, t, temp_dir, test_pkg) == [".codecov.yml"]
-    @test isfile(joinpath(pkg_dir, ".codecov.yml"))
-    rm(joinpath(pkg_dir, ".codecov.yml"))
-    p = CodeCov(; config_file=nothing)
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
-    @test !isfile(joinpath(pkg_dir, ".codecov.yml"))
-    @test_throws ArgumentError CodeCov(; config_file=fake_path)
-
-    p = GitHubPages()
-    @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
-    @test isdir(joinpath(pkg_dir, "docs"))
-    @test isfile(joinpath(pkg_dir, "docs", "make.jl"))
-    make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-    @test contains(make, "assets=[]")
-    @test !contains(make, "deploydocs")
-    @test isdir(joinpath(pkg_dir, "docs", "src"))
-    @test isfile(joinpath(pkg_dir, "docs", "src", "index.md"))
-    index = readchomp(joinpath(pkg_dir, "docs", "src", "index.md"))
-    @test index == "# $test_pkg"
-    rm(joinpath(pkg_dir, "docs"); recursive=true)
-    p = GitHubPages(; assets=[test_file])
-    @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
-    make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-    @test contains(
-        make,
-        strip("""
-        assets=[
-                "assets/$(basename(test_file))",
-            ]
-        """),
-    )
-    @test isfile(joinpath(pkg_dir, "docs", "src", "assets", basename(test_file)))
-    rm(joinpath(pkg_dir, "docs"); recursive=true)
-    t.plugins[TravisCI] = TravisCI()
-    @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
-    make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-    @test contains(make, "deploydocs")
-    rm(joinpath(pkg_dir, "docs"); recursive=true)
-    @test_throws ArgumentError GitHubPages(; assets=[fake_path])
-
-    p = Bar()
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
-    p = Baz()
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
-
-    rm(temp_dir; recursive=true)
-end
-
 @testset "Version floor" begin
     @test version_floor(v"1.0.0") == "1.0"
     @test version_floor(v"1.0.1") == "1.0"
@@ -600,6 +359,35 @@ end
     @test strip(mit) == strip(read_license("MIT"))
     @test strip(read_license("MIT")) == strip(readstring(joinpath(LICENSE_DIR, "MIT")))
     @test_throws ArgumentError read_license(fake_path)
+end
+
+@testset "Plugins" begin
+    user = gitconfig["github.user"]
+    t = Template(; user=me)
+    temp_dir = mktempdir()
+    pkg_dir = joinpath(temp_dir, test_pkg)
+
+    badge = Badge("A", "B", "C")
+    @test badge.hover == "A"
+    @test badge.image == "B"
+    @test badge.link == "C"
+    @test format(badge) == "[![A](B)](C)"
+
+    p = Bar()
+    @test isempty(badges(p, user, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+
+    p = Baz()
+    @test isempty(badges(p, user, test_pkg))
+    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+
+    include(joinpath("plugins", "travisci.jl"))
+    include(joinpath("plugins", "appveyor.jl"))
+    include(joinpath("plugins", "codecov.jl"))
+    include(joinpath("plugins", "coveralls.jl"))
+    include(joinpath("plugins", "githubpages.jl"))
+
+    rm(temp_dir; recursive=true)
 end
 
 rm(test_file)
