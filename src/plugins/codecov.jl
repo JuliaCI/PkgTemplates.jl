@@ -18,9 +18,11 @@ generated repositories, and an appropriate badge to the README. Also updates the
 
     function CodeCov(; config_file::Union{AbstractString, Void}="")
         if config_file != nothing
-            if isempty(config_file)
+            config_file = if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "codecov.yml")
-            elseif !isfile(config_file)
+            elseif isfile(config_file)
+                abspath(config_file)
+            else
                 throw(ArgumentError("File $(abspath(config_file)) does not exist"))
             end
         end

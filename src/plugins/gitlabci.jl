@@ -20,9 +20,11 @@ generated repositories, and appropriate badge(s) to the README.
 
     function GitLabCI(; config_file::Union{AbstractString, Void}="", coverage::Bool=true)
         if config_file != nothing
-            if isempty(config_file)
+            config_file = if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "gitlab-ci.yml")
-            elseif !isfile(config_file)
+            elseif isfile(config_file)
+                abspath(config_file)
+            else
                 throw(ArgumentError("File $(abspath(config_file)) does not exist"))
             end
         end

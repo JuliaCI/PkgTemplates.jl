@@ -17,8 +17,12 @@ file to generated repositories, and an appropriate badge to the README. Also upd
     view::Dict{String, Any}
 
     function Coveralls(; config_file::Union{AbstractString, Void}=nothing)
-        if config_file != nothing && !isfile(config_file)
-            throw(ArgumentError("File $(abspath(config_file)) does not exist"))
+        if config_file != nothing
+            config_file = if isfile(config_file)
+                abspath(config_file)
+            else
+                throw(ArgumentError("File $(abspath(config_file)) does not exist"))
+            end
         end
         new(
             ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"],

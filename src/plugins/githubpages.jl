@@ -19,7 +19,7 @@ adds appropriate badges to the README, and updates the `.gitignore` accordingly.
             end
         end
         # Windows Git recognizes these paths as well.
-        new(["/docs/build/", "/docs/site/"], assets)
+        new(["/docs/build/", "/docs/site/"], abspath.(assets))
     end
 end
 
