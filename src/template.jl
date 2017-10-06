@@ -215,7 +215,7 @@ function interactive_template(; fast::Bool=false)
         Dict()
     else
         gitconfig = Dict()
-        print("Enter any Git key-value pairs (one at a time, separated by spaces) [None]: ")
+        print("Enter any Git key-value pairs (one per line, separated by spaces) [None]: ")
         while true
             line = readline()
             isempty(line) && break

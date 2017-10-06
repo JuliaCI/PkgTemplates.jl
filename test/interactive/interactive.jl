@@ -25,7 +25,7 @@
         @test_throws ArgumentError t = interactive_template()
     end
 
-    write(STDIN.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\nno\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
+    write(STDIN.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\nno\n0.5\nX Y\nkey val val\nkey2 val2\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
     t = interactive_template()
     @test t.user == me
     @test t.host == "gitlab.com"
@@ -37,7 +37,7 @@
     @test !t.precompile
     @test t.julia_version == v"0.5.0"
     @test Set(t.requirements) == Set(["X", "Y"])
-    @test t.gitconfig == Dict("A" => "B")
+    @test t.gitconfig == Dict("key" => "val val", "key2" => "val2")
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
 
