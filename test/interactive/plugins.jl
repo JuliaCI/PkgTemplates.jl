@@ -1,3 +1,5 @@
+# These tests are to be skipped in OSX builds, see ./interactive.jl for more info.
+
 @testset "TravisCI" begin
     write(STDIN.buffer, "\n")
     p = interactive(TravisCI)

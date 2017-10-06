@@ -2,6 +2,9 @@
 # which seems to be the case in Travis CI OSX builds.
 # https://travis-ci.org/invenia/PkgTemplates.jl/jobs/267682403#L115
 # https://github.com/nick-paul/TerminalMenus.jl/issues/5
+# This also affects any time we write to STDIN.buffer, because
+# IOStreams do not have that attribute.
+# Therefore, we skip any interactive tests on OSX builds.
 
 @testset "Interactive template creation" begin
     write(STDIN.buffer, "$me\n\n\r\n\n\n\n\nd")
