@@ -66,6 +66,9 @@ write(test_file, template_text)
         @test t.dir == joinpath(homedir(), basename(test_file))
     end
 
+    t = Template(; user=me, precompile=false)
+    @test !t.precompile
+
     t = Template(; user=me, julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
 
@@ -185,7 +188,14 @@ end
     @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
     entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
     rm(joinpath(pkg_dir, "src"); recursive=true)
+    @test contains(entrypoint, "__precompile__()")
     @test contains(entrypoint, "module $test_pkg")
+    t2 = Template(; user=me, precompile=false)
+    gen_entrypoint(temp_dir, test_pkg, t2)
+    entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
+    @test !contains(entrypoint, "__precompile__()")
+    @test contains(entrypoint, "module $test_pkg")
+    rm(joinpath(pkg_dir, "src"); recursive=true)
 
     @test gen_require(temp_dir, test_pkg, t) == ["REQUIRE"]
     @test isfile(joinpath(pkg_dir, "REQUIRE"))

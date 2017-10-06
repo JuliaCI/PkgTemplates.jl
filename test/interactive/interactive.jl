@@ -4,7 +4,7 @@
 # https://github.com/nick-paul/TerminalMenus.jl/issues/5
 
 @testset "Interactive template creation" begin
-    write(STDIN.buffer, "$me\n\n\r\n\n\n\nd")
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\n\nd")
     t = interactive_template()
     @test t.user == me
     @test t.host == "github.com"
@@ -22,7 +22,7 @@
         @test_throws ArgumentError t = interactive_template()
     end
 
-    write(STDIN.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
+    write(STDIN.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\nno\n0.5\nX Y\nA B\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
     t = interactive_template()
     @test t.user == me
     @test t.host == "gitlab.com"
@@ -31,13 +31,14 @@
     @test t.authors == me
     @test t.years == "2016"
     @test t.dir == abspath(test_file)
+    @test !t.precompile
     @test t.julia_version == v"0.5.0"
     @test Set(t.requirements) == Set(["X", "Y"])
     @test t.gitconfig == Dict("A" => "B")
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
 
-    write(STDIN.buffer, "$me\n\n\r\n\n\nA B\n A B\n\nd")
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\nA B\n A B\n\nd")
     @test_warn r".+" interactive_template()
 
     write(STDIN.buffer, "$me\nd")
@@ -57,7 +58,7 @@
 end
 
 @testset "Interactive package generation" begin
-    write(STDIN.buffer, "$me\n\n\r\n\n\n\nd")
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\n\nd")
     generate_interactive(test_pkg)
     @test isdir(Pkg.dir(test_pkg))
     rm(Pkg.dir(test_pkg); force=true, recursive=true)
