@@ -171,7 +171,8 @@ Create the module entrypoint in the temp package directory.
 Returns an array of generated file/directory names.
 """
 function gen_entrypoint(dir::AbstractString, pkg_name::AbstractString, template::Template)
-    text = """
+    text = template.precompile ? "__precompile__()\n" : ""
+    text *= """
         module $pkg_name
 
         # Package code goes here.
