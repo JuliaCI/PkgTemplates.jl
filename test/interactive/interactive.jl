@@ -61,7 +61,8 @@
 end
 
 @testset "Interactive package generation" begin
-    write(STDIN.buffer, "$me\n\n\r\n\n\n\n\nd")
+    cfg = join(["$(p.first) $(p.second)" for p in gitconfig], "\n")
+    write(STDIN.buffer, "$me\n\n\r\n\n\n\n$cfg\n\nd")
     generate_interactive(test_pkg)
     @test isdir(Pkg.dir(test_pkg))
     rm(Pkg.dir(test_pkg); force=true, recursive=true)

@@ -217,8 +217,9 @@ function interactive_template(; fast::Bool=false)
         gitconfig = Dict()
         print("Enter any Git key-value pairs (one at a time, separated by spaces) [None]: ")
         while true
-            tokens = split(readline())
-            isempty(tokens) && break
+            line = readline()
+            isempty(line) && break
+            tokens = split(line, " ", limit=2)
             if haskey(gitconfig, tokens[1])
                 warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
             end
