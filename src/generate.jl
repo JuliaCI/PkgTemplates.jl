@@ -53,10 +53,11 @@ function generate(
     # Initialize the repo and configure it.
     repo = LibGit2.init(temp_pkg_dir)
     info("Initialized git repo at $temp_pkg_dir")
-    cfg = LibGit2.GitConfig(repo)
     !isempty(t.gitconfig) && info("Applying git configuration")
-    for (key, val) in t.gitconfig
-        LibGit2.set!(cfg, key, val)
+    LibGit2.with(LibGit2.GitConfig, repo) do cfg
+        for (key, val) in t.gitconfig
+            LibGit2.set!(cfg, key, val)
+        end
     end
     LibGit2.commit(repo, "Empty initial commit")
     info("Made initial empty commit")
@@ -65,7 +66,8 @@ function generate(
     else
         "https://$(t.host)/$(t.user)/$pkg_name.jl"
     end
-    LibGit2.set_remote_url(repo, rmt)
+    # We need to set the remote in a strange way, see #8.
+    close(LibGit2.GitRemote(repo, "origin", rmt))
     info("Set remote origin to $rmt")
 
     # Create the gh-pages branch if necessary.
