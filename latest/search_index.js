@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Usage",
     "category": "section",
-    "text": "The simplest template only requires your GitHub username.using PkgTemplates\nt = Template(; user=\"myusername\")\ngenerate(\"MyPkg\", t)\ncd(joinpath(t.dir, \"MyPkg\")); run(`git ls-tree -r --name-only HEAD`)However, we can also configure a number of keyword arguments to Template and generate:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    years=\"2016-2017\",\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.5.2\",\n    requirements=[\"PkgTemplates\"],\n    gitconfig=Dict(\"diff.renames\" => true),\n    plugins=[\n        TravisCI(),\n        CodeCov(; config_file=nothing),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg\", t; force=true, ssh=true)\ncd(joinpath(t.dir, \"MyPkg\")); run(`git ls-tree -r --name-only HEAD`)If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that's still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
+    "text": "The simplest template only requires your GitHub username.using PkgTemplates\nt = Template(; user=\"myusername\");\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-tree -r --name-only HEAD`)However, we can also configure a number of keyword arguments to Template and generate:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    years=\"2016-2017\",\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.5.2\",\n    requirements=[\"PkgTemplates\"],\n    gitconfig=Dict(\"diff.renames\" => true),\n    plugins=[\n        TravisCI(),\n        CodeCov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n);\ngenerate(\"MyPkg\", t; force=true, ssh=true)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-tree -r --name-only HEAD`)If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that's still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
 },
 
 {
@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugins",
     "title": "PkgTemplates.CodeCov",
     "category": "Type",
-    "text": "CodeCov(; config_file::Union{AbstractString, Void}=\"\") -> CodeCov\n\nAdd CodeCov to a template's plugins to add a .codecov.yml configuration file to generated repositories, and an appropriate badge to the README. Also updates the .gitignore accordingly.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=\"\": Path to a custom .codecov.yml. If nothing is supplied, no file will be generated.\n\n\n\n"
+    "text": "CodeCov(; config_file::Union{AbstractString, Void}=nothing) -> CodeCov\n\nAdd CodeCov to a template's plugins to optionally add a .codecov.yml configuration file to generated repositories, and an appropriate badge to the README. Also updates the .gitignore accordingly.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=nothing: Path to a custom .codecov.yml. If left unset, no file will be generated.\n\n\n\n"
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugins",
     "title": "PkgTemplates.Coveralls",
     "category": "Type",
-    "text": "Coveralls(; config_file::Union{AbstractString, Void}=\"\") -> Coveralls\n\nAdd Coveralls to a template's plugins to optionally add a .coveralls.yml configuration file to generated repositories, and an appropriate badge to the README. Also updates the .gitignore accordingly.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=nothing: Path to a custom .coveralls.yml. If left unset, no file will be generated.\n\n\n\n"
+    "text": "Coveralls(; config_file::Union{AbstractString, Void}=nothing) -> Coveralls\n\nAdd Coveralls to a template's plugins to optionally add a .coveralls.yml configuration file to generated repositories, and an appropriate badge to the README. Also updates the .gitignore accordingly.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=nothing: Path to a custom .coveralls.yml. If left unset, no file will be generated.\n\n\n\n"
 },
 
 {
