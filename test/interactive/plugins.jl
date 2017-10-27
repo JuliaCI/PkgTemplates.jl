@@ -50,7 +50,7 @@ end
 @testset "CodeCov" begin
     write(STDIN.buffer, "\n")
     p = interactive(CodeCov)
-    @test get(p.src, "") == joinpath(DEFAULTS_DIR, "codecov.yml")
+    @test isnull(p.src)
     write(STDIN.buffer, "$test_file\n")
     p = interactive(CodeCov)
     @test get(p.src, "") == test_file

@@ -265,7 +265,6 @@ end
     @test !isfile(Pkg.dir(test_pkg, "LICENSE"))
     @test isfile(Pkg.dir(test_pkg, ".travis.yml"))
     @test isfile(Pkg.dir(test_pkg, ".appveyor.yml"))
-    @test isfile(Pkg.dir(test_pkg, ".codecov.yml"))
     @test isdir(Pkg.dir(test_pkg, "docs"))
     @test isfile(Pkg.dir(test_pkg, "docs", "make.jl"))
     @test isdir(Pkg.dir(test_pkg, "docs", "src"))

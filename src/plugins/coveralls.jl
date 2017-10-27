@@ -1,5 +1,5 @@
 """
-    Coveralls(; config_file::Union{AbstractString, Void}="") -> Coveralls
+    Coveralls(; config_file::Union{AbstractString, Void}=nothing) -> Coveralls
 
 Add `Coveralls` to a template's plugins to optionally add a `.coveralls.yml` configuration
 file to generated repositories, and an appropriate badge to the README. Also updates the

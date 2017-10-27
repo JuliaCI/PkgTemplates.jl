@@ -1,13 +1,13 @@
 """
-    CodeCov(; config_file::Union{AbstractString, Void}="") -> CodeCov
+    CodeCov(; config_file::Union{AbstractString, Void}=nothing) -> CodeCov
 
-Add `CodeCov` to a template's plugins to add a `.codecov.yml` configuration file to
-generated repositories, and an appropriate badge to the README. Also updates the
+Add `CodeCov` to a template's plugins to optionally add a `.codecov.yml` configuration file
+to generated repositories, and an appropriate badge to the README. Also updates the
 `.gitignore` accordingly.
 
 # Keyword Arguments:
-* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.codecov.yml`.
-  If `nothing` is supplied, no file will be generated.
+* `config_file::Union{AbstractString, Void}=nothing`: Path to a custom `.codecov.yml`.
+  If left unset, no file will be generated.
 """
 @auto_hash_equals struct CodeCov <: GenericPlugin
     gitignore::Vector{AbstractString}
@@ -16,11 +16,9 @@ generated repositories, and an appropriate badge to the README. Also updates the
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function CodeCov(; config_file::Union{AbstractString, Void}="")
+    function CodeCov(; config_file::Union{AbstractString, Void}=nothing)
         if config_file != nothing
-            config_file = if isempty(config_file)
-                config_file = joinpath(DEFAULTS_DIR, "codecov.yml")
-            elseif isfile(config_file)
+            config_file = if isfile(config_file)
                 abspath(config_file)
             else
                 throw(ArgumentError("File $(abspath(config_file)) does not exist"))
@@ -41,3 +39,5 @@ generated repositories, and an appropriate badge to the README. Also updates the
         )
     end
 end
+
+interactive(plugin_type::Type{CodeCov}) = interactive(plugin_type; file=nothing)
