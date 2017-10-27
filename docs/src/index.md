@@ -22,9 +22,9 @@ The simplest template only requires your GitHub username.
 
 ```@repl
 using PkgTemplates
-t = Template(; user="myusername")
+t = Template(; user="myusername");
 generate("MyPkg", t)
-cd(joinpath(t.dir, "MyPkg")); run(`git ls-tree -r --name-only HEAD`)
+run(`git -C $(joinpath(t.dir, "MyPkg")) ls-tree -r --name-only HEAD`)
 ```
 
 However, we can also configure a number of keyword arguments to
@@ -43,14 +43,14 @@ t = Template(;
     gitconfig=Dict("diff.renames" => true),
     plugins=[
         TravisCI(),
-        CodeCov(; config_file=nothing),
+        CodeCov(),
         Coveralls(),
         AppVeyor(),
         GitHubPages(),
     ],
-)
+);
 generate("MyPkg", t; force=true, ssh=true)
-cd(joinpath(t.dir, "MyPkg")); run(`git ls-tree -r --name-only HEAD`)
+run(`git -C $(joinpath(t.dir, "MyPkg")) ls-tree -r --name-only HEAD`)
 ```
 
 If that looks like a lot of work, you can also create templates interactively
