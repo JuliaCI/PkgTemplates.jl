@@ -1,19 +1,19 @@
-stages:
-  - test{{#GITLABCOVERAGE}}
-  - coverage{{/GITLABCOVERAGE}}
+{{#GITLABCOVERAGE}}stages:
+  - test
+  - coverage
 
-.test_template: &test_template
-  stage: test
+{{/GITLABCOVERAGE}}.test_template: &test_template
+  stage: test{{#GITLABCOVERAGE}}
   artifacts:
     name: coverage
     expire_in: 2 hours
     paths:
-      - coverage/
+      - coverage/{{/GITLABCOVERAGE}}
   tags:
     - docker
   script:
-    - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"{{#GITLABCOVERAGE}}; coverage=true
-    - cp -r $(julia -e 'print(Pkg.dir("{{PKGNAME}}", "src"))') coverage{{/GITLABCOVERAGE}})'
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"{{#GITLABCOVERAGE}}; coverage=true{{/GITLABCOVERAGE}})'{{#GITLABCOVERAGE}}
+    - cp -r $(julia -e 'print(Pkg.dir("{{PKGNAME}}", "src"))') coverage{{/GITLABCOVERAGE}}
 
 Julia {{VERSION}}:
   image: julia:{{VERSION}}
@@ -26,7 +26,7 @@ Julia nightly:
 
 "Coverage":
   stage: coverage
-  image: julia:0.6
+  image: julia:{{VERSION}}
   tags:
     - docker
   before_script:
