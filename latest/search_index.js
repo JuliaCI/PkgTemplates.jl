@@ -405,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugin Development",
     "title": "PkgTemplates.interactive",
     "category": "Function",
-    "text": "interactive(\n    plugin_type::Type{P <: Plugin};\n    file::Union{AbstractString, Void}=\"\",\n) -> Plugin\n\nInteractively create a plugin of type plugin_type, where file is the plugin type's default config template with a non-standard name (for MyPlugin, this is anything but \"myplugin.yml\").\n\n\n\n"
+    "text": "interactive(\n    plugin_type::Type{<:Plugin};\n    file::Union{AbstractString, Void}=\"\",\n) -> Plugin\n\nInteractively create a plugin of type plugin_type, where file is the plugin type's default config template with a non-standard name (for MyPlugin, this is anything but \"myplugin.yml\").\n\n\n\n"
 },
 
 {
