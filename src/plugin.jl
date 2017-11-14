@@ -230,7 +230,7 @@ end
 
 """
     interactive(
-        plugin_type::Type{P <: Plugin};
+        plugin_type::Type{<:Plugin};
         file::Union{AbstractString, Void}="",
     ) -> Plugin
 

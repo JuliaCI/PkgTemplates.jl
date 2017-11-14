@@ -199,7 +199,7 @@ function interactive_template(; fast::Bool=false)
         VERSION
     else
         default_julia_version = VERSION
-        print("Enter the minimum Julia version [$default_julia_version]: ")
+        print("Enter the minimum Julia version [$(version_floor(default_julia_version))]: ")
         julia_version = readline()
         isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
     end
