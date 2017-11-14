@@ -208,8 +208,10 @@ function gen_tests(dir::AbstractString, pkg_name::AbstractString, template::Temp
         using $pkg_name
         using Base.Test
 
-        # Write your own tests here.
-        @test 1 == 2
+        @testset "$pkg_name.jl" begin
+            # Write your own tests here.
+            @test 1 == 2
+        end
         """
 
     gen_file(joinpath(dir, pkg_name, "test", "runtests.jl"), text)

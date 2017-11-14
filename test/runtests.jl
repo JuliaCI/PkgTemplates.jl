@@ -10,7 +10,9 @@ mktempdir() do temp_dir
     withenv("JULIA_PKGDIR" => temp_dir) do
         Pkg.init()
         cd(temp_dir) do
-            include("tests.jl")
+            @testset "PkgTemplates.jl" begin
+                include("tests.jl")
+            end
         end
     end
 end
