@@ -35,4 +35,4 @@ test_script:
   - C:\projects\julia\bin\julia -e "Pkg.test(\"PkgTemplates\"; coverage=true)"
 
 after_test:
-  - C:\projects\julia\bin\julia -e "VERSION > v\"0.6.0\" && exit(); cd(Pkg.dir(\"PkgTemplates\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
+  - C:\projects\julia\bin\julia -e "VERSION > v\"0.6.2\" && exit(); cd(Pkg.dir(\"PkgTemplates\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
