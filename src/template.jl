@@ -1,3 +1,5 @@
+import Base.show
+
 """
     Template(; kwargs...) -> Template
 
@@ -108,6 +110,61 @@ create a template, you can use [`interactive_template`](@ref) instead.
             user, host, license, authors, years, dir, precompile,
             julia_version, requirements_dedup, gitconfig, plugin_dict,
         )
+    end
+end
+
+function show(io::IO, t::Template)
+    maybe_none(s::AbstractString) = isempty(string(s)) ? "None" : string(s)
+    spc = "  "
+
+    println(io, "Template:")
+    println(io, "$spc→ User: $(maybe_none(t.user))")
+    println(io, "$spc→ Host: $(maybe_none(t.host))")
+    println(io, "$spc→ License: $(maybe_none(t.license))")
+
+    # We don't care about authors or license years if there is no license.
+    if !isempty(t.license)
+        # TODO: Authors could be split into multiple lines if there are more than one.
+        # Maybe the authors field of Template should be an array (or Dict, see #4).
+        println(io, "$spc→ Authors: $(maybe_none(t.authors))")
+        println(io, "$spc→ License years: $(maybe_none(t.years))")
+    end
+
+    println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir(), "~"))")
+    println(io, "$spc→ Precompilation enabled: $(t.precompile ? "yes" : "no")")
+    println(io, "$spc→ Minimum Julia version: v$(t.julia_version)")
+
+    print(io, "$spc→ Package dependencies: ")
+    if isempty(t.requirements)
+        println(io, "None")
+    else
+        println(io)
+        for req in sort(t.requirements)
+            println(io, "$(spc^2)• $req")
+        end
+    end
+
+    print(io, "$spc→ Git configuration options: ")
+    if isempty(t.gitconfig)
+        println(io, "None")
+    else
+        println(io)
+        for k in sort(collect(keys(t.gitconfig)); by=string)
+            println(io, "$(spc^2)• $k = $(t.gitconfig[k])")
+        end
+    end
+
+    print(io, "$spc→ Plugins: ")
+    if isempty(t.plugins)
+        print(io, "None")
+    else
+        for plugin in sort(collect(values(t.plugins)); by=string)
+            println(io)
+            buf = IOBuffer()
+            show(buf, plugin)
+            print(io, "$(spc^2)• ")
+            print(io, join(split(String(take!(buf)), "\n"), "\n$(spc^2)"))
+        end
     end
 end
 

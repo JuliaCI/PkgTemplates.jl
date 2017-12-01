@@ -1,3 +1,5 @@
+import Base.show
+
 """
 Add a `Documenter` subtype to a template's plugins to add support for documentation
 generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
@@ -57,6 +59,25 @@ function gen_plugin(
     if isfile(readme_path)
         cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
     end
+end
+
+function show(io::IO, p::Documenter)
+    t = split(string(typeof(p)), ".")[end]
+    println(io, "$t:")
+
+    n = length(p.assets)
+    s = n == 1 ? "" : "s"
+    print(io, "    → $n asset file$s")
+    if n == 0
+        println(io)
+    else
+        println(io, ": $(join(map(a -> replace(a, homedir(), "~"), p.assets), ", "))")
+    end
+
+    n = length(p.gitignore)
+    s = n == 1 ? "" : "s"
+    print(io, "    → $n gitignore entrie$s")
+    n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
 end
 
 function interactive(plugin_type::Type{<:Documenter})

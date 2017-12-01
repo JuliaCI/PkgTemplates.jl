@@ -1,3 +1,5 @@
+import Base.show
+
 """
 Generic plugins are plugins that add any number of patterns to the generated package's
 `.gitignore`, and have at most one associated file to generate.
@@ -66,6 +68,23 @@ config template file doesn't follow the generic naming convention, we added anot
 `interactive` method to correct the assumed filename.
 """
 abstract type GenericPlugin <: Plugin end
+
+function show(io::IO, p::GenericPlugin)
+    t = split(string(typeof(p)), ".")[end]
+    println(io, "$t:")
+
+    cfg = if isnull(p.src)
+        "None"
+    else
+        dirname(get(p.src)) == DEFAULTS_DIR ? "Default" : get(p.src)
+    end
+    println(io, "    → Config file: $cfg")
+
+    n = length(p.gitignore)
+    s = n == 1 ? "" : "s"
+    print(io, "    → $n gitignore entrie$s")
+    n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
+end
 
 """
 Custom plugins are plugins whose behaviour does not follow the [`GenericPlugin`](@ref)
