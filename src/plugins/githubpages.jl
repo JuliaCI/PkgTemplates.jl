@@ -1,12 +1,12 @@
 """
     GitHubPages(; assets::Vector{<:AbstractString}=String[]) -> GitHubPages
 
-Add `GitHubPages` to a template's plugins to add [Documenter](@ref) support via GitHub
+Add `GitHubPages` to a template's plugins to add [`Documenter`](@ref) support via GitHub
 Pages, including automatic uploading of documentation from [`TravisCI`](@ref). Also
 adds appropriate badges to the README, and updates the `.gitignore` accordingly.
 
 # Keyword Arguments
-* `assets::Vector{String}=String[]`: Array of paths to Documenter asset files.
+* `assets::Vector{<:AbstractString}=String[]`: Array of paths to Documenter asset files.
 """
 @auto_hash_equals struct GitHubPages <: Documenter
     gitignore::Vector{AbstractString}

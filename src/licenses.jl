@@ -22,7 +22,7 @@ available_licenses() = available_licenses(STDOUT)
 """
     show_license([io::IO], license::AbstractString) -> Void
 
-Print the text of `license`.
+Print the text of `license`. Errors if the license is not found.
 """
 show_license(io::IO, license::AbstractString) = println(io, read_license(license))
 show_license(license::AbstractString) = show_license(STDOUT, license)
@@ -30,7 +30,7 @@ show_license(license::AbstractString) = show_license(STDOUT, license)
 """
     read_license(license::AbstractString) -> String
 
-Returns the contents of `license`. Errors if it is not found. Use
+Returns the contents of `license`. Errors if the license is not found. Use
 [`available_licenses`](@ref) to view available licenses.
 """
 function read_license(license::AbstractString)

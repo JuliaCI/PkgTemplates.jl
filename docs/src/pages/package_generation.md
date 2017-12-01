@@ -21,39 +21,13 @@ generate
 generate_interactive
 ```
 
-## Helper Functions
-
-#### `gen_entrypoint`
+### Helper Functions
 
 ```@docs
 gen_entrypoint
-```
-
-#### `gen_tests`
-
-```@docs
 gen_tests
-```
-
-#### `gen_require`
-
-```@docs
 gen_require
-```
-
-#### `gen_readme`
-
-```@docs
 gen_readme
-```
-
-#### gen_gitignore
-
-```@docs
 gen_gitignore
-```
-
-#### gen_license
-```@docs
 gen_license
 ```

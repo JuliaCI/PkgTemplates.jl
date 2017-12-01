@@ -88,7 +88,7 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
         plugin::MyPlugin,
         template::Template,
         dir::AbstractString,
-        pkg_name::AbstractString
+        pkg_name::AbstractString,
     )
         if plugin.lucky
             text = substitute(

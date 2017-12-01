@@ -4,6 +4,7 @@
         t::Template;
         force::Bool=false,
         ssh::Bool=false,
+        backup_dir::AbstractString="",
     ) -> Void
 
 Generate a package named `pkg_name` from `template`.
@@ -12,7 +13,8 @@ Generate a package named `pkg_name` from `template`.
 * `force::Bool=false`: Whether or not to overwrite old packages with the same name.
 * `ssh::Bool=false`: Whether or not to use SSH for the remote.
 * `backup_dir::AbstractString=""`: Directory in which to store the generated package if
-  `t.dir` is not a valid directory. If left unset, a temporary directory will be created.
+  `t.dir` is not a valid directory. If left unset, a temporary directory will be created
+  (this keyword is mostly for internal usage).
 
 # Notes
 The package is generated entirely in a temporary directory and only moved into

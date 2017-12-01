@@ -6,10 +6,27 @@ using Mustache
 using TerminalMenus
 using URIParser
 
-export generate, interactive_template, generate_interactive, show_license,
-    available_licenses, Template, GitHubPages, AppVeyor, TravisCI, GitLabCI, CodeCov,
+export
+    # Template/package generation.
+    Template,
+    generate,
+    interactive_template,
+    generate_interactive,
+    # Licenses.
+    show_license,
+    available_licenses,
+    # Plugins.
+    GitHubPages,
+    AppVeyor,
+    TravisCI,
+    GitLabCI,
+    CodeCov,
     Coveralls
 
+"""
+A plugin to be added to a [`Template`](@ref), which adds some functionality or integration.
+New plugins should almost always extend [`GenericPlugin`](@ref) or [`CustomPlugin`](@ref).
+"""
 abstract type Plugin end
 
 include("licenses.jl")
