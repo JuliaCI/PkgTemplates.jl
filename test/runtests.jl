@@ -8,7 +8,12 @@ import PkgTemplates: badges, version_floor, substitute, read_license, gen_file, 
 
 mktempdir() do temp_dir
     withenv("JULIA_PKGDIR" => temp_dir) do
-        Pkg.init()
+        # We technically don't need to clone METADATA to run tests.
+        if get(ENV, "PKGTEMPLATES_TEST_FAST", "false") == "true"
+            mkdir(joinpath(temp_dir, "v$(version_floor())"))
+        else
+            Pkg.init()
+        end
         cd(temp_dir) do
             @testset "PkgTemplates.jl" begin
                 include("tests.jl")
