@@ -134,9 +134,9 @@ function show(io::IO, t::Template)
     println(io, "$spc→ Precompilation enabled: $(t.precompile ? "yes" : "no")")
     println(io, "$spc→ Minimum Julia version: v$(t.julia_version)")
 
-    print(io, "$spc→ Package dependencies: ")
+    print(io, "$spc→ Package dependencies:")
     if isempty(t.requirements)
-        println(io, "None")
+        println(io, " None")
     else
         println(io)
         for req in sort(t.requirements)
@@ -144,9 +144,9 @@ function show(io::IO, t::Template)
         end
     end
 
-    print(io, "$spc→ Git configuration options: ")
+    print(io, "$spc→ Git configuration options:")
     if isempty(t.gitconfig)
-        println(io, "None")
+        println(io, " None")
     else
         println(io)
         for k in sort(collect(keys(t.gitconfig)); by=string)
@@ -154,9 +154,9 @@ function show(io::IO, t::Template)
         end
     end
 
-    print(io, "$spc→ Plugins: ")
+    print(io, "$spc→ Plugins:")
     if isempty(t.plugins)
-        print(io, "None")
+        print(io, " None")
     else
         for plugin in sort(collect(values(t.plugins)); by=string)
             println(io)

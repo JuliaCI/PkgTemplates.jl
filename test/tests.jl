@@ -125,6 +125,71 @@ else
     info("Skipping tests that require TerminalMenus")
 end
 
+@testset "Show methods" begin
+    pkgdir = replace(joinpath(ENV["JULIA_PKGDIR"], "v$(version_floor())"), homedir(), "~")
+    buf = IOBuffer()
+    t = Template(; user=me, gitconfig=gitconfig)
+    show(buf, t)
+    text = String(take!(buf))
+    expected = """
+        Template:
+          → User: $me
+          → Host: github.com
+          → License: MIT
+          → Authors: $(gitconfig["user.name"])
+          → License years: 2017
+          → Package directory: $pkgdir
+          → Precompilation enabled: yes
+          → Minimum Julia version: v$VERSION
+          → Package dependencies: None
+          → Git configuration options:
+            • github.user = $(gitconfig["github.user"])
+            • user.email = $(gitconfig["user.email"])
+            • user.name = $(gitconfig["user.name"])
+          → Plugins: None
+        """
+    @test text == rstrip(expected)
+    t = Template(
+        user=me,
+        license="",
+        requirements=["Foo", "Bar"],
+        gitconfig=gitconfig,
+        plugins=[
+            TravisCI(),
+            CodeCov(),
+            GitHubPages(),
+        ],
+    )
+    show(buf, t)
+    text = String(take!(buf))
+    expected = """
+        Template:
+          → User: $me
+          → Host: github.com
+          → License: None
+          → Package directory: $pkgdir
+          → Precompilation enabled: yes
+          → Minimum Julia version: v$VERSION
+          → Package dependencies:
+            • Bar
+            • Foo
+          → Git configuration options:
+            • github.user = $(gitconfig["github.user"])
+            • user.email = $(gitconfig["user.email"])
+            • user.name = $(gitconfig["user.name"])
+          → Plugins:
+            • CodeCov:
+                → Config file: None
+                → 3 gitignore entries: "*.jl.cov", "*.jl.*.cov", "*.jl.mem"
+            • GitHubPages:
+                → 0 asset files
+                → 2 gitignore entries: "/docs/build/", "/docs/site/"
+            • TravisCI:
+                → Config file: Default
+                → 0 gitignore entries
+        """
+    @test text == rstrip(expected)
+end
 
 @testset "File generation" begin
     t = Template(;
