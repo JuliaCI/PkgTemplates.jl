@@ -67,7 +67,7 @@ function show(io::IO, p::Documenter)
 
     n = length(p.assets)
     s = n == 1 ? "" : "s"
-    print(io, "    → $n asset file$s")
+    print(io, "  → $n asset file$s")
     if n == 0
         println(io)
     else
@@ -76,7 +76,7 @@ function show(io::IO, p::Documenter)
 
     n = length(p.gitignore)
     s = n == 1 ? "" : "s"
-    print(io, "    → $n gitignore entrie$s")
+    print(io, "  → $n gitignore entrie$s")
     n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
 end
 

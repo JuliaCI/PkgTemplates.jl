@@ -120,28 +120,26 @@ function show(io::IO, t::Template)
     println(io, "Template:")
     println(io, "$spc→ User: $(maybe_none(t.user))")
     println(io, "$spc→ Host: $(maybe_none(t.host))")
-    println(io, "$spc→ License: $(maybe_none(t.license))")
 
-    # We don't care about authors or license years if there is no license.
-    if !isempty(t.license)
-        # TODO: Authors could be split into multiple lines if there are more than one.
-        # Maybe the authors field of Template should be an array (or Dict, see #4).
-        println(io, "$spc→ Authors: $(maybe_none(t.authors))")
-        println(io, "$spc→ License years: $(maybe_none(t.years))")
+    print(io, "$spc→ License: ")
+    if isempty(t.license)
+        println(io, "None")
+    else
+        println(io, "$(t.license) ($(t.authors) $(t.years))")
     end
 
     println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir(), "~"))")
-    println(io, "$spc→ Precompilation enabled: $(t.precompile ? "yes" : "no")")
+    println(io, "$spc→ Precompilation enabled: $(t.precompile ? "Yes" : "No")")
     println(io, "$spc→ Minimum Julia version: v$(t.julia_version)")
 
-    print(io, "$spc→ Package dependencies:")
+    n = length(t.requirements)
+    s = n == 1 ? "" : "s"
+    print(io, "$spc→ $n package requirement$s")
+
     if isempty(t.requirements)
-        println(io, " None")
-    else
         println(io)
-        for req in sort(t.requirements)
-            println(io, "$(spc^2)• $req")
-        end
+    else
+        println(io, ": $(join(t.requirements, ", "))")
     end
 
     print(io, "$spc→ Git configuration options:")

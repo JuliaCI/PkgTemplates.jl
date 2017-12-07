@@ -135,13 +135,11 @@ end
         Template:
           → User: $me
           → Host: github.com
-          → License: MIT
-          → Authors: $(gitconfig["user.name"])
-          → License years: 2017
+          → License: MIT ($(gitconfig["user.name"]) $(Dates.year(now())))
           → Package directory: $pkgdir
-          → Precompilation enabled: yes
+          → Precompilation enabled: Yes
           → Minimum Julia version: v$VERSION
-          → Package dependencies: None
+          → 0 package requirements
           → Git configuration options:
             • github.user = $(gitconfig["github.user"])
             • user.email = $(gitconfig["user.email"])
@@ -168,25 +166,23 @@ end
           → Host: github.com
           → License: None
           → Package directory: $pkgdir
-          → Precompilation enabled: yes
+          → Precompilation enabled: Yes
           → Minimum Julia version: v$VERSION
-          → Package dependencies:
-            • Bar
-            • Foo
+          → 2 package requirements: Bar, Foo
           → Git configuration options:
             • github.user = $(gitconfig["github.user"])
             • user.email = $(gitconfig["user.email"])
             • user.name = $(gitconfig["user.name"])
           → Plugins:
             • CodeCov:
-                → Config file: None
-                → 3 gitignore entries: "*.jl.cov", "*.jl.*.cov", "*.jl.mem"
+              → Config file: None
+              → 3 gitignore entries: "*.jl.cov", "*.jl.*.cov", "*.jl.mem"
             • GitHubPages:
-                → 0 asset files
-                → 2 gitignore entries: "/docs/build/", "/docs/site/"
+              → 0 asset files
+              → 2 gitignore entries: "/docs/build/", "/docs/site/"
             • TravisCI:
-                → Config file: Default
-                → 0 gitignore entries
+              → Config file: Default
+              → 0 gitignore entries
         """
     @test text == rstrip(expected)
 end
@@ -294,6 +290,8 @@ end
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
     @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
+    # Note: This test will fail on your system if you've configured Git
+    # to replace all HTTPS URLs with SSH.
     @test LibGit2.url(remote) == "https://github.com/$me/$test_pkg.jl"
     @test in("master", branches)
     @test !in("gh-pages", branches)

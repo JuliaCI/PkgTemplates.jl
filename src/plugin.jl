@@ -70,6 +70,7 @@ config template file doesn't follow the generic naming convention, we added anot
 abstract type GenericPlugin <: Plugin end
 
 function show(io::IO, p::GenericPlugin)
+    spc = "  "
     t = split(string(typeof(p)), ".")[end]
     println(io, "$t:")
 
@@ -78,11 +79,11 @@ function show(io::IO, p::GenericPlugin)
     else
         dirname(get(p.src)) == DEFAULTS_DIR ? "Default" : get(p.src)
     end
-    println(io, "    → Config file: $cfg")
+    println(io, "$spc→ Config file: $cfg")
 
     n = length(p.gitignore)
     s = n == 1 ? "" : "s"
-    print(io, "    → $n gitignore entrie$s")
+    print(io, "$spc→ $n gitignore entrie$s")
     n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
 end
 
