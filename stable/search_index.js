@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.generate",
     "category": "Function",
-    "text": "generate(\n    pkg_name::AbstractString,\n    t::Template;\n    force::Bool=false,\n    ssh::Bool=false,\n) -> Void\n\nGenerate a package named pkg_name from template.\n\nKeyword Arguments\n\nforce::Bool=false: Whether or not to overwrite old packages with the same name.\nssh::Bool=false: Whether or not to use SSH for the remote.\nbackup_dir::AbstractString=\"\": Directory in which to store the generated package if t.dir is not a valid directory. If left unset, a temporary directory will be created.\n\nNotes\n\nThe package is generated entirely in a temporary directory and only moved into joinpath(t.dir, pkg_name) at the very end. In the case of an error, the temporary directory will contain leftovers, but the destination directory will remain untouched (this is especially helpful when force=true).\n\n\n\n"
+    "text": "generate(\n    pkg_name::AbstractString,\n    t::Template;\n    force::Bool=false,\n    ssh::Bool=false,\n    backup_dir::AbstractString=\"\",\n) -> Void\n\nGenerate a package named pkg_name from template.\n\nKeyword Arguments\n\nforce::Bool=false: Whether or not to overwrite old packages with the same name.\nssh::Bool=false: Whether or not to use SSH for the remote.\nbackup_dir::AbstractString=\"\": Directory in which to store the generated package if t.dir is not a valid directory. If left unset, a temporary directory will be created (this keyword is mostly for internal usage).\n\nNotes\n\nThe package is generated entirely in a temporary directory and only moved into joinpath(t.dir, pkg_name) at the very end. In the case of an error, the temporary directory will contain leftovers, but the destination directory will remain untouched (this is especially helpful when force=true).\n\n\n\n"
 },
 
 {
@@ -105,27 +105,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#Helper-Functions-1",
-    "page": "Package Generation",
-    "title": "Helper Functions",
-    "category": "section",
-    "text": ""
-},
-
-{
     "location": "pages/package_generation.html#PkgTemplates.gen_entrypoint",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_entrypoint",
     "category": "Function",
     "text": "gen_entrypoint(\n    dir::AbstractString,\n    pkg_name::AbstractString,\n    template::Template,\n) -> Vector{String}\n\nCreate the module entrypoint in the temp package directory.\n\nArguments\n\ndir::AbstractString: The directory in which the files will be generated. Note that this will be joined to pkg_name.\npkg_name::AbstractString: Name of the package.\ntemplate::Template: The template whose entrypoint we are generating.\n\nReturns an array of generated file/directory names.\n\n\n\n"
-},
-
-{
-    "location": "pages/package_generation.html#gen_entrypoint-1",
-    "page": "Package Generation",
-    "title": "gen_entrypoint",
-    "category": "section",
-    "text": "gen_entrypoint"
 },
 
 {
@@ -137,27 +121,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#gen_tests-1",
-    "page": "Package Generation",
-    "title": "gen_tests",
-    "category": "section",
-    "text": "gen_tests"
-},
-
-{
     "location": "pages/package_generation.html#PkgTemplates.gen_require",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_require",
     "category": "Function",
     "text": "gen_require(\n    dir::AbstractString,\n    pkg_name::AbstractString,\n    template::Template,\n) -> Vector{String}\n\nCreate the REQUIRE file in the temp package directory.\n\nArguments\n\ndir::AbstractString: The directory in which the files will be generated. Note that this will be joined to pkg_name.\npkg_name::AbstractString: Name of the package.\ntemplate::Template: The template whose REQUIRE we are generating.\n\nReturns an array of generated file/directory names.\n\n\n\n"
-},
-
-{
-    "location": "pages/package_generation.html#gen_require-1",
-    "page": "Package Generation",
-    "title": "gen_require",
-    "category": "section",
-    "text": "gen_require"
 },
 
 {
@@ -169,27 +137,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#gen_readme-1",
-    "page": "Package Generation",
-    "title": "gen_readme",
-    "category": "section",
-    "text": "gen_readme"
-},
-
-{
     "location": "pages/package_generation.html#PkgTemplates.gen_gitignore",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_gitignore",
     "category": "Function",
     "text": "gen_gitignore(\n    dir::AbstractString,\n    pkg_name::AbstractString,\n    template::Template,\n) -> Vector{String}\n\nCreate a .gitignore in the temp package directory.\n\nArguments\n\ndir::AbstractString: The directory in which the files will be generated. Note that this will be joined to pkg_name.\npkg_name::AbstractString: Name of the package.\ntemplate::Template: The template whose .gitignore we are generating.\n\nReturns an array of generated file/directory names.\n\n\n\n"
-},
-
-{
-    "location": "pages/package_generation.html#gen_gitignore-1",
-    "page": "Package Generation",
-    "title": "gen_gitignore",
-    "category": "section",
-    "text": "gen_gitignore"
 },
 
 {
@@ -201,11 +153,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#gen_license-1",
+    "location": "pages/package_generation.html#Helper-Functions-1",
     "page": "Package Generation",
-    "title": "gen_license",
+    "title": "Helper Functions",
     "category": "section",
-    "text": "gen_license"
+    "text": "gen_entrypoint\ngen_tests\ngen_require\ngen_readme\ngen_gitignore\ngen_license"
 },
 
 {
@@ -221,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugins",
     "title": "Plugins",
     "category": "section",
-    "text": "Plugins are the driver for PkgTemplates's customization and extension. This page describes plugins that already exist; for information on writing your own plugins, see Plugin Development."
+    "text": "Plugins are the secret sauce behing PkgTemplates's customization and extension. This page describes plugins that already exist; for information on writing your own plugins, see Plugin Development."
 },
 
 {
@@ -233,27 +185,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#TravisCI-1",
-    "page": "Plugins",
-    "title": "TravisCI",
-    "category": "section",
-    "text": "TravisCI"
-},
-
-{
     "location": "pages/plugins.html#PkgTemplates.AppVeyor",
     "page": "Plugins",
     "title": "PkgTemplates.AppVeyor",
     "category": "Type",
     "text": "AppVeyor(; config_file::Union{AbstractString, Void}=\"\") -> AppVeyor\n\nAdd AppVeyor to a template's plugins to add a .appveyor.yml configuration file to generated repositories, and an appropriate badge to the README.\n\nKeyword Arguments\n\nconfig_file::Union{AbstractString, Void}=\"\": Path to a custom .appveyor.yml. If nothing is supplied, no file will be generated.\n\n\n\n"
-},
-
-{
-    "location": "pages/plugins.html#AppVeyor-1",
-    "page": "Plugins",
-    "title": "AppVeyor",
-    "category": "section",
-    "text": "AppVeyor"
 },
 
 {
@@ -265,11 +201,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#GitLabCI-1",
+    "location": "pages/plugins.html#Continuous-Integration-(CI)-1",
     "page": "Plugins",
-    "title": "GitLabCI",
+    "title": "Continuous Integration (CI)",
     "category": "section",
-    "text": "GitLabCI"
+    "text": "TravisCI\nAppVeyor\nGitLabCI"
 },
 
 {
@@ -281,14 +217,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#CodeCov-1",
-    "page": "Plugins",
-    "title": "CodeCov",
-    "category": "section",
-    "text": "CodeCov"
-},
-
-{
     "location": "pages/plugins.html#PkgTemplates.Coveralls",
     "page": "Plugins",
     "title": "PkgTemplates.Coveralls",
@@ -297,11 +225,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#Coveralls-1",
+    "location": "pages/plugins.html#Code-Coverage-1",
     "page": "Plugins",
-    "title": "Coveralls",
+    "title": "Code Coverage",
     "category": "section",
-    "text": "Coveralls"
+    "text": "CodeCov\nCoveralls"
 },
 
 {
@@ -313,27 +241,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#Documenter-1",
-    "page": "Plugins",
-    "title": "Documenter",
-    "category": "section",
-    "text": "Documenter"
-},
-
-{
     "location": "pages/plugins.html#PkgTemplates.GitHubPages",
     "page": "Plugins",
     "title": "PkgTemplates.GitHubPages",
     "category": "Type",
-    "text": "GitHubPages(; assets::Vector{<:AbstractString}=String[]) -> GitHubPages\n\nAdd GitHubPages to a template's plugins to add Documenter support via GitHub Pages, including automatic uploading of documentation from TravisCI. Also adds appropriate badges to the README, and updates the .gitignore accordingly.\n\nKeyword Arguments\n\nassets::Vector{String}=String[]: Array of paths to Documenter asset files.\n\n\n\n"
+    "text": "GitHubPages(; assets::Vector{<:AbstractString}=String[]) -> GitHubPages\n\nAdd GitHubPages to a template's plugins to add Documenter support via GitHub Pages, including automatic uploading of documentation from TravisCI. Also adds appropriate badges to the README, and updates the .gitignore accordingly.\n\nKeyword Arguments\n\nassets::Vector{<:AbstractString}=String[]: Array of paths to Documenter asset files.\n\n\n\n"
 },
 
 {
-    "location": "pages/plugins.html#GitHubPages-1",
+    "location": "pages/plugins.html#Documentation-1",
     "page": "Plugins",
-    "title": "GitHubPages",
+    "title": "Documentation",
     "category": "section",
-    "text": "GitHubPages"
+    "text": "Documenter\nGitHubPages"
 },
 
 {
@@ -345,11 +265,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/plugin_development.html#PkgTemplates.Plugin",
+    "page": "Plugin Development",
+    "title": "PkgTemplates.Plugin",
+    "category": "Type",
+    "text": "A plugin to be added to a Template, which adds some functionality or integration. New plugins should almost always extend GenericPlugin or CustomPlugin.\n\n\n\n"
+},
+
+{
     "location": "pages/plugin_development.html#Plugin-Development-1",
     "page": "Plugin Development",
     "title": "Plugin Development",
     "category": "section",
-    "text": "The best and easiest way to contribute to PkgTemplates is to write new plugins.There are two types of plugins: GenericPlugins and CustomPlugins."
+    "text": "The best and easiest way to contribute to PkgTemplates is to write new plugins.Plugin"
 },
 
 {
@@ -373,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugin Development",
     "title": "PkgTemplates.CustomPlugin",
     "category": "Type",
-    "text": "Custom plugins are plugins whose behaviour does not follow the GenericPlugin pattern. They can implement gen_plugin, badges, and interactive in any way they choose.\n\nAttributes\n\ngitignore::Vector{AbstractString}: Array of patterns to be added to the .gitignore of generated packages that use this plugin.\n\nExample\n\n@auto_hash_equals struct MyPlugin <: CustomPlugin\n    gitignore::Vector{AbstractString}\n    lucky::Bool\n\n    MyPlugin() = new([], rand() > 0.8)\n\n    function gen_plugin(\n        plugin::MyPlugin,\n        template::Template,\n        dir::AbstractString,\n        pkg_name::AbstractString\n    )\n        if plugin.lucky\n            text = substitute(\n                \"You got lucky with {{PKGNAME}}, {{USER}}!\",\n                template,\n            )\n            gen_file(joinpath(dir, pkg_name, \".myplugin.yml\"), text)\n        else\n            println(\"Maybe next time.\")\n        end\n    end\n\n    function badges(\n        plugin::MyPlugin,\n        user::AbstractString,\n        pkg_name::AbstractString,\n    )\n        if plugin.lucky\n            return [\n                format(Badge(\n                    \"You got lucky!\",\n                    \"https://myplugin.com/badge.png\",\n                    \"https://myplugin.com/$user/$pkg_name.jl\",\n                )),\n            ]\n        else\n            return String[]\n        end\n    end\nend\n\ninteractive(plugin_type::Type{MyPlugin}) = MyPlugin()\n\nThis plugin doesn't do much, but it demonstrates how gen_plugin, badges and interactive can be implemented using substitute, gen_file, Badge, and format.\n\nDefining Template Files\n\nOften, the contents of the config file that your plugin generates depends on variables like the package name, the user's username, etc. Template files (which are stored in defaults) can use here's syntax to define replacements.\n\nNote: Due to a bug in Mustache, conditionals can insert undesired newlines (more detail here).\n\n\n\n"
+    "text": "Custom plugins are plugins whose behaviour does not follow the GenericPlugin pattern. They can implement gen_plugin, badges, and interactive in any way they choose.\n\nAttributes\n\ngitignore::Vector{AbstractString}: Array of patterns to be added to the .gitignore of generated packages that use this plugin.\n\nExample\n\n@auto_hash_equals struct MyPlugin <: CustomPlugin\n    gitignore::Vector{AbstractString}\n    lucky::Bool\n\n    MyPlugin() = new([], rand() > 0.8)\n\n    function gen_plugin(\n        plugin::MyPlugin,\n        template::Template,\n        dir::AbstractString,\n        pkg_name::AbstractString,\n    )\n        if plugin.lucky\n            text = substitute(\n                \"You got lucky with {{PKGNAME}}, {{USER}}!\",\n                template,\n            )\n            gen_file(joinpath(dir, pkg_name, \".myplugin.yml\"), text)\n        else\n            println(\"Maybe next time.\")\n        end\n    end\n\n    function badges(\n        plugin::MyPlugin,\n        user::AbstractString,\n        pkg_name::AbstractString,\n    )\n        if plugin.lucky\n            return [\n                format(Badge(\n                    \"You got lucky!\",\n                    \"https://myplugin.com/badge.png\",\n                    \"https://myplugin.com/$user/$pkg_name.jl\",\n                )),\n            ]\n        else\n            return String[]\n        end\n    end\nend\n\ninteractive(plugin_type::Type{MyPlugin}) = MyPlugin()\n\nThis plugin doesn't do much, but it demonstrates how gen_plugin, badges and interactive can be implemented using substitute, gen_file, Badge, and format.\n\nDefining Template Files\n\nOften, the contents of the config file that your plugin generates depends on variables like the package name, the user's username, etc. Template files (which are stored in defaults) can use here's syntax to define replacements.\n\nNote: Due to a bug in Mustache, conditionals can insert undesired newlines (more detail here).\n\n\n\n"
 },
 
 {
@@ -405,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugin Development",
     "title": "PkgTemplates.interactive",
     "category": "Function",
-    "text": "interactive(\n    plugin_type::Type{P <: Plugin};\n    file::Union{AbstractString, Void}=\"\",\n) -> Plugin\n\nInteractively create a plugin of type plugin_type, where file is the plugin type's default config template with a non-standard name (for MyPlugin, this is anything but \"myplugin.yml\").\n\n\n\n"
+    "text": "interactive(\n    plugin_type::Type{<:Plugin};\n    file::Union{AbstractString, Void}=\"\",\n) -> Plugin\n\nInteractively create a plugin of type plugin_type, where file is the plugin type's default config template with a non-standard name (for MyPlugin, this is anything but \"myplugin.yml\").\n\n\n\n"
 },
 
 {
@@ -529,14 +457,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#Licenses-1",
-    "page": "Licenses",
-    "title": "Licenses",
-    "category": "section",
-    "text": "Many open-source licenses are available for use with PkgTemplates, but if you see that one is missing, don't hesitate to open an issue or PR."
-},
-
-{
     "location": "pages/licenses.html#PkgTemplates.available_licenses",
     "page": "Licenses",
     "title": "PkgTemplates.available_licenses",
@@ -545,35 +465,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#available_licenses-1",
-    "page": "Licenses",
-    "title": "available_licenses",
-    "category": "section",
-    "text": "available_licenses"
-},
-
-{
     "location": "pages/licenses.html#PkgTemplates.show_license",
     "page": "Licenses",
     "title": "PkgTemplates.show_license",
     "category": "Function",
-    "text": "show_license([io::IO], license::AbstractString) -> Void\n\nPrint the text of license.\n\n\n\n"
+    "text": "show_license([io::IO], license::AbstractString) -> Void\n\nPrint the text of license. Errors if the license is not found.\n\n\n\n"
 },
 
 {
-    "location": "pages/licenses.html#show_license-1",
+    "location": "pages/licenses.html#Licenses-1",
     "page": "Licenses",
-    "title": "show_license",
+    "title": "Licenses",
     "category": "section",
-    "text": "show_license"
-},
-
-{
-    "location": "pages/licenses.html#Helper-Functions-1",
-    "page": "Licenses",
-    "title": "Helper Functions",
-    "category": "section",
-    "text": ""
+    "text": "Many open-source licenses are available for use with PkgTemplates, but if you see that one is missing, don't hesitate to open an issue or PR.available_licenses\nshow_license"
 },
 
 {
@@ -581,13 +485,13 @@ var documenterSearchIndex = {"docs": [
     "page": "Licenses",
     "title": "PkgTemplates.read_license",
     "category": "Function",
-    "text": "read_license(license::AbstractString) -> String\n\nReturns the contents of license. Errors if it is not found. Use available_licenses to view available licenses.\n\n\n\n"
+    "text": "read_license(license::AbstractString) -> String\n\nReturns the contents of license. Errors if the license is not found. Use available_licenses to view available licenses.\n\n\n\n"
 },
 
 {
-    "location": "pages/licenses.html#read_license-1",
+    "location": "pages/licenses.html#Helper-Functions-1",
     "page": "Licenses",
-    "title": "read_license",
+    "title": "Helper Functions",
     "category": "section",
     "text": "read_license"
 },
