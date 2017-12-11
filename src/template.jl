@@ -130,7 +130,7 @@ function show(io::IO, t::Template)
 
     println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir(), "~"))")
     println(io, "$spc→ Precompilation enabled: $(t.precompile ? "Yes" : "No")")
-    println(io, "$spc→ Minimum Julia version: v$(t.julia_version)")
+    println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
 
     n = length(t.requirements)
     s = n == 1 ? "" : "s"
