@@ -197,7 +197,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugins",
     "title": "PkgTemplates.GitLabCI",
     "category": "Type",
-    "text": "GitLabCI(; config_file::Union{AbstractString, Void}=\"\", coverage::Bool=true) -> GitLabCI\n\nAdd GitLabCI to a template's plugins to add a .gitlab-ci.yml configuration file to generated repositories, and appropriate badge(s) to the README.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=\"\": Path to a custom .gitlab-ci.yml. If nothing is supplied, no file will be generated.\ncoverage::Bool=true: Whether or not GitLab CI's built-in code coverage analysis should be enabled. If enabled, you must set a regex in your repo settings; use Test Coverage (d+.d+)%.\n\n\n\n"
+    "text": "GitLabCI(; config_file::Union{AbstractString, Void}=\"\", coverage::Bool=true) -> GitLabCI\n\nAdd GitLabCI to a template's plugins to add a .gitlab-ci.yml configuration file to generated repositories, and appropriate badge(s) to the README.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Void}=\"\": Path to a custom .gitlab-ci.yml. If nothing is supplied, no file will be generated.\ncoverage::Bool=true: Whether or not GitLab CI's built-in code coverage analysis should be enabled.\n\n\n\n"
 },
 
 {
