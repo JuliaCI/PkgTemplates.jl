@@ -8,8 +8,7 @@ generated repositories, and appropriate badge(s) to the README.
 * `config_file::Union{AbstractString, Void}=""`: Path to a custom `.gitlab-ci.yml`.
   If `nothing` is supplied, no file will be generated.
 * `coverage::Bool=true`: Whether or not GitLab CI's built-in code coverage analysis should
-  be enabled. If enabled, you must set a regex in your repo settings; use
-  `Test Coverage (\d+.\d+)%`.
+  be enabled.
 """
 @auto_hash_equals struct GitLabCI <: GenericPlugin
     gitignore::Vector{AbstractString}

@@ -26,6 +26,7 @@ Julia nightly:
 
 "Coverage":
   stage: coverage
+  coverage: /Test Coverage (\d+\.\d+%)/
   image: julia:{{VERSION}}
   tags:
     - docker
