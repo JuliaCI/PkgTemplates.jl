@@ -389,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugin Development",
     "title": "PkgTemplates.substitute",
     "category": "Function",
-    "text": "substitute(template::AbstractString, view::Dict{String, Any}) -> String\n\nReplace placeholders in template with values in view via Mustache. template is not modified.\n\nFor information on how to structure template, see \"Defining Template Files\" section in Custom Plugins.\n\nNote: Conditionals in template without a corresponding key in view won't error, but will simply be evaluated as false.\n\n\n\nsubstitute(\n    template::AbstractString,\n    pkg_template::Template;\n    view::Dict{String, Any}=Dict{String, Any}(),\n) -> String\n\nReplace placeholders in template, using some default replacements based on the pkg_template and additional ones in view. template is not modified.\n\n\n\n"
+    "text": "substitute(template::AbstractString, view::Dict{String, Any}) -> String\nsubstitute(\n    template::AbstractString,\n    pkg_template::Template;\n    view::Dict{String, Any}=Dict{String, Any}(),\n) -> String\n\nReplace placeholders in template with values in view via Mustache. template is not modified. If pkg_template is supplied, some default replacements are also performed.\n\nFor information on how to structure template, see \"Defining Template Files\" section in Custom Plugins.\n\nNote: Conditionals in template without a corresponding key in view won't error, but will simply be evaluated as false.\n\n\n\n"
 },
 
 {
