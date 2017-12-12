@@ -88,7 +88,7 @@ function generate(
         gen_readme(dir, pkg_name, t),
         gen_gitignore(dir, pkg_name, t),
         gen_license(dir, pkg_name, t),
-        vcat([gen_plugin(plugin, t, dir, pkg_name) for plugin in values(t.plugins)]...),
+        vcat(map(p -> gen_plugin(p, t, dir, pkg_name), values(t.plugins))...),
     )
 
     LibGit2.add!(repo, files...)
@@ -307,7 +307,7 @@ Returns an array of generated file/directory names.
 """
 function gen_gitignore(dir::AbstractString, pkg_name::AbstractString, template::Template)
     seen = [".DS_Store"]
-    patterns = vcat([plugin.gitignore for plugin in values(template.plugins)]...)
+    patterns = vcat(map(p -> p.gitignore, values(template.plugins))...)
     for pattern in patterns
         if !in(pattern, seen)
             push!(seen, pattern)
@@ -390,9 +390,15 @@ end
 
 """
     substitute(template::AbstractString, view::Dict{String, Any}) -> String
+    substitute(
+        template::AbstractString,
+        pkg_template::Template;
+        view::Dict{String, Any}=Dict{String, Any}(),
+    ) -> String
 
 Replace placeholders in `template` with values in `view` via
 [`Mustache`](https://github.com/jverzani/Mustache.jl). `template` is not modified.
+If `pkg_template` is supplied, some default replacements are also performed.
 
 For information on how to structure `template`, see "Defining Template Files" section in
 [Custom Plugins](@ref).
@@ -402,16 +408,6 @@ but will simply be evaluated as false.
 """
 substitute(template::AbstractString, view::Dict{String, Any}) = render(template, view)
 
-"""
-    substitute(
-        template::AbstractString,
-        pkg_template::Template;
-        view::Dict{String, Any}=Dict{String, Any}(),
-    ) -> String
-
-Replace placeholders in `template`, using some default replacements based on the
-`pkg_template` and additional ones in `view`. `template` is not modified.
-"""
 function substitute(
     template::AbstractString,
     pkg_template::Template;
@@ -422,7 +418,7 @@ function substitute(
     d = Dict{String, Any}(
         "USER" => pkg_template.user,
         "VERSION" => "$(v.major).$(v.minor)",
-        "DOCUMENTER" => any(isa(p, Documenter) for p in values(pkg_template.plugins)),
+        "DOCUMENTER" => any(map(p -> isa(p, Documenter), values(pkg_template.plugins))),
         "CODECOV" => haskey(pkg_template.plugins, CodeCov),
         "COVERALLS" => haskey(pkg_template.plugins, Coveralls),
     )

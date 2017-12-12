@@ -16,7 +16,7 @@ const LICENSES = Dict(
 
 Print the names of all available licenses.
 """
-available_licenses(io::IO) = println(io, join(["$k: $v" for (k, v) in LICENSES], "\n"))
+available_licenses(io::IO) = println(io, join(("$k: $v" for (k, v) in LICENSES), "\n"))
 available_licenses() = available_licenses(STDOUT)
 
 """

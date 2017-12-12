@@ -92,7 +92,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
 
         requirements_dedup = collect(Set(requirements))
         diff = length(requirements) - length(requirements_dedup)
-        names = [tokens[1] for tokens in split.(requirements_dedup)]
+        names = map(t -> first(t), split.(requirements_dedup))
         if length(names) > length(Set(names))
             throw(ArgumentError(
                 "requirements contains duplicate packages with conflicting versions"

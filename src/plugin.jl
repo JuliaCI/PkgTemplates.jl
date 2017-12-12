@@ -71,8 +71,7 @@ abstract type GenericPlugin <: Plugin end
 
 function show(io::IO, p::GenericPlugin)
     spc = "  "
-    t = split(string(typeof(p)), ".")[end]
-    println(io, "$t:")
+    println(io, "$(Base.datatype_name(typeof(p))):")
 
     cfg = if isnull(p.src)
         "None"
@@ -245,7 +244,7 @@ badges(plugin::Plugin, user::AbstractString, pkg_name::AbstractString) = String[
 function badges(plugin::GenericPlugin, user::AbstractString, pkg_name::AbstractString)
     # Give higher priority to replacements defined in the plugin's view.
     view = merge(Dict("USER" => user, "PKGNAME" => pkg_name), plugin.view)
-    return [substitute(format(badge), view) for badge in plugin.badges]
+    return map(b -> substitute(format(b), view), plugin.badges)
 end
 
 """

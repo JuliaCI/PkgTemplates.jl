@@ -62,12 +62,12 @@ function gen_plugin(
 end
 
 function show(io::IO, p::Documenter)
-    t = split(string(typeof(p)), ".")[end]
-    println(io, "$t:")
+    spc = "  "
+    println(io, "$(Base.datatype_name(typeof(p))):")
 
     n = length(p.assets)
     s = n == 1 ? "" : "s"
-    print(io, "  → $n asset file$s")
+    print(io, "$spc→ $n asset file$s")
     if n == 0
         println(io)
     else
@@ -76,12 +76,12 @@ function show(io::IO, p::Documenter)
 
     n = length(p.gitignore)
     s = n == 1 ? "" : "s"
-    print(io, "  → $n gitignore entrie$s")
+    print(io, "$spc→ $n gitignore entrie$s")
     n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
 end
 
 function interactive(plugin_type::Type{<:Documenter})
-    plugin_name = split(string(plugin_type), ".")[end]
-    print("$plugin_name: Enter any Documenter asset files (separated by spaces) []: ")
+    t = Base.datatype_name(plugin_type)
+    print("$t: Enter any Documenter asset files (separated by spaces) []: ")
     return plugin_type(; assets=String.(split(readline())))
 end

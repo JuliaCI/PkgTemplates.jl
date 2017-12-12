@@ -138,7 +138,7 @@ end
           → License: MIT ($(gitconfig["user.name"]) $(Dates.year(now())))
           → Package directory: $pkgdir
           → Precompilation enabled: Yes
-          → Minimum Julia version: v$VERSION
+          → Minimum Julia version: v$(PkgTemplates.version_floor())
           → 0 package requirements
           → Git configuration options:
             • github.user = $(gitconfig["github.user"])
@@ -167,7 +167,7 @@ end
           → License: None
           → Package directory: $pkgdir
           → Precompilation enabled: Yes
-          → Minimum Julia version: v$VERSION
+          → Minimum Julia version: v$(PkgTemplates.version_floor())
           → 2 package requirements: Bar, Foo
           → Git configuration options:
             • github.user = $(gitconfig["github.user"])
@@ -288,7 +288,7 @@ end
     @test isfile(Pkg.dir(test_pkg, "test", "runtests.jl"))
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
-    branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
+    branches = map(b -> LibGit2.shortname(first(b)), LibGit2.GitBranchIter(repo))
     @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
     # Note: This test will fail on your system if you've configured Git
     # to replace all HTTPS URLs with SSH.
@@ -334,7 +334,7 @@ end
     @test isfile(Pkg.dir(test_pkg, "docs", "src", "index.md"))
     repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
     @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
-    branches = [LibGit2.shortname(branch[1]) for branch in LibGit2.GitBranchIter(repo)]
+    branches = map(b -> LibGit2.shortname(first(b)), LibGit2.GitBranchIter(repo))
     @test in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
     rm(Pkg.dir(test_pkg); recursive=true)
