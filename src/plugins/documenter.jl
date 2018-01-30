@@ -53,11 +53,19 @@ function gen_plugin(
 
     gen_file(joinpath(dirname(docs_dir), "make.jl"), text)
     open(joinpath(docs_dir,  "index.md"), "w") do fp
-        write(fp, "# $pkg_name")
-    end
-    readme_path = joinpath(dir, pkg_name, "README.md")
-    if isfile(readme_path)
-        cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
+        write(fp, """
+            # $pkg_name
+
+            ## Index
+
+            ```@index
+            ```
+
+            ```@autodocs
+            Modules = [$pkg_name]
+            ```
+            end
+           """)
     end
 end
 
