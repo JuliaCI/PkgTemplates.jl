@@ -67,6 +67,7 @@ function gen_plugin(
             end
            """)
     end
+end
 
 function show(io::IO, p::Documenter)
     spc = "  "
