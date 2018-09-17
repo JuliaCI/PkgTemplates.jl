@@ -114,7 +114,7 @@ function generate(
 
     @info "Finished"
     if multiple_branches
-        @warn "Remember to push all created branches to your remote: git push --all"
+        @info "Remember to push all created branches to your remote: git push --all"
     end
 end
 
