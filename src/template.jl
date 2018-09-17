@@ -53,7 +53,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
     function Template(;
         user::AbstractString="",
         host::AbstractString="https://github.com",
-        license::Union{AbstractString, Void}="MIT",
+        license::Union{AbstractString, Nothing}="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
         years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
         dir::AbstractString=Pkg.dir(),

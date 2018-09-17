@@ -5,7 +5,7 @@
         force::Bool=false,
         ssh::Bool=false,
         backup_dir::AbstractString="",
-    ) -> Void
+    ) -> Nothing
 
 Generate a package named `pkg_name` from `template`.
 
@@ -135,7 +135,7 @@ end
         ssh::Bool=false,
         backup_dir::AbstractString="",
         fast::Bool=false,
-    ) -> Void
+    ) -> Nothing
 
 Interactively create a template, and then generate a package with it. Arguments and
 keywords are used in the same way as in [`generate`](@ref) and

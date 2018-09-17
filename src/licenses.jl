@@ -12,7 +12,7 @@ const LICENSES = Dict(
 )
 
 """
-    available_licenses([io::IO]) -> Void
+    available_licenses([io::IO]) -> Nothing
 
 Print the names of all available licenses.
 """
@@ -20,7 +20,7 @@ available_licenses(io::IO) = println(io, join(("$k: $v" for (k, v) in LICENSES),
 available_licenses() = available_licenses(STDOUT)
 
 """
-    show_license([io::IO], license::AbstractString) -> Void
+    show_license([io::IO], license::AbstractString) -> Nothing
 
 Print the text of `license`. Errors if the license is not found.
 """

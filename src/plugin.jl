@@ -30,7 +30,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function MyPlugin(; config_file::Union{AbstractString, Void}="")
+    function MyPlugin(; config_file::Union{AbstractString, Nothing}="")
         if config_file != nothing
             config_file = if isempty(config_file)
                 joinpath(DEFAULTS_DIR, "my-plugin.toml")
@@ -250,7 +250,7 @@ end
 """
     interactive(
         plugin_type::Type{<:Plugin};
-        file::Union{AbstractString, Void}="",
+        file::Union{AbstractString, Nothing}="",
     ) -> Plugin
 
 Interactively create a plugin of type `plugin_type`, where `file` is the plugin type's
@@ -259,7 +259,7 @@ default config template with a non-standard name (for `MyPlugin`, this is anythi
 """
 function interactive(
     plugin_type::Type{<:GenericPlugin};
-    file::Union{AbstractString, Void}="",
+    file::Union{AbstractString, Nothing}="",
 )
     plugin_name = String(split(string(plugin_type), ".")[end])
     # By default, we expect the default plugin file template for a plugin called
