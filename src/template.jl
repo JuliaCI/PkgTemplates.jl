@@ -276,7 +276,7 @@ function interactive_template(; fast::Bool=false)
             isempty(line) && break
             tokens = split(line, " ", limit=2)
             if haskey(gitconfig, tokens[1])
-                warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
+                @warn "Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'"
             end
             gitconfig[tokens[1]] = tokens[2]
         end
@@ -285,7 +285,7 @@ function interactive_template(; fast::Bool=false)
 
     println("Select plugins:")
     # Only include plugin types which have an `interactive` method.
-    plugin_types = filter(t -> method_exists(interactive, (Type{t},)), fetch(plugin_types))
+    plugin_types = filter(t -> hasmethod(interactive, (Type{t},)), fetch(plugin_types))
     type_names = map(t -> split(string(t), ".")[end], plugin_types)
     menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
     selected = collect(request(menu))
@@ -301,4 +301,4 @@ end
 
 Get all concrete subtypes of `t`.
 """
-leaves(t::Type)::Vector{DataType} = isleaftype(t) ? [t] : vcat(leaves.(subtypes(t))...)
+leaves(t::Type)::Vector{DataType} = isconcretetype(t) ? [t] : vcat(leaves.(subtypes(t))...)

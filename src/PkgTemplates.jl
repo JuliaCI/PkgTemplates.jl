@@ -4,11 +4,11 @@ module PkgTemplates
 using AutoHashEquals
 using Dates
 using Distributed
+using InteractiveUtils
+using LibGit2
 using Mustache
 using TerminalMenus
 using URIParser
-
-import LibGit2
 
 export
     # Template/package generation.
