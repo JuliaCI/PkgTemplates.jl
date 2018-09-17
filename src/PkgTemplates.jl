@@ -2,6 +2,8 @@ __precompile__()
 module PkgTemplates
 
 using AutoHashEquals
+using Dates
+using Distributed
 using Mustache
 using TerminalMenus
 using URIParser

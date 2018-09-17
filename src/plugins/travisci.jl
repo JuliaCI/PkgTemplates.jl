@@ -1,21 +1,21 @@
 """
-    TravisCI(; config_file::Union{AbstractString, Void}="") -> TravisCI
+    TravisCI(; config_file::Union{AbstractString, Nothing}="") -> TravisCI
 
 Add `TravisCI` to a template's plugins to add a `.travis.yml` configuration file to
 generated repositories, and an appropriate badge to the README.
 
 # Keyword Arguments:
-* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.travis.yml`.
+* `config_file::Union{AbstractString, Nothing}=""`: Path to a custom `.travis.yml`.
   If `nothing` is supplied, no file will be generated.
 """
 @auto_hash_equals struct TravisCI <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function TravisCI(; config_file::Union{AbstractString, Void}="")
+    function TravisCI(; config_file::Union{AbstractString, Nothing}="")
         if config_file != nothing
             config_file = if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "travis.yml")

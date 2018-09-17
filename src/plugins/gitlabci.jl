@@ -1,23 +1,23 @@
 """
-    GitLabCI(; config_file::Union{AbstractString, Void}="", coverage::Bool=true) -> GitLabCI
+    GitLabCI(; config_file::Union{AbstractString, Nothing}="", coverage::Bool=true) -> GitLabCI
 
 Add `GitLabCI` to a template's plugins to add a `.gitlab-ci.yml` configuration file to
 generated repositories, and appropriate badge(s) to the README.
 
 # Keyword Arguments:
-* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.gitlab-ci.yml`.
+* `config_file::Union{AbstractString, Nothing}=""`: Path to a custom `.gitlab-ci.yml`.
   If `nothing` is supplied, no file will be generated.
 * `coverage::Bool=true`: Whether or not GitLab CI's built-in code coverage analysis should
   be enabled.
 """
 @auto_hash_equals struct GitLabCI <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function GitLabCI(; config_file::Union{AbstractString, Void}="", coverage::Bool=true)
+    function GitLabCI(; config_file::Union{AbstractString, Nothing}="", coverage::Bool=true)
         if config_file != nothing
             config_file = if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "gitlab-ci.yml")

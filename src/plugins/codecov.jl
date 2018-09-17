@@ -1,22 +1,22 @@
 """
-    CodeCov(; config_file::Union{AbstractString, Void}=nothing) -> CodeCov
+    CodeCov(; config_file::Union{AbstractString, Nothing}=nothing) -> CodeCov
 
 Add `CodeCov` to a template's plugins to optionally add a `.codecov.yml` configuration file
 to generated repositories, and an appropriate badge to the README. Also updates the
 `.gitignore` accordingly.
 
 # Keyword Arguments:
-* `config_file::Union{AbstractString, Void}=nothing`: Path to a custom `.codecov.yml`.
+* `config_file::Union{AbstractString, Nothing}=nothing`: Path to a custom `.codecov.yml`.
   If left unset, no file will be generated.
 """
 @auto_hash_equals struct CodeCov <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function CodeCov(; config_file::Union{AbstractString, Void}=nothing)
+    function CodeCov(; config_file::Union{AbstractString, Nothing}=nothing)
         if config_file != nothing
             config_file = if isfile(config_file)
                 abspath(config_file)

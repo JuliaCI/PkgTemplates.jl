@@ -25,12 +25,12 @@ function gen_plugin(
         #         assets/file1,
         #         assets/file2,
         #     ]
-        const TAB = repeat(" ", 4)
+        tab = repeat(" ", 4)
         assets_string = "[\n"
         for asset in plugin.assets
-            assets_string *= """$(TAB^2)"assets/$(basename(asset))",\n"""
+            assets_string *= """$(tab^2)"assets/$(basename(asset))",\n"""
         end
-        assets_string *= "$TAB]"
+        assets_string *= "$tab]"
 
     else
         assets_string = "[]"

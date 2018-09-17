@@ -7,7 +7,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 # Attributes
 * `gitignore::Vector{AbstractString}`: Array of patterns to be added to the `.gitignore` of
   generated packages that use this plugin.
-* `src::Nullable{AbstractString}`: Path to the file that will be copied into the generated
+* `src::Union{AbstractString, Nothing}`: Path to the file that will be copied into the generated
   package repository. If set to `nothing`, no file will be generated. When this defaults
   to an empty string, there should be a default file in `defaults` that will be copied.
   That file's name is usually the same as the plugin's name, except in all lowercase and
@@ -25,7 +25,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 ```julia
 @auto_hash_equals struct MyPlugin <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
