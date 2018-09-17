@@ -213,13 +213,11 @@ function gen_plugin(
     dir::AbstractString,
     pkg_name::AbstractString,
 )
-    src = try
-        plugin.src
-    catch
+    if plugin.src === nothing
         return String[]
     end
     text = substitute(
-        readstring(src),
+        read(plugin.src, String),
         template;
         view=merge(Dict("PKGNAME" => pkg_name), plugin.view),
     )

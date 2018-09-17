@@ -109,12 +109,12 @@ function generate(
         end
         mkpath(backup_dir)
         mv(temp_pkg_dir, joinpath(backup_dir, pkg_name))
-        warn("$pkg_name couldn't be moved into $pkg_dir, left package in $backup_dir")
+        @warn "$pkg_name couldn't be moved into $pkg_dir, left package in $backup_dir"
     end
 
     @info "Finished"
     if multiple_branches
-        warn("Remember to push all created branches to your remote: git push --all")
+        @warn "Remember to push all created branches to your remote: git push --all"
     end
 end
 
