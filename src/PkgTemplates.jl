@@ -8,6 +8,8 @@ using Mustache
 using TerminalMenus
 using URIParser
 
+import LibGit2
+
 export
     # Template/package generation.
     Template,

@@ -26,8 +26,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
   git config's value, if it is left unset.
 * `years::Union{Integer, AbstractString}=Dates.year(Dates.today())`: Copyright years on the
   license. Can be supplied by a number, or a string such as "2016 - 2017".
-* `dir::AbstractString=Pkg.dir()`: Directory in which the package will go. Relative paths
-  are converted to absolute ones at template creation time.
+* `dir::AbstractString=joinpath(first(DEPOT_PATH), "dev")`: Directory in which the package
+  will go. Relative paths are converted to absolute ones at template creation time.
 * `precompile::Bool=true`: Whether or not to enable precompilation in generated packages.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `requirements::Vector{<:AbstractString}=String[]`: Package requirements. If there are
@@ -56,7 +56,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
         license::Union{AbstractString, Nothing}="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
         years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
-        dir::AbstractString=Pkg.dir(),
+        dir::AbstractString=joinpath(first(DEPOT_PATH), "dev"),
         precompile::Bool=true,
         julia_version::VersionNumber=VERSION,
         requirements::Vector{<:AbstractString}=String[],
@@ -128,7 +128,7 @@ function show(io::IO, t::Template)
         println(io, "$(t.license) ($(t.authors) $(t.years))")
     end
 
-    println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir(), "~"))")
+    println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir() => "~"))")
     println(io, "$spc→ Precompilation enabled: $(t.precompile ? "Yes" : "No")")
     println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
 
@@ -173,7 +173,7 @@ Interactively create a [`Template`](@ref). If `fast` is set, defaults will be as
 all values except username and plugins.
 """
 function interactive_template(; fast::Bool=false)
-    info("Default values are shown in [brackets]")
+    @info "Default values are shown in [brackets]"
     # Getting the leaf types in a separate thread eliminates an awkward wait after
     # "Select plugins" is printed.
     plugin_types = @spawn leaves(Plugin)
@@ -235,9 +235,9 @@ function interactive_template(; fast::Bool=false)
     end
 
     kwargs[:dir] = if fast
-        Pkg.dir()
+        joinpath(first(DEPOT_PATH), "dev")
     else
-        default_dir = Pkg.dir()
+        default_dir = "."
         print("Enter the path to the package directory [$default_dir]: ")
         dir = readline()
         isempty(dir) ? default_dir : dir

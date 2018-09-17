@@ -71,12 +71,12 @@ abstract type GenericPlugin <: Plugin end
 
 function show(io::IO, p::GenericPlugin)
     spc = "  "
-    println(io, "$(Base.datatype_name(typeof(p))):")
+    println(io, "$(nameof(typeof(p))):")
 
-    cfg = if isnull(p.src)
+    cfg = if p.src === nothing
         "None"
     else
-        dirname(get(p.src)) == DEFAULTS_DIR ? "Default" : get(p.src)
+        dirname(p.src) == DEFAULTS_DIR ? "Default" : p.src
     end
     println(io, "$spc→ Config file: $cfg")
 
@@ -214,7 +214,7 @@ function gen_plugin(
     pkg_name::AbstractString,
 )
     src = try
-        get(plugin.src)
+        plugin.src
     catch
         return String[]
     end

@@ -57,13 +57,13 @@ function gen_plugin(
     end
     readme_path = joinpath(dir, pkg_name, "README.md")
     if isfile(readme_path)
-        cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
+        cp(readme_path, joinpath(docs_dir, "index.md"), force=true)
     end
 end
 
 function show(io::IO, p::Documenter)
     spc = "  "
-    println(io, "$(Base.datatype_name(typeof(p))):")
+    println(io, "$(nameof(typeof(p))):")
 
     n = length(p.assets)
     s = n == 1 ? "" : "s"
