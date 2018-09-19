@@ -211,7 +211,7 @@ end
     rm(joinpath(pkg_dir, "README.md"))
     @test occursin("# $test_pkg", readme)
     for p in values(t.plugins)
-        @test occursin("\n"), readme, join(badges(p, t.user, test_pkg))
+        @test occursin(join(badges(p, t.user, test_pkg), "\n"), readme)
     end
     # Check the order of the badges.
     @test search(readme, "github.io").start <
