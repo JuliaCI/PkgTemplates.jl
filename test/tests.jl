@@ -209,9 +209,9 @@ end
     @test isfile(joinpath(pkg_dir, "README.md"))
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
-    @test contains(readme, "# $test_pkg")
+    @test occursin("# $test_pkg", readme)
     for p in values(t.plugins)
-        @test contains(readme, join(badges(p, t.user, test_pkg), "\n"))
+        @test occursin("\n"), readme, join(badges(p, t.user, test_pkg))
     end
     # Check the order of the badges.
     @test search(readme, "github.io").start <
@@ -230,10 +230,10 @@ end
     @test isfile(joinpath(pkg_dir, ".gitignore"))
     gitignore = read(joinpath(pkg_dir, ".gitignore"), String)
     rm(joinpath(pkg_dir, ".gitignore"))
-    @test contains(gitignore, ".DS_Store")
+    @test occursin(".DS_Store", gitignore)
     for p in values(t.plugins)
         for entry in p.gitignore
-            @test contains(gitignore, entry)
+            @test occursin(entry, gitignore)
         end
     end
 
@@ -241,22 +241,22 @@ end
     @test isfile(joinpath(pkg_dir, "LICENSE"))
     license = readchomp(joinpath(pkg_dir, "LICENSE"))
     rm(joinpath(pkg_dir, "LICENSE"))
-    @test contains(license, t.authors)
-    @test contains(license, t.years)
-    @test contains(license, read_license(t.license))
+    @test occursin(t.authors, license)
+    @test occursin(t.years, license)
+    @test occursin(read_license(t.license), license)
 
     @test gen_entrypoint(temp_dir, test_pkg, t) == ["src/"]
     @test isdir(joinpath(pkg_dir, "src"))
     @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
     entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
     rm(joinpath(pkg_dir, "src"); recursive=true)
-    @test contains(entrypoint, "__precompile__()")
-    @test contains(entrypoint, "module $test_pkg")
+    @test occursin("__precompile__()", entrypoint)
+    @test occursin("module $test_pkg", entrypoint)
     t2 = Template(; user=me, precompile=false)
     gen_entrypoint(temp_dir, test_pkg, t2)
     entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
-    @test !contains(entrypoint, "__precompile__()")
-    @test contains(entrypoint, "module $test_pkg")
+    @test !occursin("__precompile__()", entrypoint)
+    @test occursin("module $test_pkg", entrypoint)
     rm(joinpath(pkg_dir, "src"); recursive=true)
 
     @test gen_require(temp_dir, test_pkg, t) == ["REQUIRE"]
@@ -270,8 +270,8 @@ end
     @test isfile(joinpath(pkg_dir, "test", "runtests.jl"))
     runtests = readchomp(joinpath(pkg_dir, "test", "runtests.jl"))
     rm(joinpath(pkg_dir, "test"); recursive=true)
-    @test contains(runtests, "using $test_pkg")
-    @test contains(runtests, "using Base.Test")
+    @test occursin("using $test_pkg", runtests)
+    @test occursin("using Base.Test", runtests)
 
     rm(temp_dir; recursive=true)
 end
@@ -378,49 +378,49 @@ end
 @testset "Mustache substitution" begin
     view = Dict{String, Any}()
     text = substitute(template_text, view)
-    @test !contains(text, "PKGNAME: $test_pkg")
-    @test !contains(text, "Documenter")
-    @test !contains(text, "CodeCov")
-    @test !contains(text, "Coveralls")
-    @test !contains(text, "After")
-    @test !contains(text, "Other")
+    @test !occursin("PKGNAME: $test_pkg", text)
+    @test !occursin("Documenter", text)
+    @test !occursin("CodeCov", text)
+    @test !occursin("Coveralls", text)
+    @test !occursin("After", text)
+    @test !occursin("Other", text)
     view["PKGNAME"] = test_pkg
     view["OTHER"] = true
     text = substitute(template_text, view)
-    @test contains(text, "PKGNAME: $test_pkg")
-    @test contains(text, "Other")
+    @test occursin("PKGNAME: $test_pkg", text)
+    @test occursin("Other", text)
 
     t = Template(; user=me)
     view["OTHER"] = false
 
     text = substitute(template_text, t; view=view)
-    @test contains(text, "PKGNAME: $test_pkg")
-    @test contains(text, "VERSION: $(t.julia_version.major).$(t.julia_version.minor)")
-    @test !contains(text, "Documenter")
-    @test !contains(text, "After")
-    @test !contains(text, "Other")
+    @test occursin("PKGNAME: $test_pkg", text)
+    @test occursin("VERSION: $(t.julia_version.major).$(t.julia_version.minor)", text)
+    @test !occursin("Documenter", text)
+    @test !occursin("After", text)
+    @test !occursin("Other", text)
 
     t.plugins[GitHubPages] = GitHubPages()
     text = substitute(template_text, t; view=view)
-    @test contains(text, "Documenter")
-    @test contains(text, "After")
+    @test occursin("Documenter", text)
+    @test occursin("After", text)
     empty!(t.plugins)
 
     t.plugins[CodeCov] = CodeCov()
     text = substitute(template_text, t; view=view)
-    @test contains(text, "CodeCov")
-    @test contains(text, "After")
+    @test occursin("CodeCov", text)
+    @test occursin("After", text)
     empty!(t.plugins)
 
     t.plugins[Coveralls] = Coveralls()
     text = substitute(template_text, t; view=view)
-    @test contains(text, "Coveralls")
-    @test contains(text, "After")
+    @test occursin("Coveralls", text)
+    @test occursin("After", text)
     empty!(t.plugins)
 
     view["OTHER"] = true
     text = substitute(template_text, t; view=view)
-    @test contains(text, "Other")
+    @test occursin("Other", text)
 end
 
 @testset "License display" begin
@@ -435,7 +435,7 @@ end
     redirect_stdout(old_stdout)
 
     for (short, long) in LICENSES
-        @test contains(licenses, "$short: $long")
+        @test occursin("$short: $long", licenses)
     end
     @test strip(mit) == strip(read_license("MIT"))
     @test strip(read_license("MIT")) == strip(read(joinpath(LICENSE_DIR, "MIT"), String))
