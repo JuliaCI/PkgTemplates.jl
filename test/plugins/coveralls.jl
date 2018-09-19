@@ -7,7 +7,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "Plugin creation" begin
         p = Coveralls()
         @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
-        @test isnull(p.src)
+        @test p.src === nothing
         @test p.dest == ".coveralls.yml"
         @test p.badges == [
             Badge(
@@ -18,9 +18,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         ]
         @test isempty(p.view)
         p = Coveralls(; config_file=nothing)
-        @test isnull(p.src)
+        @test p.src === nothing
         p = Coveralls(; config_file=test_file)
-        @test get(p.src, "") == test_file
+        @test p.src == test_file
         @test_throws ArgumentError Coveralls(; config_file=fake_path)
     end
 

@@ -8,7 +8,7 @@ const LICENSES = Dict(
     "GPL-2.0+" => "GNU Public License, Version 2.0+",
     "GPL-3.0+" => "GNU Public License, Version 3.0+",
     "LGPL-2.1+" => "Lesser GNU Public License, Version 2.1+",
-    "LGPL-3.0+" => "Lesser GNU Public License, Version 3.0+"
+    "LGPL-3.0+" => "Lesser GNU Public License, Version 3.0+",
 )
 
 """
@@ -16,16 +16,16 @@ const LICENSES = Dict(
 
 Print the names of all available licenses.
 """
-available_licenses(io::IO) = println(io, join(("$k: $v" for (k, v) in LICENSES), "\n"))
-available_licenses() = available_licenses(STDOUT)
+available_licenses(io::IO) = print(io, join(("$k: $v" for (k, v) in LICENSES), "\n"))
+available_licenses() = available_licenses(stdout)
 
 """
     show_license([io::IO], license::AbstractString) -> Nothing
 
 Print the text of `license`. Errors if the license is not found.
 """
-show_license(io::IO, license::AbstractString) = println(io, read_license(license))
-show_license(license::AbstractString) = show_license(STDOUT, license)
+show_license(io::IO, license::AbstractString) = print(io, read_license(license))
+show_license(license::AbstractString) = show_license(stdout, license)
 
 """
     read_license(license::AbstractString) -> String

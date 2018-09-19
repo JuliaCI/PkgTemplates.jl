@@ -1,6 +1,6 @@
 struct Foo <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
@@ -18,8 +18,9 @@ const gitconfig = Dict(
     "github.user" => "TesterMcTestFace",
 )
 const test_pkg = "TestPkg"
-const fake_path = bin(hash("/this/file/does/not/exist"))
+const fake_path = string(hash("/this/file/does/not/exist"); base=2)
 const test_file = tempname()
+const default_dir = PkgTemplates.dev_dir()
 const template_text = """
             PKGNAME: {{PKGNAME}}
             VERSION: {{VERSION}}}
@@ -37,7 +38,7 @@ write(test_file, template_text)
     @test t.license == "MIT"
     @test t.years == string(Dates.year(Dates.today()))
     @test t.authors == LibGit2.getconfig("user.name", "")
-    @test t.dir == Pkg.dir()
+    @test t.dir == default_dir
     @test t.julia_version == VERSION
     @test isempty(t.gitconfig)
     @test isempty(t.plugins)
@@ -61,7 +62,7 @@ write(test_file, template_text)
 
     t = Template(; user=me, dir=test_file)
     @test t.dir == abspath(test_file)
-    if is_unix()  # ~ means temporary file on Windows, not $HOME.
+    if Sys.isunix()  # ~ means temporary file on Windows, not $HOME.
         t = Template(; user=me, dir="~/$(basename(test_file))")
         @test t.dir == joinpath(homedir(), basename(test_file))
     end
@@ -74,7 +75,7 @@ write(test_file, template_text)
 
     t = Template(; user=me, requirements=["$test_pkg 0.1"])
     @test t.requirements == ["$test_pkg 0.1"]
-    @test_warn r".+" t = Template(; user=me, requirements=[test_pkg, test_pkg])
+    @test_logs (:warn, r".+") t = Template(; user=me, requirements=[test_pkg, test_pkg])
     @test t.requirements == [test_pkg]
     @test_throws ArgumentError Template(;
         user=me,
@@ -102,7 +103,7 @@ write(test_file, template_text)
         [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()]
     )
 
-    @test_warn r".+" t = Template(;
+    @test_logs (:warn, r".+") t = Template(;
         user=me,
         plugins=[TravisCI(), TravisCI()],
     )
@@ -126,7 +127,7 @@ else
 end
 
 @testset "Show methods" begin
-    pkgdir = replace(joinpath(ENV["JULIA_PKGDIR"], "v$(version_floor())"), homedir(), "~")
+    pkg_dir = replace(default_dir, homedir() => "~")
     buf = IOBuffer()
     t = Template(; user=me, gitconfig=gitconfig)
     show(buf, t)
@@ -136,7 +137,7 @@ end
           → User: $me
           → Host: github.com
           → License: MIT ($(gitconfig["user.name"]) $(Dates.year(now())))
-          → Package directory: $pkgdir
+          → Package directory: $pkg_dir
           → Precompilation enabled: Yes
           → Minimum Julia version: v$(PkgTemplates.version_floor())
           → 0 package requirements
@@ -165,7 +166,7 @@ end
           → User: $me
           → Host: github.com
           → License: None
-          → Package directory: $pkgdir
+          → Package directory: $pkg_dir
           → Precompilation enabled: Yes
           → Minimum Julia version: v$(PkgTemplates.version_floor())
           → 2 package requirements: Bar, Foo
@@ -201,7 +202,7 @@ end
     temp_file = tempname()
     gen_file(temp_file, "Hello, world")
     @test isfile(temp_file)
-    @test readstring(temp_file) == "Hello, world\n"
+    @test read(temp_file, String) == "Hello, world\n"
     rm(temp_file)
 
     @test gen_readme(temp_dir, test_pkg, t) == ["README.md"]
@@ -227,7 +228,7 @@ end
 
     @test gen_gitignore(temp_dir, test_pkg, t) == [".gitignore"]
     @test isfile(joinpath(pkg_dir, ".gitignore"))
-    gitignore = readstring(joinpath(pkg_dir, ".gitignore"))
+    gitignore = read(joinpath(pkg_dir, ".gitignore"), String)
     rm(joinpath(pkg_dir, ".gitignore"))
     @test contains(gitignore, ".DS_Store")
     for p in values(t.plugins)
@@ -278,15 +279,17 @@ end
 @testset "Package generation" begin
     t = Template(; user=me, gitconfig=gitconfig)
     generate(test_pkg, t)
-    @test isfile(Pkg.dir(test_pkg, "LICENSE"))
-    @test isfile(Pkg.dir(test_pkg, "README.md"))
-    @test isfile(Pkg.dir(test_pkg, "REQUIRE"))
-    @test isfile(Pkg.dir(test_pkg, ".gitignore"))
-    @test isdir(Pkg.dir(test_pkg, "src"))
-    @test isfile(Pkg.dir(test_pkg, "src", "$test_pkg.jl"))
-    @test isdir(Pkg.dir(test_pkg, "test"))
-    @test isfile(Pkg.dir(test_pkg, "test", "runtests.jl"))
-    repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
+    pkg_dir = joinpath(default_dir, test_pkg)
+
+    @test isfile(joinpath(pkg_dir, "LICENSE"))
+    @test isfile(joinpath(pkg_dir, "README.md"))
+    @test isfile(joinpath(pkg_dir, "REQUIRE"))
+    @test isfile(joinpath(pkg_dir, ".gitignore"))
+    @test isdir(joinpath(pkg_dir, "src"))
+    @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
+    @test isdir(joinpath(pkg_dir, "test"))
+    @test isfile(joinpath(pkg_dir, "test", "runtests.jl"))
+    repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     branches = map(b -> LibGit2.shortname(first(b)), LibGit2.GitBranchIter(repo))
     @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
@@ -296,20 +299,20 @@ end
     @test in("master", branches)
     @test !in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
-    rm(Pkg.dir(test_pkg); recursive=true)
+    rm(pkg_dir; recursive=true)
 
     generate(t, test_pkg; ssh=true)  # Test the reversed-arguments method.
-    repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
+    repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     @test LibGit2.url(remote) == "git@github.com:$me/$test_pkg.jl.git"
-    rm(Pkg.dir(test_pkg); recursive=true)
+    rm(pkg_dir; recursive=true)
 
     t = Template(; user=me, host="gitlab.com", gitconfig=gitconfig)
     generate(test_pkg, t)
-    repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
+    repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     @test LibGit2.url(remote) == "https://gitlab.com/$me/$test_pkg.jl"
-    rm(Pkg.dir(test_pkg); recursive=true)
+    rm(pkg_dir; recursive=true)
 
     temp_dir = mktempdir()
     t = Template(; user=me, dir=temp_dir, gitconfig=gitconfig)
@@ -324,45 +327,45 @@ end
         plugins=[AppVeyor(), GitHubPages(), Coveralls(), CodeCov(), TravisCI()],
     )
     generate(test_pkg, t)
-    @test isdir(joinpath(Pkg.dir(), test_pkg))
-    @test !isfile(Pkg.dir(test_pkg, "LICENSE"))
-    @test isfile(Pkg.dir(test_pkg, ".travis.yml"))
-    @test isfile(Pkg.dir(test_pkg, ".appveyor.yml"))
-    @test isdir(Pkg.dir(test_pkg, "docs"))
-    @test isfile(Pkg.dir(test_pkg, "docs", "make.jl"))
-    @test isdir(Pkg.dir(test_pkg, "docs", "src"))
-    @test isfile(Pkg.dir(test_pkg, "docs", "src", "index.md"))
-    repo = LibGit2.GitRepo(Pkg.dir(test_pkg))
+    @test isdir(pkg_dir)
+    @test !isfile(joinpath(pkg_dir, "LICENSE"))
+    @test isfile(joinpath(pkg_dir, ".travis.yml"))
+    @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
+    @test isdir(joinpath(pkg_dir, "docs"))
+    @test isfile(joinpath(pkg_dir, "docs", "make.jl"))
+    @test isdir(joinpath(pkg_dir, "docs", "src"))
+    @test isfile(joinpath(pkg_dir, "docs", "src", "index.md"))
+    repo = LibGit2.GitRepo(pkg_dir)
     @test LibGit2.getconfig(repo, "user.name", "") == gitconfig["user.name"]
     branches = map(b -> LibGit2.shortname(first(b)), LibGit2.GitBranchIter(repo))
     @test in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
-    rm(Pkg.dir(test_pkg); recursive=true)
+    rm(pkg_dir; recursive=true)
 
-    mkdir(Pkg.dir(test_pkg))
+    mkdir(pkg_dir)
     @test_throws ArgumentError generate(test_pkg, t)
     generate(test_pkg, t; force=true)
-    @test isfile(Pkg.dir(test_pkg, "README.md"))
-    rm(Pkg.dir(test_pkg); recursive=true)
+    @test isfile(joinpath(pkg_dir, "README.md"))
+    rm(pkg_dir; recursive=true)
 
-    temp_file, fd = mktemp()
-    close(fd)
+    temp_file, io = mktemp()
+    close(io)
     temp_dir = mktempdir()
-    t = Template(; user=me, dir=temp_file, gitconfig=gitconfig)
-    @test_warn r".+" generate(test_pkg, t; backup_dir=temp_dir)
+    t = Template(; user=me, dir=temp_file)
+    @test_logs (:warn, r".+") match_mode=:any generate(test_pkg, t; backup_dir=temp_dir)
     rm(temp_dir; recursive=true)
     temp_dir = mktempdir()
-    t = Template(; user=me, dir=joinpath(temp_file, "file"), gitconfig=gitconfig)
-    @test_warn r".+" generate(test_pkg, t; backup_dir=temp_dir)
+    t = Template(; user=me, dir=joinpath(temp_file, "dir"))
+    @test_logs (:warn, r".+") match_mode=:any generate(test_pkg, t; backup_dir=temp_dir)
     rm(temp_dir; recursive=true)
     rm(temp_file)
 
     t = Template(; user=me, gitconfig=gitconfig, plugins=[GitHubPages()])
     generate(test_pkg, t)
-    readme = readstring(Pkg.dir(test_pkg, "README.md"))
-    index = readstring(Pkg.dir(test_pkg, "docs", "src", "index.md"))
+    readme = read(joinpath(pkg_dir, "README.md"), String)
+    index = read(joinpath(pkg_dir, "docs", "src", "index.md"), String)
     @test readme == index
-    rm(Pkg.dir(test_pkg); recursive=true)
+    rm(pkg_dir; recursive=true)
 end
 
 @testset "Version floor" begin
@@ -435,7 +438,7 @@ end
         @test contains(licenses, "$short: $long")
     end
     @test strip(mit) == strip(read_license("MIT"))
-    @test strip(read_license("MIT")) == strip(readstring(joinpath(LICENSE_DIR, "MIT")))
+    @test strip(read_license("MIT")) == strip(read(joinpath(LICENSE_DIR, "MIT"), String))
     @test_throws ArgumentError read_license(fake_path)
 
     for license in readdir(LICENSE_DIR)

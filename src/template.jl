@@ -1,6 +1,13 @@
 import Base.show
 
 """
+    dev_dir() -> String
+
+Get the default development directory (~/.julia/dev).
+"""
+dev_dir() = joinpath(first(DEPOT_PATH), "dev")
+
+"""
     Template(; kwargs...) -> Template
 
 Records common information used to generate a package. If you don't wish to manually
@@ -24,10 +31,10 @@ create a template, you can use [`interactive_template`](@ref) instead.
   license. Supply a string for one author or an array for multiple. Similarly to `user`,
   it will try to take the value of a supplied git config's "user.name" key, then the global
   git config's value, if it is left unset.
-* `years::Union{Integer, AbstractString}=Dates.year(Dates.today())`: Copyright years on the
-  license. Can be supplied by a number, or a string such as "2016 - 2017".
-* `dir::AbstractString=joinpath(first(DEPOT_PATH), "dev")`: Directory in which the package
-  will go. Relative paths are converted to absolute ones at template creation time.
+* `years::Union{Integer, AbstractString}=$(Dates.year(Dates.today()))`: Copyright years on
+  the license. Can be supplied by a number, or a string such as "2016 - 2017".
+* `dir::AbstractString=$(dev_dir())`: Directory in which the package will go. Relative
+  paths are converted to absolute ones at template creation time.
 * `precompile::Bool=true`: Whether or not to enable precompilation in generated packages.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `requirements::Vector{<:AbstractString}=String[]`: Package requirements. If there are
@@ -53,10 +60,10 @@ create a template, you can use [`interactive_template`](@ref) instead.
     function Template(;
         user::AbstractString="",
         host::AbstractString="https://github.com",
-        license::Union{AbstractString, Nothing}="MIT",
+        license::AbstractString="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
         years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
-        dir::AbstractString=joinpath(first(DEPOT_PATH), "dev"),
+        dir::AbstractString=dev_dir(),
         precompile::Bool=true,
         julia_version::VersionNumber=VERSION,
         requirements::Vector{<:AbstractString}=String[],
@@ -98,12 +105,12 @@ create a template, you can use [`interactive_template`](@ref) instead.
                 "requirements contains duplicate packages with conflicting versions"
             ))
         elseif diff > 0
-            warn("Removed $(diff) duplicate$(diff == 1 ? "" : "s") from requirements")
+            @warn "Removed $(diff) duplicate$(diff == 1 ? "" : "s") from requirements"
         end
 
         plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
         if (length(plugins) != length(plugin_dict))
-            warn("Plugin list contained duplicates, only the last of each type was kept")
+            @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
         new(
@@ -206,7 +213,7 @@ function interactive_template(; fast::Bool=false)
         io = IOBuffer()
         available_licenses(io)
         licenses = ["" => "", collect(LICENSES)...]
-        menu = RadioMenu(["None", split(String(take!(io)), "\n")...])
+        menu = RadioMenu(String["None", split(String(take!(io)), "\n")...])
         # If the user breaks out of the menu with Ctrl-c, the result is -1, the absolute
         # value of which correponds to no license.
         licenses[abs(request(menu))].first
@@ -235,9 +242,9 @@ function interactive_template(; fast::Bool=false)
     end
 
     kwargs[:dir] = if fast
-        joinpath(first(DEPOT_PATH), "dev")
+        dev_dir()
     else
-        default_dir = "."
+        default_dir = dev_dir()
         print("Enter the path to the package directory [$default_dir]: ")
         dir = readline()
         isempty(dir) ? default_dir : dir

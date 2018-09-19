@@ -7,7 +7,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "Plugin creation" begin
         p = AppVeyor()
         @test isempty(p.gitignore)
-        @test get(p.src, "") == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
+        @test p.src == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
         @test p.dest == ".appveyor.yml"
         @test p.badges == [
             Badge(
@@ -18,9 +18,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         ]
         @test isempty(p.view)
         p = AppVeyor(; config_file=nothing)
-        @test isnull(p.src)
+        @test p.src === nothing
         p = AppVeyor(; config_file=test_file)
-        @test get(p.src, "") == test_file
+        @test p.src == test_file
         @test_throws ArgumentError AppVeyor(; config_file=fake_path)
     end
 
