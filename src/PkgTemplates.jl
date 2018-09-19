@@ -7,7 +7,7 @@ using Distributed
 using InteractiveUtils
 using LibGit2
 using Mustache
-using TerminalMenus
+using REPL.TerminalMenus
 using URIParser
 
 export
