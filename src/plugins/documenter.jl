@@ -1,5 +1,3 @@
-import Base.show
-
 """
 Add a `Documenter` subtype to a template's plugins to add support for documentation
 generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
@@ -60,7 +58,7 @@ function gen_plugin(
     end
 end
 
-function show(io::IO, p::Documenter)
+function Base.show(io::IO, p::Documenter)
     spc = "  "
     println(io, "$(nameof(typeof(p))):")
 

@@ -1,5 +1,3 @@
-import Base.show
-
 """
     dev_dir() -> String
 
@@ -120,7 +118,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
     end
 end
 
-function show(io::IO, t::Template)
+function Base.show(io::IO, t::Template)
     maybe_none(s::AbstractString) = isempty(string(s)) ? "None" : string(s)
     spc = "  "
 

@@ -1,5 +1,3 @@
-import Base.show
-
 """
 Generic plugins are plugins that add any number of patterns to the generated package's
 `.gitignore`, and have at most one associated file to generate.
@@ -69,7 +67,7 @@ config template file doesn't follow the generic naming convention, we added anot
 """
 abstract type GenericPlugin <: Plugin end
 
-function show(io::IO, p::GenericPlugin)
+function Base.show(io::IO, p::GenericPlugin)
     spc = "  "
     println(io, "$(nameof(typeof(p))):")
 
