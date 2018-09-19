@@ -31,7 +31,6 @@ function gen_plugin(
             assets_string *= """$(tab^2)"assets/$(basename(asset))",\n"""
         end
         assets_string *= "$tab]"
-
     else
         assets_string = "[]"
     end
@@ -71,7 +70,7 @@ function show(io::IO, p::Documenter)
     if n == 0
         println(io)
     else
-        println(io, ": $(join(map(a -> replace(a, homedir(), "~"), p.assets), ", "))")
+        println(io, ": $(join(map(a -> replace(a, homedir() => "~"), p.assets), ", "))")
     end
 
     n = length(p.gitignore)

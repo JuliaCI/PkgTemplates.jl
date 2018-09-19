@@ -37,13 +37,13 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = GitHubPages(; assets=[test_file])
         @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-        @test contains(
-            make,
+        @test occursin(
             strip("""
             assets=[
                     "assets/$(basename(test_file))",
                 ]
             """),
+            make,
         )
         @test isfile(joinpath(pkg_dir, "docs", "src", "assets", basename(test_file)))
         rm(joinpath(pkg_dir, "docs"); recursive=true)

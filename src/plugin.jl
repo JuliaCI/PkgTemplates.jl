@@ -268,7 +268,7 @@ function interactive(
     if default_config_file == nothing
         print("[None]: ")
     else
-        print("[$(replace(default_config_file, homedir(), "~"))]: ")
+        print("[$(replace(default_config_file, homedir() => "~"))]: ")
     end
     config_file = readline()
     config_file = if uppercase(config_file) == "NONE"

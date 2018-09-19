@@ -214,17 +214,20 @@ end
         @test occursin(join(badges(p, t.user, test_pkg), "\n"), readme)
     end
     # Check the order of the badges.
-    @test search(readme, "github.io").start <
-        search(readme, "travis").start <
-        search(readme, "appveyor").start <
-        search(readme, "codecov").start <
-        search(readme, "coveralls").start
+    @test something(findfirst("github.io", readme)).start <
+        something(findfirst("travis", readme)).start <
+        something(findfirst("appveyor", readme)).start <
+        something(findfirst("codecov", readme)).start <
+        something(findfirst("coveralls", readme)).start
     # Plugins with badges but not in BADGE_ORDER should appear at the far right side.
     t.plugins[Foo] = Foo()
     gen_readme(temp_dir, test_pkg, t)
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
-    @test search(readme, "coveralls").start < search(readme, "baz").start
+    @test <(
+        something(findfirst("coveralls", readme)).start,
+        something(findfirst("baz", readme)).start,
+    )
 
     @test gen_gitignore(temp_dir, test_pkg, t) == [".gitignore"]
     @test isfile(joinpath(pkg_dir, ".gitignore"))
