@@ -424,7 +424,7 @@ end
 end
 
 @testset "License display" begin
-    old_stdout = STDOUT
+    old_stdout = stdout
     out_read, out_write = redirect_stdout()
     available_licenses()
     licenses = String(readavailable(out_read))

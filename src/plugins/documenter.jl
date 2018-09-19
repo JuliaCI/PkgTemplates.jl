@@ -81,7 +81,7 @@ function show(io::IO, p::Documenter)
 end
 
 function interactive(plugin_type::Type{<:Documenter})
-    t = Base.datatype_name(plugin_type)
+    t = nameof(plugin_type)
     print("$t: Enter any Documenter asset files (separated by spaces) []: ")
     return plugin_type(; assets=String.(split(readline())))
 end
