@@ -12,8 +12,8 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         @test p.badges == [
             Badge(
                 "Build Status",
-                "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
-                "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
+                "https://travis-ci.com/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
+                "https://travis-ci.com/{{USER}}/{{PKGNAME}}.jl",
             ),
         ]
         @test isempty(p.view)
@@ -26,7 +26,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = TravisCI()
-        @test badges(p, user, test_pkg) == ["[![Build Status](https://travis-ci.org/$user/$test_pkg.jl.svg?branch=master)](https://travis-ci.org/$user/$test_pkg.jl)"]
+        @test badges(p, user, test_pkg) == ["[![Build Status](https://travis-ci.com/$user/$test_pkg.jl.svg?branch=master)](https://travis-ci.com/$user/$test_pkg.jl)"]
     end
 
     @testset "File generation" begin

@@ -32,8 +32,8 @@ generated repositories, and an appropriate badge to the README.
             [
                 Badge(
                     "Build Status",
-                    "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
-                    "https://travis-ci.org/{{USER}}/{{PKGNAME}}.jl",
+                    "https://travis-ci.com/{{USER}}/{{PKGNAME}}.jl.svg?branch=master",
+                    "https://travis-ci.com/{{USER}}/{{PKGNAME}}.jl",
                 ),
             ],
             Dict{String, Any}(),
