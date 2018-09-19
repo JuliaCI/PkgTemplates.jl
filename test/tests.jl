@@ -123,7 +123,7 @@ if get(ENV, "TRAVIS_OS_NAME", "") != "osx"
         include(joinpath("interactive", "plugins.jl"))
     end
 else
-    info("Skipping tests that require TerminalMenus")
+    @info "Skipping tests that require TerminalMenus"
 end
 
 @testset "Show methods" begin
