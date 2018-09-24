@@ -16,6 +16,7 @@
     @test t.years == string(Dates.year(Dates.today()))
     @test t.dir == default_dir
     @test t.julia_version == VERSION
+    @test !t.ssh
     @test isempty(t.requirements)
     @test isempty(t.gitconfig)
     @test isempty(t.plugins)
@@ -25,7 +26,7 @@
         @test_throws ArgumentError t = interactive_template()
     end
 
-    write(stdin.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\nno\n0.5\nX Y\nkey val val\nkey2 val2\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
+    write(stdin.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\n0.5\nyes\nX Y\nkey val val\nkey2 val2\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
     t = interactive_template()
     @test t.user == me
     @test t.host == "gitlab.com"
@@ -34,14 +35,15 @@
     @test t.authors == me
     @test t.years == "2016"
     @test t.dir == abspath(test_file)
-    @test !t.precompile
     @test t.julia_version == v"0.5.0"
+    @test t.ssh
     @test Set(t.requirements) == Set(["X", "Y"])
     @test t.gitconfig == Dict("key" => "val val", "key2" => "val2")
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
 
-    write(stdin.buffer, "$me\n\n\r\n\n\n\nA B\nA B\n\nd")
+    # TODO: What is this supposed to warn about?
+    write(stdin.buffer, "$me\n\n\r\n\nA B\nA B\n\nd")
     @test_logs (:warn, r".+") match_mode=:any interactive_template()
 
     write(stdin.buffer, "$me\nd")
@@ -54,6 +56,7 @@
     @test t.years == string(Dates.year(Dates.today()))
     @test t.dir == default_dir
     @test t.julia_version == VERSION
+    @test !t.ssh
     @test isempty(t.requirements)
     @test isempty(t.gitconfig)
     @test isempty(t.plugins)

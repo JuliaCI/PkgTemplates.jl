@@ -33,8 +33,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
   the license. Can be supplied by a number, or a string such as "2016 - 2017".
 * `dir::AbstractString=$(dev_dir())`: Directory in which the package will go. Relative
   paths are converted to absolute ones at template creation time.
-* `precompile::Bool=true`: Whether or not to enable precompilation in generated packages.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
+* `ssh::Bool=false`: Whether or not to use SSH for the remote.
 * `requirements::Vector{<:AbstractString}=String[]`: Package requirements. If there are
   duplicate requirements with different versions, i.e. ["PkgTemplates", "PkgTemplates
   0.1"], an `ArgumentError` is thrown. Each entry in this array will be copied into the
@@ -49,8 +49,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
     authors::AbstractString
     years::AbstractString
     dir::AbstractString
-    precompile::Bool
     julia_version::VersionNumber
+    ssh::Bool
     requirements::Vector{AbstractString}
     gitconfig::Dict
     plugins::Dict{DataType, Plugin}
@@ -62,8 +62,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
         years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
         dir::AbstractString=dev_dir(),
-        precompile::Bool=true,
         julia_version::VersionNumber=VERSION,
+        ssh::Bool=false,
         requirements::Vector{<:AbstractString}=String[],
         gitconfig::Dict=Dict(),
         plugins::Vector{<:Plugin}=Plugin[],
@@ -112,8 +112,8 @@ create a template, you can use [`interactive_template`](@ref) instead.
         end
 
         new(
-            user, host, license, authors, years, dir, precompile,
-            julia_version, requirements_dedup, gitconfig, plugin_dict,
+            user, host, license, authors, years, dir, julia_version, ssh,
+            requirements_dedup, gitconfig, plugin_dict,
         )
     end
 end
@@ -134,8 +134,8 @@ function Base.show(io::IO, t::Template)
     end
 
     println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir() => "~"))")
-    println(io, "$spc→ Precompilation enabled: $(t.precompile ? "Yes" : "No")")
     println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
+    println(io, "$spc→ SSH remote: $(t.ssh ? "Yes" : "No")")
 
     n = length(t.requirements)
     s = n == 1 ? "" : "s"
@@ -248,13 +248,6 @@ function interactive_template(; fast::Bool=false)
         isempty(dir) ? default_dir : dir
     end
 
-    kwargs[:precompile] = if fast
-        true
-    else
-        print("Enable precompilation? [yes]: ")
-        !in(uppercase(readline()), ["N", "NO", "F", "FALSE"])
-    end
-
     kwargs[:julia_version] = if fast
         VERSION
     else
@@ -262,6 +255,13 @@ function interactive_template(; fast::Bool=false)
         print("Enter the minimum Julia version [$(version_floor(default_julia_version))]: ")
         julia_version = readline()
         isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
+    end
+
+    kwargs[:ssh] = if fast
+        false
+    else
+        print("Set remote to SSH? [no]: ")
+        in(uppercase(readline()), ["Y", "YES", "T", "TRUE"])
     end
 
     kwargs[:requirements] = if fast

@@ -1,4 +1,3 @@
-__precompile__()
 module PkgTemplates
 
 using AutoHashEquals
@@ -7,6 +6,7 @@ using Distributed
 using InteractiveUtils
 using LibGit2
 using Mustache
+using Pkg
 using REPL.TerminalMenus
 using URIParser
 

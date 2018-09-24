@@ -76,9 +76,6 @@ write(test_file, template_text)
         @test t.dir == joinpath(homedir(), basename(test_file))
     end
 
-    t = Template(; user=me, precompile=false)
-    @test !t.precompile
-
     t = Template(; user=me, julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
 
@@ -156,8 +153,8 @@ end
           → Host: github.com
           → License: MIT ($(gitconfig["user.name"]) $(Dates.year(now())))
           → Package directory: $pkg_dir
-          → Precompilation enabled: Yes
           → Minimum Julia version: v$(PkgTemplates.version_floor())
+          → SSH remote: No
           → 0 package requirements
           → Git configuration options:
             • github.user = $(gitconfig["github.user"])
@@ -170,6 +167,7 @@ end
         user=me,
         license="",
         requirements=["Foo", "Bar"],
+        ssh=true,
         gitconfig=gitconfig,
         plugins=[
             TravisCI(),
@@ -185,8 +183,8 @@ end
           → Host: github.com
           → License: None
           → Package directory: $pkg_dir
-          → Precompilation enabled: Yes
           → Minimum Julia version: v$(PkgTemplates.version_floor())
+          → SSH remote: Yes
           → 2 package requirements: Bar, Foo
           → Git configuration options:
             • github.user = $(gitconfig["github.user"])
@@ -224,7 +222,7 @@ end
     rm(temp_file)
 
     # Test the README generation.
-    @test gen_readme(temp_dir, test_pkg, t) == ["README.md"]
+    @test gen_readme(pkg_dir, t) == ["README.md"]
     @test isfile(joinpath(pkg_dir, "README.md"))
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
@@ -240,7 +238,7 @@ end
         something(findfirst("coveralls", readme)).start
     # Plugins with badges but not in BADGE_ORDER should appear at the far right side.
     t.plugins[Foo] = Foo()
-    gen_readme(temp_dir, test_pkg, t)
+    gen_readme(pkg_dir, t)
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
     @test <(
@@ -249,7 +247,7 @@ end
     )
 
     # Test the gitignore generation.
-    @test gen_gitignore(temp_dir, test_pkg, t) == [".gitignore"]
+    @test gen_gitignore(pkg_dir, t) == [".gitignore"]
     @test isfile(joinpath(pkg_dir, ".gitignore"))
     gitignore = read(joinpath(pkg_dir, ".gitignore"), String)
     rm(joinpath(pkg_dir, ".gitignore"))
@@ -261,7 +259,7 @@ end
     end
 
     # Test the license generation.
-    @test gen_license(temp_dir, test_pkg, t) == ["LICENSE"]
+    @test gen_license(pkg_dir, t) == ["LICENSE"]
     @test isfile(joinpath(pkg_dir, "LICENSE"))
     license = readchomp(joinpath(pkg_dir, "LICENSE"))
     rm(joinpath(pkg_dir, "LICENSE"))
@@ -269,36 +267,21 @@ end
     @test occursin(t.years, license)
     @test occursin(read_license(t.license), license)
 
-    # Test the source code entrypoint generation.
-    @test gen_entrypoint(temp_dir, test_pkg, t) == ["src/"]
-    @test isdir(joinpath(pkg_dir, "src"))
-    @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
-    entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
-    rm(joinpath(pkg_dir, "src"); recursive=true)
-    @test occursin("__precompile__()", entrypoint)
-    @test occursin("module $test_pkg", entrypoint)
-    t2 = Template(; user=me, precompile=false)
-    gen_entrypoint(temp_dir, test_pkg, t2)
-    entrypoint = readchomp(joinpath(pkg_dir, "src", "$test_pkg.jl"))
-    @test !occursin("__precompile__()", entrypoint)
-    @test occursin("module $test_pkg", entrypoint)
-    rm(joinpath(pkg_dir, "src"); recursive=true)
-
     # Test the REQUIRE generation.
-    @test gen_require(temp_dir, test_pkg, t) == ["REQUIRE"]
+    @test gen_require(pkg_dir, t) == ["REQUIRE"]
     @test isfile(joinpath(pkg_dir, "REQUIRE"))
     vf = version_floor(t.julia_version)
     @test readchomp(joinpath(pkg_dir, "REQUIRE")) == "julia $vf\n$test_pkg"
     rm(joinpath(pkg_dir, "REQUIRE"))
 
     # Test the test generation.
-    @test gen_tests(temp_dir, test_pkg, t) == ["test/"]
+    @test gen_tests(pkg_dir, t) == ["Manifest.toml", "test/"]
     @test isdir(joinpath(pkg_dir, "test"))
     @test isfile(joinpath(pkg_dir, "test", "runtests.jl"))
     runtests = readchomp(joinpath(pkg_dir, "test", "runtests.jl"))
     rm(joinpath(pkg_dir, "test"); recursive=true)
     @test occursin("using $test_pkg", runtests)
-    @test occursin("using Base.Test", runtests)
+    @test occursin("using Test", runtests)
 
     rm(temp_dir; recursive=true)
 end
@@ -315,8 +298,10 @@ end
     @test isfile(joinpath(pkg_dir, ".gitignore"))
     @test isdir(joinpath(pkg_dir, "src"))
     @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
+    @test isfile(joinpath(pkg_dir, "Project.toml"))
     @test isdir(joinpath(pkg_dir, "test"))
     @test isfile(joinpath(pkg_dir, "test", "runtests.jl"))
+    @test isfile(joinpath(pkg_dir, "Manifest.toml"))
     # Check the gitconfig.
     repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
@@ -331,8 +316,9 @@ end
     @test !LibGit2.isdirty(repo)
     rm(pkg_dir; recursive=true)
 
-    # Check that the remote is an SSH URL.
-    generate(t, test_pkg; ssh=true)  # Test the reversed-arguments method.
+    # Check that the remote is an SSH URL when we want it to be.
+    t = Template(; user=me, gitconfig=gitconfig, ssh=true)
+    generate(t, test_pkg)  # Test the reversed-arguments method.
     repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     @test LibGit2.url(remote) == "git@github.com:$me/$test_pkg.jl.git"
@@ -376,26 +362,6 @@ end
     @test in("gh-pages", branches)
     @test !LibGit2.isdirty(repo)
     rm(pkg_dir; recursive=true)
-
-    # Check that an existing directory is removed when force is set.
-    mkdir(pkg_dir)
-    @test_throws ArgumentError generate(test_pkg, t)
-    generate(test_pkg, t; force=true)
-    @test isfile(joinpath(pkg_dir, "README.md"))
-    rm(pkg_dir; recursive=true)
-
-    # Check that the backup directory mechanism works.
-    temp_file, io = mktemp()
-    close(io)
-    temp_dir = mktempdir()
-    t = Template(; user=me, dir=temp_file)
-    @test_logs (:warn, r".+") match_mode=:any generate(test_pkg, t; backup_dir=temp_dir)
-    rm(temp_dir; recursive=true)
-    temp_dir = mktempdir()
-    t = Template(; user=me, dir=joinpath(temp_file, "dir"))
-    @test_logs (:warn, r".+") match_mode=:any generate(test_pkg, t; backup_dir=temp_dir)
-    rm(temp_dir; recursive=true)
-    rm(temp_file)
 
     # Check that the generated docs root is just the copied README.
     t = Template(; user=me, gitconfig=gitconfig, plugins=[GitHubPages()])
