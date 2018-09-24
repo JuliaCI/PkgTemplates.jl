@@ -37,6 +37,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = GitHubPages(; assets=[test_file])
         @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
+        # Check the formatting of the assets list.
         @test occursin(
             strip("""
             assets=[
