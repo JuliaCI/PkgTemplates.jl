@@ -13,6 +13,7 @@ matrix:
 notifications:
   email: false
 before_script:
+  # Git configuration is required to make commits in generated packages.
   - git config --global user.name "Travis"
   - git config --global user.email "travis@example.com"
 after_success:
