@@ -1,5 +1,3 @@
-import Base.show
-
 """
 Generic plugins are plugins that add any number of patterns to the generated package's
 `.gitignore`, and have at most one associated file to generate.
@@ -7,7 +5,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 # Attributes
 * `gitignore::Vector{AbstractString}`: Array of patterns to be added to the `.gitignore` of
   generated packages that use this plugin.
-* `src::Nullable{AbstractString}`: Path to the file that will be copied into the generated
+* `src::Union{AbstractString, Nothing}`: Path to the file that will be copied into the generated
   package repository. If set to `nothing`, no file will be generated. When this defaults
   to an empty string, there should be a default file in `defaults` that will be copied.
   That file's name is usually the same as the plugin's name, except in all lowercase and
@@ -25,12 +23,12 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 ```julia
 @auto_hash_equals struct MyPlugin <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function MyPlugin(; config_file::Union{AbstractString, Void}="")
+    function MyPlugin(; config_file::Union{AbstractString, Nothing}="")
         if config_file != nothing
             config_file = if isempty(config_file)
                 joinpath(DEFAULTS_DIR, "my-plugin.toml")
@@ -69,14 +67,14 @@ config template file doesn't follow the generic naming convention, we added anot
 """
 abstract type GenericPlugin <: Plugin end
 
-function show(io::IO, p::GenericPlugin)
+function Base.show(io::IO, p::GenericPlugin)
     spc = "  "
-    println(io, "$(Base.datatype_name(typeof(p))):")
+    println(io, "$(nameof(typeof(p))):")
 
-    cfg = if isnull(p.src)
+    cfg = if p.src === nothing
         "None"
     else
-        dirname(get(p.src)) == DEFAULTS_DIR ? "Default" : get(p.src)
+        dirname(p.src) == DEFAULTS_DIR ? "Default" : p.src
     end
     println(io, "$spc→ Config file: $cfg")
 
@@ -213,13 +211,11 @@ function gen_plugin(
     dir::AbstractString,
     pkg_name::AbstractString,
 )
-    src = try
-        get(plugin.src)
-    catch
+    if plugin.src === nothing
         return String[]
     end
     text = substitute(
-        readstring(src),
+        read(plugin.src, String),
         template;
         view=merge(Dict("PKGNAME" => pkg_name), plugin.view),
     )
@@ -250,7 +246,7 @@ end
 """
     interactive(
         plugin_type::Type{<:Plugin};
-        file::Union{AbstractString, Void}="",
+        file::Union{AbstractString, Nothing}="",
     ) -> Plugin
 
 Interactively create a plugin of type `plugin_type`, where `file` is the plugin type's
@@ -259,7 +255,7 @@ default config template with a non-standard name (for `MyPlugin`, this is anythi
 """
 function interactive(
     plugin_type::Type{<:GenericPlugin};
-    file::Union{AbstractString, Void}="",
+    file::Union{AbstractString, Nothing}="",
 )
     plugin_name = String(split(string(plugin_type), ".")[end])
     # By default, we expect the default plugin file template for a plugin called
@@ -270,7 +266,7 @@ function interactive(
     if default_config_file == nothing
         print("[None]: ")
     else
-        print("[$(replace(default_config_file, homedir(), "~"))]: ")
+        print("[$(replace(default_config_file, homedir() => "~"))]: ")
     end
     config_file = readline()
     config_file = if uppercase(config_file) == "NONE"

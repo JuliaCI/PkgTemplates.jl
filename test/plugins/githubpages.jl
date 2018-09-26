@@ -27,8 +27,8 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         @test isdir(joinpath(pkg_dir, "docs"))
         @test isfile(joinpath(pkg_dir, "docs", "make.jl"))
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-        @test contains(make, "assets=[]")
-        @test !contains(make, "deploydocs")
+        @test occursin("assets=[]", make)
+        @test !occursin("deploydocs", make)
         @test isdir(joinpath(pkg_dir, "docs", "src"))
         @test isfile(joinpath(pkg_dir, "docs", "src", "index.md"))
         index = readchomp(joinpath(pkg_dir, "docs", "src", "index.md"))
@@ -37,20 +37,21 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         p = GitHubPages(; assets=[test_file])
         @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-        @test contains(
-            make,
+        # Check the formatting of the assets list.
+        @test occursin(
             strip("""
             assets=[
                     "assets/$(basename(test_file))",
                 ]
             """),
+            make,
         )
         @test isfile(joinpath(pkg_dir, "docs", "src", "assets", basename(test_file)))
         rm(joinpath(pkg_dir, "docs"); recursive=true)
         t.plugins[TravisCI] = TravisCI()
         @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
-        @test contains(make, "deploydocs")
+        @test occursin("deploydocs", make)
         rm(joinpath(pkg_dir, "docs"); recursive=true)
     end
 end

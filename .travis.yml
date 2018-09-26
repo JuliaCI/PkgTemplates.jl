@@ -3,7 +3,8 @@ os:
   - linux
   - osx
 julia:
-  - 0.6
+  - 0.7
+  - 1.0
   - nightly
 matrix:
   allow_failures:
@@ -11,9 +12,11 @@ matrix:
   fast_finish: true
 notifications:
   email: false
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.test("PkgTemplates"; coverage=true)'
+before_script:
+  # Git configuration is required to make commits in generated packages.
+  - git config --global user.name "Travis"
+  - git config --global user.email "travis@example.com"
 after_success:
-  - julia -e 'VERSION > v"0.6.2" && exit(); cd(Pkg.dir("PkgTemplates")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
-  - julia -e 'Pkg.add("Documenter"); cd(Pkg.dir("PkgTemplates")); include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg; Pkg.add("Coverage")'
+  - julia -e 'using Coverage; CodeCov.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'

@@ -1,21 +1,21 @@
 """
-    AppVeyor(; config_file::Union{AbstractString, Void}="") -> AppVeyor
+    AppVeyor(; config_file::Union{AbstractString, Nothing}="") -> AppVeyor
 
 Add `AppVeyor` to a template's plugins to add a `.appveyor.yml` configuration file to
 generated repositories, and an appropriate badge to the README.
 
 # Keyword Arguments
-* `config_file::Union{AbstractString, Void}=""`: Path to a custom `.appveyor.yml`.
+* `config_file::Union{AbstractString, Nothing}=""`: Path to a custom `.appveyor.yml`.
   If `nothing` is supplied, no file will be generated.
 """
 @auto_hash_equals struct AppVeyor <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function AppVeyor(; config_file::Union{AbstractString, Void}="")
+    function AppVeyor(; config_file::Union{AbstractString, Nothing}="")
         if config_file != nothing
             config_file = if isempty(config_file)
                 config_file = joinpath(DEFAULTS_DIR, "appveyor.yml")

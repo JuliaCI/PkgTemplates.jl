@@ -1,4 +1,9 @@
-import Base.show
+"""
+    dev_dir() -> String
+
+Get the default development directory (~/.julia/dev).
+"""
+dev_dir() = joinpath(first(DEPOT_PATH), "dev")
 
 """
     Template(; kwargs...) -> Template
@@ -24,10 +29,10 @@ create a template, you can use [`interactive_template`](@ref) instead.
   license. Supply a string for one author or an array for multiple. Similarly to `user`,
   it will try to take the value of a supplied git config's "user.name" key, then the global
   git config's value, if it is left unset.
-* `years::Union{Integer, AbstractString}=Dates.year(Dates.today())`: Copyright years on the
-  license. Can be supplied by a number, or a string such as "2016 - 2017".
-* `dir::AbstractString=Pkg.dir()`: Directory in which the package will go. Relative paths
-  are converted to absolute ones at template creation time.
+* `years::Union{Integer, AbstractString}=$(Dates.year(Dates.today()))`: Copyright years on
+  the license. Can be supplied by a number, or a string such as "2016 - 2017".
+* `dir::AbstractString=$(dev_dir())`: Directory in which the package will go. Relative
+  paths are converted to absolute ones at template creation time.
 * `precompile::Bool=true`: Whether or not to enable precompilation in generated packages.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
 * `requirements::Vector{<:AbstractString}=String[]`: Package requirements. If there are
@@ -53,10 +58,10 @@ create a template, you can use [`interactive_template`](@ref) instead.
     function Template(;
         user::AbstractString="",
         host::AbstractString="https://github.com",
-        license::Union{AbstractString, Void}="MIT",
+        license::AbstractString="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
         years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
-        dir::AbstractString=Pkg.dir(),
+        dir::AbstractString=dev_dir(),
         precompile::Bool=true,
         julia_version::VersionNumber=VERSION,
         requirements::Vector{<:AbstractString}=String[],
@@ -98,12 +103,12 @@ create a template, you can use [`interactive_template`](@ref) instead.
                 "requirements contains duplicate packages with conflicting versions"
             ))
         elseif diff > 0
-            warn("Removed $(diff) duplicate$(diff == 1 ? "" : "s") from requirements")
+            @warn "Removed $(diff) duplicate$(diff == 1 ? "" : "s") from requirements"
         end
 
         plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
         if (length(plugins) != length(plugin_dict))
-            warn("Plugin list contained duplicates, only the last of each type was kept")
+            @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
         new(
@@ -113,7 +118,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
     end
 end
 
-function show(io::IO, t::Template)
+function Base.show(io::IO, t::Template)
     maybe_none(s::AbstractString) = isempty(string(s)) ? "None" : string(s)
     spc = "  "
 
@@ -128,7 +133,7 @@ function show(io::IO, t::Template)
         println(io, "$(t.license) ($(t.authors) $(t.years))")
     end
 
-    println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir(), "~"))")
+    println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir() => "~"))")
     println(io, "$spc→ Precompilation enabled: $(t.precompile ? "Yes" : "No")")
     println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
 
@@ -173,7 +178,7 @@ Interactively create a [`Template`](@ref). If `fast` is set, defaults will be as
 all values except username and plugins.
 """
 function interactive_template(; fast::Bool=false)
-    info("Default values are shown in [brackets]")
+    @info "Default values are shown in [brackets]"
     # Getting the leaf types in a separate thread eliminates an awkward wait after
     # "Select plugins" is printed.
     plugin_types = @spawn leaves(Plugin)
@@ -206,7 +211,7 @@ function interactive_template(; fast::Bool=false)
         io = IOBuffer()
         available_licenses(io)
         licenses = ["" => "", collect(LICENSES)...]
-        menu = RadioMenu(["None", split(String(take!(io)), "\n")...])
+        menu = RadioMenu(String["None", split(String(take!(io)), "\n")...])
         # If the user breaks out of the menu with Ctrl-c, the result is -1, the absolute
         # value of which correponds to no license.
         licenses[abs(request(menu))].first
@@ -235,9 +240,9 @@ function interactive_template(; fast::Bool=false)
     end
 
     kwargs[:dir] = if fast
-        Pkg.dir()
+        dev_dir()
     else
-        default_dir = Pkg.dir()
+        default_dir = dev_dir()
         print("Enter the path to the package directory [$default_dir]: ")
         dir = readline()
         isempty(dir) ? default_dir : dir
@@ -276,7 +281,7 @@ function interactive_template(; fast::Bool=false)
             isempty(line) && break
             tokens = split(line, " ", limit=2)
             if haskey(gitconfig, tokens[1])
-                warn("Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'")
+                @warn "Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'"
             end
             gitconfig[tokens[1]] = tokens[2]
         end
@@ -285,7 +290,7 @@ function interactive_template(; fast::Bool=false)
 
     println("Select plugins:")
     # Only include plugin types which have an `interactive` method.
-    plugin_types = filter(t -> method_exists(interactive, (Type{t},)), fetch(plugin_types))
+    plugin_types = filter(t -> hasmethod(interactive, (Type{t},)), fetch(plugin_types))
     type_names = map(t -> split(string(t), ".")[end], plugin_types)
     menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
     selected = collect(request(menu))
@@ -301,4 +306,4 @@ end
 
 Get all concrete subtypes of `t`.
 """
-leaves(t::Type)::Vector{DataType} = isleaftype(t) ? [t] : vcat(leaves.(subtypes(t))...)
+leaves(t::Type)::Vector{DataType} = isconcretetype(t) ? [t] : vcat(leaves.(subtypes(t))...)

@@ -1,38 +1,30 @@
 environment:
   matrix:
-    - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
-    - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6-latest-win64.exe"
-    - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x86/julia-latest-win32.exe"
-    - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x64/julia-latest-win64.exe"
-
-
+  - julia_version: 0.7
+  - julia_version: 1.0
+  - julia_version: nightly
+platform:
+  - x86
+  - x64
 matrix:
   allow_failures:
-    - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x86/julia-latest-win32.exe"
-    - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x64/julia-latest-win64.exe"
-
+  - julia_version: nightly
 notifications:
   - provider: Email
     on_build_success: false
     on_build_failure: false
     on_build_status_changed: false
-
 install:
-  - ps: "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12"
-  # Download most recent Julia Windows binary
-  - ps: (new-object net.webclient).DownloadFile(
-        $env:JULIA_URL,
-        "C:\projects\julia-binary.exe")
-  # Run installer silently, output to C:\projects\julia
-  - C:\projects\julia-binary.exe /S /D=C:\projects\julia
-
+  - ps: iex ((new-object net.webclient).DownloadString("https://raw.githubusercontent.com/JuliaCI/Appveyor.jl/version-1/bin/install.ps1"))
 build_script:
-  # Need to convert from shallow to complete for Pkg.clone to work
-  - IF EXIST .git\shallow (git fetch --unshallow)
-  - C:\projects\julia\bin\julia -e "versioninfo(); Pkg.clone(pwd(), \"PkgTemplates\")"
-
+  - echo "%JL_BUILD_SCRIPT%"
+  - C:\julia\bin\julia -e "%JL_BUILD_SCRIPT%"
 test_script:
-  - C:\projects\julia\bin\julia -e "Pkg.test(\"PkgTemplates\"; coverage=true)"
-
-after_test:
-  - C:\projects\julia\bin\julia -e "VERSION > v\"0.6.2\" && exit(); cd(Pkg.dir(\"PkgTemplates\")); Pkg.add(\"Coverage\"); using Coverage; Codecov.submit(process_folder())"
+  # Git configuration is required to make commits in generated packages.
+  - git config --global user.name "AppVeyor"
+  - git config --global user.email "appveyor@example.com"
+  - echo "%JL_TEST_SCRIPT%"
+  - C:\julia\bin\julia -e "%JL_TEST_SCRIPT%"
+on_success:
+  - echo "%JL_CODECOV_SCRIPT%"
+  - C:\julia\bin\julia -e "%JL_CODECOV_SCRIPT%"

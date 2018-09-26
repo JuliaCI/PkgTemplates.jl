@@ -2,8 +2,12 @@ __precompile__()
 module PkgTemplates
 
 using AutoHashEquals
+using Dates
+using Distributed
+using InteractiveUtils
+using LibGit2
 using Mustache
-using TerminalMenus
+using REPL.TerminalMenus
 using URIParser
 
 export

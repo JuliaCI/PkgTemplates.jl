@@ -1,22 +1,22 @@
 """
-    Coveralls(; config_file::Union{AbstractString, Void}=nothing) -> Coveralls
+    Coveralls(; config_file::Union{AbstractString, Nothing}=nothing) -> Coveralls
 
 Add `Coveralls` to a template's plugins to optionally add a `.coveralls.yml` configuration
 file to generated repositories, and an appropriate badge to the README. Also updates the
 `.gitignore` accordingly.
 
 # Keyword Arguments:
-* `config_file::Union{AbstractString, Void}=nothing`: Path to a custom `.coveralls.yml`.
+* `config_file::Union{AbstractString, Nothing}=nothing`: Path to a custom `.coveralls.yml`.
   If left unset, no file will be generated.
 """
 @auto_hash_equals struct Coveralls <: GenericPlugin
     gitignore::Vector{AbstractString}
-    src::Nullable{AbstractString}
+    src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function Coveralls(; config_file::Union{AbstractString, Void}=nothing)
+    function Coveralls(; config_file::Union{AbstractString, Nothing}=nothing)
         if config_file != nothing
             config_file = if isfile(config_file)
                 abspath(config_file)

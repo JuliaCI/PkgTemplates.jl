@@ -1,5 +1,3 @@
-import Base.show
-
 """
 Add a `Documenter` subtype to a template's plugins to add support for documentation
 generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
@@ -25,13 +23,12 @@ function gen_plugin(
         #         assets/file1,
         #         assets/file2,
         #     ]
-        const TAB = repeat(" ", 4)
+        tab = repeat(" ", 4)
         assets_string = "[\n"
         for asset in plugin.assets
-            assets_string *= """$(TAB^2)"assets/$(basename(asset))",\n"""
+            assets_string *= """$(tab^2)"assets/$(basename(asset))",\n"""
         end
-        assets_string *= "$TAB]"
-
+        assets_string *= "$tab]"
     else
         assets_string = "[]"
     end
@@ -57,13 +54,13 @@ function gen_plugin(
     end
     readme_path = joinpath(dir, pkg_name, "README.md")
     if isfile(readme_path)
-        cp(readme_path, joinpath(docs_dir, "index.md"), remove_destination=true)
+        cp(readme_path, joinpath(docs_dir, "index.md"), force=true)
     end
 end
 
-function show(io::IO, p::Documenter)
+function Base.show(io::IO, p::Documenter)
     spc = "  "
-    println(io, "$(Base.datatype_name(typeof(p))):")
+    println(io, "$(nameof(typeof(p))):")
 
     n = length(p.assets)
     s = n == 1 ? "" : "s"
@@ -71,7 +68,7 @@ function show(io::IO, p::Documenter)
     if n == 0
         println(io)
     else
-        println(io, ": $(join(map(a -> replace(a, homedir(), "~"), p.assets), ", "))")
+        println(io, ": $(join(map(a -> replace(a, homedir() => "~"), p.assets), ", "))")
     end
 
     n = length(p.gitignore)
@@ -81,7 +78,7 @@ function show(io::IO, p::Documenter)
 end
 
 function interactive(plugin_type::Type{<:Documenter})
-    t = Base.datatype_name(plugin_type)
+    t = nameof(plugin_type)
     print("$t: Enter any Documenter asset files (separated by spaces) []: ")
     return plugin_type(; assets=String.(split(readline())))
 end

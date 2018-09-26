@@ -7,7 +7,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "Plugin creation" begin
         p = AppVeyor()
         @test isempty(p.gitignore)
-        @test get(p.src, "") == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
+        @test p.src == joinpath(PkgTemplates.DEFAULTS_DIR, "appveyor.yml")
         @test p.dest == ".appveyor.yml"
         @test p.badges == [
             Badge(
@@ -18,9 +18,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         ]
         @test isempty(p.view)
         p = AppVeyor(; config_file=nothing)
-        @test isnull(p.src)
+        @test p.src === nothing
         p = AppVeyor(; config_file=test_file)
-        @test get(p.src, "") == test_file
+        @test p.src == test_file
         @test_throws ArgumentError AppVeyor(; config_file=fake_path)
     end
 
@@ -30,33 +30,39 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     end
 
     @testset "File generation" begin
+        # Without a coverage plugin in the template, there should be no post-test step.
         p = AppVeyor()
         @test gen_plugin(p, t, temp_dir, test_pkg) == [".appveyor.yml"]
         @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
-        appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
-        @test !contains(appveyor, "coverage=true")
-        @test !contains(appveyor, "after_test")
-        @test !contains(appveyor, "Codecov.submit")
-        @test !contains(appveyor, "Coveralls.submit")
+        appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
+        @test !occursin("coverage=true", appveyor)
+        @test !occursin("after_test", appveyor)
+        @test !occursin("Codecov.submit", appveyor)
+        @test !occursin("Coveralls.submit", appveyor)
         rm(joinpath(pkg_dir, ".appveyor.yml"))
+
+        # Generating the plugin with CodeCov in the template should create a post-test step.
         t.plugins[CodeCov] = CodeCov()
         gen_plugin(p, t, temp_dir, test_pkg)
         delete!(t.plugins, CodeCov)
-        appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
-        @test contains(appveyor, "coverage=true")
-        @test contains(appveyor, "after_test")
-        @test contains(appveyor, "Codecov.submit")
-        @test !contains(appveyor, "Coveralls.submit")
+        appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
+        @test occursin("coverage=true", appveyor)
+        @test occursin("after_test", appveyor)
+        @test occursin("Codecov.submit", appveyor)
+        @test !occursin("Coveralls.submit", appveyor)
         rm(joinpath(pkg_dir, ".appveyor.yml"))
+
+        # Coveralls should do the same.
         t.plugins[Coveralls] = Coveralls()
         gen_plugin(p, t, temp_dir, test_pkg)
         delete!(t.plugins, Coveralls)
-        appveyor = readstring(joinpath(pkg_dir, ".appveyor.yml"))
-        @test contains(appveyor, "coverage=true")
-        @test contains(appveyor, "after_test")
-        @test contains(appveyor, "Coveralls.submit")
-        @test !contains(appveyor, "Codecov.submit")
+        appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
+        @test occursin("coverage=true", appveyor)
+        @test occursin("after_test", appveyor)
+        @test occursin("Coveralls.submit", appveyor)
+        @test !occursin("Codecov.submit", appveyor)
         rm(joinpath(pkg_dir, ".appveyor.yml"))
+
         p = AppVeyor(; config_file=nothing)
         @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
         @test !isfile(joinpath(pkg_dir, ".appveyor.yml"))
