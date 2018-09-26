@@ -50,7 +50,6 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         @test gen_plugin(p, t, temp_dir, test_pkg) == [".gitlab-ci.yml"]
         @test isfile(joinpath(pkg_dir, ".gitlab-ci.yml"))
         gitlab = read(joinpath(pkg_dir, ".gitlab-ci.yml"), String)
-        @test occursin("test_template", gitlab)
         # The default plugin should enable the coverage step.
         @test occursin("using Coverage", gitlab)
         rm(joinpath(pkg_dir, ".gitlab-ci.yml"))

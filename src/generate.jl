@@ -289,6 +289,10 @@ function substitute(
     )
     # d["AFTER"] is true whenever something needs to occur in a CI "after_script".
     d["AFTER"] = d["DOCUMENTER"] || d["CODECOV"] || d["COVERALLS"]
+    # d["COVERAGE"] is true whenever a coverage plugin is enabled.
+    # TODO: This doesn't handle user-defined coverage plugins.
+    # Maybe we need an abstract CoveragePlugin <: GenericPlugin?
+    d["COVERAGE"] = d["CODECOV"] || d["COVERALLS"]
     return substitute(template, merge(d, view))
 end
 

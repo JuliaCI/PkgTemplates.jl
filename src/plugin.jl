@@ -257,7 +257,7 @@ function interactive(
     plugin_type::Type{<:GenericPlugin};
     file::Union{AbstractString, Nothing}="",
 )
-    plugin_name = String(split(string(plugin_type), ".")[end])
+    plugin_name = string(nameof(plugin_type))
     # By default, we expect the default plugin file template for a plugin called
     # "MyPlugin" to be called "myplugin.yml".
     fn = file != nothing && isempty(file) ? "$(lowercase(plugin_name)).yml" : file

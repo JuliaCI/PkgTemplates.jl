@@ -34,10 +34,8 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         @test gen_plugin(p, t, temp_dir, test_pkg) == [".appveyor.yml"]
         @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
         appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
-        @test !occursin("coverage=true", appveyor)
-        @test !occursin("after_test", appveyor)
-        @test !occursin("Codecov.submit", appveyor)
-        @test !occursin("Coveralls.submit", appveyor)
+        @test !occursin("on_success", appveyor)
+        @test !occursin("%JL_CODECOV_SCRIPT%", appveyor)
         rm(joinpath(pkg_dir, ".appveyor.yml"))
 
         # Generating the plugin with CodeCov in the template should create a post-test step.
@@ -45,22 +43,11 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         gen_plugin(p, t, temp_dir, test_pkg)
         delete!(t.plugins, CodeCov)
         appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
-        @test occursin("coverage=true", appveyor)
-        @test occursin("after_test", appveyor)
-        @test occursin("Codecov.submit", appveyor)
-        @test !occursin("Coveralls.submit", appveyor)
+        @test occursin("on_success", appveyor)
+        @test occursin("%JL_CODECOV_SCRIPT%", appveyor)
         rm(joinpath(pkg_dir, ".appveyor.yml"))
 
-        # Coveralls should do the same.
-        t.plugins[Coveralls] = Coveralls()
-        gen_plugin(p, t, temp_dir, test_pkg)
-        delete!(t.plugins, Coveralls)
-        appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
-        @test occursin("coverage=true", appveyor)
-        @test occursin("after_test", appveyor)
-        @test occursin("Coveralls.submit", appveyor)
-        @test !occursin("Codecov.submit", appveyor)
-        rm(joinpath(pkg_dir, ".appveyor.yml"))
+        # TODO: Add Coveralls tests when AppVeyor.jl supports it.
 
         p = AppVeyor(; config_file=nothing)
         @test isempty(gen_plugin(p, t, temp_dir, test_pkg))

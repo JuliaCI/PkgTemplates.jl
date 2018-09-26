@@ -17,6 +17,5 @@ before_script:
   - git config --global user.name "Travis"
   - git config --global user.email "travis@example.com"
 after_success:
-  - julia -e 'using Pkg; Pkg.add("Coverage")'
-  - julia -e 'using Coverage; CodeCov.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; CodeCov.submit(process_folder())'
   - julia -e 'using Pkg; Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'

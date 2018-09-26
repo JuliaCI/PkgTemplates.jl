@@ -58,7 +58,7 @@ function gen_plugin(
                 deploydocs(;
                     repo="github.com/$(template.user)/$pkg_name.jl",
                     target="build",
-                    julia="0.6",
+                    julia="1.0",
                     deps=nothing,
                     make=nothing,
                 )
