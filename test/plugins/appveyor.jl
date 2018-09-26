@@ -1,4 +1,3 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
 temp_dir = mktempdir()
 pkg_dir = joinpath(temp_dir, test_pkg)
@@ -26,7 +25,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = AppVeyor()
-        @test badges(p, user, test_pkg) == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/$user/$test_pkg.jl?svg=true)](https://ci.appveyor.com/project/$user/$test_pkg-jl)"]
+        @test badges(p, me, test_pkg) == ["[![Build Status](https://ci.appveyor.com/api/projects/status/github/$me/$test_pkg.jl?svg=true)](https://ci.appveyor.com/project/$me/$test_pkg-jl)"]
     end
 
     @testset "File generation" begin

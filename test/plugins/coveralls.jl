@@ -1,4 +1,3 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
 temp_dir = mktempdir()
 pkg_dir = joinpath(temp_dir, test_pkg)
@@ -26,7 +25,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = Coveralls()
-        @test badges(p, user, test_pkg) == ["[![Coveralls](https://coveralls.io/repos/github/$user/$test_pkg.jl/badge.svg?branch=master)](https://coveralls.io/github/$user/$test_pkg.jl?branch=master)"]
+        @test badges(p, me, test_pkg) == ["[![Coveralls](https://coveralls.io/repos/github/$me/$test_pkg.jl/badge.svg?branch=master)](https://coveralls.io/github/$me/$test_pkg.jl?branch=master)"]
     end
 
     @testset "File generation" begin

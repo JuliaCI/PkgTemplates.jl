@@ -1,4 +1,3 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
 temp_dir = mktempdir()
 pkg_dir = joinpath(temp_dir, test_pkg)
@@ -26,7 +25,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = CodeCov()
-        @test badges(p, user, test_pkg) == ["[![CodeCov](https://codecov.io/gh/$user/$test_pkg.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$user/$test_pkg.jl)"]
+        @test badges(p, me, test_pkg) == ["[![CodeCov](https://codecov.io/gh/$me/$test_pkg.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$me/$test_pkg.jl)"]
     end
 
     @testset "File generation" begin

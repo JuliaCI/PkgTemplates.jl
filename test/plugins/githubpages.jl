@@ -1,4 +1,3 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
 temp_dir = mktempdir()
 pkg_dir = joinpath(temp_dir, test_pkg)
@@ -15,9 +14,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = GitHubPages()
-        @test badges(p, user, test_pkg) ==  [
-            "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$user.github.io/$test_pkg.jl/stable)"
-            "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$user.github.io/$test_pkg.jl/latest)"
+        @test badges(p, me, test_pkg) ==  [
+            "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$me.github.io/$test_pkg.jl/stable)"
+            "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$me.github.io/$test_pkg.jl/latest)"
         ]
     end
 
@@ -53,6 +52,23 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
         @test occursin("deploydocs", make)
         rm(joinpath(pkg_dir, "docs"); recursive=true)
+    end
+
+    @testset "Package generation with GitHubPages plugin" begin
+        t = Template(; user=me, plugins=[GitHubPages()])
+        generate(test_pkg, t)
+        pkg_dir = joinpath(default_dir, test_pkg)
+
+        # Check that the gh-pages branch exists.
+        repo = LibGit2.GitRepo(pkg_dir)
+        branches = map(b -> LibGit2.shortname(first(b)), LibGit2.GitBranchIter(repo))
+        @test in("gh-pages", branches)
+
+        # Check that the generated docs root is just the copied README.
+        readme = read(joinpath(pkg_dir, "README.md"), String)
+        index = read(joinpath(pkg_dir, "docs", "src", "index.md"), String)
+        @test readme == index
+        rm(pkg_dir; recursive=true)
     end
 end
 

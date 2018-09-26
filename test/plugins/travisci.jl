@@ -1,4 +1,3 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
 temp_dir = mktempdir()
 pkg_dir = joinpath(temp_dir, test_pkg)
@@ -26,7 +25,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = TravisCI()
-        @test badges(p, user, test_pkg) == ["[![Build Status](https://travis-ci.com/$user/$test_pkg.jl.svg?branch=master)](https://travis-ci.com/$user/$test_pkg.jl)"]
+        @test badges(p, me, test_pkg) == ["[![Build Status](https://travis-ci.com/$me/$test_pkg.jl.svg?branch=master)](https://travis-ci.com/$me/$test_pkg.jl)"]
     end
 
     @testset "File generation" begin

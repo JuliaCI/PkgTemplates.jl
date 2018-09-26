@@ -1,4 +1,3 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
 temp_dir = mktempdir()
 pkg_dir = joinpath(temp_dir, test_pkg)
@@ -40,9 +39,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = GitLabCI()
-        @test badges(p, user, test_pkg) == [
-	    	"[![Build Status](https://gitlab.com/$user/$test_pkg.jl/badges/master/build.svg)](https://gitlab.com/$user/$test_pkg.jl/pipelines)",
-			"[![Coverage](https://gitlab.com/$user/$test_pkg.jl/badges/master/coverage.svg)](https://gitlab.com/$user/$test_pkg.jl/commits/master)",
+        @test badges(p, me, test_pkg) == [
+	    	"[![Build Status](https://gitlab.com/$me/$test_pkg.jl/badges/master/build.svg)](https://gitlab.com/$me/$test_pkg.jl/pipelines)",
+			"[![Coverage](https://gitlab.com/$me/$test_pkg.jl/badges/master/coverage.svg)](https://gitlab.com/$me/$test_pkg.jl/commits/master)",
 		]
     end
 
