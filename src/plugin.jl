@@ -148,9 +148,6 @@ and [`interactive`](@ref) can be implemented using [`substitute`](@ref),
 Often, the contents of the config file that your plugin generates depends on variables like
 the package name, the user's username, etc. Template files (which are stored in `defaults`)
 can use [here](https://github.com/jverzani/Mustache.jl)'s syntax to define replacements.
-
-**Note**: Due to a bug in `Mustache`, conditionals can insert undesired newlines
-(more detail [here](https://github.com/jverzani/Mustache.jl/issues/47)).
 """
 abstract type CustomPlugin <: Plugin end
 
@@ -171,7 +168,7 @@ A `Badge` contains the data necessary to generate a Markdown badge.
 end
 
 """
-    format(b::Badge)
+    format(b::Badge) -> String
 
 Return `badge`'s data formatted as a Markdown string.
 """
