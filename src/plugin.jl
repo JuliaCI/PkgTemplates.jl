@@ -87,7 +87,8 @@ end
 """
 Custom plugins are plugins whose behaviour does not follow the [`GenericPlugin`](@ref)
 pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
-[`interactive`](@ref) in any way they choose.
+[`interactive`](@ref) in any way they choose, as long as they conform to the usual type
+signature.
 
 # Attributes
 * `gitignore::Vector{AbstractString}`: Array of patterns to be added to the `.gitignore` of
@@ -102,24 +103,19 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
     MyPlugin() = new([], rand() > 0.8)
 
     function gen_plugin(p::MyPlugin, t::Template, pkg_name::AbstractString)
-        if plugin.lucky
-            text = substitute(
-                "You got lucky with {{PKGNAME}}, {{USER}}!",
-                template,
-            )
-            gen_file(joinpath(dir, pkg_name, ".myplugin.yml"), text)
+        return if p.lucky
+            text = substitute("You got lucky with {{PKGNAME}}, {{USER}}!", t)
+            gen_file(joinpath(t.dir, pkg_name, ".myplugin.yml"), text)
+            [".myplugin.yml"]
         else
             println("Maybe next time.")
+            String[]
         end
     end
 
-    function badges(
-        plugin::MyPlugin,
-        user::AbstractString,
-        pkg_name::AbstractString,
-    )
-        if plugin.lucky
-            return [
+    function badges(p::MyPlugin, user::AbstractString, pkg_name::AbstractString)
+        return if p.lucky
+            [
                 format(Badge(
                     "You got lucky!",
                     "https://myplugin.com/badge.png",
@@ -127,12 +123,12 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
                 )),
             ]
         else
-            return String[]
+            String[]
         end
     end
 end
 
-interactive(t:Type{MyPlugin}) = MyPlugin()
+interactive(:Type{MyPlugin}) = MyPlugin()
 ```
 
 This plugin doesn't do much, but it demonstrates how [`gen_plugin`](@ref), [`badges`](@ref)
