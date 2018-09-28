@@ -30,7 +30,7 @@ pkg_dir = joinpath(t.dir, test_pkg)
         @test isdir(joinpath(pkg_dir, "docs", "src"))
         @test isfile(joinpath(pkg_dir, "docs", "src", "index.md"))
         index = readchomp(joinpath(pkg_dir, "docs", "src", "index.md"))
-        @test index == "# $test_pkg"
+        @test occursin("autodocs", index)
         rm(joinpath(pkg_dir, "docs"); recursive=true)
         p = GitHubPages(; assets=[test_file])
         @test gen_plugin(p, t, test_pkg) == ["docs/"]
@@ -57,18 +57,11 @@ pkg_dir = joinpath(t.dir, test_pkg)
         temp_dir = mktempdir()
         t = Template(; user=me, dir=temp_dir, plugins=[GitHubPages()])
         generate(test_pkg, t)
-        pkg_dir = joinpath(t.dir, test_pkg)
 
         # Check that the gh-pages branch exists.
-        repo = LibGit2.GitRepo(pkg_dir)
+        repo = LibGit2.GitRepo(joinpath(t.dir, test_pkg))
         branches = map(b -> LibGit2.shortname(first(b)), LibGit2.GitBranchIter(repo))
         @test in("gh-pages", branches)
-
-        # Check that the generated docs root is just the copied README.
-        readme = read(joinpath(pkg_dir, "README.md"), String)
-        index = read(joinpath(pkg_dir, "docs", "src", "index.md"), String)
-        @test readme == index
-        rm(temp_dir; recursive=true)
     end
 end
 

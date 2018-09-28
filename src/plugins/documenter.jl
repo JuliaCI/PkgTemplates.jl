@@ -32,7 +32,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         "[]"
     end
 
-    text = """
+    make = """
         using Documenter, $pkg_name
 
         makedocs(;
@@ -47,16 +47,19 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
             assets=$assets_string,
         )
         """
+    docs = """
+    # $pkg_name.jl
 
-    gen_file(joinpath(dirname(docs_dir), "make.jl"), text)
+    ```@index
+    ```
 
-    # If the README exists, use it as the default docs.
-    readme_path = joinpath(t.dir, pkg_name, "README.md")
-    if isfile(readme_path)
-        cp(readme_path, joinpath(docs_dir, "index.md"))
-    else
-        gen_file(joinpath(docs_dir,  "index.md"), "# $pkg_name")
-    end
+    ```@autodocs
+    Modules = [$pkg_name]
+    ```
+    """
+
+    gen_file(joinpath(dirname(docs_dir), "make.jl"), make)
+    gen_file(joinpath(docs_dir, "index.md"), docs)
 end
 
 function Base.show(io::IO, p::Documenter)
