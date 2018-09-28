@@ -1,6 +1,5 @@
 t = Template(; user=me)
-temp_dir = mktempdir()
-pkg_dir = joinpath(temp_dir, test_pkg)
+pkg_dir = joinpath(t.dir, test_pkg)
 
 @testset "GitHubPages" begin
     @testset "Plugin creation" begin
@@ -22,7 +21,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "File generation" begin
         p = GitHubPages()
-        @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
+        @test gen_plugin(p, t, test_pkg) == ["docs/"]
         @test isdir(joinpath(pkg_dir, "docs"))
         @test isfile(joinpath(pkg_dir, "docs", "make.jl"))
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
@@ -34,7 +33,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         @test index == "# $test_pkg"
         rm(joinpath(pkg_dir, "docs"); recursive=true)
         p = GitHubPages(; assets=[test_file])
-        @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
+        @test gen_plugin(p, t, test_pkg) == ["docs/"]
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
         # Check the formatting of the assets list.
         @test occursin(
@@ -48,16 +47,17 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         @test isfile(joinpath(pkg_dir, "docs", "src", "assets", basename(test_file)))
         rm(joinpath(pkg_dir, "docs"); recursive=true)
         t.plugins[TravisCI] = TravisCI()
-        @test gen_plugin(p, t, temp_dir, test_pkg) == ["docs/"]
+        @test gen_plugin(p, t, test_pkg) == ["docs/"]
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
         @test occursin("deploydocs", make)
         rm(joinpath(pkg_dir, "docs"); recursive=true)
     end
 
     @testset "Package generation with GitHubPages plugin" begin
-        t = Template(; user=me, plugins=[GitHubPages()])
+        temp_dir = mktempdir()
+        t = Template(; user=me, dir=temp_dir, plugins=[GitHubPages()])
         generate(test_pkg, t)
-        pkg_dir = joinpath(default_dir, test_pkg)
+        pkg_dir = joinpath(t.dir, test_pkg)
 
         # Check that the gh-pages branch exists.
         repo = LibGit2.GitRepo(pkg_dir)
@@ -68,8 +68,8 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         readme = read(joinpath(pkg_dir, "README.md"), String)
         index = read(joinpath(pkg_dir, "docs", "src", "index.md"), String)
         @test readme == index
-        rm(pkg_dir; recursive=true)
+        rm(temp_dir; recursive=true)
     end
 end
 
-rm(temp_dir; recursive=true)
+rm(pkg_dir; recursive=true)

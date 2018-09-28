@@ -1,6 +1,5 @@
 t = Template(; user=me)
-temp_dir = mktempdir()
-pkg_dir = joinpath(temp_dir, test_pkg)
+pkg_dir = joinpath(t.dir, test_pkg)
 
 @testset "AppVeyor" begin
     @testset "Plugin creation" begin
@@ -31,7 +30,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "File generation" begin
         # Without a coverage plugin in the template, there should be no post-test step.
         p = AppVeyor()
-        @test gen_plugin(p, t, temp_dir, test_pkg) == [".appveyor.yml"]
+        @test gen_plugin(p, t, test_pkg) == [".appveyor.yml"]
         @test isfile(joinpath(pkg_dir, ".appveyor.yml"))
         appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
         @test !occursin("on_success", appveyor)
@@ -40,7 +39,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
         # Generating the plugin with CodeCov in the template should create a post-test step.
         t.plugins[CodeCov] = CodeCov()
-        gen_plugin(p, t, temp_dir, test_pkg)
+        gen_plugin(p, t, test_pkg)
         delete!(t.plugins, CodeCov)
         appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
         @test occursin("on_success", appveyor)
@@ -50,9 +49,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         # TODO: Add Coveralls tests when AppVeyor.jl supports it.
 
         p = AppVeyor(; config_file=nothing)
-        @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+        @test isempty(gen_plugin(p, t, test_pkg))
         @test !isfile(joinpath(pkg_dir, ".appveyor.yml"))
     end
 end
 
-rm(temp_dir; recursive=true)
+rm(pkg_dir; recursive=true)

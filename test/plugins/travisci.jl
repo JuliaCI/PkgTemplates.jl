@@ -1,6 +1,5 @@
 t = Template(; user=me)
-temp_dir = mktempdir()
-pkg_dir = joinpath(temp_dir, test_pkg)
+pkg_dir = joinpath(t.dir, test_pkg)
 
 @testset "TravisCI" begin
     @testset "Plugin creation" begin
@@ -31,7 +30,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
     @testset "File generation" begin
         # Without a coverage plugin in the template, there should be no post-test step.
         p = TravisCI()
-        @test gen_plugin(p, t, temp_dir, test_pkg) == [".travis.yml"]
+        @test gen_plugin(p, t, test_pkg) == [".travis.yml"]
         @test isfile(joinpath(pkg_dir, ".travis.yml"))
         travis = read(joinpath(pkg_dir, ".travis.yml"), String)
 
@@ -43,7 +42,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
         # Generating the plugin with CodeCov in the template should create a post-test step.
         t.plugins[CodeCov] = CodeCov()
-        gen_plugin(p, t, temp_dir, test_pkg)
+        gen_plugin(p, t, test_pkg)
         delete!(t.plugins, CodeCov)
         travis = read(joinpath(pkg_dir, ".travis.yml"), String)
         @test occursin("after_success", travis)
@@ -54,7 +53,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
         # Coveralls should do the same.
         t.plugins[Coveralls] = Coveralls()
-        gen_plugin(p, t, temp_dir, test_pkg)
+        gen_plugin(p, t, test_pkg)
         delete!(t.plugins, Coveralls)
         travis = read(joinpath(pkg_dir, ".travis.yml"), String)
         @test occursin("after_success", travis)
@@ -65,7 +64,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
         # With a Documenter plugin, there should be a docs deployment step.
         t.plugins[GitHubPages] = GitHubPages()
-        gen_plugin(p, t, temp_dir, test_pkg)
+        gen_plugin(p, t, test_pkg)
         delete!(t.plugins, GitHubPages)
         travis = read(joinpath(pkg_dir, ".travis.yml"), String)
         @test occursin("after_success", travis)
@@ -75,9 +74,9 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         rm(joinpath(pkg_dir, ".travis.yml"))
 
         p = TravisCI(; config_file=nothing)
-        @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+        @test isempty(gen_plugin(p, t, test_pkg))
         @test !isfile(joinpath(pkg_dir, ".travis.yml"))
     end
 end
 
-rm(temp_dir; recursive=true)
+rm(pkg_dir; recursive=true)

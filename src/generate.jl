@@ -43,7 +43,7 @@ function generate(pkg_name::AbstractString, t::Template)
             gen_readme(pkg_dir, t),
             gen_gitignore(pkg_dir, t),
             gen_license(pkg_dir, t),
-            vcat(map(p -> gen_plugin(p, t, t.dir, pkg_name), values(t.plugins))...),
+            vcat(map(p -> gen_plugin(p, t, pkg_name), values(t.plugins))...),
         )
 
         LibGit2.add!(repo, files...)

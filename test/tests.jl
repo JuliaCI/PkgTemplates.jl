@@ -368,8 +368,7 @@ end
 
 @testset "Plugins" begin
     t = Template(; user=me)
-    temp_dir = mktempdir()
-    pkg_dir = joinpath(temp_dir, test_pkg)
+    pkg_dir = joinpath(t.dir, test_pkg)
 
     # Check badge constructor and formatting.
     badge = Badge("A", "B", "C")
@@ -380,11 +379,11 @@ end
 
     p = Bar()
     @test isempty(badges(p, me, test_pkg))
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+    @test isempty(gen_plugin(p, t, test_pkg))
 
     p = Baz()
     @test isempty(badges(p, me, test_pkg))
-    @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+    @test isempty(gen_plugin(p, t, test_pkg))
 
     include(joinpath("plugins", "travisci.jl"))
     include(joinpath("plugins", "appveyor.jl"))
@@ -392,8 +391,6 @@ end
     include(joinpath("plugins", "codecov.jl"))
     include(joinpath("plugins", "coveralls.jl"))
     include(joinpath("plugins", "githubpages.jl"))
-
-    rm(temp_dir; recursive=true)
 end
 
 rm(test_file)

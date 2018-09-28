@@ -1,6 +1,5 @@
 t = Template(; user=me)
-temp_dir = mktempdir()
-pkg_dir = joinpath(temp_dir, test_pkg)
+pkg_dir = joinpath(t.dir, test_pkg)
 
 @testset "GitLabCI" begin
     @testset "Plugin creation" begin
@@ -47,7 +46,7 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "File generation" begin
         p = GitLabCI()
-        @test gen_plugin(p, t, temp_dir, test_pkg) == [".gitlab-ci.yml"]
+        @test gen_plugin(p, t, test_pkg) == [".gitlab-ci.yml"]
         @test isfile(joinpath(pkg_dir, ".gitlab-ci.yml"))
         gitlab = read(joinpath(pkg_dir, ".gitlab-ci.yml"), String)
         # The default plugin should enable the coverage step.
@@ -55,16 +54,16 @@ pkg_dir = joinpath(temp_dir, test_pkg)
         rm(joinpath(pkg_dir, ".gitlab-ci.yml"))
 
         p = GitLabCI(; coverage=false)
-        gen_plugin(p, t, temp_dir, test_pkg)
+        gen_plugin(p, t, test_pkg)
         gitlab = read(joinpath(pkg_dir, ".gitlab-ci.yml"), String)
         # If coverage is false, there should be no coverage step.
         @test !occursin("using Coverage", gitlab)
         rm(joinpath(pkg_dir, ".gitlab-ci.yml"))
         p = GitLabCI(; config_file=nothing)
 
-        @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+        @test isempty(gen_plugin(p, t, test_pkg))
         @test !isfile(joinpath(pkg_dir, ".gitlab-ci.yml"))
     end
 end
 
-rm(temp_dir; recursive=true)
+rm(pkg_dir; recursive=true)
