@@ -36,7 +36,7 @@ t = Template(;
     license="MIT",
     authors=["Chris de Graaf", "Invenia Technical Computing Corporation"],
     dir=joinpath(homedir(), "code"),
-    julia_version=v"0.5.2",
+    julia_version=v"0.7",
     ssh=true,
     plugins=[
         TravisCI(),

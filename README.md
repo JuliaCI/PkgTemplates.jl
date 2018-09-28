@@ -77,7 +77,7 @@ julia> t = Template(;
            license="ISC",
            authors=["Chris de Graaf", "Invenia Technical Computing Corporation"],
            dir=joinpath(homedir(), "code"),
-           julia_version=v"0.6",
+           julia_version=v"0.7",
            plugins=[
                TravisCI(),
                CodeCov(),
@@ -91,7 +91,7 @@ Template:
   → Host: github.com
   → License: ISC (Chris de Graaf, Invenia Technical Computing Corporation 2018)
   → Package directory: ~/code
-  → Minimum Julia version: v0.6
+  → Minimum Julia version: v0.7
   → SSH remote: No
   → Plugins:
     • AppVeyor:
