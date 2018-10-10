@@ -12,9 +12,6 @@ matrix:
   fast_finish: true
 notifications:
   email: false
-{{#COVERAGE}}
-script: julia -e 'using Pkg; Pkg.build(); Pkg.test(; coverage=true)'
-{{/COVERAGE}}
 {{#AFTER}}
 after_success:
 {{#CODECOV}}
