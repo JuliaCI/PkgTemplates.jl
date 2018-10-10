@@ -157,7 +157,7 @@ Information on each keyword as well as plugin types can be found in the
 If that looks like a lot of work, you can also create templates interactively
 with `interactive_template`:
 
-[![asciicast](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8.png)](https://asciinema.org/a/bqBwff05mI7Cl9bz7EqLPMKF8)
+[![asciicast](https://asciinema.org/a/31bZqW9u8h5RHpd7gtsemioRV.png)](https://asciinema.org/a/31bZqW9u8h5RHpd7gtsemioRV)
 
 And if that's **still** too much work for you, you can call
 `interactive_template` with `fast=true` to use default values for everything
