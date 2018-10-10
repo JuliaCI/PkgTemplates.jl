@@ -63,14 +63,16 @@ end
 generate(t::Template, pkg_name::AbstractString) = generate(pkg_name, t)
 
 """
-    generate_interactive(pkg::AbstractString; fast::Bool=false) -> Nothing
+    generate_interactive(pkg::AbstractString; fast::Bool=false) -> Template
 
 Interactively create a template, and then generate a package with it. Arguments and
 keywords are used in the same way as in [`generate`](@ref) and
 [`interactive_template`](@ref).
 """
 function generate_interactive(pkg::AbstractString; fast::Bool=false)
-    generate(pkg, interactive_template(; fast=fast))
+    t = interactive_template(; fast=fast)
+    generate(pkg, t)
+    return t
 end
 
 """
