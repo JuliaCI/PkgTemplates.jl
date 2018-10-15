@@ -12,34 +12,24 @@ Records common information used to generate a package. If you don't wish to manu
 create a template, you can use [`interactive_template`](@ref) instead.
 
 # Keyword Arguments
-* `user::AbstractString=""`: GitHub username. If left  unset, it will try to take the
-  value of a supplied git config's "github.user" key, then the global git config's
-  value. If neither is set, an `ArgumentError` is thrown.
-  **This is case-sensitive for some plugins, so take care to enter it correctly.**
+* `user::AbstractString=""`: GitHub (or other code hosting service) username. If left
+  unset, it will take the the global git config's value. If that is not set, an
+  `ArgumentError` is thrown. **This is case-sensitive for some plugins, so take care to
+  enter it correctly.**
 * `host::AbstractString="github.com"`: URL to the code hosting service where your package
   will reside. Note that while hosts other than GitHub won't cause errors, they are not
   officially supported and they will cause certain plugins will produce incorrect output.
-  For example, [`AppVeyor`](@ref)'s badge image will point to a GitHub-specific URL,
-  regardless of the value of `host`.
 * `license::AbstractString="MIT"`: Name of the package license. If an empty string is
   given, no license is created. [`available_licenses`](@ref) can be used to list all
   available licenses, and [`show_license`](@ref) can be used to print out a particular
   license's text.
 * `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the
   license. Supply a string for one author or an array for multiple. Similarly to `user`,
-  it will try to take the value of a supplied git config's "user.name" key, then the global
-  git config's value, if it is left unset.
-* `years::Union{Integer, AbstractString}=$(Dates.year(Dates.today()))`: Copyright years on
-  the license. Can be supplied by a number, or a string such as "2016 - 2017".
+  it will take the value of of the global git config's value if it is left unset.
 * `dir::AbstractString=$(dev_dir())`: Directory in which the package will go. Relative
   paths are converted to absolute ones at template creation time.
-* `precompile::Bool=true`: Whether or not to enable precompilation in generated packages.
 * `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
-* `requirements::Vector{<:AbstractString}=String[]`: Package requirements. If there are
-  duplicate requirements with different versions, i.e. ["PkgTemplates", "PkgTemplates
-  0.1"], an `ArgumentError` is thrown. Each entry in this array will be copied into the
-  `REQUIRE` file of packages generated with this template.
-* `gitconfig::Dict=Dict()`: Git configuration options.
+* `ssh::Bool=false`: Whether or not to use SSH for the remote.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
 @auto_hash_equals struct Template
@@ -47,12 +37,9 @@ create a template, you can use [`interactive_template`](@ref) instead.
     host::AbstractString
     license::AbstractString
     authors::AbstractString
-    years::AbstractString
     dir::AbstractString
-    precompile::Bool
     julia_version::VersionNumber
-    requirements::Vector{AbstractString}
-    gitconfig::Dict
+    ssh::Bool
     plugins::Dict{DataType, Plugin}
 
     function Template(;
@@ -60,18 +47,24 @@ create a template, you can use [`interactive_template`](@ref) instead.
         host::AbstractString="https://github.com",
         license::AbstractString="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
-        years::Union{Integer, AbstractString}=Dates.year(Dates.today()),
         dir::AbstractString=dev_dir(),
-        precompile::Bool=true,
         julia_version::VersionNumber=VERSION,
-        requirements::Vector{<:AbstractString}=String[],
-        gitconfig::Dict=Dict(),
+        ssh::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
     )
-        # If no username was set, look for one in a supplied git config,
-        # and then in the global git config.
+        # Check for required Git options for package generation
+        # (you can't commit to a repository without them).
+        if isempty(LibGit2.getconfig("user.name", ""))
+            @warn "Git config option 'user.name' missing, package generation will fail"
+        end
+        if isempty(LibGit2.getconfig("user.email", ""))
+            @warn "Git config option 'user.email' missing, package generation will fail"
+        end
+
+        # If no username was set, look for one in the global git config.
+        # Note: This is one of a few GitHub specifics.
         if isempty(user)
-            user = get(gitconfig, "github.user", LibGit2.getconfig("github.user", ""))
+            user = LibGit2.getconfig("github.user", "")
         end
         if isempty(user)
             throw(ArgumentError("No GitHub username found, set one with user=username"))
@@ -83,79 +76,42 @@ create a template, you can use [`interactive_template`](@ref) instead.
             throw(ArgumentError("License '$license' is not available"))
         end
 
-        # If no author was set, look for one in the supplied git config,
-        # and then in the global git config.
+        # If no author was set, look for one in the global git config.
         if isempty(authors)
-            authors = get(gitconfig, "user.name", LibGit2.getconfig("user.name", ""))
+            authors = LibGit2.getconfig("user.name", "")
         elseif isa(authors, Vector)
             authors = join(authors, ", ")
         end
 
-        years = string(years)
-
         dir = abspath(expanduser(dir))
-
-        requirements_dedup = collect(Set(requirements))
-        diff = length(requirements) - length(requirements_dedup)
-        names = map(t -> first(t), split.(requirements_dedup))
-        if length(names) > length(Set(names))
-            throw(ArgumentError(
-                "requirements contains duplicate packages with conflicting versions"
-            ))
-        elseif diff > 0
-            @warn "Removed $(diff) duplicate$(diff == 1 ? "" : "s") from requirements"
-        end
 
         plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
         if (length(plugins) != length(plugin_dict))
             @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
-        new(
-            user, host, license, authors, years, dir, precompile,
-            julia_version, requirements_dedup, gitconfig, plugin_dict,
-        )
+        new(user, host, license, authors, dir, julia_version, ssh, plugin_dict)
     end
 end
 
 function Base.show(io::IO, t::Template)
-    maybe_none(s::AbstractString) = isempty(string(s)) ? "None" : string(s)
+    maybe(s::AbstractString) = isempty(string(s)) ? "None" : string(s)
     spc = "  "
 
     println(io, "Template:")
-    println(io, "$spc→ User: $(maybe_none(t.user))")
-    println(io, "$spc→ Host: $(maybe_none(t.host))")
+    println(io, "$spc→ User: $(maybe(t.user))")
+    println(io, "$spc→ Host: $(maybe(t.host))")
 
     print(io, "$spc→ License: ")
     if isempty(t.license)
         println(io, "None")
     else
-        println(io, "$(t.license) ($(t.authors) $(t.years))")
+        println(io, "$(t.license) ($(t.authors) $(Dates.year(Dates.now())))")
     end
 
-    println(io, "$spc→ Package directory: $(replace(maybe_none(t.dir), homedir() => "~"))")
-    println(io, "$spc→ Precompilation enabled: $(t.precompile ? "Yes" : "No")")
+    println(io, "$spc→ Package directory: $(replace(maybe(t.dir), homedir() => "~"))")
     println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
-
-    n = length(t.requirements)
-    s = n == 1 ? "" : "s"
-    print(io, "$spc→ $n package requirement$s")
-
-    if isempty(t.requirements)
-        println(io)
-    else
-        println(io, ": $(join(t.requirements, ", "))")
-    end
-
-    print(io, "$spc→ Git configuration options:")
-    if isempty(t.gitconfig)
-        println(io, " None")
-    else
-        println(io)
-        for k in sort(collect(keys(t.gitconfig)); by=string)
-            println(io, "$(spc^2)• $k = $(t.gitconfig[k])")
-        end
-    end
+    println(io, "$spc→ SSH remote: $(t.ssh ? "Yes" : "No")")
 
     print(io, "$spc→ Plugins:")
     if isempty(t.plugins)
@@ -214,12 +170,11 @@ function interactive_template(; fast::Bool=false)
         menu = RadioMenu(String["None", split(String(take!(io)), "\n")...])
         # If the user breaks out of the menu with Ctrl-c, the result is -1, the absolute
         # value of which correponds to no license.
-        licenses[abs(request(menu))].first
+        first(licenses[abs(request(menu))])
     end
 
-    # We don't need to ask for authors or copyright years if there is no license,
+    # We don't need to ask for authors if there is no license,
     # because the license is the only place that they matter.
-
     kwargs[:authors] = if fast || isempty(kwargs[:license])
         LibGit2.getconfig("user.name", "")
     else
@@ -228,15 +183,6 @@ function interactive_template(; fast::Bool=false)
         print("Enter the package author(s) [$default_str]: ")
         authors = readline()
         isempty(authors) ? default_authors : authors
-    end
-
-    kwargs[:years] = if fast || isempty(kwargs[:license])
-        Dates.year(Dates.today())
-    else
-        default_years = Dates.year(Dates.today())
-        print("Enter the copyright year(s) [$default_years]: ")
-        years = readline()
-        isempty(years) ? default_years : years
     end
 
     kwargs[:dir] = if fast
@@ -248,13 +194,6 @@ function interactive_template(; fast::Bool=false)
         isempty(dir) ? default_dir : dir
     end
 
-    kwargs[:precompile] = if fast
-        true
-    else
-        print("Enable precompilation? [yes]: ")
-        !in(uppercase(readline()), ["N", "NO", "F", "FALSE"])
-    end
-
     kwargs[:julia_version] = if fast
         VERSION
     else
@@ -264,28 +203,11 @@ function interactive_template(; fast::Bool=false)
         isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
     end
 
-    kwargs[:requirements] = if fast
-        String[]
+    kwargs[:ssh] = if fast
+        false
     else
-        print("Enter any Julia package requirements, (separated by spaces) []: ")
-        String.(split(readline()))
-    end
-
-    kwargs[:gitconfig] = if fast
-        Dict()
-    else
-        gitconfig = Dict()
-        print("Enter any Git key-value pairs (one per line, separated by spaces) [None]: ")
-        while true
-            line = readline()
-            isempty(line) && break
-            tokens = split(line, " ", limit=2)
-            if haskey(gitconfig, tokens[1])
-                @warn "Duplicate key '$(tokens[1])': Replacing old value '$(tokens[2])'"
-            end
-            gitconfig[tokens[1]] = tokens[2]
-        end
-        gitconfig
+        print("Set remote to SSH? [no]: ")
+        in(uppercase(readline()), ["Y", "YES", "T", "TRUE"])
     end
 
     println("Select plugins:")

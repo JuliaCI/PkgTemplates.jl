@@ -55,11 +55,11 @@ generated repositories, and appropriate badge(s) to the README.
     end
 end
 
-function interactive(plugin_type::Type{GitLabCI})
+function interactive(::Type{GitLabCI})
     name = "GitLabCI"
     kwargs = Dict{Symbol, Any}()
-
     default_config_file = joinpath(DEFAULTS_DIR, "gitlab-ci.yml")
+
     print("$name: Enter the config template filename (\"None\" for no file) ")
     print("[$default_config_file]: ")
     config_file = readline()

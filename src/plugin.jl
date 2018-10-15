@@ -56,7 +56,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
     end
 end
 
-interactive(plugin_type::Type{MyPlugin}) = interactive(plugin_type; file="my-plugin.toml")
+interactive(::Type{MyPlugin}) = interactive(MyPlugin; file="my-plugin.toml")
 ```
 
 The above plugin ignores files ending with `.mgp`, copies `defaults/my-plugin.toml` by
@@ -87,7 +87,8 @@ end
 """
 Custom plugins are plugins whose behaviour does not follow the [`GenericPlugin`](@ref)
 pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
-[`interactive`](@ref) in any way they choose.
+[`interactive`](@ref) in any way they choose, as long as they conform to the usual type
+signature.
 
 # Attributes
 * `gitignore::Vector{AbstractString}`: Array of patterns to be added to the `.gitignore` of
@@ -101,30 +102,20 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
 
     MyPlugin() = new([], rand() > 0.8)
 
-    function gen_plugin(
-        plugin::MyPlugin,
-        template::Template,
-        dir::AbstractString,
-        pkg_name::AbstractString,
-    )
-        if plugin.lucky
-            text = substitute(
-                "You got lucky with {{PKGNAME}}, {{USER}}!",
-                template,
-            )
-            gen_file(joinpath(dir, pkg_name, ".myplugin.yml"), text)
+    function gen_plugin(p::MyPlugin, t::Template, pkg_name::AbstractString)
+        return if p.lucky
+            text = substitute("You got lucky with {{PKGNAME}}, {{USER}}!", t)
+            gen_file(joinpath(t.dir, pkg_name, ".myplugin.yml"), text)
+            [".myplugin.yml"]
         else
             println("Maybe next time.")
+            String[]
         end
     end
 
-    function badges(
-        plugin::MyPlugin,
-        user::AbstractString,
-        pkg_name::AbstractString,
-    )
-        if plugin.lucky
-            return [
+    function badges(p::MyPlugin, user::AbstractString, pkg_name::AbstractString)
+        return if p.lucky
+            [
                 format(Badge(
                     "You got lucky!",
                     "https://myplugin.com/badge.png",
@@ -132,12 +123,12 @@ pattern. They can implement [`gen_plugin`](@ref), [`badges`](@ref), and
                 )),
             ]
         else
-            return String[]
+            String[]
         end
     end
 end
 
-interactive(plugin_type::Type{MyPlugin}) = MyPlugin()
+interactive(:Type{MyPlugin}) = MyPlugin()
 ```
 
 This plugin doesn't do much, but it demonstrates how [`gen_plugin`](@ref), [`badges`](@ref)
@@ -148,9 +139,6 @@ and [`interactive`](@ref) can be implemented using [`substitute`](@ref),
 Often, the contents of the config file that your plugin generates depends on variables like
 the package name, the user's username, etc. Template files (which are stored in `defaults`)
 can use [here](https://github.com/jverzani/Mustache.jl)'s syntax to define replacements.
-
-**Note**: Due to a bug in `Mustache`, conditionals can insert undesired newlines
-(more detail [here](https://github.com/jverzani/Mustache.jl/issues/47)).
 """
 abstract type CustomPlugin <: Plugin end
 
@@ -171,103 +159,80 @@ A `Badge` contains the data necessary to generate a Markdown badge.
 end
 
 """
-    format(b::Badge)
+    format(b::Badge) -> String
 
 Return `badge`'s data formatted as a Markdown string.
 """
 format(b::Badge) = "[![$(b.hover)]($(b.image))]($(b.link))"
 
 """
-    gen_plugin(
-        plugin::Plugin,
-        template::Template,
-        dir::AbstractString,
-        pkg_name::AbstractString
-    ) -> Vector{String}
+    gen_plugin(p::Plugin, t::Template, pkg_name::AbstractString) -> Vector{String}
 
 Generate any files associated with a plugin.
 
 # Arguments
-* `plugin::Plugin`: Plugin whose files are being generated.
-* `template::Template`: Template configuration.
-* `dir::AbstractString`: The directory in which the files will be generated. Note that
-  this will be joined to `pkg_name`.
+* `p::Plugin`: Plugin whose files are being generated.
+* `t::Template`: Template configuration.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of generated file/directory names.
 """
-function gen_plugin(
-    plugin::Plugin,
-    template::Template,
-    dir::AbstractString,
-    pkg_name::AbstractString,
-)
-    return String[]
-end
+gen_plugin(::Plugin, ::Template, ::AbstractString) = String[]
 
-function gen_plugin(
-    plugin::GenericPlugin,
-    template::Template,
-    dir::AbstractString,
-    pkg_name::AbstractString,
-)
-    if plugin.src === nothing
+function gen_plugin(p::GenericPlugin, t::Template, pkg_name::AbstractString)
+    if p.src === nothing
         return String[]
     end
     text = substitute(
-        read(plugin.src, String),
-        template;
-        view=merge(Dict("PKGNAME" => pkg_name), plugin.view),
+        read(p.src, String),
+        t;
+        view=merge(Dict("PKGNAME" => pkg_name), p.view),
     )
-    gen_file(joinpath(dir, pkg_name, plugin.dest), text)
-    return [plugin.dest]
+    gen_file(joinpath(t.dir, pkg_name, p.dest), text)
+    return [p.dest]
 end
 
 """
-    badges(plugin::Plugin, user::AbstractString, pkg_name::AbstractString) -> Vector{String}
+    badges(p::Plugin, user::AbstractString, pkg_name::AbstractString) -> Vector{String}
 
 Generate Markdown badges for the plugin.
 
 # Arguments
-* `plugin::Plugin`: Plugin whose badges we are generating.
+* `p::Plugin`: Plugin whose badges we are generating.
 * `user::AbstractString`: Username of the package creator.
 * `pkg_name::AbstractString`: Name of the package.
 
 Returns an array of Markdown badges.
 """
-badges(plugin::Plugin, user::AbstractString, pkg_name::AbstractString) = String[]
+badges(::Plugin, ::AbstractString, ::AbstractString) = String[]
 
-function badges(plugin::GenericPlugin, user::AbstractString, pkg_name::AbstractString)
+function badges(p::GenericPlugin, user::AbstractString, pkg_name::AbstractString)
     # Give higher priority to replacements defined in the plugin's view.
-    view = merge(Dict("USER" => user, "PKGNAME" => pkg_name), plugin.view)
-    return map(b -> substitute(format(b), view), plugin.badges)
+    view = merge(Dict("USER" => user, "PKGNAME" => pkg_name), p.view)
+    return map(b -> substitute(format(b), view), p.badges)
 end
 
 """
-    interactive(
-        plugin_type::Type{<:Plugin};
-        file::Union{AbstractString, Nothing}="",
-    ) -> Plugin
+    interactive(t::Type{<:Plugin}; file::Union{AbstractString, Nothing}="") -> Plugin
 
-Interactively create a plugin of type `plugin_type`, where `file` is the plugin type's
-default config template with a non-standard name (for `MyPlugin`, this is anything but
+Interactively create a plugin of type `t`, where `file` is the plugin type's default
+config template with a non-standard name (for `MyPlugin`, this is anything but
 "myplugin.yml").
 """
-function interactive(
-    plugin_type::Type{<:GenericPlugin};
-    file::Union{AbstractString, Nothing}="",
-)
-    plugin_name = String(split(string(plugin_type), ".")[end])
+function interactive(t::Type{<:GenericPlugin}; file::Union{AbstractString, Nothing}="")
+    name = string(nameof(t))
     # By default, we expect the default plugin file template for a plugin called
     # "MyPlugin" to be called "myplugin.yml".
-    fn = file != nothing && isempty(file) ? "$(lowercase(plugin_name)).yml" : file
+    fn = file != nothing && isempty(file) ? "$(lowercase(name)).yml" : file
     default_config_file = fn == nothing ? fn : joinpath(DEFAULTS_DIR, fn)
-    print("$plugin_name: Enter the config template filename (\"None\" for no file) ")
+
+    print("$name: Enter the config template filename (\"None\" for no file) ")
     if default_config_file == nothing
         print("[None]: ")
     else
         print("[$(replace(default_config_file, homedir() => "~"))]: ")
     end
+
     config_file = readline()
     config_file = if uppercase(config_file) == "NONE"
         nothing
@@ -276,5 +241,6 @@ function interactive(
     else
         config_file
     end
-    return plugin_type(; config_file=config_file)
+
+    return t(; config_file=config_file)
 end

@@ -1,45 +1,8 @@
-{{#GITLABCOVERAGE}}
-stages:
-  - test
-  - coverage
-
-{{/GITLABCOVERAGE}}
-.test_template: &test_template
-  stage: test
-{{#GITLABCOVERAGE}}
-  artifacts:
-    name: coverage
-    expire_in: 2 hours
-    paths:
-      - coverage/
-{{/GITLABCOVERAGE}}
-  tags:
-    - docker
-  script:
-    - julia -e 'Pkg.clone(pwd()); Pkg.build("{{PKGNAME}}"); Pkg.test("{{PKGNAME}}"{{#GITLABCOVERAGE}}; coverage=true{{/GITLABCOVERAGE}})'
-{{#GITLABCOVERAGE}}
-    - cp -r $(julia -e 'print(Pkg.dir("{{PKGNAME}}", "src"))') coverage
-{{/GITLABCOVERAGE}}
-
 Julia {{VERSION}}:
   image: julia:{{VERSION}}
-  <<: *test_template
-
-Julia nightly:
-  image: staticfloat/julia:nightly-x64
-  allow_failure: true
-  <<: *test_template
+  script: julia --project='@.' -e 'using Pkg; Pkg.build(); Pkg.test({{#GITLABCOVERAGE}}; coverage=true{{/GITLABCOVERAGE}})'
 {{#GITLABCOVERAGE}}
-
-"Coverage":
-  stage: coverage
   coverage: /Test Coverage (\d+\.\d+%)/
-  image: julia:{{VERSION}}
-  tags:
-    - docker
-  before_script:
-    - apt-get update && apt-get -y install git make unzip gcc bzip2
-  script:
-    - rm -rf src && mv coverage src
-    - julia -e 'Pkg.add("Coverage"); using Coverage; c, t = get_summary(process_folder()); @printf("Test Coverage %.2f%%\n", 100c/t)'
+  after_script:
+    - julia -e 'using Printf; using Pkg; Pkg.add("Coverage"); using Coverage; c, t = get_summary(process_folder()); @printf "Test Coverage %.2f%%\n" 100c/t'
 {{/GITLABCOVERAGE}}

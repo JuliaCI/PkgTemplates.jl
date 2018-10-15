@@ -1,7 +1,5 @@
-user = gitconfig["github.user"]
 t = Template(; user=me)
-temp_dir = mktempdir()
-pkg_dir = joinpath(temp_dir, test_pkg)
+pkg_dir = joinpath(t.dir, test_pkg)
 
 @testset "GitLabCI" begin
     @testset "Plugin creation" begin
@@ -40,33 +38,32 @@ pkg_dir = joinpath(temp_dir, test_pkg)
 
     @testset "Badge generation" begin
         p = GitLabCI()
-        @test badges(p, user, test_pkg) == [
-	    	"[![Build Status](https://gitlab.com/$user/$test_pkg.jl/badges/master/build.svg)](https://gitlab.com/$user/$test_pkg.jl/pipelines)",
-			"[![Coverage](https://gitlab.com/$user/$test_pkg.jl/badges/master/coverage.svg)](https://gitlab.com/$user/$test_pkg.jl/commits/master)",
+        @test badges(p, me, test_pkg) == [
+	    	"[![Build Status](https://gitlab.com/$me/$test_pkg.jl/badges/master/build.svg)](https://gitlab.com/$me/$test_pkg.jl/pipelines)",
+			"[![Coverage](https://gitlab.com/$me/$test_pkg.jl/badges/master/coverage.svg)](https://gitlab.com/$me/$test_pkg.jl/commits/master)",
 		]
     end
 
     @testset "File generation" begin
         p = GitLabCI()
-        @test gen_plugin(p, t, temp_dir, test_pkg) == [".gitlab-ci.yml"]
+        @test gen_plugin(p, t, test_pkg) == [".gitlab-ci.yml"]
         @test isfile(joinpath(pkg_dir, ".gitlab-ci.yml"))
         gitlab = read(joinpath(pkg_dir, ".gitlab-ci.yml"), String)
-        @test occursin("test_template", gitlab)
         # The default plugin should enable the coverage step.
         @test occursin("using Coverage", gitlab)
         rm(joinpath(pkg_dir, ".gitlab-ci.yml"))
 
         p = GitLabCI(; coverage=false)
-        gen_plugin(p, t, temp_dir, test_pkg)
+        gen_plugin(p, t, test_pkg)
         gitlab = read(joinpath(pkg_dir, ".gitlab-ci.yml"), String)
         # If coverage is false, there should be no coverage step.
         @test !occursin("using Coverage", gitlab)
         rm(joinpath(pkg_dir, ".gitlab-ci.yml"))
         p = GitLabCI(; config_file=nothing)
 
-        @test isempty(gen_plugin(p, t, temp_dir, test_pkg))
+        @test isempty(gen_plugin(p, t, test_pkg))
         @test !isfile(joinpath(pkg_dir, ".gitlab-ci.yml"))
     end
 end
 
-rm(temp_dir; recursive=true)
+rm(pkg_dir; recursive=true)

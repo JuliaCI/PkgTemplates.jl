@@ -4,35 +4,35 @@ generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
  """
 abstract type Documenter <: CustomPlugin end
 
-function gen_plugin(
-    plugin::Documenter,
-    template::Template,
-    dir::AbstractString,
-    pkg_name::AbstractString,
-)
-    path = joinpath(dir, pkg_name)
+function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
+    path = joinpath(t.dir, pkg_name)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
-    if !isempty(plugin.assets)
+
+    assets_string = if !isempty(p.assets)
         mkpath(joinpath(docs_dir, "assets"))
-        for file in plugin.assets
+        for file in p.assets
             cp(file, joinpath(docs_dir, "assets", basename(file)))
         end
+
         # We want something that looks like the following:
         # [
         #         assets/file1,
         #         assets/file2,
         #     ]
         tab = repeat(" ", 4)
-        assets_string = "[\n"
-        for asset in plugin.assets
-            assets_string *= """$(tab^2)"assets/$(basename(asset))",\n"""
+        s = "[\n"
+        for asset in p.assets
+            s *= """$(tab^2)"assets/$(basename(asset))",\n"""
         end
-        assets_string *= "$tab]"
+        s *= "$tab]"
+
+        s
     else
-        assets_string = "[]"
+        "[]"
     end
-    text = """
+
+    make = """
         using Documenter, $pkg_name
 
         makedocs(;
@@ -41,21 +41,25 @@ function gen_plugin(
             pages=[
                 "Home" => "index.md",
             ],
-            repo="https://$(template.host)/$(template.user)/$pkg_name.jl/blob/{commit}{path}#L{line}",
+            repo="https://$(t.host)/$(t.user)/$pkg_name.jl/blob/{commit}{path}#L{line}",
             sitename="$pkg_name.jl",
-            authors="$(template.authors)",
+            authors="$(t.authors)",
             assets=$assets_string,
         )
         """
+    docs = """
+    # $pkg_name.jl
 
-    gen_file(joinpath(dirname(docs_dir), "make.jl"), text)
-    open(joinpath(docs_dir,  "index.md"), "w") do fp
-        write(fp, "# $pkg_name")
-    end
-    readme_path = joinpath(dir, pkg_name, "README.md")
-    if isfile(readme_path)
-        cp(readme_path, joinpath(docs_dir, "index.md"), force=true)
-    end
+    ```@index
+    ```
+
+    ```@autodocs
+    Modules = [$pkg_name]
+    ```
+    """
+
+    gen_file(joinpath(dirname(docs_dir), "make.jl"), make)
+    gen_file(joinpath(docs_dir, "index.md"), docs)
 end
 
 function Base.show(io::IO, p::Documenter)
@@ -77,8 +81,8 @@ function Base.show(io::IO, p::Documenter)
     n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
 end
 
-function interactive(plugin_type::Type{<:Documenter})
-    t = nameof(plugin_type)
-    print("$t: Enter any Documenter asset files (separated by spaces) []: ")
-    return plugin_type(; assets=String.(split(readline())))
+function interactive(t::Type{<:Documenter})
+    name = string(nameof(t))
+    print("$name: Enter any Documenter asset files (separated by spaces) []: ")
+    return t(; assets=string.(split(readline())))
 end

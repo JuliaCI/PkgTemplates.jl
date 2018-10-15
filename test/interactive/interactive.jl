@@ -7,17 +7,15 @@
 # Therefore, we skip any interactive tests on OSX builds.
 
 @testset "Interactive template creation" begin
-    write(stdin.buffer, "$me\n\n\r\n\n\n\n\nd")
+    write(stdin.buffer, "$me\n\n\r\n\n\nd")
     t = interactive_template()
     @test t.user == me
     @test t.host == "github.com"
     @test isempty(t.license)
     @test t.authors == LibGit2.getconfig("user.name", "")
-    @test t.years == string(Dates.year(Dates.today()))
     @test t.dir == default_dir
     @test t.julia_version == VERSION
-    @test isempty(t.requirements)
-    @test isempty(t.gitconfig)
+    @test !t.ssh
     @test isempty(t.plugins)
 
     if isempty(LibGit2.getconfig("github.user", ""))
@@ -25,24 +23,19 @@
         @test_throws ArgumentError t = interactive_template()
     end
 
-    write(stdin.buffer, "$me\ngitlab.com\n$('\x1b')[B\r$me\n2016\n$test_file\nno\n0.5\nX Y\nkey val val\nkey2 val2\n\n$('\x1b')[B\r$('\x1b')[B\rd\n\n")
+    down = '\x1b' * "[B"  # Down array key.
+    write(stdin.buffer, "$me\ngitlab.com\n$down\r$me\n$test_file\n0.5\nyes\n$down\r$down\rd\n\n")
     t = interactive_template()
     @test t.user == me
     @test t.host == "gitlab.com"
     # Not sure if the order the licenses are displayed in is consistent.
     @test !isempty(t.license)
     @test t.authors == me
-    @test t.years == "2016"
     @test t.dir == abspath(test_file)
-    @test !t.precompile
     @test t.julia_version == v"0.5.0"
-    @test Set(t.requirements) == Set(["X", "Y"])
-    @test t.gitconfig == Dict("key" => "val val", "key2" => "val2")
+    @test t.ssh
     # Like above, not sure which plugins this will generate.
     @test length(t.plugins) == 2
-
-    write(stdin.buffer, "$me\n\n\r\n\n\n\nA B\nA B\n\nd")
-    @test_logs (:warn, r".+") match_mode=:any interactive_template()
 
     write(stdin.buffer, "$me\nd")
     t = interactive_template(; fast=true)
@@ -50,19 +43,15 @@
     @test t.host == "github.com"
     @test t.license == "MIT"
     @test t.authors == LibGit2.getconfig("user.name", "")
-    # I guess this could technically break if it runs on New Year's Eve...
-    @test t.years == string(Dates.year(Dates.today()))
     @test t.dir == default_dir
     @test t.julia_version == VERSION
-    @test isempty(t.requirements)
-    @test isempty(t.gitconfig)
+    @test !t.ssh
     @test isempty(t.plugins)
     println()
 end
 
 @testset "Interactive package generation" begin
-    cfg = join(("$k $v" for (k, v) in gitconfig), "\n")
-    write(stdin.buffer, "$me\n\n\r\n\n\n\n$cfg\n\nd")
+    write(stdin.buffer, "$me\n\n\r\n\n\n\n\n\nd")
     generate_interactive(test_pkg)
     @test isdir(joinpath(default_dir, test_pkg))
     rm(joinpath(default_dir, test_pkg); force=true, recursive=true)

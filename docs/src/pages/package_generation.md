@@ -24,7 +24,6 @@ generate_interactive
 ### Helper Functions
 
 ```@docs
-gen_entrypoint
 gen_tests
 gen_require
 gen_readme
