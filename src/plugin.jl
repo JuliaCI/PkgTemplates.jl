@@ -51,7 +51,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
                     "https://myplugin.com/{{USER}}/{{PKGNAME}}.jl",
                 ),
             ],
-            Dict{String, Any}("YEAR" => Dates.year(Dates.today())),
+            Dict{String, Any}("YEAR" => year(today())),
         )
     end
 end
@@ -61,9 +61,9 @@ interactive(::Type{MyPlugin}) = interactive(MyPlugin; file="my-plugin.toml")
 
 The above plugin ignores files ending with `.mgp`, copies `defaults/my-plugin.toml` by
 default, and creates a badge that links to the project on its own site, using the default
-substitutions with one addition: `{{YEAR}} => Dates.year(Dates.today())`. Since the default
-config template file doesn't follow the generic naming convention, we added another
-`interactive` method to correct the assumed filename.
+substitutions with one addition: `{{YEAR}} => year(today())`. Since the default config
+template file doesn't follow the generic naming convention, we added another `interactive`
+method to correct the assumed filename.
 """
 abstract type GenericPlugin <: Plugin end
 

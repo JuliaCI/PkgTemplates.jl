@@ -106,7 +106,7 @@ function Base.show(io::IO, t::Template)
     if isempty(t.license)
         println(io, "None")
     else
-        println(io, "$(t.license) ($(t.authors) $(Dates.year(Dates.now())))")
+        println(io, "$(t.license) ($(t.authors) $(year(today())))")
     end
 
     println(io, "$spc→ Package directory: $(replace(maybe(t.dir), homedir() => "~"))")

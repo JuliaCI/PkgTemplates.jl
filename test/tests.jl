@@ -114,7 +114,7 @@ end
         Template:
           → User: $me
           → Host: github.com
-          → License: MIT ($(LibGit2.getconfig("user.name", "")) $(Dates.year(now())))
+          → License: MIT ($(LibGit2.getconfig("user.name", "")) $(year(today())))
           → Package directory: $pkg_dir
           → Minimum Julia version: v$(PkgTemplates.version_floor())
           → SSH remote: No

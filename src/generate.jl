@@ -210,7 +210,7 @@ function gen_license(pkg_dir::AbstractString, t::Template)
         return String[]
     end
 
-    text = "Copyright (c) $(Dates.year(Dates.now())) $(t.authors)\n"
+    text = "Copyright (c) $(year(today())) $(t.authors)\n"
     text *= read_license(t.license)
 
     gen_file(joinpath(pkg_dir, "LICENSE"), text)
