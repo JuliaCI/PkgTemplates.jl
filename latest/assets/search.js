@@ -39,7 +39,7 @@ parseUri.options = {
 requirejs.config({
     paths: {
         'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min',
-        'lunr': 'https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.1.3/lunr.min',
+        'lunr': 'https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.1/lunr.min',
         'lodash': 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min',
     }
 });
@@ -198,6 +198,13 @@ require(["jquery", "lunr", "lodash"], function($, lunr, _) {
                 tokens.forEach(function (t) {
                     q.term(t.toString(), {
                         fields: ["title"],
+                        boost: 100,
+                        usePipeline: false,
+                        editDistance: 0,
+                        wildcard: lunr.Query.wildcard.NONE
+                    })
+                    q.term(t.toString(), {
+                        fields: ["title"],
                         boost: 10,
                         usePipeline: false,
                         editDistance: 2,
@@ -207,7 +214,7 @@ require(["jquery", "lunr", "lodash"], function($, lunr, _) {
                         fields: ["text"],
                         boost: 1,
                         usePipeline: true,
-                        editDistance: 2,
+                        editDistance: 0,
                         wildcard: lunr.Query.wildcard.NONE
                     })
                 })
@@ -220,7 +227,7 @@ require(["jquery", "lunr", "lodash"], function($, lunr, _) {
                 link.text(data.title)
                 link.attr('href', documenterBaseURL+'/'+result.ref)
                 cat = $('<span class="category">('+data.category+')</span>')
-                li = $('<li>').append(link).append(cat)
+                li = $('<li>').append(link).append(" ").append(cat)
                 $('#search-results').append(li)
             })
         }
