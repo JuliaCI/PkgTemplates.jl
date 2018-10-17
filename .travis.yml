@@ -20,4 +20,4 @@ after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; CodeCov.submit(process_folder())'
   # For zero-argument template example.
   - git config --global github.user "travis"
-  - julia -e 'using Pkg; Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg; ps=Pkg.PackageSpec(name="Documenter", version="0.19"); Pkg.add(ps); Pkg.pin(ps); include(joinpath("docs", "make.jl"))'
