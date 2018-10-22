@@ -20,6 +20,7 @@ const test_pkg = "TestPkg"
 const fake_path = "/dev/null/this/file/does/not/exist"
 const test_file = tempname()
 const default_dir = Pkg.devdir()
+const gitconfig = GitConfig(joinpath(@__DIR__, "gitconfig"))
 const template_text = """
             PKGNAME: {{PKGNAME}}
             VERSION: {{VERSION}}}
@@ -79,7 +80,7 @@ write(test_file, template_text)
     )
 
     # Duplicate plugins should warn.
-    @test_logs (:warn, r".+") t = Template(;
+    @test_logs (:warn, r"duplicates") match_mode=:any t = Template(;
         user=me,
         plugins=[TravisCI(), TravisCI()],
     )
@@ -239,7 +240,7 @@ end
 
 @testset "Package generation" begin
     t = Template(; user=me)
-    generate(test_pkg, t)
+    generate(test_pkg, t; gitconfig=gitconfig)
     pkg_dir = joinpath(default_dir, test_pkg)
 
     # Check that the expected files all exist.
@@ -266,7 +267,7 @@ end
 
     # Check that the remote is an SSH URL when we want it to be.
     t = Template(; user=me, ssh=true)
-    generate(t, test_pkg)  # Test the reversed-arguments method here.
+    generate(t, test_pkg; gitconfig=gitconfig)  # Test the reversed-arguments method here.
     repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     @test LibGit2.url(remote) == "git@github.com:$me/$test_pkg.jl.git"
@@ -274,7 +275,7 @@ end
 
     # Check that the remote is set correctly for non-default hosts.
     t = Template(; user=me, host="gitlab.com")
-    generate(test_pkg, t)
+    generate(test_pkg, t; gitconfig=gitconfig)
     repo = LibGit2.GitRepo(pkg_dir)
     remote = LibGit2.get(LibGit2.GitRemote, repo, "origin")
     @test LibGit2.url(remote) == "https://gitlab.com/$me/$test_pkg.jl"
@@ -283,7 +284,7 @@ end
     # Check that the package ends up in the right directory.
     temp_dir = mktempdir()
     t = Template(; user=me, dir=temp_dir)
-    generate(test_pkg, t)
+    generate(test_pkg, t; gitconfig=gitconfig)
     @test isdir(joinpath(temp_dir, test_pkg))
     rm(temp_dir; recursive=true)
 end

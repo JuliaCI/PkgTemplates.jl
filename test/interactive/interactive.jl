@@ -52,7 +52,7 @@ end
 
 @testset "Interactive package generation" begin
     write(stdin.buffer, "$me\n\n\r\n\n\n\n\n\nd")
-    generate_interactive(test_pkg)
+    generate_interactive(test_pkg; gitconfig=gitconfig)
     @test isdir(joinpath(default_dir, test_pkg))
     rm(joinpath(default_dir, test_pkg); force=true, recursive=true)
 end

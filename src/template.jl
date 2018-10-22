@@ -47,15 +47,11 @@ create a template, you can use [`interactive_template`](@ref) instead.
     )
         # Check for required Git options for package generation
         # (you can't commit to a repository without them).
-        if isempty(LibGit2.getconfig("user.name", ""))
-            @warn "Git config option 'user.name' missing, package generation will fail"
-        end
-        if isempty(LibGit2.getconfig("user.email", ""))
-            @warn "Git config option 'user.email' missing, package generation will fail"
-        end
+        isempty(LibGit2.getconfig("user.name", "")) && missingopt("user.name")
+        isempty(LibGit2.getconfig("user.email", "")) && missingopt("user.email")
 
         # If no username was set, look for one in the global git config.
-        # Note: This is one of a few GitHub specifics.
+        # Note: This is one of a few GitHub specifics (maybe we could use the host value).
         if isempty(user)
             user = LibGit2.getconfig("github.user", "")
         end
@@ -216,9 +212,6 @@ function interactive_template(; fast::Bool=false)
     return Template(; kwargs...)
 end
 
-"""
-    leaves(t:Type) -> Vector{DataType}
-
-Get all concrete subtypes of `t`.
-"""
 leaves(t::Type)::Vector{DataType} = isconcretetype(t) ? [t] : vcat(leaves.(subtypes(t))...)
+
+missingopt(name) = @warn "Git config option '$name' missing, package generation will fail unless you supply a GitConfig"
