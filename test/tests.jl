@@ -19,7 +19,7 @@ const me = "christopher-dG"
 const test_pkg = "TestPkg"
 const fake_path = "/dev/null/this/file/does/not/exist"
 const test_file = tempname()
-const default_dir = PkgTemplates.dev_dir()
+const default_dir = Pkg.devdir()
 const template_text = """
             PKGNAME: {{PKGNAME}}
             VERSION: {{VERSION}}}

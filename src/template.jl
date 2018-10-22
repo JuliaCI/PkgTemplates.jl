@@ -1,11 +1,4 @@
 """
-    dev_dir() -> String
-
-Get the default development directory (~/.julia/dev).
-"""
-dev_dir() = joinpath(first(DEPOT_PATH), "dev")
-
-"""
     Template(; kwargs...) -> Template
 
 Records common information used to generate a package. If you don't wish to manually
@@ -13,9 +6,9 @@ create a template, you can use [`interactive_template`](@ref) instead.
 
 # Keyword Arguments
 * `user::AbstractString=""`: GitHub (or other code hosting service) username. If left
-  unset, it will take the the global git config's value. If that is not set, an
-  `ArgumentError` is thrown. **This is case-sensitive for some plugins, so take care to
-  enter it correctly.**
+  unset, it will take the the global git config's value (`github.user`). If that is not
+  set, an `ArgumentError` is thrown. **This is case-sensitive for some plugins, so take
+  care to enter it correctly.**
 * `host::AbstractString="github.com"`: URL to the code hosting service where your package
   will reside. Note that while hosts other than GitHub won't cause errors, they are not
   officially supported and they will cause certain plugins will produce incorrect output.
@@ -26,9 +19,9 @@ create a template, you can use [`interactive_template`](@ref) instead.
 * `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the
   license. Supply a string for one author or an array for multiple. Similarly to `user`,
   it will take the value of of the global git config's value if it is left unset.
-* `dir::AbstractString=$(dev_dir())`: Directory in which the package will go. Relative
-  paths are converted to absolute ones at template creation time.
-* `julia_version::VersionNumber=VERSION`: Minimum allowed Julia version.
+* `dir::AbstractString=$(replace(Pkg.devdir(), homedir() => "~"))`: Directory in which the
+  package will go. Relative paths are converted to absolute ones at template creation time.
+* `julia_version::VersionNumber=$VERSION`: Minimum allowed Julia version.
 * `ssh::Bool=false`: Whether or not to use SSH for the remote.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
@@ -47,7 +40,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
         host::AbstractString="https://github.com",
         license::AbstractString="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
-        dir::AbstractString=dev_dir(),
+        dir::AbstractString=Pkg.devdir(),
         julia_version::VersionNumber=VERSION,
         ssh::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
@@ -186,9 +179,9 @@ function interactive_template(; fast::Bool=false)
     end
 
     kwargs[:dir] = if fast
-        dev_dir()
+        Pkg.devdir()
     else
-        default_dir = dev_dir()
+        default_dir = Pkg.devdir()
         print("Enter the path to the package directory [$default_dir]: ")
         dir = readline()
         isempty(dir) ? default_dir : dir

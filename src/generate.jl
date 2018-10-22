@@ -1,16 +1,15 @@
 """
-    generate(pkg_name::AbstractString, t::Template) -> Nothing
+    generate(pkg::AbstractString, t::Template) -> Nothing
+    generate(t::Template, pkg::AbstractString) -> Nothing
 
-Generate a package named `pkg_name` from `t`.
+Generate a package named `pkg` from `t`.
 """
-function generate(pkg_name::AbstractString, t::Template)
-    pkg_dir = joinpath(t.dir, pkg_name)
+function generate(pkg::AbstractString, t::Template)
+    pkg = splitjl(pkg)
+    pkg_dir = joinpath(t.dir, pkg)
     ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
 
     try
-        pkg_name = splitjl(pkg_name)
-        pkg_dir = joinpath(t.dir, pkg_name)
-
         # Create the directory with some boilerplate inside.
         Pkg.generate(pkg_dir)
 
@@ -19,9 +18,9 @@ function generate(pkg_name::AbstractString, t::Template)
         @info "Initialized git repo at $pkg_dir"
         LibGit2.commit(repo, "Initial commit")
         rmt = if t.ssh
-            "git@$(t.host):$(t.user)/$pkg_name.jl.git"
+            "git@$(t.host):$(t.user)/$pkg.jl.git"
         else
-            "https://$(t.host)/$(t.user)/$pkg_name.jl"
+            "https://$(t.host)/$(t.user)/$pkg.jl"
         end
         # We need to set the remote in a strange way, see #8.
         close(LibGit2.GitRemote(repo, "origin", rmt))
@@ -43,7 +42,7 @@ function generate(pkg_name::AbstractString, t::Template)
             gen_readme(pkg_dir, t),
             gen_gitignore(pkg_dir, t),
             gen_license(pkg_dir, t),
-            vcat(map(p -> gen_plugin(p, t, pkg_name), values(t.plugins))...),
+            vcat(map(p -> gen_plugin(p, t, pkg), values(t.plugins))...),
         )
 
         LibGit2.add!(repo, files...)
@@ -60,7 +59,7 @@ function generate(pkg_name::AbstractString, t::Template)
     end
 end
 
-generate(t::Template, pkg_name::AbstractString) = generate(pkg_name, t)
+generate(t::Template, pkg::AbstractString) = generate(pkg, t)
 
 """
     generate_interactive(pkg::AbstractString; fast::Bool=false) -> Template
