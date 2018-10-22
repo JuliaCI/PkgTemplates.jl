@@ -109,13 +109,28 @@ Create the test entrypoint in `pkg_dir`.
 Returns an array of generated file/directory names.
 """
 function gen_tests(pkg_dir::AbstractString, t::Template)
+    # TODO: Silence Pkg for this section? Adding and removing Test creates a lot of noise.
     proj = Base.current_project()
     try
         Pkg.activate(pkg_dir)
         Pkg.add("Test")
+
+        # Move the Test dependency into the [extras] section.
+        toml = read(joinpath(pkg_dir, "Project.toml"), String)
+        lines = split(toml, "\n")
+        idx = findfirst(l -> startswith(l, "Test = "), lines)
+        testdep = lines[idx]
+        deleteat!(lines, idx)
+        toml = join(lines, "\n") * """
+        [extras]
+        $testdep
+
+        [targets]
+        test = ["Test"]
+        """
+        gen_file(joinpath(pkg_dir, "Project.toml"), toml)
+        Pkg.update()  # Regenerate Manifest.toml (this cleans up Project.toml too).
     finally
-        # TODO: What should we do if there is no current project?
-        # Activating the generated project is now a side effect.
         proj !== nothing && Pkg.activate(dirname(proj))
     end
 
@@ -126,12 +141,10 @@ function gen_tests(pkg_dir::AbstractString, t::Template)
 
         @testset "$pkg.jl" begin
             # Write your own tests here.
-            @test 1 == 2
         end
         """
 
     gen_file(joinpath(pkg_dir, "test", "runtests.jl"), text)
-    # TODO: Should we be checking Manifest.toml into Git?
     return ["Manifest.toml", "test/"]
 end
 

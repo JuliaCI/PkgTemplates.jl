@@ -1,7 +1,7 @@
 name = "PkgTemplates"
 uuid = "19f0ff7e-bab4-11e8-074b-97459630f98a"
 authors = ["Chris de Graaf <chrisadegraaf@gmail.com>"]
-version = "0.1.0"
+version = "0.3.1"
 
 [deps]
 AutoHashEquals = "15f4f7f2-30c1-5605-9d31-71845cf9641f"
@@ -12,5 +12,10 @@ LibGit2 = "76f85450-5226-5b5a-8eaa-529ad045b433"
 Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 URIParser = "30578b45-9adc-5946-b283-645ec420af67"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

@@ -225,6 +225,9 @@ end
 
     # Test the test generation.
     @test gen_tests(pkg_dir, t) == ["Manifest.toml", "test/"]
+    @test isfile(joinpath(pkg_dir, "Project.toml"))
+    project = read(joinpath(pkg_dir, "Project.toml"), String)
+    @test occursin("[extras]\nTest = ", project)
     @test isdir(joinpath(pkg_dir, "test"))
     @test isfile(joinpath(pkg_dir, "test", "runtests.jl"))
     @test isfile(joinpath(pkg_dir, "Manifest.toml"))
@@ -233,7 +236,7 @@ end
     @test occursin("using $test_pkg", runtests)
     @test occursin("using Test", runtests)
     manifest = read(joinpath(pkg_dir, "Manifest.toml"), String)
-    @test occursin("[[Test]]", manifest)
+    @test !occursin("[[Test]]", manifest)
 
     rm(temp_dir; recursive=true)
 end
