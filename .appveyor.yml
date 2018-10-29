@@ -20,9 +20,6 @@ build_script:
   - echo "%JL_BUILD_SCRIPT%"
   - C:\julia\bin\julia -e "%JL_BUILD_SCRIPT%"
 test_script:
-  # Git configuration is required to make commits in generated packages.
-  - git config --global user.name "AppVeyor"
-  - git config --global user.email "appveyor@example.com"
   - echo "%JL_TEST_SCRIPT%"
   - C:\julia\bin\julia -e "%JL_TEST_SCRIPT%"
 on_success:

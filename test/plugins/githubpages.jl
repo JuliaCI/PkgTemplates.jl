@@ -56,7 +56,7 @@ pkg_dir = joinpath(t.dir, test_pkg)
     @testset "Package generation with GitHubPages plugin" begin
         temp_dir = mktempdir()
         t = Template(; user=me, dir=temp_dir, plugins=[GitHubPages()])
-        generate(test_pkg, t)
+        generate(test_pkg, t; gitconfig=gitconfig)
 
         # Check that the gh-pages branch exists.
         repo = LibGit2.GitRepo(joinpath(t.dir, test_pkg))
