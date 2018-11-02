@@ -13,6 +13,11 @@ end
 struct Bar <: CustomPlugin end
 # A dummy Plugin subtype.
 struct Baz <: Plugin end
+# A Documenter with extra kwargs
+struct Bat <: Documenter
+    assets::Vector{AbstractString}
+    additional_kwargs::Vector{<:Pair}
+end
 
 # Various options to be passed into templates.
 const me = "christopher-dG"
@@ -395,6 +400,28 @@ end
     include(joinpath("plugins", "codecov.jl"))
     include(joinpath("plugins", "coveralls.jl"))
     include(joinpath("plugins", "githubpages.jl"))
+end
+
+@testset "Documenter add kwargs" begin
+    t = Template(; user=me)
+    pkg_dir = joinpath(t.dir, test_pkg)
+    p = Bat(
+        [],
+        ["strict"=>true, "checkdocs"=>:none, "format"=>:markdown, "stringarg"=>"string"]
+    )
+    gen_plugin(p, t, test_pkg)
+    make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
+    @test occursin(
+        strip("""
+            strict=true,
+            checkdocs=:none,
+            stringarg="string",
+        """),
+        make,
+    )
+    @test !occursin("format=:markdown", make)
+    @test occursin("format=:html", make)
+    rm(pkg_dir; recursive=true)
 end
 
 rm(test_file)

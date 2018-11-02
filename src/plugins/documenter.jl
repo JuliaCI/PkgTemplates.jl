@@ -32,8 +32,8 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         "[]"
     end
 
-    kwargs_string = if "additional_kwargs" in fieldnames(typeof(p))
-        const set_kwargs = ["modules", "format", "pages", "repo", "sitename", "authors", "assets"]
+    kwargs_string = if :additional_kwargs in fieldnames(typeof(p))
+        set_kwargs = ["modules", "format", "pages", "repo", "sitename", "authors", "assets"]
 
         # We want something that looks like the following:
         #     key1="val1",
