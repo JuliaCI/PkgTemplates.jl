@@ -9,6 +9,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
 
+    tab = repeat(" ", 4)
     assets_string = if !isempty(p.assets)
         mkpath(joinpath(docs_dir, "assets"))
         for file in p.assets
@@ -20,7 +21,6 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         #         assets/file1,
         #         assets/file2,
         #     ]
-        tab = repeat(" ", 4)
         s = "[\n"
         for asset in p.assets
             s *= """$(tab^2)"assets/$(basename(asset))",\n"""
@@ -30,6 +30,19 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         s
     else
         "[]"
+    end
+
+    kwargs_string = if "additional_kwargs" in fieldnames(typeof(p))
+        const set_kwargs = ["modules", "format", "pages", "repo", "sitename", "authors", "assets"]
+
+        # We want something that looks like the following:
+        #     key1="val1",
+        #     key2="val2",
+        #
+        kwargs = (x for x in p.additional_kwargs if first(x) ∉ set_kwargs)
+        join(string(tab, first(p), "=", repr(last(p)), ",\n") for p in kwargs)
+    else
+        ""
     end
 
     make = """
@@ -45,7 +58,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
             sitename="$pkg_name.jl",
             authors="$(t.authors)",
             assets=$assets_string,
-        )
+        $kwargs_string)
         """
     docs = """
     # $pkg_name.jl
