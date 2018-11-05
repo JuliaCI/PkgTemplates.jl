@@ -41,4 +41,4 @@ generated repositories, and an appropriate badge to the README.
     end
 end
 
-interactive(plugin_type::Type{TravisCI}) = interactive(plugin_type; file="travis.yml")
+interactive(::Type{TravisCI}) = interactive(TravisCI; file="travis.yml")

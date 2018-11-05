@@ -213,14 +213,14 @@ function badges(p::GenericPlugin, user::AbstractString, pkg_name::AbstractString
 end
 
 """
-    interactive(t::Type{<:Plugin}; file::Union{AbstractString, Nothing}="") -> Plugin
+    interactive(T::Type{<:Plugin}; file::Union{AbstractString, Nothing}="") -> Plugin
 
-Interactively create a plugin of type `t`, where `file` is the plugin type's default
+Interactively create a plugin of type `T`, where `file` is the plugin type's default
 config template with a non-standard name (for `MyPlugin`, this is anything but
 "myplugin.yml").
 """
-function interactive(t::Type{<:GenericPlugin}; file::Union{AbstractString, Nothing}="")
-    name = string(nameof(t))
+function interactive(T::Type{<:GenericPlugin}; file::Union{AbstractString, Nothing}="")
+    name = string(nameof(T))
     # By default, we expect the default plugin file template for a plugin called
     # "MyPlugin" to be called "myplugin.yml".
     fn = file != nothing && isempty(file) ? "$(lowercase(name)).yml" : file
@@ -242,5 +242,5 @@ function interactive(t::Type{<:GenericPlugin}; file::Union{AbstractString, Nothi
         config_file
     end
 
-    return t(; config_file=config_file)
+    return T(; config_file=config_file)
 end

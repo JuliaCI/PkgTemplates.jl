@@ -40,4 +40,4 @@ file to generated repositories, and an appropriate badge to the README. Also upd
     end
 end
 
-interactive(plugin_type::Type{Coveralls}) = interactive(plugin_type; file=nothing)
+interactive(::Type{Coveralls}) = interactive(Coveralls; file=nothing)

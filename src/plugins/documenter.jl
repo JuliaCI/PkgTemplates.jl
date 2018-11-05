@@ -116,8 +116,8 @@ function Base.show(io::IO, p::Documenter)
     n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
 end
 
-function interactive(t::Type{<:Documenter})
-    name = string(nameof(t))
+function interactive(T::Type{<:Documenter})
+    name = string(nameof(T))
     print("$name: Enter any Documenter asset files (separated by spaces) []: ")
-    return t(; assets=string.(split(readline())))
+    return T(; assets=string.(split(readline())))
 end
