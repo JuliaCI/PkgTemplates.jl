@@ -47,11 +47,12 @@ create a template, you can use [`interactive_template`](@ref) instead.
         ssh::Bool=false,
         manifest::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
+        git::Bool=true,
     )
         # Check for required Git options for package generation
         # (you can't commit to a repository without them).
-        isempty(LibGit2.getconfig("user.name", "")) && missingopt("user.name")
-        isempty(LibGit2.getconfig("user.email", "")) && missingopt("user.email")
+        git && isempty(LibGit2.getconfig("user.name", "")) && missingopt("user.name")
+        git && isempty(LibGit2.getconfig("user.email", "")) && missingopt("user.email")
 
         # If no username was set, look for one in the global git config.
         # Note: This is one of a few GitHub specifics (maybe we could use the host value).
@@ -218,7 +219,7 @@ function interactive_template(; git::Bool=true, fast::Bool=false)
     selected = collect(request(menu))
     kwargs[:plugins] = Vector{Plugin}(map(interactive, getindex(plugin_types, selected)))
 
-    return Template(; kwargs...)
+    return Template(; git=git, kwargs...)
 end
 
 leaves(T::Type)::Vector{DataType} = isconcretetype(T) ? [T] : vcat(leaves.(subtypes(T))...)
