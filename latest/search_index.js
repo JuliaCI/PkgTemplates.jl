@@ -237,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugins",
     "title": "PkgTemplates.Documenter",
     "category": "type",
-    "text": "Add a Documenter subtype to a template\'s plugins to add support for documentation generation via Documenter.jl.\n\n\n\n\n\n"
+    "text": "Add a Documenter subtype to a template\'s plugins to add support for documentation generation via Documenter.jl.\n\nBy default, the plugin generates a minimal index.md and a make.jl file. The make.jl file contains the Documenter.makedocs command with predefined values for modules, format, pages, repo, sitename, and authors.\n\nThe subtype is expected to include the following fields:\n\nassets::Vector{AbstractString}, a list of filenames to be included as the assets\n\nkwarg to makedocs\n\ngitignore::Vector{AbstractString}, a list of files to be added to the .gitignore\n\nIt may optionally include the field additional_kwargs::Union{AbstractDict, NamedTuple} to allow additional kwargs to be added to makedocs.\n\n\n\n\n\n"
 },
 
 {
