@@ -408,10 +408,7 @@ end
     pkg_dir = joinpath(t.dir, test_pkg)
 
     function check_kwargs(kwargs, warn_str)
-        p = Qux(
-            [],
-            kwargs
-        )
+        p = Qux([], kwargs)
         @test_logs (:warn, warn_str) gen_plugin(p, t, test_pkg)
 
         make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))

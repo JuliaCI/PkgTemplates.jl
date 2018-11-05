@@ -46,7 +46,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         "[]"
     end
 
-    kwargs_string = if in(:additional_kwargs, fieldnames(typeof(p))) &&
+    kwargs_string = if :additional_kwargs in fieldnames(typeof(p)) &&
         fieldtype(typeof(p), :additional_kwargs) <: Union{AbstractDict, NamedTuple}
         # We want something that looks like the following:
         #     key1="val1",
