@@ -1,7 +1,21 @@
+const STANDARD_KWS = [:modules, :format, :pages, :repo, :sitename, :authors, :assets]
+
 """
 Add a `Documenter` subtype to a template's plugins to add support for documentation
 generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
- """
+
+By default, the plugin generates a minimal index.md and a make.jl file. The make.jl
+file contains the Documenter.makedocs command with predefined values for `modules`,
+`format`, `pages`, `repo`, `sitename`, and `authors`.
+
+The subtype is expected to include the following fields:
+* `assets::Vector{AbstractString}`, a list of filenames to be included as the `assets`
+kwarg to `makedocs`
+* `gitignore::Vector{AbstractString}`, a list of files to be added to the `.gitignore`
+
+It may optionally include the field `additional_kwargs::Union{AbstractDict, NamedTuple}`
+to allow additional kwargs to be added to `makedocs`.
+"""
 abstract type Documenter <: CustomPlugin end
 
 function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
@@ -32,23 +46,23 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         "[]"
     end
 
-    kwargs_string = if :additional_kwargs in fieldnames(typeof(p))
-        standard_kwargs = ["modules", "format", "pages", "repo", "sitename", "authors", "assets"]
-
+    kwargs_string = if in(:additional_kwargs, fieldnames(typeof(p))) &&
+        fieldtype(typeof(p), :additional_kwargs) <: Union{AbstractDict, NamedTuple}
         # We want something that looks like the following:
         #     key1="val1",
         #     key2="val2",
         #
-        valid_keys = [k for k in keys(p.additional_kwargs) if k ∉ standard_kwargs]
+        kws = [keys(p.additional_kwargs)...]
+        valid_keys = filter(k -> !in(Symbol(k), STANDARD_KWS), kws)
         if length(p.additional_kwargs) > length(valid_keys)
-            invalid_keys = (repr(k) for k in keys(p.additional_kwargs) if k in standard_kwargs)
+            invalid_keys = filter(k -> in(Symbol(k), STANDARD_KWS), kws)
             @warn string(
                 "Ignoring predefined Documenter kwargs ",
-                join(invalid_keys, ", "),
-                " from additional kwargs."
+                join(map(repr, invalid_keys), ", "),
+                " from additional kwargs"
             )
         end
-        join(string(tab, k, "=", repr(p.additional_kwargs[k]), ",\n") for k in valid_keys)
+        join(map(k -> string(tab, k, "=", repr(p.additional_kwargs[k]), ",\n"), valid_keys))
     else
         ""
     end
