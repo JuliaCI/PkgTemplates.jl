@@ -7,7 +7,7 @@ using Pkg
 import PkgTemplates: badges, version_floor, substitute, read_license, gen_file, gen_readme,
     gen_tests, gen_license, gen_require, gen_gitignore, gen_plugin, show_license, LICENSES,
     LICENSE_DIR, Plugin, GenericPlugin, CustomPlugin, Badge, format, interactive,
-    DEFAULTS_DIR
+    DEFAULTS_DIR, Documenter
 
 mktempdir() do temp_dir
     mkdir(joinpath(temp_dir, "dev"))

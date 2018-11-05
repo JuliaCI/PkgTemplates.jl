@@ -397,4 +397,49 @@ end
     include(joinpath("plugins", "githubpages.jl"))
 end
 
+# A Documenter with extra kwargs
+struct Qux <: Documenter
+    assets::Vector{AbstractString}
+    additional_kwargs::Union{AbstractDict, NamedTuple}
+end
+
+@testset "Documenter add kwargs" begin
+    t = Template(; user=me)
+    pkg_dir = joinpath(t.dir, test_pkg)
+
+    function check_kwargs(kwargs, warn_str)
+        p = Qux([], kwargs)
+        @test_logs (:warn, warn_str) gen_plugin(p, t, test_pkg)
+
+        make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
+        @test occursin("\n    stringarg=\"string\",\n", make)
+        @test occursin("\n    strict=true,\n", make)
+        @test occursin("\n    checkdocs=:none,\n", make)
+
+        @test !occursin("format=:markdown", make)
+        @test occursin("format=:html", make)
+        rm(pkg_dir; recursive=true)
+    end
+    # Test with string kwargs
+    kwargs = Dict("checkdocs" => :none,
+        "strict" => true,
+        "format" => :markdown,
+        "stringarg" => "string",
+    )
+    warn_str = "Ignoring predefined Documenter kwargs \"format\" from additional kwargs"
+    check_kwargs(kwargs, warn_str)
+
+    kwargs = Dict(:checkdocs => :none,
+        :strict => true,
+        :format => :markdown,
+        :stringarg => "string",
+    )
+    warn_str = "Ignoring predefined Documenter kwargs :format from additional kwargs"
+    check_kwargs(kwargs, warn_str)
+
+    kwargs = (checkdocs = :none, strict = true, format = :markdown, stringarg = "string")
+    warn_str = "Ignoring predefined Documenter kwargs :format from additional kwargs"
+    check_kwargs(kwargs, warn_str)
+end
+
 rm(test_file)

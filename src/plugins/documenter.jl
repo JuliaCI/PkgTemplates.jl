@@ -1,7 +1,21 @@
+const STANDARD_KWS = [:modules, :format, :pages, :repo, :sitename, :authors, :assets]
+
 """
 Add a `Documenter` subtype to a template's plugins to add support for documentation
 generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
- """
+
+By default, the plugin generates a minimal index.md and a make.jl file. The make.jl
+file contains the Documenter.makedocs command with predefined values for `modules`,
+`format`, `pages`, `repo`, `sitename`, and `authors`.
+
+The subtype is expected to include the following fields:
+* `assets::Vector{AbstractString}`, a list of filenames to be included as the `assets`
+kwarg to `makedocs`
+* `gitignore::Vector{AbstractString}`, a list of files to be added to the `.gitignore`
+
+It may optionally include the field `additional_kwargs::Union{AbstractDict, NamedTuple}`
+to allow additional kwargs to be added to `makedocs`.
+"""
 abstract type Documenter <: CustomPlugin end
 
 function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
@@ -9,6 +23,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
     docs_dir = joinpath(path, "docs", "src")
     mkpath(docs_dir)
 
+    tab = repeat(" ", 4)
     assets_string = if !isempty(p.assets)
         mkpath(joinpath(docs_dir, "assets"))
         for file in p.assets
@@ -20,7 +35,6 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         #         assets/file1,
         #         assets/file2,
         #     ]
-        tab = repeat(" ", 4)
         s = "[\n"
         for asset in p.assets
             s *= """$(tab^2)"assets/$(basename(asset))",\n"""
@@ -30,6 +44,27 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         s
     else
         "[]"
+    end
+
+    kwargs_string = if :additional_kwargs in fieldnames(typeof(p)) &&
+        fieldtype(typeof(p), :additional_kwargs) <: Union{AbstractDict, NamedTuple}
+        # We want something that looks like the following:
+        #     key1="val1",
+        #     key2="val2",
+        #
+        kws = [keys(p.additional_kwargs)...]
+        valid_keys = filter(k -> !in(Symbol(k), STANDARD_KWS), kws)
+        if length(p.additional_kwargs) > length(valid_keys)
+            invalid_keys = filter(k -> in(Symbol(k), STANDARD_KWS), kws)
+            @warn string(
+                "Ignoring predefined Documenter kwargs ",
+                join(map(repr, invalid_keys), ", "),
+                " from additional kwargs"
+            )
+        end
+        join(map(k -> string(tab, k, "=", repr(p.additional_kwargs[k]), ",\n"), valid_keys))
+    else
+        ""
     end
 
     make = """
@@ -45,7 +80,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
             sitename="$pkg_name.jl",
             authors="$(t.authors)",
             assets=$assets_string,
-        )
+        $kwargs_string)
         """
     docs = """
     # $pkg_name.jl
