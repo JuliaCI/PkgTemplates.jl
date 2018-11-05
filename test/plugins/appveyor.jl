@@ -37,10 +37,10 @@ pkg_dir = joinpath(t.dir, test_pkg)
         @test !occursin("%JL_CODECOV_SCRIPT%", appveyor)
         rm(joinpath(pkg_dir, ".appveyor.yml"))
 
-        # Generating the plugin with CodeCov in the template should create a post-test step.
-        t.plugins[CodeCov] = CodeCov()
+        # Generating the plugin with Codecov in the template should create a post-test step.
+        t.plugins[Codecov] = Codecov()
         gen_plugin(p, t, test_pkg)
-        delete!(t.plugins, CodeCov)
+        delete!(t.plugins, Codecov)
         appveyor = read(joinpath(pkg_dir, ".appveyor.yml"), String)
         @test occursin("on_success", appveyor)
         @test occursin("%JL_CODECOV_SCRIPT%", appveyor)

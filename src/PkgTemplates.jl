@@ -24,7 +24,7 @@ export
     AppVeyor,
     TravisCI,
     GitLabCI,
-    CodeCov,
+    Codecov,
     Coveralls
 
 """
@@ -46,6 +46,6 @@ include(joinpath("plugins", "gitlabci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
-const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, GitLabCI, CodeCov, Coveralls]
+const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, GitLabCI, Codecov, Coveralls]
 
 end

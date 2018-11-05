@@ -321,7 +321,7 @@ function substitute(
         "USER" => pkg_template.user,
         "VERSION" => "$(v.major).$(v.minor)",
         "DOCUMENTER" => any(map(p -> isa(p, Documenter), values(pkg_template.plugins))),
-        "CODECOV" => haskey(pkg_template.plugins, CodeCov),
+        "CODECOV" => haskey(pkg_template.plugins, Codecov),
         "COVERALLS" => haskey(pkg_template.plugins, Coveralls),
     )
     # d["AFTER"] is true whenever something needs to occur in a CI "after_script".

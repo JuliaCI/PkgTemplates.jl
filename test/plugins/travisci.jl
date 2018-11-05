@@ -40,10 +40,10 @@ pkg_dir = joinpath(t.dir, test_pkg)
         @test !occursin("Pkg.add(\"Documenter\")", travis)
         rm(joinpath(pkg_dir, ".travis.yml"))
 
-        # Generating the plugin with CodeCov in the template should create a post-test step.
-        t.plugins[CodeCov] = CodeCov()
+        # Generating the plugin with Codecov in the template should create a post-test step.
+        t.plugins[Codecov] = Codecov()
         gen_plugin(p, t, test_pkg)
-        delete!(t.plugins, CodeCov)
+        delete!(t.plugins, Codecov)
         travis = read(joinpath(pkg_dir, ".travis.yml"), String)
         @test occursin("after_success", travis)
         @test occursin("Codecov.submit", travis)

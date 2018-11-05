@@ -4,7 +4,7 @@
 [![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://invenia.github.io/PkgTemplates.jl/latest)
 [![Build Status](https://travis-ci.org/invenia/PkgTemplates.jl.svg?branch=master)](https://travis-ci.org/invenia/PkgTemplates.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/r24xamruqlm88uti/branch/master?svg=true)](https://ci.appveyor.com/project/christopher-dG/pkgtemplates-jl/branch/master)
-[![CodeCov](https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/PkgTemplates.jl)
+[![Codecov](https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/PkgTemplates.jl)
 
 **PkgTemplates is a Julia package for creating new Julia packages in an easy,
 repeatable, and customizable way.**
@@ -40,7 +40,7 @@ t = Template(;
     ssh=true,
     plugins=[
         TravisCI(),
-        CodeCov(),
+        Codecov(),
         Coveralls(),
         AppVeyor(),
         GitHubPages(),

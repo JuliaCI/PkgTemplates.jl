@@ -47,18 +47,18 @@ end
     println()
 end
 
-@testset "CodeCov" begin
+@testset "Codecov" begin
     write(stdin.buffer, "\n")
-    p = interactive(CodeCov)
+    p = interactive(Codecov)
     @test p.src === nothing
     write(stdin.buffer, "$test_file\n")
-    p = interactive(CodeCov)
+    p = interactive(Codecov)
     @test p.src == test_file
     write(stdin.buffer, "none\n")
-    p = interactive(CodeCov)
+    p = interactive(Codecov)
     @test p.src === nothing
     write(stdin.buffer, "$fake_path\n")
-    @test_throws ArgumentError interactive(CodeCov)
+    @test_throws ArgumentError interactive(Codecov)
     println()
 end
 
