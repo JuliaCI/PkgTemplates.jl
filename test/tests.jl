@@ -13,11 +13,6 @@ end
 struct Bar <: CustomPlugin end
 # A dummy Plugin subtype.
 struct Baz <: Plugin end
-# A Documenter with extra kwargs
-struct Bat <: Documenter
-    assets::Vector{AbstractString}
-    additional_kwargs::Vector{<:Pair}
-end
 
 # Various options to be passed into templates.
 const me = "christopher-dG"
@@ -402,19 +397,25 @@ end
     include(joinpath("plugins", "githubpages.jl"))
 end
 
+# A Documenter with extra kwargs
+struct Qux <: Documenter
+    assets::Vector{AbstractString}
+    additional_kwargs::AbstractDict
+end
 @testset "Documenter add kwargs" begin
     t = Template(; user=me)
     pkg_dir = joinpath(t.dir, test_pkg)
-    p = Bat(
+    p = Qux(
         [],
-        ["strict"=>true, "checkdocs"=>:none, "format"=>:markdown, "stringarg"=>"string"]
+        Dict("strict"=>true, "checkdocs"=>:none, "format"=>:markdown, "stringarg"=>"string")
     )
-    gen_plugin(p, t, test_pkg)
+    warn_str = "Ignoring predefined Documenter kwargs \"format\" from additional kwargs."
+    @test_logs (:warn, warn_str) gen_plugin(p, t, test_pkg)
     make = readchomp(joinpath(pkg_dir, "docs", "make.jl"))
     @test occursin(
         strip("""
-            strict=true,
             checkdocs=:none,
+            strict=true,
             stringarg="string",
         """),
         make,

@@ -33,14 +33,22 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
     end
 
     kwargs_string = if :additional_kwargs in fieldnames(typeof(p))
-        set_kwargs = ["modules", "format", "pages", "repo", "sitename", "authors", "assets"]
+        standard_kwargs = ["modules", "format", "pages", "repo", "sitename", "authors", "assets"]
 
         # We want something that looks like the following:
         #     key1="val1",
         #     key2="val2",
         #
-        kwargs = (x for x in p.additional_kwargs if first(x) ∉ set_kwargs)
-        join(string(tab, first(p), "=", repr(last(p)), ",\n") for p in kwargs)
+        valid_keys = [k for k in keys(p.additional_kwargs) if k ∉ standard_kwargs]
+        if length(p.additional_kwargs) > length(valid_keys)
+            invalid_keys = (repr(k) for k in keys(p.additional_kwargs) if k in standard_kwargs)
+            @warn string(
+                "Ignoring predefined Documenter kwargs ",
+                join(invalid_keys, ", "),
+                " from additional kwargs."
+            )
+        end
+        join(string(tab, k, "=", repr(p.additional_kwargs[k]), ",\n") for k in valid_keys)
     else
         ""
     end
