@@ -21,7 +21,7 @@ function generate(
         if git
             # Initialize the repo.
             repo = LibGit2.init(pkg_dir)
-            @info "Initialized git repo at $pkg_dir"
+            @info "Initialized Git repo at $pkg_dir"
 
             if gitconfig !== nothing
                 # Configure the repo.
@@ -105,7 +105,7 @@ function generate_interactive(
     git::Bool=true,
     gitconfig::Union{GitConfig, Nothing}=nothing,
 )
-    t = interactive_template(; fast=fast)
+    t = interactive_template(; git=git, fast=fast)
     generate(pkg, t; git=git, gitconfig=gitconfig)
     return t
 end
