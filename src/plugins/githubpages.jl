@@ -61,3 +61,8 @@ function gen_plugin(p::GitHubPages, t::Template, pkg_name::AbstractString)
     end
     return ["docs/"]
 end
+
+function interactive(::Type{GitHubPages})
+    print("GitHubPages: Enter any Documenter asset files (separated by spaces) []: ")
+    return GitHubPages(; assets=string.(split(readline())))
+end
