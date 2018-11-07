@@ -45,6 +45,8 @@ write(test_file, template_text)
     @test t.authors == LibGit2.getconfig("user.name", "")
     @test t.dir == default_dir
     @test t.julia_version == VERSION
+    @test !t.ssh
+    @test !t.manifest
     @test isempty(t.plugins)
 
     # Checking non-default field assignments.
@@ -71,6 +73,12 @@ write(test_file, template_text)
 
     t = Template(; user=me, julia_version=v"0.1.2")
     @test t.julia_version == v"0.1.2"
+
+    t = Template(; user=me, ssh=true)
+    @test t.ssh
+
+    t = Template(; user=me, manifest=true)
+    @test t.manifest
 
     # The template should contain whatever plugins you give it.
     t = Template(;
@@ -114,6 +122,7 @@ end
           → Package directory: $pkg_dir
           → Minimum Julia version: v$(PkgTemplates.version_floor())
           → SSH remote: No
+          → Commit Manifest.toml: No
           → Plugins: None
         """
     @test text == rstrip(expected)
@@ -121,6 +130,7 @@ end
         user=me,
         license="",
         ssh=true,
+        manifest=true,
         plugins=[
             TravisCI(),
             CodeCov(),
@@ -137,6 +147,7 @@ end
           → Package directory: $pkg_dir
           → Minimum Julia version: v$(PkgTemplates.version_floor())
           → SSH remote: Yes
+          → Commit Manifest.toml: Yes
           → Plugins:
             • CodeCov:
               → Config file: None
@@ -186,10 +197,7 @@ end
     gen_readme(pkg_dir, t)
     readme = readchomp(joinpath(pkg_dir, "README.md"))
     rm(joinpath(pkg_dir, "README.md"))
-    @test <(
-        something(findfirst("coveralls", readme)).start,
-        something(findfirst("baz", readme)).start,
-    )
+    @test findfirst("coveralls", readme).start < findfirst("baz", readme).start
 
     # Test the gitignore generation.
     @test gen_gitignore(pkg_dir, t) == [".gitignore"]
@@ -285,6 +293,26 @@ end
     generate(test_pkg, t; gitconfig=gitconfig)
     @test isdir(joinpath(temp_dir, test_pkg))
     rm(temp_dir; recursive=true)
+
+    # Check that the Manifest.toml is not commited by default.
+    t = Template(; user=me)
+    generate(test_pkg, t; gitconfig=gitconfig)
+    @test occursin("Manifest.toml", read(joinpath(pkg_dir, ".gitignore"), String))
+    # I'm not sure this is the "right" way to do this.
+    repo = GitRepo(pkg_dir)
+    idx = LibGit2.GitIndex(repo)
+    @test findall("Manifest.toml", idx) === nothing
+    rm(pkg_dir; recursive=true)
+
+    # And that it is when you tell it to be.
+    t = Template(; user=me, manifest=true)
+    generate(test_pkg, t; gitconfig=gitconfig)
+    @test !occursin("Manifest.toml", read(joinpath(pkg_dir, ".gitignore"), String))
+    # I'm not sure this is the "right" way to do this.
+    repo = GitRepo(pkg_dir)
+    idx = LibGit2.GitIndex(repo)
+    @test findall("Manifest.toml", idx) !== nothing
+    rm(pkg_dir; recursive=true)
 end
 
 @testset "Version floor" begin
