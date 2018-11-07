@@ -331,6 +331,13 @@ end
     rm(temp_dir; recursive=true)
 end
 
+@testset "Git-less package generation" begin
+    t = Template(; user=me)
+    generate(test_pkg, t; git=false)
+    @test !ispath(joinpath(t.dir, ".git"))
+    @test !isfile(joinpath(t.dir, ".gitignore"))
+end
+
 @testset "Version floor" begin
     @test version_floor(v"1.0.0") == "1.0"
     @test version_floor(v"1.0.1") == "1.0"
