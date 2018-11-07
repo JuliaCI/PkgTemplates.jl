@@ -23,6 +23,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
   package will go. Relative paths are converted to absolute ones at template creation time.
 * `julia_version::VersionNumber=$VERSION`: Minimum allowed Julia version.
 * `ssh::Bool=false`: Whether or not to use SSH for the remote.
+* `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
 @auto_hash_equals struct Template
@@ -33,6 +34,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
     dir::AbstractString
     julia_version::VersionNumber
     ssh::Bool
+    manifest::Bool
     plugins::Dict{DataType, Plugin}
 
     function Template(;
@@ -43,6 +45,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
         dir::AbstractString=Pkg.devdir(),
         julia_version::VersionNumber=VERSION,
         ssh::Bool=false,
+        manifest::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
     )
         # Check for required Git options for package generation
@@ -79,7 +82,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
             @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
-        new(user, host, license, authors, dir, julia_version, ssh, plugin_dict)
+        new(user, host, license, authors, dir, julia_version, ssh, manifest, plugin_dict)
     end
 end
 
@@ -101,6 +104,7 @@ function Base.show(io::IO, t::Template)
     println(io, "$spc→ Package directory: $(replace(maybe(t.dir), homedir() => "~"))")
     println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
     println(io, "$spc→ SSH remote: $(t.ssh ? "Yes" : "No")")
+    println(io, "$spc→ Commit Manifest.toml: $(t.manifest ? "Yes" : "No")")
 
     print(io, "$spc→ Plugins:")
     if isempty(t.plugins)
@@ -130,7 +134,7 @@ function interactive_template(; fast::Bool=false)
     kwargs = Dict{Symbol, Any}()
 
     default_user = LibGit2.getconfig("github.user", "")
-    print("Enter your username [$(isempty(default_user) ? "REQUIRED" : default_user)]: ")
+    print("Username [$(isempty(default_user) ? "REQUIRED" : default_user)]: ")
     user = readline()
     kwargs[:user] = if !isempty(user)
         user
@@ -144,7 +148,7 @@ function interactive_template(; fast::Bool=false)
         "https://github.com"
     else
         default_host = "github.com"
-        print("Enter the code hosting service [$default_host]: ")
+        print("Code hosting service [$default_host]: ")
         host = readline()
         isempty(host) ? default_host : host
     end
@@ -152,7 +156,7 @@ function interactive_template(; fast::Bool=false)
     kwargs[:license] = if fast
         "MIT"
     else
-        println("Select a license:")
+        println("License:")
         io = IOBuffer()
         available_licenses(io)
         licenses = ["" => "", collect(LICENSES)...]
@@ -169,7 +173,7 @@ function interactive_template(; fast::Bool=false)
     else
         default_authors = LibGit2.getconfig("user.name", "")
         default_str = isempty(default_authors) ? "None" : default_authors
-        print("Enter the package author(s) [$default_str]: ")
+        print("Package author(s) [$default_str]: ")
         authors = readline()
         isempty(authors) ? default_authors : authors
     end
@@ -178,7 +182,7 @@ function interactive_template(; fast::Bool=false)
         Pkg.devdir()
     else
         default_dir = Pkg.devdir()
-        print("Enter the path to the package directory [$default_dir]: ")
+        print("Path to package directory [$default_dir]: ")
         dir = readline()
         isempty(dir) ? default_dir : dir
     end
@@ -187,7 +191,7 @@ function interactive_template(; fast::Bool=false)
         VERSION
     else
         default_julia_version = VERSION
-        print("Enter the minimum Julia version [$(version_floor(default_julia_version))]: ")
+        print("Mminimum Julia version [$(version_floor(default_julia_version))]: ")
         julia_version = readline()
         isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
     end
@@ -196,10 +200,17 @@ function interactive_template(; fast::Bool=false)
         false
     else
         print("Set remote to SSH? [no]: ")
-        in(uppercase(readline()), ["Y", "YES", "T", "TRUE"])
+        uppercase(readline()) in ["Y", "YES", "T", "TRUE"]
     end
 
-    println("Select plugins:")
+    kwargs[:manifest] = if fast
+        false
+    else
+        print("Commit Manifest.toml? [no]: ")
+        uppercase(readline()) in ["Y", "YES", "T", "TRUE"]
+    end
+
+    println("Plugins:")
     # Only include plugin types which have an `interactive` method.
     plugin_types = filter(t -> hasmethod(interactive, (Type{t},)), fetch(plugin_types))
     type_names = map(t -> split(string(t), ".")[end], plugin_types)
