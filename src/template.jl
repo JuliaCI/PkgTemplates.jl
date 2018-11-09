@@ -126,7 +126,7 @@ function interactive_template(; fast::Bool=false)
     @info "Default values are shown in [brackets]"
     # Getting the leaf types in a separate thread eliminates an awkward wait after
     # "Select plugins" is printed.
-    plugin_types = @spawn leaves(Plugin)
+    plugin_types = @async leaves(Plugin)
     kwargs = Dict{Symbol, Any}()
 
     default_user = LibGit2.getconfig("github.user", "")
@@ -205,13 +205,11 @@ function interactive_template(; fast::Bool=false)
     type_names = map(t -> split(string(t), ".")[end], plugin_types)
     menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
     selected = collect(request(menu))
-    kwargs[:plugins] = Vector{Plugin}(
-        map(t -> interactive(t), getindex(plugin_types, selected))
-    )
+    kwargs[:plugins] = Vector{Plugin}(map(interactive, getindex(plugin_types, selected)))
 
     return Template(; kwargs...)
 end
 
-leaves(t::Type)::Vector{DataType} = isconcretetype(t) ? [t] : vcat(leaves.(subtypes(t))...)
+leaves(T::Type)::Vector{DataType} = isconcretetype(T) ? [T] : vcat(leaves.(subtypes(T))...)
 
 missingopt(name) = @warn "Git config option '$name' missing, package generation will fail unless you supply a GitConfig"

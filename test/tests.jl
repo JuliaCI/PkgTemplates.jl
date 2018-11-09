@@ -13,6 +13,11 @@ end
 struct Bar <: CustomPlugin end
 # A dummy Plugin subtype.
 struct Baz <: Plugin end
+# A Documenter with extra kwargs
+struct Qux <: Documenter
+    assets::Vector{AbstractString}
+    additional_kwargs::Union{AbstractDict, NamedTuple}
+end
 
 # Various options to be passed into templates.
 const me = "christopher-dG"
@@ -93,16 +98,6 @@ write(test_file, template_text)
         @test t.user == LibGit2.getconfig("github.user", "")
     end
     @test_throws ArgumentError Template(; user=me, license="FakeLicense")
-end
-
-# TerminalMenus doesn't work quite right on Travis OSX.
-if get(ENV, "TRAVIS_OS_NAME", "") != "osx"
-    include(joinpath("interactive", "interactive.jl"))
-    @testset "Interactive plugin creation" begin
-        include(joinpath("interactive", "plugins.jl"))
-    end
-else
-    @info "Skipping tests that require TerminalMenus on OSX"
 end
 
 @testset "Show methods" begin
@@ -397,12 +392,6 @@ end
     include(joinpath("plugins", "githubpages.jl"))
 end
 
-# A Documenter with extra kwargs
-struct Qux <: Documenter
-    assets::Vector{AbstractString}
-    additional_kwargs::Union{AbstractDict, NamedTuple}
-end
-
 @testset "Documenter add kwargs" begin
     t = Template(; user=me)
     pkg_dir = joinpath(t.dir, test_pkg)
@@ -441,5 +430,7 @@ end
     warn_str = "Ignoring predefined Documenter kwargs :format from additional kwargs"
     check_kwargs(kwargs, warn_str)
 end
+
+include(joinpath("interactive", "interactive.jl"))
 
 rm(test_file)
