@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PkgTemplates",
     "category": "section",
-    "text": "(Image: Stable) (Image: Latest) (Image: Build Status) (Image: Build Status) (Image: CodeCov)PkgTemplates is a Julia package for creating new Julia packages in an easy, repeatable, and customizable way."
+    "text": "(Image: Stable) (Image: Latest) (Image: Build Status) (Image: Build Status) (Image: Codecov)PkgTemplates is a Julia package for creating new Julia packages in an easy, repeatable, and customizable way."
 },
 
 {
@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Usage",
     "category": "section",
-    "text": "The simplest template requires no arguments.using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        CodeCov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-tree -r --name-only HEAD`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
+    "text": "The simplest template requires no arguments.using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-tree -r --name-only HEAD`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
 },
 
 {
@@ -209,11 +209,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.CodeCov",
+    "location": "pages/plugins.html#PkgTemplates.Codecov",
     "page": "Plugins",
-    "title": "PkgTemplates.CodeCov",
+    "title": "PkgTemplates.Codecov",
     "category": "type",
-    "text": "CodeCov(; config_file::Union{AbstractString, Nothing}=nothing) -> CodeCov\n\nAdd CodeCov to a template\'s plugins to optionally add a .codecov.yml configuration file to generated repositories, and an appropriate badge to the README. Also updates the .gitignore accordingly.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Nothing}=nothing: Path to a custom .codecov.yml. If left unset, no file will be generated.\n\n\n\n\n\n"
+    "text": "Codecov(; config_file::Union{AbstractString, Nothing}=nothing) -> Codecov\n\nAdd Codecov to a template\'s plugins to optionally add a .codecov.yml configuration file to generated repositories, and an appropriate badge to the README. Also updates the .gitignore accordingly.\n\nKeyword Arguments:\n\nconfig_file::Union{AbstractString, Nothing}=nothing: Path to a custom .codecov.yml. If left unset, no file will be generated.\n\n\n\n\n\n"
 },
 
 {
@@ -229,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugins",
     "title": "Code Coverage",
     "category": "section",
-    "text": "CodeCov\nCoveralls"
+    "text": "Codecov\nCoveralls"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plugin Development",
     "title": "PkgTemplates.interactive",
     "category": "function",
-    "text": "interactive(t::Type{<:Plugin}; file::Union{AbstractString, Nothing}=\"\") -> Plugin\n\nInteractively create a plugin of type t, where file is the plugin type\'s default config template with a non-standard name (for MyPlugin, this is anything but \"myplugin.yml\").\n\n\n\n\n\n"
+    "text": "interactive(T::Type{<:Plugin}; file::Union{AbstractString, Nothing}=\"\") -> Plugin\n\nInteractively create a plugin of type T, where file is the plugin type\'s default config template with a non-standard name (for MyPlugin, this is anything but \"myplugin.yml\").\n\n\n\n\n\n"
 },
 
 {
