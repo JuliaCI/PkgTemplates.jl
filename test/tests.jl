@@ -205,11 +205,17 @@ end
     gitignore = read(joinpath(pkg_dir, ".gitignore"), String)
     rm(joinpath(pkg_dir, ".gitignore"))
     @test occursin(".DS_Store", gitignore)
+    @test occursin("Manifest.toml", gitignore)
     for p in values(t.plugins)
         for entry in p.gitignore
             @test occursin(entry, gitignore)
         end
     end
+    t = Template(; user=me, manifest=true)
+    @test gen_gitignore(pkg_dir, t) == [".gitignore", "Manifest.toml"]
+    gitignore = read(joinpath(pkg_dir, ".gitignore"), String)
+    @test !occursin("Manifest.toml", gitignore)
+    rm(joinpath(pkg_dir, ".gitignore"))
 
     # Test the license generation.
     @test gen_license(pkg_dir, t) == ["LICENSE"]
@@ -227,7 +233,7 @@ end
     rm(joinpath(pkg_dir, "REQUIRE"))
 
     # Test the test generation.
-    @test gen_tests(pkg_dir, t) == ["Manifest.toml", "test/"]
+    @test gen_tests(pkg_dir, t) == ["test/"]
     @test isfile(joinpath(pkg_dir, "Project.toml"))
     project = read(joinpath(pkg_dir, "Project.toml"), String)
     @test occursin("[extras]\nTest = ", project)

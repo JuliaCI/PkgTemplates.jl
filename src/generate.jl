@@ -145,7 +145,7 @@ function gen_tests(pkg_dir::AbstractString, t::Template)
         """
 
     gen_file(joinpath(pkg_dir, "test", "runtests.jl"), text)
-    return ["Manifest.toml", "test/"]
+    return ["test/"]
 end
 
 """
@@ -227,7 +227,9 @@ function gen_gitignore(pkg_dir::AbstractString, t::Template)
     text = join(seen, "\n")
 
     gen_file(joinpath(pkg_dir, ".gitignore"), text)
-    return [".gitignore"]
+    files = [".gitignore"]
+    t.manifest && push!(files, "Manifest.toml")
+    return files
 end
 
 """
