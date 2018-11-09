@@ -319,6 +319,13 @@ end
     idx = LibGit2.GitIndex(repo)
     @test findall("Manifest.toml", idx) !== nothing
     rm(pkg_dir; recursive=true)
+
+    # Check that the created package ends up developed in the global environment.
+    t = Template(; user=me)
+    generate(test_pkg, t; gitconfig=gitconfig)
+    Pkg.activate()
+    @test haskey(Pkg.installed(), test_pkg)
+    rm(pkg_dir; recursive=true)
 end
 
 @testset "Version floor" begin
