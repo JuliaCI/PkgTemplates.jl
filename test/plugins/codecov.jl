@@ -1,38 +1,38 @@
 t = Template(; user=me)
 pkg_dir = joinpath(t.dir, test_pkg)
 
-@testset "CodeCov" begin
+@testset "Codecov" begin
     @testset "Plugin creation" begin
-        p = CodeCov()
+        p = Codecov()
         @test p.gitignore == ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
         @test p.src === nothing
         @test p.dest == ".codecov.yml"
         @test p.badges == [
             Badge(
-                "CodeCov",
+                "Codecov",
                 "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
                 "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
             )
         ]
         @test isempty(p.view)
-        p = CodeCov(; config_file=nothing)
+        p = Codecov(; config_file=nothing)
         @test p.src === nothing
-        p = CodeCov(; config_file=test_file)
+        p = Codecov(; config_file=test_file)
         @test p.src == test_file
-        @test_throws ArgumentError CodeCov(; config_file=fake_path)
+        @test_throws ArgumentError Codecov(; config_file=fake_path)
     end
 
     @testset "Badge generation" begin
-        p = CodeCov()
-        @test badges(p, me, test_pkg) == ["[![CodeCov](https://codecov.io/gh/$me/$test_pkg.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$me/$test_pkg.jl)"]
+        p = Codecov()
+        @test badges(p, me, test_pkg) == ["[![Codecov](https://codecov.io/gh/$me/$test_pkg.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/$me/$test_pkg.jl)"]
     end
 
     @testset "File generation" begin
-        p = CodeCov()
+        p = Codecov()
         @test isempty(gen_plugin(p, t, test_pkg))
         @test !isfile(joinpath(pkg_dir, ".codecov.yml"))
 
-        p = CodeCov(; config_file=test_file)
+        p = Codecov(; config_file=test_file)
         @test gen_plugin(p, t, test_pkg) == [".codecov.yml"]
         @test isfile(joinpath(pkg_dir, ".codecov.yml"))
     end

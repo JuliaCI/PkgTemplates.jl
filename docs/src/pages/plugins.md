@@ -19,7 +19,7 @@ GitLabCI
 ## Code Coverage
 
 ```@docs
-CodeCov
+Codecov
 Coveralls
 ```
 

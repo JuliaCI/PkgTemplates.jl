@@ -30,7 +30,7 @@ const template_text = """
             PKGNAME: {{PKGNAME}}
             VERSION: {{VERSION}}}
             {{#DOCUMENTER}}Documenter{{/DOCUMENTER}}
-            {{#CODECOV}}CodeCov{{/CODECOV}}
+            {{#CODECOV}}Codecov{{/CODECOV}}
             {{#COVERALLS}}Coveralls{{/COVERALLS}}
             {{#AFTER}}After{{/AFTER}}
             {{#OTHER}}Other{{/OTHER}}
@@ -75,13 +75,13 @@ write(test_file, template_text)
     # The template should contain whatever plugins you give it.
     t = Template(;
         user=me,
-        plugins = [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()],
+        plugins = [GitHubPages(), TravisCI(), AppVeyor(), Codecov(), Coveralls()],
     )
     @test Set(keys(t.plugins)) == Set(
-        [GitHubPages, TravisCI, AppVeyor, CodeCov, Coveralls]
+        [GitHubPages, TravisCI, AppVeyor, Codecov, Coveralls]
     )
     @test Set(values(t.plugins)) == Set(
-        [GitHubPages(), TravisCI(), AppVeyor(), CodeCov(), Coveralls()]
+        [GitHubPages(), TravisCI(), AppVeyor(), Codecov(), Coveralls()]
     )
 
     # Duplicate plugins should warn.
@@ -123,7 +123,7 @@ end
         ssh=true,
         plugins=[
             TravisCI(),
-            CodeCov(),
+            Codecov(),
             GitHubPages(),
         ],
     )
@@ -138,7 +138,7 @@ end
           → Minimum Julia version: v$(PkgTemplates.version_floor())
           → SSH remote: Yes
           → Plugins:
-            • CodeCov:
+            • Codecov:
               → Config file: None
               → 3 gitignore entries: "*.jl.cov", "*.jl.*.cov", "*.jl.mem"
             • GitHubPages:
@@ -155,7 +155,7 @@ end
     t = Template(;
         user=me,
         license="MPL",
-        plugins=[Coveralls(), TravisCI(), CodeCov(), GitHubPages(), AppVeyor()],
+        plugins=[Coveralls(), TravisCI(), Codecov(), GitHubPages(), AppVeyor()],
     )
     temp_dir = mktempdir()
     pkg_dir = joinpath(temp_dir, test_pkg)
@@ -299,7 +299,7 @@ end
     text = substitute(template_text, view)
     @test !occursin("PKGNAME: $test_pkg", text)
     @test !occursin("Documenter", text)
-    @test !occursin("CodeCov", text)
+    @test !occursin("Codecov", text)
     @test !occursin("Coveralls", text)
     @test !occursin("After", text)
     @test !occursin("Other", text)
@@ -325,9 +325,9 @@ end
     @test occursin("After", text)
     empty!(t.plugins)
 
-    t.plugins[CodeCov] = CodeCov()
+    t.plugins[Codecov] = Codecov()
     text = substitute(template_text, t; view=view)
-    @test occursin("CodeCov", text)
+    @test occursin("Codecov", text)
     @test occursin("After", text)
     empty!(t.plugins)
 

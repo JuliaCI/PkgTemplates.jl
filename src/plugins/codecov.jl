@@ -1,7 +1,7 @@
 """
-    CodeCov(; config_file::Union{AbstractString, Nothing}=nothing) -> CodeCov
+    Codecov(; config_file::Union{AbstractString, Nothing}=nothing) -> Codecov
 
-Add `CodeCov` to a template's plugins to optionally add a `.codecov.yml` configuration file
+Add `Codecov` to a template's plugins to optionally add a `.codecov.yml` configuration file
 to generated repositories, and an appropriate badge to the README. Also updates the
 `.gitignore` accordingly.
 
@@ -9,14 +9,14 @@ to generated repositories, and an appropriate badge to the README. Also updates 
 * `config_file::Union{AbstractString, Nothing}=nothing`: Path to a custom `.codecov.yml`.
   If left unset, no file will be generated.
 """
-@auto_hash_equals struct CodeCov <: GenericPlugin
+@auto_hash_equals struct Codecov <: GenericPlugin
     gitignore::Vector{AbstractString}
     src::Union{AbstractString, Nothing}
     dest::AbstractString
     badges::Vector{Badge}
     view::Dict{String, Any}
 
-    function CodeCov(; config_file::Union{AbstractString, Nothing}=nothing)
+    function Codecov(; config_file::Union{AbstractString, Nothing}=nothing)
         if config_file != nothing
             config_file = if isfile(config_file)
                 abspath(config_file)
@@ -30,7 +30,7 @@ to generated repositories, and an appropriate badge to the README. Also updates 
             ".codecov.yml",
             [
                 Badge(
-                    "CodeCov",
+                    "Codecov",
                     "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl/branch/master/graph/badge.svg",
                     "https://codecov.io/gh/{{USER}}/{{PKGNAME}}.jl",
                 ),
@@ -39,5 +39,6 @@ to generated repositories, and an appropriate badge to the README. Also updates 
         )
     end
 end
+Base.@deprecate_binding CodeCov Codecov
 
-interactive(plugin_type::Type{CodeCov}) = interactive(plugin_type; file=nothing)
+interactive(::Type{Codecov}) = interactive(Codecov; file=nothing)
