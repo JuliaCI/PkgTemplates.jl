@@ -50,7 +50,13 @@ Generating project MyPkg:
   [9e88b42a] - Serialization 
   [6462fe0b] - Sockets 
   [8dfed614] - Test 
+[ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/Project.toml.
 [ Info: Committed 7 files/directories: src/, Project.toml, test/, REQUIRE, README.md, .gitignore, LICENSE
+ Resolving package versions...
+  Updating `~/build/invenia/PkgTemplates.jl/Project.toml`
+  [d118b2b0] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  Updating `~/build/invenia/PkgTemplates.jl/Manifest.toml`
+  [d118b2b0] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
 .gitignore
@@ -140,7 +146,13 @@ Generating project MyPkg2:
   [9e88b42a] - Serialization 
   [6462fe0b] - Sockets 
   [8dfed614] - Test 
+[ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/Project.toml.
 [ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, .gitignore, LICENSE, .travis.yml, docs/, .appveyor.yml
+ Resolving package versions...
+  Updating `~/build/invenia/PkgTemplates.jl/Project.toml`
+  [d4fc73b0] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  Updating `~/build/invenia/PkgTemplates.jl/Manifest.toml`
+  [d4fc73b0] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
 [ Info: Remember to push all created branches to your remote: git push --all
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-tree -r --name-only HEAD`);
