@@ -27,14 +27,14 @@ const test_file = tempname()
 const default_dir = Pkg.devdir()
 const gitconfig = GitConfig(joinpath(@__DIR__, "gitconfig"))
 const template_text = """
-PKGNAME: {{PKGNAME}}
-VERSION: {{VERSION}}}
-{{#DOCUMENTER}}Documenter{{/DOCUMENTER}}
-{{#CODECOV}}Codecov{{/CODECOV}}
-{{#COVERALLS}}Coveralls{{/COVERALLS}}
-{{#AFTER}}After{{/AFTER}}
-{{#OTHER}}Other{{/OTHER}}
-"""
+    PKGNAME: {{PKGNAME}}
+    VERSION: {{VERSION}}}
+    {{#DOCUMENTER}}Documenter{{/DOCUMENTER}}
+    {{#CODECOV}}Codecov{{/CODECOV}}
+    {{#COVERALLS}}Coveralls{{/COVERALLS}}
+    {{#AFTER}}After{{/AFTER}}
+    {{#OTHER}}Other{{/OTHER}}
+    """
 write(test_file, template_text)
 
 @testset "Template creation" begin
@@ -333,7 +333,7 @@ end
 
 @testset "Git-less template creation" begin
     if isempty(LibGit2.getconfig("user.name", ""))
-        @test_nowarn Template(; user=me, git=false)
+        @test_logs Template(; user=me, git=false)
     end
 end
 
