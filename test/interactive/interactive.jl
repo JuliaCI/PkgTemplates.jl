@@ -45,7 +45,7 @@
         println()
 
         # Host and SSH aren't prompted for when git is disabled.
-        write(stdin.buffer, "$me\n\n\r\n\nd")
+        write(stdin.buffer, "$me\n\n\r\n\n\nd")
         t = interactive_template(; git=false)
         @test t.host == "github.com"
         @test !t.ssh
