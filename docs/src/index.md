@@ -47,7 +47,7 @@ t = Template(;
     ],
 )
 generate("MyPkg2", t)
-run(`git -C $(joinpath(t.dir, "MyPkg2")) ls-tree -r --name-only HEAD`);
+run(`git -C $(joinpath(t.dir, "MyPkg2")) ls-files`);
 ```
 
 If that looks like a lot of work, you can also create templates interactively

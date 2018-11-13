@@ -47,11 +47,12 @@ create a template, you can use [`interactive_template`](@ref) instead.
         ssh::Bool=false,
         manifest::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
+        git::Bool=true,
     )
         # Check for required Git options for package generation
         # (you can't commit to a repository without them).
-        isempty(LibGit2.getconfig("user.name", "")) && missingopt("user.name")
-        isempty(LibGit2.getconfig("user.email", "")) && missingopt("user.email")
+        git && isempty(LibGit2.getconfig("user.name", "")) && missingopt("user.name")
+        git && isempty(LibGit2.getconfig("user.email", "")) && missingopt("user.email")
 
         # If no username was set, look for one in the global git config.
         # Note: This is one of a few GitHub specifics (maybe we could use the host value).
@@ -126,7 +127,7 @@ end
 Interactively create a [`Template`](@ref). If `fast` is set, defaults will be assumed for
 all values except username and plugins.
 """
-function interactive_template(; fast::Bool=false)
+function interactive_template(; git::Bool=true, fast::Bool=false)
     @info "Default values are shown in [brackets]"
     # Getting the leaf types in a separate thread eliminates an awkward wait after
     # "Select plugins" is printed.
@@ -144,8 +145,8 @@ function interactive_template(; fast::Bool=false)
         throw(ArgumentError("Username is required"))
     end
 
-    kwargs[:host] = if fast
-        "https://github.com"
+    kwargs[:host] = if fast || !git
+        "https://github.com"  # If Git isn't enabled, this value never gets used.
     else
         default_host = "github.com"
         print("Code hosting service [$default_host]: ")
@@ -196,7 +197,7 @@ function interactive_template(; fast::Bool=false)
         isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
     end
 
-    kwargs[:ssh] = if fast
+    kwargs[:ssh] = if fast || !git
         false
     else
         print("Set remote to SSH? [no]: ")
@@ -218,7 +219,7 @@ function interactive_template(; fast::Bool=false)
     selected = collect(request(menu))
     kwargs[:plugins] = Vector{Plugin}(map(interactive, getindex(plugin_types, selected)))
 
-    return Template(; kwargs...)
+    return Template(; git=git, kwargs...)
 end
 
 leaves(T::Type)::Vector{DataType} = isconcretetype(T) ? [T] : vcat(leaves.(subtypes(T))...)
