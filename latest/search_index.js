@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Usage",
     "category": "section",
-    "text": "The simplest template requires no arguments.using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-tree -r --name-only HEAD`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
+    "text": "The simplest template requires no arguments.using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-files`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
 },
 
 {
@@ -93,7 +93,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.generate",
     "category": "function",
-    "text": "generate(pkg::AbstractString, t::Template) -> Nothing\ngenerate(t::Template, pkg::AbstractString) -> Nothing\n\nGenerate a package named pkg from t.\n\n\n\n\n\n"
+    "text": "generate(pkg::AbstractString, t::Template) -> Nothing\ngenerate(t::Template, pkg::AbstractString) -> Nothing\n\nGenerate a package named pkg from t. If git is false, no Git repository is created.\n\n\n\n\n\n"
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.generate_interactive",
     "category": "function",
-    "text": "generate_interactive(pkg::AbstractString; fast::Bool=false) -> Template\n\nInteractively create a template, and then generate a package with it. Arguments and keywords are used in the same way as in generate and interactive_template.\n\n\n\n\n\n"
+    "text": "generate_interactive(pkg::AbstractString; fast::Bool=false, git::Bool=true) -> Template\n\nInteractively create a template, and then generate a package with it. Arguments and keywords are used in the same way as in generate and interactive_template.\n\n\n\n\n\n"
 },
 
 {

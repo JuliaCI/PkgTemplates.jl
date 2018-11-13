@@ -16,7 +16,7 @@ julia&gt; generate(&quot;MyPkg&quot;, t)
 Generating project MyPkg:
     /home/travis/.julia/dev/MyPkg/Project.toml
     /home/travis/.julia/dev/MyPkg/src/MyPkg.jl
-[ Info: Initialized git repo at /home/travis/.julia/dev/MyPkg
+[ Info: Initialized Git repo at /home/travis/.julia/dev/MyPkg
 [ Info: Set remote origin to https://github.com/travis/MyPkg.jl
  Resolving package versions...
   Updating `~/.julia/dev/MyPkg/Project.toml`
@@ -51,12 +51,13 @@ Generating project MyPkg:
   [6462fe0b] - Sockets 
   [8dfed614] - Test 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/Project.toml.
-[ Info: Committed 7 files/directories: src/, Project.toml, test/, REQUIRE, README.md, .gitignore, LICENSE
+[ Info: Committed 7 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .gitignore
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/Project.toml`
-  [d118b2b0] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [22509038] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
   Updating `~/build/invenia/PkgTemplates.jl/Manifest.toml`
-  [d118b2b0] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [22509038] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+[ Info: New package is at /home/travis/.julia/dev/MyPkg
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
 .gitignore
@@ -111,7 +112,7 @@ julia&gt; generate(&quot;MyPkg2&quot;, t)
 Generating project MyPkg2:
     /home/travis/code/MyPkg2/Project.toml
     /home/travis/code/MyPkg2/src/MyPkg2.jl
-[ Info: Initialized git repo at /home/travis/code/MyPkg2
+[ Info: Initialized Git repo at /home/travis/code/MyPkg2
 [ Info: Set remote origin to git@github.com:myusername/MyPkg2.jl.git
 [ Info: Created empty gh-pages branch
  Resolving package versions...
@@ -147,15 +148,16 @@ Generating project MyPkg2:
   [6462fe0b] - Sockets 
   [8dfed614] - Test 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/Project.toml.
-[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, .gitignore, LICENSE, .travis.yml, docs/, .appveyor.yml
+[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .appveyor.yml, docs/, .travis.yml, .gitignore
+[ Info: Remember to push all created branches to your remote: git push --all
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/Project.toml`
-  [d4fc73b0] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [261ed47c] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
   Updating `~/build/invenia/PkgTemplates.jl/Manifest.toml`
-  [d4fc73b0] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
-[ Info: Remember to push all created branches to your remote: git push --all
+  [261ed47c] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+[ Info: New package is at /home/travis/code/MyPkg2
 
-julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-tree -r --name-only HEAD`);
+julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
 .appveyor.yml
 .gitignore
 .travis.yml
