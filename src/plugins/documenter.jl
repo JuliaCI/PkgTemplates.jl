@@ -72,7 +72,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
 
         makedocs(;
             modules=[$pkg_name],
-            format=:html,
+            format=Documenter.HTML(),
             pages=[
                 "Home" => "index.md",
             ],
