@@ -50,10 +50,6 @@ function gen_plugin(p::GitHubPages, t::Template, pkg_name::AbstractString)
 
                 deploydocs(;
                     repo="$(t.host)/$(t.user)/$pkg_name.jl",
-                    target="build",
-                    julia="1.0",
-                    deps=nothing,
-                    make=nothing,
                 )
                 """
             )
