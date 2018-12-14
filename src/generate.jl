@@ -230,7 +230,7 @@ Returns an array of generated file/directory names.
 function gen_gitignore(pkg_dir::AbstractString, t::Template)
     pkg = basename(pkg_dir)
     seen = [".DS_Store"]
-    t.manifest || push!(seen, "Manifest.toml")
+    t.manifest || push!(seen, "/Manifest.toml")  # Only ignore manifests at the repo root.
     patterns = vcat(map(p -> p.gitignore, values(t.plugins))...)
     for pattern in patterns
         if !in(pattern, seen)
