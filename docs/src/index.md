@@ -12,14 +12,23 @@ repeatable, and customizable way.**
 ## Installation
 
 ```julia
-(v1.0) pkg> add PkgTemplates
+pkg> add PkgTemplates
 ```
 
 ## Usage
 
+```@setup usage
+run(`git config --global user.name "Travis"`)
+run(`git config --global user.email "travis@c.i"`)
+run(`git config --global github.user "travis"`)
+using Pkg
+Pkg.activate(mktempdir())
+```
+
 The simplest template requires no arguments.
 
-```@repl
+
+```@repl usage
 using PkgTemplates
 t = Template()
 generate("MyPkg", t)
@@ -29,13 +38,13 @@ run(`git -C $(joinpath(t.dir, "MyPkg")) ls-files`);
 However, we can also configure a number of keyword arguments to
 [`Template`](@ref):
 
-```@repl
+```@repl usage
 using PkgTemplates
 t = Template(;
     user="myusername",
     license="MIT",
     authors=["Chris de Graaf", "Invenia Technical Computing Corporation"],
-    dir=joinpath(homedir(), "code"),
+    dir="~/code",
     julia_version=v"0.7",
     ssh=true,
     plugins=[
