@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · PkgTemplates.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>PkgTemplates.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>Home</a><ul class="internal"><li><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Usage-1">Usage</a></li><li><a class="toctext" href="#Comparison-to-PkgDev-1">Comparison to PkgDev</a></li><li><a class="toctext" href="#Contributing-1">Contributing</a></li></ul></li><li><a class="toctext" href="pages/package_generation/">Package Generation</a></li><li><a class="toctext" href="pages/plugins/">Plugins</a></li><li><a class="toctext" href="pages/plugin_development/">Plugin Development</a></li><li><a class="toctext" href="pages/licenses/">Licenses</a></li><li><a class="toctext" href="pages/">Index</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Home</a></li></ul><a class="edit-page" href="https://github.com/invenia/PkgTemplates.jl/blob/master/docs/src/index.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Home</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="PkgTemplates-1" href="#PkgTemplates-1">PkgTemplates</a></h1><p><a href="https://invenia.github.io/PkgTemplates.jl/stable"><img src="https://img.shields.io/badge/docs-stable-blue.svg" alt="Stable"/></a> <a href="https://invenia.github.io/PkgTemplates.jl/latest"><img src="https://img.shields.io/badge/docs-latest-blue.svg" alt="Latest"/></a> <a href="https://travis-ci.org/invenia/PkgTemplates.jl"><img src="https://travis-ci.org/invenia/PkgTemplates.jl.svg?branch=master" alt="Build Status"/></a> <a href="https://ci.appveyor.com/project/christopher-dG/pkgtemplates-jl/branch/master"><img src="https://ci.appveyor.com/api/projects/status/r24xamruqlm88uti/branch/master?svg=true" alt="Build Status"/></a> <a href="https://codecov.io/gh/invenia/PkgTemplates.jl"><img src="https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg" alt="Codecov"/></a></p><p><strong>PkgTemplates is a Julia package for creating new Julia packages in an easy, repeatable, and customizable way.</strong></p><h2><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h2><pre><code class="language-julia">pkg&gt; add PkgTemplates</code></pre><h2><a class="nav-anchor" id="Usage-1" href="#Usage-1">Usage</a></h2><div></div><p>The simplest template requires no arguments.</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
+ERROR: ArgumentError: Package PkgTemplates not found in current path:
+- Run `import Pkg; Pkg.add(&quot;PkgTemplates&quot;)` to install the PkgTemplates package.
+
+julia&gt; t = Template()
+ERROR: UndefVarError: Template not defined
+
+julia&gt; generate(&quot;MyPkg&quot;, t)
+ERROR: UndefVarError: generate not defined
+
+julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
+ERROR: UndefVarError: t not defined</code></pre><p>However, we can also configure a number of keyword arguments to <a href="pages/package_generation/#PkgTemplates.Template"><code>Template</code></a>:</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
+ERROR: ArgumentError: Package PkgTemplates not found in current path:
+- Run `import Pkg; Pkg.add(&quot;PkgTemplates&quot;)` to install the PkgTemplates package.
+
+julia&gt; t = Template(;
+           user=&quot;myusername&quot;,
+           license=&quot;MIT&quot;,
+           authors=[&quot;Chris de Graaf&quot;, &quot;Invenia Technical Computing Corporation&quot;],
+           dir=&quot;~/code&quot;,
+           julia_version=v&quot;0.7&quot;,
+           ssh=true,
+           plugins=[
+               TravisCI(),
+               Codecov(),
+               Coveralls(),
+               AppVeyor(),
+               GitHubPages(),
+           ],
+       )
+ERROR: UndefVarError: TravisCI not defined
+
+julia&gt; generate(&quot;MyPkg2&quot;, t)
+ERROR: UndefVarError: generate not defined
+
+julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
+ERROR: UndefVarError: t not defined</code></pre><p>If that looks like a lot of work, you can also create templates interactively with <a href="pages/package_generation/#PkgTemplates.interactive_template"><code>interactive_template</code></a>:</p><p><a href="https://asciinema.org/a/31bZqW9u8h5RHpd7gtsemioRV"><img src="https://asciinema.org/a/31bZqW9u8h5RHpd7gtsemioRV.png" alt="asciicast"/></a></p><p>And if that&#39;s <strong>still</strong> too much work for you, you can call <code>interactive_template</code> with <code>fast=true</code> to use default values for everything but username and plugin selection.</p><p>You can also use <a href="pages/package_generation/#PkgTemplates.generate_interactive"><code>generate_interactive</code></a> to interactively generate a template and then immediately use it to create a new package.</p><h2><a class="nav-anchor" id="Comparison-to-PkgDev-1" href="#Comparison-to-PkgDev-1">Comparison to PkgDev</a></h2><p><code>PkgTemplates</code> is similar in functionality to <a href="https://github.com/JuliaLang/PkgDev.jl"><code>PkgDev</code></a>&#39;s <code>generate</code> function. However, <code>PkgTemplates</code> offers more customizability in templates and more extensibility via plugins. For the package registration and release management features that <code>PkgTemplates</code> doesn&#39;t include, you are encouraged to use <a href="https://github.com/apps/attobot">AttoBot</a> instead.</p><h2><a class="nav-anchor" id="Contributing-1" href="#Contributing-1">Contributing</a></h2><p>It&#39;s extremely easy to extend <code>PkgTemplates</code> with new plugins. To get started, check out the <a href="https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html">plugin development guide</a>.</p><footer><hr/><a class="next" href="pages/package_generation/"><span class="direction">Next</span><span class="title">Package Generation</span></a></footer></article></body></html>

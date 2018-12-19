@@ -1,7 +1,7 @@
 var documenterSearchIndex = {"docs": [
 
 {
-    "location": "index.html#",
+    "location": "#",
     "page": "Home",
     "title": "Home",
     "category": "page",
@@ -9,7 +9,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#PkgTemplates-1",
+    "location": "#PkgTemplates-1",
     "page": "Home",
     "title": "PkgTemplates",
     "category": "section",
@@ -17,23 +17,23 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Installation-1",
+    "location": "#Installation-1",
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "(v1.0) pkg> add PkgTemplates"
+    "text": "pkg> add PkgTemplates"
 },
 
 {
-    "location": "index.html#Usage-1",
+    "location": "#Usage-1",
     "page": "Home",
     "title": "Usage",
     "category": "section",
-    "text": "The simplest template requires no arguments.using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=joinpath(homedir(), \"code\"),\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-files`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
+    "text": "run(`git config --global user.name \"Travis\"`)\nrun(`git config --global user.email \"travis@c.i\"`)\nrun(`git config --global github.user \"travis\"`)\nusing Pkg\nPkg.activate(mktempdir())The simplest template requires no arguments.using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=\"~/code\",\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-files`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
 },
 
 {
-    "location": "index.html#Comparison-to-PkgDev-1",
+    "location": "#Comparison-to-PkgDev-1",
     "page": "Home",
     "title": "Comparison to PkgDev",
     "category": "section",
@@ -41,7 +41,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Contributing-1",
+    "location": "#Contributing-1",
     "page": "Home",
     "title": "Contributing",
     "category": "section",
@@ -49,7 +49,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#",
+    "location": "pages/package_generation/#",
     "page": "Package Generation",
     "title": "Package Generation",
     "category": "page",
@@ -57,7 +57,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#Package-Generation-1",
+    "location": "pages/package_generation/#Package-Generation-1",
     "page": "Package Generation",
     "title": "Package Generation",
     "category": "section",
@@ -65,15 +65,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.Template",
+    "location": "pages/package_generation/#PkgTemplates.Template",
     "page": "Package Generation",
     "title": "PkgTemplates.Template",
     "category": "type",
-    "text": "Template(; kwargs...) -> Template\n\nRecords common information used to generate a package. If you don\'t wish to manually create a template, you can use interactive_template instead.\n\nKeyword Arguments\n\nuser::AbstractString=\"\": GitHub (or other code hosting service) username. If left unset, it will take the the global git config\'s value (github.user). If that is not set, an ArgumentError is thrown. This is case-sensitive for some plugins, so take care to enter it correctly.\nhost::AbstractString=\"github.com\": URL to the code hosting service where your package will reside. Note that while hosts other than GitHub won\'t cause errors, they are not officially supported and they will cause certain plugins will produce incorrect output.\nlicense::AbstractString=\"MIT\": Name of the package license. If an empty string is given, no license is created. available_licenses can be used to list all available licenses, and show_license can be used to print out a particular license\'s text.\nauthors::Union{AbstractString, Vector{<:AbstractString}}=\"\": Names that appear on the license. Supply a string for one author or an array for multiple. Similarly to user, it will take the value of of the global git config\'s value if it is left unset.\ndir::AbstractString=~/.julia/dev: Directory in which the package will go. Relative paths are converted to absolute ones at template creation time.\njulia_version::VersionNumber=1.0.2: Minimum allowed Julia version.\nssh::Bool=false: Whether or not to use SSH for the remote.\nmanifest::Bool=false: Whether or not to commit the Manifest.toml.\nplugins::Vector{<:Plugin}=Plugin[]: A list of Plugins that the package will include.\n\n\n\n\n\n"
+    "text": "Template(; kwargs...) -> Template\n\nRecords common information used to generate a package. If you don\'t wish to manually create a template, you can use interactive_template instead.\n\nKeyword Arguments\n\nuser::AbstractString=\"\": GitHub (or other code hosting service) username. If left unset, it will take the the global git config\'s value (github.user). If that is not set, an ArgumentError is thrown. This is case-sensitive for some plugins, so take care to enter it correctly.\nhost::AbstractString=\"github.com\": URL to the code hosting service where your package will reside. Note that while hosts other than GitHub won\'t cause errors, they are not officially supported and they will cause certain plugins will produce incorrect output.\nlicense::AbstractString=\"MIT\": Name of the package license. If an empty string is given, no license is created. available_licenses can be used to list all available licenses, and show_license can be used to print out a particular license\'s text.\nauthors::Union{AbstractString, Vector{<:AbstractString}}=\"\": Names that appear on the license. Supply a string for one author or an array for multiple. Similarly to user, it will take the value of of the global git config\'s value if it is left unset.\ndir::AbstractString=~/.julia/dev: Directory in which the package will go. Relative paths are converted to absolute ones at template creation time.\njulia_version::VersionNumber=1.0.3: Minimum allowed Julia version.\nssh::Bool=false: Whether or not to use SSH for the remote.\nmanifest::Bool=false: Whether or not to commit the Manifest.toml.\nplugins::Vector{<:Plugin}=Plugin[]: A list of Plugins that the package will include.\n\n\n\n\n\n"
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.interactive_template",
+    "location": "pages/package_generation/#PkgTemplates.interactive_template",
     "page": "Package Generation",
     "title": "PkgTemplates.interactive_template",
     "category": "function",
@@ -81,7 +81,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#Template-1",
+    "location": "pages/package_generation/#Template-1",
     "page": "Package Generation",
     "title": "Template",
     "category": "section",
@@ -89,7 +89,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.generate",
+    "location": "pages/package_generation/#PkgTemplates.generate",
     "page": "Package Generation",
     "title": "PkgTemplates.generate",
     "category": "function",
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.generate_interactive",
+    "location": "pages/package_generation/#PkgTemplates.generate_interactive",
     "page": "Package Generation",
     "title": "PkgTemplates.generate_interactive",
     "category": "function",
@@ -105,7 +105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#generate-1",
+    "location": "pages/package_generation/#generate-1",
     "page": "Package Generation",
     "title": "generate",
     "category": "section",
@@ -113,7 +113,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.gen_tests",
+    "location": "pages/package_generation/#PkgTemplates.gen_tests",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_tests",
     "category": "function",
@@ -121,7 +121,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.gen_require",
+    "location": "pages/package_generation/#PkgTemplates.gen_require",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_require",
     "category": "function",
@@ -129,7 +129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.gen_readme",
+    "location": "pages/package_generation/#PkgTemplates.gen_readme",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_readme",
     "category": "function",
@@ -137,7 +137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.gen_gitignore",
+    "location": "pages/package_generation/#PkgTemplates.gen_gitignore",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_gitignore",
     "category": "function",
@@ -145,7 +145,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#PkgTemplates.gen_license",
+    "location": "pages/package_generation/#PkgTemplates.gen_license",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_license",
     "category": "function",
@@ -153,7 +153,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation.html#Helper-Functions-1",
+    "location": "pages/package_generation/#Helper-Functions-1",
     "page": "Package Generation",
     "title": "Helper Functions",
     "category": "section",
@@ -161,7 +161,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#",
+    "location": "pages/plugins/#",
     "page": "Plugins",
     "title": "Plugins",
     "category": "page",
@@ -169,7 +169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#Plugins-1",
+    "location": "pages/plugins/#Plugins-1",
     "page": "Plugins",
     "title": "Plugins",
     "category": "section",
@@ -177,7 +177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.TravisCI",
+    "location": "pages/plugins/#PkgTemplates.TravisCI",
     "page": "Plugins",
     "title": "PkgTemplates.TravisCI",
     "category": "type",
@@ -185,7 +185,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.AppVeyor",
+    "location": "pages/plugins/#PkgTemplates.AppVeyor",
     "page": "Plugins",
     "title": "PkgTemplates.AppVeyor",
     "category": "type",
@@ -193,7 +193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.GitLabCI",
+    "location": "pages/plugins/#PkgTemplates.GitLabCI",
     "page": "Plugins",
     "title": "PkgTemplates.GitLabCI",
     "category": "type",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#Continuous-Integration-(CI)-1",
+    "location": "pages/plugins/#Continuous-Integration-(CI)-1",
     "page": "Plugins",
     "title": "Continuous Integration (CI)",
     "category": "section",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.Codecov",
+    "location": "pages/plugins/#PkgTemplates.Codecov",
     "page": "Plugins",
     "title": "PkgTemplates.Codecov",
     "category": "type",
@@ -217,7 +217,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.Coveralls",
+    "location": "pages/plugins/#PkgTemplates.Coveralls",
     "page": "Plugins",
     "title": "PkgTemplates.Coveralls",
     "category": "type",
@@ -225,7 +225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#Code-Coverage-1",
+    "location": "pages/plugins/#Code-Coverage-1",
     "page": "Plugins",
     "title": "Code Coverage",
     "category": "section",
@@ -233,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.Documenter",
+    "location": "pages/plugins/#PkgTemplates.Documenter",
     "page": "Plugins",
     "title": "PkgTemplates.Documenter",
     "category": "type",
@@ -241,15 +241,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugins.html#PkgTemplates.GitHubPages",
+    "location": "pages/plugins/#PkgTemplates.GitHubPages",
     "page": "Plugins",
     "title": "PkgTemplates.GitHubPages",
     "category": "type",
-    "text": "GitHubPages(; assets::Vector{<:AbstractString}=String[]) -> GitHubPages\n\nAdd GitHubPages to a template\'s plugins to add Documenter support via GitHub Pages, including automatic uploading of documentation from TravisCI. Also adds appropriate badges to the README, and updates the .gitignore accordingly.\n\nKeyword Arguments\n\nassets::Vector{<:AbstractString}=String[]: Array of paths to Documenter asset files.\n\n\n\n\n\n"
+    "text": "GitHubPages(; assets::Vector{<:AbstractString}=String[]) -> GitHubPages\n\nAdd GitHubPages to a template\'s plugins to add Documenter support via GitHub Pages, including automatic uploading of documentation from TravisCI. Also adds appropriate badges to the README, and updates the .gitignore accordingly.\n\nKeyword Arguments\n\nassets::Vector{<:AbstractString}=String[]: Array of paths to Documenter asset files.\n\nnote: Note\nIf deploying documentation with Travis CI, don\'t forget to complete the required configuration (see here).\n\n\n\n\n\n"
 },
 
 {
-    "location": "pages/plugins.html#Documentation-1",
+    "location": "pages/plugins/#Documentation-1",
     "page": "Plugins",
     "title": "Documentation",
     "category": "section",
@@ -257,7 +257,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#",
+    "location": "pages/plugin_development/#",
     "page": "Plugin Development",
     "title": "Plugin Development",
     "category": "page",
@@ -265,7 +265,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.Plugin",
+    "location": "pages/plugin_development/#PkgTemplates.Plugin",
     "page": "Plugin Development",
     "title": "PkgTemplates.Plugin",
     "category": "type",
@@ -273,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#Plugin-Development-1",
+    "location": "pages/plugin_development/#Plugin-Development-1",
     "page": "Plugin Development",
     "title": "Plugin Development",
     "category": "section",
@@ -281,7 +281,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.GenericPlugin",
+    "location": "pages/plugin_development/#PkgTemplates.GenericPlugin",
     "page": "Plugin Development",
     "title": "PkgTemplates.GenericPlugin",
     "category": "type",
@@ -289,7 +289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#Generic-Plugins-1",
+    "location": "pages/plugin_development/#Generic-Plugins-1",
     "page": "Plugin Development",
     "title": "Generic Plugins",
     "category": "section",
@@ -297,7 +297,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.CustomPlugin",
+    "location": "pages/plugin_development/#PkgTemplates.CustomPlugin",
     "page": "Plugin Development",
     "title": "PkgTemplates.CustomPlugin",
     "category": "type",
@@ -305,7 +305,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#Custom-Plugins-1",
+    "location": "pages/plugin_development/#Custom-Plugins-1",
     "page": "Plugin Development",
     "title": "Custom Plugins",
     "category": "section",
@@ -313,7 +313,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#CustomPlugin-Required-Methods-1",
+    "location": "pages/plugin_development/#CustomPlugin-Required-Methods-1",
     "page": "Plugin Development",
     "title": "CustomPlugin Required Methods",
     "category": "section",
@@ -321,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.gen_plugin",
+    "location": "pages/plugin_development/#PkgTemplates.gen_plugin",
     "page": "Plugin Development",
     "title": "PkgTemplates.gen_plugin",
     "category": "function",
@@ -329,7 +329,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.interactive",
+    "location": "pages/plugin_development/#PkgTemplates.interactive",
     "page": "Plugin Development",
     "title": "PkgTemplates.interactive",
     "category": "function",
@@ -337,7 +337,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#gen_plugin-1",
+    "location": "pages/plugin_development/#gen_plugin-1",
     "page": "Plugin Development",
     "title": "gen_plugin",
     "category": "section",
@@ -345,7 +345,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.badges",
+    "location": "pages/plugin_development/#PkgTemplates.badges",
     "page": "Plugin Development",
     "title": "PkgTemplates.badges",
     "category": "function",
@@ -353,7 +353,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#badges-1",
+    "location": "pages/plugin_development/#badges-1",
     "page": "Plugin Development",
     "title": "badges",
     "category": "section",
@@ -361,7 +361,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#Helper-Types/Functions-1",
+    "location": "pages/plugin_development/#Helper-Types/Functions-1",
     "page": "Plugin Development",
     "title": "Helper Types/Functions",
     "category": "section",
@@ -369,7 +369,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.gen_file",
+    "location": "pages/plugin_development/#PkgTemplates.gen_file",
     "page": "Plugin Development",
     "title": "PkgTemplates.gen_file",
     "category": "function",
@@ -377,7 +377,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#gen_file-1",
+    "location": "pages/plugin_development/#gen_file-1",
     "page": "Plugin Development",
     "title": "gen_file",
     "category": "section",
@@ -385,7 +385,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.substitute",
+    "location": "pages/plugin_development/#PkgTemplates.substitute",
     "page": "Plugin Development",
     "title": "PkgTemplates.substitute",
     "category": "function",
@@ -393,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#substitute-1",
+    "location": "pages/plugin_development/#substitute-1",
     "page": "Plugin Development",
     "title": "substitute",
     "category": "section",
@@ -401,7 +401,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.Badge",
+    "location": "pages/plugin_development/#PkgTemplates.Badge",
     "page": "Plugin Development",
     "title": "PkgTemplates.Badge",
     "category": "type",
@@ -409,7 +409,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#Badge-1",
+    "location": "pages/plugin_development/#Badge-1",
     "page": "Plugin Development",
     "title": "Badge",
     "category": "section",
@@ -417,7 +417,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.format",
+    "location": "pages/plugin_development/#PkgTemplates.format",
     "page": "Plugin Development",
     "title": "PkgTemplates.format",
     "category": "function",
@@ -425,7 +425,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#format-1",
+    "location": "pages/plugin_development/#format-1",
     "page": "Plugin Development",
     "title": "format",
     "category": "section",
@@ -433,7 +433,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#PkgTemplates.version_floor",
+    "location": "pages/plugin_development/#PkgTemplates.version_floor",
     "page": "Plugin Development",
     "title": "PkgTemplates.version_floor",
     "category": "function",
@@ -441,7 +441,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/plugin_development.html#version_floor-1",
+    "location": "pages/plugin_development/#version_floor-1",
     "page": "Plugin Development",
     "title": "version_floor",
     "category": "section",
@@ -449,7 +449,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#",
+    "location": "pages/licenses/#",
     "page": "Licenses",
     "title": "Licenses",
     "category": "page",
@@ -457,7 +457,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#PkgTemplates.available_licenses",
+    "location": "pages/licenses/#PkgTemplates.available_licenses",
     "page": "Licenses",
     "title": "PkgTemplates.available_licenses",
     "category": "function",
@@ -465,7 +465,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#PkgTemplates.show_license",
+    "location": "pages/licenses/#PkgTemplates.show_license",
     "page": "Licenses",
     "title": "PkgTemplates.show_license",
     "category": "function",
@@ -473,7 +473,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#Licenses-1",
+    "location": "pages/licenses/#Licenses-1",
     "page": "Licenses",
     "title": "Licenses",
     "category": "section",
@@ -481,7 +481,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#PkgTemplates.read_license",
+    "location": "pages/licenses/#PkgTemplates.read_license",
     "page": "Licenses",
     "title": "PkgTemplates.read_license",
     "category": "function",
@@ -489,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/licenses.html#Helper-Functions-1",
+    "location": "pages/licenses/#Helper-Functions-1",
     "page": "Licenses",
     "title": "Helper Functions",
     "category": "section",
@@ -497,7 +497,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/index.html#",
+    "location": "pages/#",
     "page": "Index",
     "title": "Index",
     "category": "page",
@@ -505,7 +505,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/index.html#Index-1",
+    "location": "pages/#Index-1",
     "page": "Index",
     "title": "Index",
     "category": "section",
