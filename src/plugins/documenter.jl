@@ -1,3 +1,4 @@
+const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 const STANDARD_KWS = [:modules, :format, :pages, :repo, :sitename, :authors, :assets]
 
 """
@@ -27,7 +28,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
     proj = Base.current_project()
     try
         Pkg.activate(docs_dir)
-        Pkg.add("Documenter")
+        Pkg.add(PackageSpec(; name="Documenter", uuid=DOCUMENTER_UUID))
     finally
         proj === nothing ? Pkg.activate() : Pkg.activate(proj)
     end
