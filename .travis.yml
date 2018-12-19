@@ -3,7 +3,6 @@ os:
   - linux
   - osx
 julia:
-  - 0.7
   - 1.0
   - nightly
 matrix:
@@ -12,10 +11,14 @@ matrix:
   fast_finish: true
 notifications:
   email: false
-after_success:
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; CodeCov.submit(process_folder())'
-  # For package generation examples.
-  - git config --global user.name "Travis"
-  - git config --global user.email "travis@c.i"
-  - git config --global github.user "travis"
-  - julia -e 'using Pkg; ps=Pkg.PackageSpec(name="Documenter", version="0.19"); Pkg.add(ps); Pkg.pin(ps); include(joinpath("docs", "make.jl"))'
+after_success: julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+jobs:
+  include:
+    - stage: Documentation
+      julia: 1.0
+      script: julia --project=docs -e '
+          using Pkg;
+          Pkg.develop(PackageSpec(path=pwd()));
+          Pkg.instantiate();
+          include("docs/make.jl");'
+      after_success: skip

@@ -20,14 +20,23 @@ abstract type Documenter <: CustomPlugin end
 
 function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
     path = joinpath(t.dir, pkg_name)
-    docs_dir = joinpath(path, "docs", "src")
+    docs_dir = joinpath(path, "docs")
     mkpath(docs_dir)
+
+    # Create the documentation project.
+    proj = Base.current_project()
+    try
+        Pkg.activate(docs_dir)
+        Pkg.add("Documenter")
+    finally
+        proj === nothing ? Pkg.activate() : Pkg.activate(proj)
+    end
 
     tab = repeat(" ", 4)
     assets_string = if !isempty(p.assets)
-        mkpath(joinpath(docs_dir, "assets"))
+        mkpath(joinpath(docs_dir, "src", "assets"))
         for file in p.assets
-            cp(file, joinpath(docs_dir, "assets", basename(file)))
+            cp(file, joinpath(docs_dir, "src", "assets", basename(file)))
         end
 
         # We want something that looks like the following:
@@ -55,7 +64,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         kws = [keys(p.additional_kwargs)...]
         valid_keys = filter(k -> !in(Symbol(k), STANDARD_KWS), kws)
         if length(p.additional_kwargs) > length(valid_keys)
-            invalid_keys = filter(k -> in(Symbol(k), STANDARD_KWS), kws)
+            invalid_keys = filter(k -> Symbol(k) in STANDARD_KWS, kws)
             @warn string(
                 "Ignoring predefined Documenter kwargs ",
                 join(map(repr, invalid_keys), ", "),
@@ -72,7 +81,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
 
         makedocs(;
             modules=[$pkg_name],
-            format=:html,
+            format=Documenter.HTML(),
             pages=[
                 "Home" => "index.md",
             ],
@@ -93,8 +102,8 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
     ```
     """
 
-    gen_file(joinpath(dirname(docs_dir), "make.jl"), make)
-    gen_file(joinpath(docs_dir, "index.md"), docs)
+    gen_file(joinpath(docs_dir, "make.jl"), make)
+    gen_file(joinpath(docs_dir, "src", "index.md"), docs)
 end
 
 function Base.show(io::IO, p::Documenter)

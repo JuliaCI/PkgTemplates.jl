@@ -2,7 +2,7 @@ using Documenter, PkgTemplates
 
 makedocs(;
     modules=[PkgTemplates],
-    format=:html,
+    format=Documenter.HTML(),
     pages=[
         "Home" => "index.md",
         "Package Generation" => "pages/package_generation.md",
@@ -19,8 +19,4 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/invenia/PkgTemplates.jl",
-    target="build",
-    julia="1.0",
-    deps=nothing,
-    make=nothing,
 )

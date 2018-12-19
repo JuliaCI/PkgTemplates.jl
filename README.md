@@ -12,7 +12,7 @@ repeatable, and customizable way.**
 ## Installation
 
 ```julia
-(v1.0) pkg> add PkgTemplates
+pkg> add PkgTemplates
 ```
 
 ## Usage
@@ -30,33 +30,10 @@ Template:
   → Package directory: ~/.julia/dev
   → Minimum Julia version: v1.0
   → SSH remote: No
+  → Commit Manifest.toml: No
   → Plugins: None
 
 julia> generate("MyPkg", t)
-Generating project MyPkg:
-    /Users/degraafc/.julia/dev/MyPkg/Project.toml
-    /Users/degraafc/.julia/dev/MyPkg/src/MyPkg.jl
-[ Info: Initialized git repo at /Users/degraafc/.julia/dev/MyPkg
-[ Info: Set remote origin to https://github.com/myusername/MyPkg.jl
-  Updating registry at `~/.julia/registries/General`
-  Updating git-repo `https://github.com/JuliaRegistries/General.git`
- Resolving package versions...
-  Updating `~/.julia/dev/MyPkg/Project.toml`
-  [8dfed614] + Test
-  Updating `~/.julia/dev/MyPkg/Manifest.toml`
-  [2a0f44e3] + Base64
-  [8ba89e20] + Distributed
-  [b77e0a4c] + InteractiveUtils
-  [8f399da3] + Libdl
-  [37e2e46d] + LinearAlgebra
-  [56ddb016] + Logging
-  [d6f4376e] + Markdown
-  [9a3f8284] + Random
-  [9e88b42a] + Serialization
-  [6462fe0b] + Sockets
-  [8dfed614] + Test
-[ Info: Staged and committed 8 files/directories: src/, Project.toml, Manifest.toml, test/, REQUIRE, README.md, .gitignore, LICENSE
-[ Info: Finished
 
 julia> run(`git -C $(joinpath(t.dir, "MyPkg")) ls-files`);
 .gitignore
@@ -76,7 +53,7 @@ julia> t = Template(;
            user="myusername",
            license="ISC",
            authors=["Chris de Graaf", "Invenia Technical Computing Corporation"],
-           dir=joinpath(homedir(), "code"),
+           dir="~/code",
            julia_version=v"0.7",
            plugins=[
                TravisCI(),
@@ -93,6 +70,7 @@ Template:
   → Package directory: ~/code
   → Minimum Julia version: v0.7
   → SSH remote: No
+  → Commit Manifest.toml: No
   → Plugins:
     • AppVeyor:
       → Config file: Default
@@ -111,40 +89,17 @@ Template:
       → 0 gitignore entries
 
 julia> generate(t, "MyPkg2")
-Generating project MyPkg2:
-    /Users/degraafc/code/MyPkg2/Project.toml
-    /Users/degraafc/code/MyPkg2/src/MyPkg2.jl
-[ Info: Initialized git repo at /Users/degraafc/code/MyPkg2
-[ Info: Set remote origin to https://github.com/myusername/MyPkg2.jl
-[ Info: Created empty gh-pages branch
- Resolving package versions...
-  Updating `~/code/MyPkg2/Project.toml`
-  [8dfed614] + Test
-  Updating `~/code/MyPkg2/Manifest.toml`
-  [2a0f44e3] + Base64
-  [8ba89e20] + Distributed
-  [b77e0a4c] + InteractiveUtils
-  [8f399da3] + Libdl
-  [37e2e46d] + LinearAlgebra
-  [56ddb016] + Logging
-  [d6f4376e] + Markdown
-  [9a3f8284] + Random
-  [9e88b42a] + Serialization
-  [6462fe0b] + Sockets
-  [8dfed614] + Test
-[ Info: Staged and committed 11 files/directories: src/, Project.toml, Manifest.toml, test/, REQUIRE, README.md, .gitignore, LICENSE, .appveyor.yml, .travis.yml, docs/
-[ Info: Finished
-[ Info: Remember to push all created branches to your remote: git push --all
 
 julia> run(`git -C $(joinpath(t.dir, "MyPkg2")) ls-files`);
 .appveyor.yml
 .gitignore
 .travis.yml
 LICENSE
-Manifest.toml
 Project.toml
 README.md
 REQUIRE
+docs/Manifest.toml
+docs/Project.toml
 docs/make.jl
 docs/src/index.md
 src/MyPkg2.jl

@@ -7,6 +7,11 @@ adds appropriate badges to the README, and updates the `.gitignore` accordingly.
 
 # Keyword Arguments
 * `assets::Vector{<:AbstractString}=String[]`: Array of paths to Documenter asset files.
+
+!!! note
+    If deploying documentation with Travis CI, don't forget to complete the required
+    configuration (see
+    [here](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1)).
 """
 @auto_hash_equals struct GitHubPages <: Documenter
     gitignore::Vector{AbstractString}
@@ -50,10 +55,6 @@ function gen_plugin(p::GitHubPages, t::Template, pkg_name::AbstractString)
 
                 deploydocs(;
                     repo="$(t.host)/$(t.user)/$pkg_name.jl",
-                    target="build",
-                    julia="1.0",
-                    deps=nothing,
-                    make=nothing,
                 )
                 """
             )

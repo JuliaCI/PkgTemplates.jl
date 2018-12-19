@@ -463,7 +463,7 @@ end
         @test occursin("\n    checkdocs=:none,\n", make)
 
         @test !occursin("format=:markdown", make)
-        @test occursin("format=:html", make)
+        @test occursin("format=Documenter.HTML()", make)
         rm(pkg_dir; recursive=true)
     end
     # Test with string kwargs
