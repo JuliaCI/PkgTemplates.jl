@@ -37,9 +37,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[Mustache]]
 deps = ["Tables", "Test"]
-git-tree-sha1 = "536782063c50421b05d1369bbd09fced13624361"
+git-tree-sha1 = "be8d12b4a84ed7b592a6540b71c664440a4dd7f1"
 uuid = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
-version = "0.5.7"
+version = "0.5.8"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
