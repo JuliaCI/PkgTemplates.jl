@@ -10,10 +10,10 @@ generated repositories, and appropriate badge(s) to the README.
 * `coverage::Bool=true`: Whether or not GitLab CI's built-in code coverage analysis should
   be enabled.
 """
-@auto_hash_equals struct GitLabCI <: GenericPlugin
-    gitignore::Vector{AbstractString}
-    src::Union{AbstractString, Nothing}
-    dest::AbstractString
+struct GitLabCI <: GenericPlugin
+    gitignore::Vector{String}
+    src::Union{String, Nothing}
+    dest::String
     badges::Vector{Badge}
     view::Dict{String, Any}
 

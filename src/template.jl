@@ -26,16 +26,16 @@ create a template, you can use [`interactive_template`](@ref) instead.
 * `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
-@auto_hash_equals struct Template
-    user::AbstractString
-    host::AbstractString
-    license::AbstractString
-    authors::AbstractString
-    dir::AbstractString
+struct Template
+    user::String
+    host::String
+    license::String
+    authors::String
+    dir::String
     julia_version::VersionNumber
     ssh::Bool
     manifest::Bool
-    plugins::Dict{DataType, Plugin}
+    plugins::Dict{DataType, <:Plugin}
 
     function Template(;
         user::AbstractString="",

@@ -9,10 +9,10 @@ to generated repositories, and an appropriate badge to the README. Also updates 
 * `config_file::Union{AbstractString, Nothing}=nothing`: Path to a custom `.codecov.yml`.
   If left unset, no file will be generated.
 """
-@auto_hash_equals struct Codecov <: GenericPlugin
-    gitignore::Vector{AbstractString}
-    src::Union{AbstractString, Nothing}
-    dest::AbstractString
+struct Codecov <: GenericPlugin
+    gitignore::Vector{String}
+    src::Union{String, Nothing}
+    dest::String
     badges::Vector{Badge}
     view::Dict{String, Any}
 

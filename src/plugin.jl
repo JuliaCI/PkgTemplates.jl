@@ -21,7 +21,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 
 # Example
 ```julia
-@auto_hash_equals struct MyPlugin <: GenericPlugin
+struct MyPlugin <: GenericPlugin
     gitignore::Vector{AbstractString}
     src::Union{AbstractString, Nothing}
     dest::AbstractString
@@ -96,7 +96,7 @@ signature.
 
 # Example
 ```julia
-@auto_hash_equals struct MyPlugin <: CustomPlugin
+struct MyPlugin <: CustomPlugin
     gitignore::Vector{AbstractString}
     lucky::Bool
 
@@ -152,10 +152,10 @@ A `Badge` contains the data necessary to generate a Markdown badge.
 * `image::AbstractString`: URL to the image to display.
 * `link::AbstractString`: URL to go to upon clicking the badge.
 """
-@auto_hash_equals struct Badge
-    hover::AbstractString
-    image::AbstractString
-    link::AbstractString
+struct Badge
+    hover::String
+    image::String
+    link::String
 end
 
 """

@@ -9,10 +9,10 @@ file to generated repositories, and an appropriate badge to the README. Also upd
 * `config_file::Union{AbstractString, Nothing}=nothing`: Path to a custom `.coveralls.yml`.
   If left unset, no file will be generated.
 """
-@auto_hash_equals struct Coveralls <: GenericPlugin
-    gitignore::Vector{AbstractString}
-    src::Union{AbstractString, Nothing}
-    dest::AbstractString
+struct Coveralls <: GenericPlugin
+    gitignore::Vector{String}
+    src::Union{String, Nothing}
+    dest::String
     badges::Vector{Badge}
     view::Dict{String, Any}
 

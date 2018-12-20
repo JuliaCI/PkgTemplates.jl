@@ -1,6 +1,5 @@
 module PkgTemplates
 
-using AutoHashEquals
 using Dates
 using InteractiveUtils
 using LibGit2
