@@ -69,19 +69,19 @@ abstract type GenericPlugin <: Plugin end
 
 function Base.show(io::IO, p::GenericPlugin)
     spc = "  "
-    println(io, "$(nameof(typeof(p))):")
+    println(io, nameof(typeof(p)), ":")
 
     cfg = if p.src === nothing
         "None"
     else
         dirname(p.src) == DEFAULTS_DIR ? "Default" : p.src
     end
-    println(io, "$spc→ Config file: $cfg")
+    println(io, spc, "→ Config file: ", cfg)
 
     n = length(p.gitignore)
     s = n == 1 ? "" : "s"
-    print(io, "$spc→ $n gitignore entrie$s")
-    n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
+    print(io, spc, "→ $n gitignore entrie$s")
+    n > 0 && print(io, ": ", join(map(repr, p.gitignore), ", "))
 end
 
 """
@@ -230,7 +230,7 @@ function interactive(T::Type{<:GenericPlugin}; file::Union{AbstractString, Nothi
     if default_config_file == nothing
         print("[None]: ")
     else
-        print("[$(replace(default_config_file, homedir() => "~"))]: ")
+        print("[", replace(default_config_file, homedir() => "~"), "]: ")
     end
 
     config_file = readline()

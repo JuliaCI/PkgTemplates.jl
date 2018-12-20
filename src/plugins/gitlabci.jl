@@ -61,7 +61,7 @@ function interactive(::Type{GitLabCI})
     default_config_file = joinpath(DEFAULTS_DIR, "gitlab-ci.yml")
 
     print("$name: Enter the config template filename (\"None\" for no file) ")
-    print("[$default_config_file]: ")
+    print("[", replace(default_config_file, homedir() => "~"), "]: ")
     config_file = readline()
     kwargs[:config_file] = if uppercase(config_file) == "NONE"
         nothing
