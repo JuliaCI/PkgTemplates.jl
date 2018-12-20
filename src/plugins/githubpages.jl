@@ -13,9 +13,9 @@ adds appropriate badges to the README, and updates the `.gitignore` accordingly.
     configuration (see
     [here](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1)).
 """
-@auto_hash_equals struct GitHubPages <: Documenter
-    gitignore::Vector{AbstractString}
-    assets::Vector{AbstractString}
+struct GitHubPages <: Documenter
+    gitignore::Vector{String}
+    assets::Vector{String}
 
     function GitHubPages(; assets::Vector{<:AbstractString}=String[])
         for file in assets

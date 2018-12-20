@@ -109,19 +109,19 @@ end
 
 function Base.show(io::IO, p::Documenter)
     spc = "  "
-    println(io, "$(nameof(typeof(p))):")
+    println(io, nameof(typeof(p)), ":")
 
     n = length(p.assets)
     s = n == 1 ? "" : "s"
-    print(io, "$spc→ $n asset file$s")
+    print(io, spc, "→ $n asset file$s")
     if n == 0
         println(io)
     else
-        println(io, ": $(join(map(a -> replace(a, homedir() => "~"), p.assets), ", "))")
+        println(io, ": ", join(map(a -> replace(a, homedir() => "~"), p.assets), ", "))
     end
 
     n = length(p.gitignore)
     s = n == 1 ? "" : "s"
     print(io, "$spc→ $n gitignore entrie$s")
-    n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
+    n > 0 && print(io, ": ", join(map(repr, p.gitignore), ", "))
 end

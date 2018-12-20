@@ -85,11 +85,8 @@ write(test_file, template_text)
         user=me,
         plugins = [GitHubPages(), TravisCI(), AppVeyor(), Codecov(), Coveralls()],
     )
-    @test Set(keys(t.plugins)) == Set(
+    @test Set(keys(t.plugins)) == Set(map(typeof, values(t.plugins))) == Set(
         [GitHubPages, TravisCI, AppVeyor, Codecov, Coveralls]
-    )
-    @test Set(values(t.plugins)) == Set(
-        [GitHubPages(), TravisCI(), AppVeyor(), Codecov(), Coveralls()]
     )
 
     # Duplicate plugins should warn.

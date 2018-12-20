@@ -8,10 +8,10 @@ generated repositories, and an appropriate badge to the README.
 * `config_file::Union{AbstractString, Nothing}=""`: Path to a custom `.travis.yml`.
   If `nothing` is supplied, no file will be generated.
 """
-@auto_hash_equals struct TravisCI <: GenericPlugin
-    gitignore::Vector{AbstractString}
-    src::Union{AbstractString, Nothing}
-    dest::AbstractString
+struct TravisCI <: GenericPlugin
+    gitignore::Vector{String}
+    src::Union{String, Nothing}
+    dest::String
     badges::Vector{Badge}
     view::Dict{String, Any}
 

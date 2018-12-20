@@ -26,16 +26,16 @@ create a template, you can use [`interactive_template`](@ref) instead.
 * `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
-@auto_hash_equals struct Template
-    user::AbstractString
-    host::AbstractString
-    license::AbstractString
-    authors::AbstractString
-    dir::AbstractString
+struct Template
+    user::String
+    host::String
+    license::String
+    authors::String
+    dir::String
     julia_version::VersionNumber
     ssh::Bool
     manifest::Bool
-    plugins::Dict{DataType, Plugin}
+    plugins::Dict{DataType, <:Plugin}
 
     function Template(;
         user::AbstractString="",
@@ -88,26 +88,26 @@ create a template, you can use [`interactive_template`](@ref) instead.
 end
 
 function Base.show(io::IO, t::Template)
-    maybe(s::AbstractString) = isempty(string(s)) ? "None" : string(s)
+    maybe(s::String) = isempty(s) ? "None" : s
     spc = "  "
 
     println(io, "Template:")
-    println(io, "$spc→ User: $(maybe(t.user))")
-    println(io, "$spc→ Host: $(maybe(t.host))")
+    println(io, spc, "→ User: ", maybe(t.user))
+    println(io, spc, "→ Host: ", maybe(t.host))
 
-    print(io, "$spc→ License: ")
+    print(io, spc, "→ License: ")
     if isempty(t.license)
         println(io, "None")
     else
-        println(io, "$(t.license) ($(t.authors) $(year(today())))")
+        println(io, t.license, " ($(t.authors) ", year(today()), ")")
     end
 
-    println(io, "$spc→ Package directory: $(replace(maybe(t.dir), homedir() => "~"))")
-    println(io, "$spc→ Minimum Julia version: v$(version_floor(t.julia_version))")
-    println(io, "$spc→ SSH remote: $(t.ssh ? "Yes" : "No")")
-    println(io, "$spc→ Commit Manifest.toml: $(t.manifest ? "Yes" : "No")")
+    println(io, spc, "→ Package directory: ", replace(maybe(t.dir), homedir() => "~"))
+    println(io, spc, "→ Minimum Julia version: v", version_floor(t.julia_version))
+    println(io, spc, "→ SSH remote: ", t.ssh ? "Yes" : "No")
+    println(io, spc, "→ Commit Manifest.toml: ", t.manifest ? "Yes" : "No")
 
-    print(io, "$spc→ Plugins:")
+    print(io, spc, "→ Plugins:")
     if isempty(t.plugins)
         print(io, " None")
     else
@@ -115,7 +115,7 @@ function Base.show(io::IO, t::Template)
             println(io)
             buf = IOBuffer()
             show(buf, plugin)
-            print(io, "$(spc^2)• ")
+            print(io, spc^2, "• ")
             print(io, join(split(String(take!(buf)), "\n"), "\n$(spc^2)"))
         end
     end
@@ -135,7 +135,7 @@ function interactive_template(; git::Bool=true, fast::Bool=false)
     kwargs = Dict{Symbol, Any}()
 
     default_user = LibGit2.getconfig("github.user", "")
-    print("Username [$(isempty(default_user) ? "REQUIRED" : default_user)]: ")
+    print("Username [", isempty(default_user) ? "REQUIRED" : default_user, "]: ")
     user = readline()
     kwargs[:user] = if !isempty(user)
         user
@@ -192,7 +192,7 @@ function interactive_template(; git::Bool=true, fast::Bool=false)
         VERSION
     else
         default_julia_version = VERSION
-        print("Mminimum Julia version [$(version_floor(default_julia_version))]: ")
+        print("Minimum Julia version [", version_floor(default_julia_version), "]: ")
         julia_version = readline()
         isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
     end

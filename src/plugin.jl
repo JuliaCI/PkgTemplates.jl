@@ -21,7 +21,7 @@ Generic plugins are plugins that add any number of patterns to the generated pac
 
 # Example
 ```julia
-@auto_hash_equals struct MyPlugin <: GenericPlugin
+struct MyPlugin <: GenericPlugin
     gitignore::Vector{AbstractString}
     src::Union{AbstractString, Nothing}
     dest::AbstractString
@@ -69,19 +69,19 @@ abstract type GenericPlugin <: Plugin end
 
 function Base.show(io::IO, p::GenericPlugin)
     spc = "  "
-    println(io, "$(nameof(typeof(p))):")
+    println(io, nameof(typeof(p)), ":")
 
     cfg = if p.src === nothing
         "None"
     else
         dirname(p.src) == DEFAULTS_DIR ? "Default" : p.src
     end
-    println(io, "$spc→ Config file: $cfg")
+    println(io, spc, "→ Config file: ", cfg)
 
     n = length(p.gitignore)
     s = n == 1 ? "" : "s"
-    print(io, "$spc→ $n gitignore entrie$s")
-    n > 0 && print(io, ": $(join(map(g -> "\"$g\"", p.gitignore), ", "))")
+    print(io, spc, "→ $n gitignore entrie$s")
+    n > 0 && print(io, ": ", join(map(repr, p.gitignore), ", "))
 end
 
 """
@@ -96,7 +96,7 @@ signature.
 
 # Example
 ```julia
-@auto_hash_equals struct MyPlugin <: CustomPlugin
+struct MyPlugin <: CustomPlugin
     gitignore::Vector{AbstractString}
     lucky::Bool
 
@@ -152,10 +152,10 @@ A `Badge` contains the data necessary to generate a Markdown badge.
 * `image::AbstractString`: URL to the image to display.
 * `link::AbstractString`: URL to go to upon clicking the badge.
 """
-@auto_hash_equals struct Badge
-    hover::AbstractString
-    image::AbstractString
-    link::AbstractString
+struct Badge
+    hover::String
+    image::String
+    link::String
 end
 
 """
@@ -230,7 +230,7 @@ function interactive(T::Type{<:GenericPlugin}; file::Union{AbstractString, Nothi
     if default_config_file == nothing
         print("[None]: ")
     else
-        print("[$(replace(default_config_file, homedir() => "~"))]: ")
+        print("[", replace(default_config_file, homedir() => "~"), "]: ")
     end
 
     config_file = readline()
