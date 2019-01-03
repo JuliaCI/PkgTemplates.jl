@@ -14,6 +14,7 @@ describes plugins that already exist; for information on writing your own plugin
 TravisCI
 AppVeyor
 GitLabCI
+CirrusCI
 ```
 
 ## Code Coverage
