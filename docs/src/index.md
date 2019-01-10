@@ -23,6 +23,7 @@ run(`git config --global user.email "travis@c.i"`)
 run(`git config --global github.user "travis"`)
 using Pkg
 Pkg.activate(mktempdir())
+Pkg.add(PackageSpec(path=dirname(dirname(pwd()))))
 ```
 
 The simplest template requires no arguments.
