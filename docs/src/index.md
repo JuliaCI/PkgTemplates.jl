@@ -18,9 +18,10 @@ pkg> add PkgTemplates
 ## Usage
 
 ```@setup usage
-run(`git config --global user.name "Travis"`)
-run(`git config --global user.email "travis@c.i"`)
-run(`git config --global github.user "travis"`)
+using LibGit2: getconfig
+isempty(getconfig("user.name", "")) && run(`git config --global user.name "Travis"`)
+isempty(getconfig("user.email", "")) && run(`git config --global user.email "travis@c.i"`)
+isempty(getconfig("github.user", "")) && run(`git config --global github.user "travis"`)
 using Pkg
 Pkg.activate(mktempdir())
 # This code gets run in docs/build/, so this path evaluates to the repo root.
