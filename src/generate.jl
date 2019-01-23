@@ -229,15 +229,12 @@ Returns an array of generated file/directory names.
 """
 function gen_gitignore(pkg_dir::AbstractString, t::Template)
     pkg = basename(pkg_dir)
-    seen = [".DS_Store"]
-    t.manifest || push!(seen, "/Manifest.toml")  # Only ignore manifests at the repo root.
-    patterns = vcat(map(p -> p.gitignore, values(t.plugins))...)
-    for pattern in patterns
-        if !in(pattern, seen)
-            push!(seen, pattern)
-        end
+    entries = mapfoldl(p -> p.gitignore, append!, values(t.plugins); init=[".DS_Store"])
+    if !t.manifest && !in("Manifest.toml", entries)
+        push!(entries, "/Manifest.toml")  # Only ignore manifests at the repo root.
     end
-    text = join(seen, "\n")
+    unique!(sort!(entries))
+    text = join(entries, "\n")
 
     gen_file(joinpath(pkg_dir, ".gitignore"), text)
     files = [".gitignore"]
