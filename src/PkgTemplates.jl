@@ -19,6 +19,7 @@ export
     available_licenses,
     # Plugins.
     GitHubPages,
+    GitLabPages,
     AppVeyor,
     TravisCI,
     GitLabCI,
@@ -42,8 +43,9 @@ include(joinpath("plugins", "codecov.jl"))
 include(joinpath("plugins", "travisci.jl"))
 include(joinpath("plugins", "gitlabci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
+include(joinpath("plugins", "gitlabpages.jl"))
 
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
-const BADGE_ORDER = [GitHubPages, TravisCI, AppVeyor, GitLabCI, Codecov, Coveralls]
+const BADGE_ORDER = [GitHubPages, GitLabPages, TravisCI, AppVeyor, GitLabCI, Codecov, Coveralls]
 
 end
