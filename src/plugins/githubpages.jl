@@ -36,9 +36,9 @@ function badges(::GitHubPages, user::AbstractString, pkg_name::AbstractString)
             "https://$user.github.io/$pkg_name.jl/stable"
         )),
         format(Badge(
-            "Latest",
-            "https://img.shields.io/badge/docs-latest-blue.svg",
-            "https://$user.github.io/$pkg_name.jl/latest"
+            "Dev",
+            "https://img.shields.io/badge/docs-dev-blue.svg",
+            "https://$user.github.io/$pkg_name.jl/dev"
         )),
     ]
 end

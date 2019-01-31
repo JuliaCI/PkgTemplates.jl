@@ -15,7 +15,7 @@ pkg_dir = joinpath(t.dir, test_pkg)
         p = GitHubPages()
         @test badges(p, me, test_pkg) ==  [
             "[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://$me.github.io/$test_pkg.jl/stable)"
-            "[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://$me.github.io/$test_pkg.jl/latest)"
+            "[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://$me.github.io/$test_pkg.jl/dev)"
         ]
     end
 
