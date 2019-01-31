@@ -54,9 +54,9 @@ Generating project MyPkg:
 [ Info: Committed 7 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .gitignore
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [ac0341d8] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [ddd7a30a] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [ac0341d8] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [ddd7a30a] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
 [ Info: New package is at /home/travis/.julia/dev/MyPkg
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
@@ -149,11 +149,12 @@ Generating project MyPkg2:
   [8dfed614] - Test 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
  Resolving package versions...
+ Installed Documenter ─ v0.21.1
   Updating `~/code/MyPkg2/docs/Project.toml`
-  [e30172f5] + Documenter v0.21.0
+  [e30172f5] + Documenter v0.21.1
   Updating `~/code/MyPkg2/docs/Manifest.toml`
   [ffbed154] + DocStringExtensions v0.6.0
-  [e30172f5] + Documenter v0.21.0
+  [e30172f5] + Documenter v0.21.1
   [2a0f44e3] + Base64 
   [ade2ca70] + Dates 
   [8ba89e20] + Distributed 
@@ -174,13 +175,13 @@ Generating project MyPkg2:
   [cf7118a7] + UUIDs 
   [4ec0a83e] + Unicode 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
-[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .travis.yml, docs/, .appveyor.yml, .gitignore
+[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, docs/, .appveyor.yml, .travis.yml, .gitignore
 [ Info: Remember to push all created branches to your remote: git push --all
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [adc97b7c] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [df850c1a] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [adc97b7c] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [df850c1a] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
 [ Info: New package is at /home/travis/code/MyPkg2
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
