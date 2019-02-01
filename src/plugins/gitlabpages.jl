@@ -24,14 +24,10 @@ struct GitLabPages <: Documenter
 end
 
 function badges(::GitLabPages, user::AbstractString, pkg_name::AbstractString)
+    # We are only including a badge for `dev` documentation since versioned documentation
+    # is not supported in GitLab pages yet.  See:
+    # https://github.com/invenia/PkgTemplates.jl/pull/54
     return [
-        #=
-        format(Badge(
-            "Stable",
-            "https://img.shields.io/badge/docs-stable-blue.svg",
-            "https://$user.gitlab.io/$pkg_name.jl/stable"
-        )),
-        =#
         format(Badge(
             "Dev",
             "https://img.shields.io/badge/docs-dev-blue.svg",
