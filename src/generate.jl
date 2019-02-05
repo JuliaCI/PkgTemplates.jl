@@ -18,6 +18,11 @@ function generate(
         # Create the directory with some boilerplate inside.
         Pkg.generate(pkg_dir)
 
+        # Replace the UUID with something that's compatible with METADATA.
+        project = joinpath(pkg_dir, "Project.toml")
+        uuid = string(Pkg.METADATA_compatible_uuid(pkg))
+        write(project, replace(read(project, String), r"uuid = .*" => "uuid = \"$uuid\""))
+
         if git
             # Initialize the repo.
             repo = LibGit2.init(pkg_dir)
