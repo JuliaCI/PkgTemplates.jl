@@ -6,3 +6,21 @@ Julia {{VERSION}}:
   after_script:
     - julia -e 'using Printf; using Pkg; Pkg.add("Coverage"); using Coverage; c, t = get_summary(process_folder()); @printf "Test Coverage %.2f%%\n" 100c/t'
 {{/GITLABCOVERAGE}}
+{{#DOCUMENTER}}
+pages:
+  image: julia:{{VERSION}}
+  stage: deploy
+  script:
+    - julia --project=docs -e '
+          using Pkg;
+          Pkg.develop(PackageSpec(path=pwd()));
+          Pkg.instantiate();
+          include("docs/make.jl");'
+    - mkdir -p public
+    - mv docs/build public/dev
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+{{/DOCUMENTER}}
