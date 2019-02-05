@@ -22,5 +22,5 @@ pages:
     paths:
       - public
   only:
-  - master
+    - master
 {{/DOCUMENTER}}
