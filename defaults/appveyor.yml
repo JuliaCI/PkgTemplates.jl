@@ -1,14 +1,18 @@
 # Documentation: https://github.com/JuliaCI/Appveyor.jl
 environment:
   matrix:
-  - julia_version: {{VERSION}}
-  - julia_version: nightly
+{{#VERSIONS}}
+  - julia_version: {{.}}
+{{/VERSIONS}}
 platform:
-  - x86
-  - x64
+{{#PLATFORMS}}
+  - {{.}}
+{{/PLATFORMS}}
+{{#HAS_NIGHTLY}}
 matrix:
   allow_failures:
     - julia_version: nightly
+{{/HAS_NIGHTLY}}
 branches:
   only:
     - master
@@ -26,8 +30,8 @@ build_script:
 test_script:
   - echo "%JL_TEST_SCRIPT%"
   - C:\julia\bin\julia -e "%JL_TEST_SCRIPT%"
-{{#CODECOV}}
+{{#HAS_CODECOV}}
 on_success:
   - echo "%JL_CODECOV_SCRIPT%"
   - C:\julia\bin\julia -e "%JL_CODECOV_SCRIPT%"
-{{/CODECOV}}
+{{/HAS_CODECOV}}

@@ -1,31 +1,85 @@
 const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-const STANDARD_KWS = [:modules, :format, :pages, :repo, :sitename, :authors, :assets]
 
 """
-Add a `Documenter` subtype to a template's plugins to add support for documentation
-generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
+    Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
+        assets::Vector{<:AbstractString}=String[],
+        makedocs_kwargs::Dict{Symbol}=Dict(),
+        canonical_url::Union{Function, Nothing}=nothing,
+    ) -> Documenter{T}
 
-By default, the plugin generates a minimal index.md and a make.jl file. The make.jl
-file contains the Documenter.makedocs command with predefined values for `modules`,
-`format`, `pages`, `repo`, `sitename`, and `authors`.
+The `Documenter` plugin adds support for documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
+Documentation deployment depends on `T`, where `T` is some supported CI plugin, or `Nothing` to only support local documentation builds.
 
-The subtype is expected to include the following fields:
-* `assets::Vector{AbstractString}`, a list of filenames to be included as the `assets`
-kwarg to `makedocs`
-* `gitignore::Vector{AbstractString}`, a list of files to be added to the `.gitignore`
+## Keyword Arguments
+todo
+- `assets::Vector{<:AbstractString}=String[]`:
+- `makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}()`:
+- `canonical_url::Union{Function, Nothing}=nothing`:`
 
-It may optionally include the field `additional_kwargs::Union{AbstractDict, NamedTuple}`
-to allow additional kwargs to be added to `makedocs`.
+!!! note
+    If deploying documentation with Travis CI, don't forget to complete the required configuration.
+    See [here](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
 """
-abstract type Documenter <: CustomPlugin end
+struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
+    assets::Vector{String}
+    makedocs_kwargs::Dict{Symbol}
+    canonical_url::Union{Function, Nothing}
 
-function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
-    path = joinpath(t.dir, pkg_name)
-    docs_dir = joinpath(path, "docs")
-    mkpath(docs_dir)
+    # Can't use @kwdef due to some weird precompilation issues.
+    function Documenter{T}(
+        assets::Vector{<:AbstractString}=String[],
+        makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
+        canonical_url::Union{Function, Nothing}=T === TravisCI ? github_pages_url : nothing,
+    ) where T <: Union{TravisCI, GitLabCI, Nothing}
+        return new(assets, makedocs_kwargs, canonical_url)
+    end
+end
+
+Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
+
+gitignore(::Documenter) = ["/docs/build/", "/docs/site/"]
+
+badges(::Documenter) = Badge[]
+badges(::Documenter{TravisCI}) = [
+    Badge(
+        "Stable",
+        "https://img.shields.io/badge/docs-stable-blue.svg",
+        "https://{{USER}}.github.io/{{PKG}}.jl/stable",
+    ),
+    Badge(
+        "Dev",
+        "https://img.shields.io/badge/docs-dev-blue.svg",
+        "https://{{USER}}.github.io/{{PKG}}.jl/dev",
+    ),
+]
+badges(::Documenter{GitLabCI}) = Badge(
+    "Dev",
+    "https://img.shields.io/badge/docs-dev-blue.svg",
+    "https://{{USER}}.gitlab.io/{{PKG}}.jl/dev",
+)
+
+view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
+    "ASSETS" => p.assets,
+    "AUTHORS" => t.authors,
+    "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
+    "HAS_ASSETS" => !isempty(p.assets),
+    "MAKEDOCS_KWARGS" => map((k, v) -> k => repr(v), collect(p.makedocs_kwargs)),
+    "PKG" => pkg,
+    "REPO" => "https://$(t.host)/$(t.user)/$pkg.jl",
+)
+
+function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
+    base = invoke(view, Tuple{Documenter, Template, AbstractString}, p, t, pkg)
+    return merge(base, Dict("HAS_DEPLOY" => true))
+end
+
+function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
+    # TODO: gen make.jl
+    # TODO: gen index.md
 
     # Create the documentation project.
-    proj = Base.current_project()
+    docs_dir = joinpath(pkg_dir, "docs")
+    proj = current_project()
     try
         Pkg.activate(docs_dir)
         Pkg.add(PackageSpec(; name="Documenter", uuid=DOCUMENTER_UUID))
@@ -33,95 +87,38 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
         proj === nothing ? Pkg.activate() : Pkg.activate(proj)
     end
 
-    tab = repeat(" ", 4)
-    assets_string = if !isempty(p.assets)
-        mkpath(joinpath(docs_dir, "src", "assets"))
-        for file in p.assets
-            cp(file, joinpath(docs_dir, "src", "assets", basename(file)))
-        end
-
-        # We want something that looks like the following:
-        # [
-        #         assets/file1,
-        #         assets/file2,
-        #     ]
-        s = "[\n"
-        for asset in p.assets
-            s *= """$(tab^2)"assets/$(basename(asset))",\n"""
-        end
-        s *= "$tab]"
-
-        s
-    else
-        "String[]"
-    end
-
-    kwargs_string = if :additional_kwargs in fieldnames(typeof(p)) &&
-        fieldtype(typeof(p), :additional_kwargs) <: Union{AbstractDict, NamedTuple}
-        # We want something that looks like the following:
-        #     key1="val1",
-        #     key2="val2",
-        #
-        kws = [keys(p.additional_kwargs)...]
-        valid_keys = filter(k -> !in(Symbol(k), STANDARD_KWS), kws)
-        if length(p.additional_kwargs) > length(valid_keys)
-            invalid_keys = filter(k -> Symbol(k) in STANDARD_KWS, kws)
-            @warn string(
-                "Ignoring predefined Documenter kwargs ",
-                join(map(repr, invalid_keys), ", "),
-                " from additional kwargs"
-            )
-        end
-        join(map(k -> string(tab, k, "=", repr(p.additional_kwargs[k]), ",\n"), valid_keys))
-    else
-        ""
-    end
-
-    make = """
-        using Documenter, $pkg_name
-
-        makedocs(;
-            modules=[$pkg_name],
-            format=Documenter.HTML(),
-            pages=[
-                "Home" => "index.md",
-            ],
-            repo="https://$(t.host)/$(t.user)/$pkg_name.jl/blob/{commit}{path}#L{line}",
-            sitename="$pkg_name.jl",
-            authors="$(t.authors)",
-            assets=$assets_string,
-        $kwargs_string)
-        """
-    docs = """
-    # $pkg_name.jl
-
-    ```@index
-    ```
-
-    ```@autodocs
-    Modules = [$pkg_name]
-    ```
-    """
-
-    gen_file(joinpath(docs_dir, "make.jl"), make)
-    gen_file(joinpath(docs_dir, "src", "index.md"), docs)
+    # Copy any assets.
+    assets_dir = joinpath(docs_dir, "src", "assets")
+    isempty(p.assets) || mkpath(assets_dir)
+    foreach(a -> cp(a, joinpath(assets_dir, basename(asset))), p.assets)
 end
 
-function Base.show(io::IO, p::Documenter)
-    spc = "  "
-    println(io, nameof(typeof(p)), ":")
+function interactive(::Type{Documenter{T}}) where T
+    name = "Documenter{$T}"
 
-    n = length(p.assets)
-    s = n == 1 ? "" : "s"
-    print(io, spc, "→ $n asset file$s")
-    if n == 0
-        println(io)
-    else
-        println(io, ": ", join(map(a -> replace(a, homedir() => "~"), p.assets), ", "))
+    print("$name: Enter any Documenter asset files (separated by spaces) [none]: ")
+    assets = split(readline())
+
+    print("$name: Enter any extra makedocs key-value pairs (joined by '=') [none]\n> ")
+    kwargs = Dict{Symbol, Any}()
+    line = map(split(readline())) do kv
+        k, v = split(kv, "="; limit=2)
+        kwargs[Symbol(k)] = eval(Meta.parse(v))
     end
 
-    n = length(p.gitignore)
-    s = n == 1 ? "" : "s"
-    print(io, "$spc→ $n gitignore entrie$s")
-    n > 0 && print(io, ": ", join(map(repr, p.gitignore), ", "))
+    return Documenter{T}(; assets=assets, kwargs=kwargs)
 end
+
+function interactive(::Type{Documenter})
+    types = Dict(
+        "None (local documentation only)" => Nothing,
+        "TravisCI (GitHub Pages)" => TravisCI,
+        "GitLabCI (GitLab Pages)" => GitLabCI,
+    )
+    options = collect(keys(types))
+    menu = RadioMenu(options)
+    T = types[options[request("Documenter: Select integration:", menu)]]
+    return interactive(Documenter{T})
+end
+
+github_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).github.io/$pkg.jl"

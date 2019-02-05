@@ -72,8 +72,7 @@ t = Template(;
         Codecov(),
         Coveralls(),
         AppVeyor(),
-        GitHubPages(),
-        CirrusCI(),
+        Documenter{TravisCI}(),
     ],
 )
 generate("MyPkg2", t)
@@ -103,5 +102,4 @@ include, you are encouraged to use [AttoBot](https://github.com/apps/attobot) in
 ## Contributing
 
 It's extremely easy to extend `PkgTemplates` with new plugins. To get started,
-check out the
-[plugin development guide](https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html).
+check out [Plugin Development](@ref).

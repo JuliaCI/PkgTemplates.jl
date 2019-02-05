@@ -1,35 +1,46 @@
-# Documentation: http://docs.travis-ci.com/user/languages/julia/
+# Documentation: http://docs.travis-ci.com/user/languages/julia
 language: julia
-os:
-  - linux
-  - osx
-julia:
-  - {{VERSION}}
-  - nightly
-matrix:
-  allow_failures:
-    - julia: nightly
-  fast_finish: true
 notifications:
   email: false
-{{#COVERAGE}}
-after_success:
-{{#CODECOV}}
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
-{{/CODECOV}}
-{{#COVERALLS}}
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
-{{/COVERALLS}}
-{{/COVERAGE}}
-{{#DOCUMENTER}}
+{{#HAS_DOCUMENTER}}
 jobs:
+  fast_finish: true
+{{#HAS_NIGHTLY}}
+  allow_failures:
+    - julia: nightly
+{{/HAS_NIGHTLY}}
   include:
+{{#JOBS}}
+    - julia: {{JULIA}}
+      os: {{OS}}
+{{#ARCH}}
+      arch: {{ARCH}}
+{{/ARCH}}
+{{/JOBS}}
+{{#HAS_DOCUMENTER}}
     - stage: Documentation
       julia: {{VERSION}}
       script: julia --project=docs -e '
           using Pkg;
-          Pkg.develop(PackageSpec(path=pwd()));
+          Pkg.develop(PackageSpec(; path=pwd()));
           Pkg.instantiate();
           include("docs/make.jl");'
       after_success: skip
-{{/DOCUMENTER}}
+{{/HAS_DOCUMENTER}}
+{{#HAS_COVERAGE}}
+after_success:
+{{#HAS_CODECOV}}
+  - julia -e '
+      using Pkg;
+      Pkg.add("Coverage");
+      using Coverage;
+      Codecov.submit(process_folder());'
+{{/HAS_CODECOV}}
+{{#HAS_COVERALLS}}
+  - julia -e '
+      using Pkg;
+      Pkg.add("Coverage");
+      using Coverage;
+      Coveralls.submit(process_folder());'
+{{/HAS_COVERALLS}}
+{{/HAS_COVERAGE}}

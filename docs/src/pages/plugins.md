@@ -28,6 +28,4 @@ Coveralls
 
 ```@docs
 Documenter
-GitHubPages
-GitLabPages
 ```

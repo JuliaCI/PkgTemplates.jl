@@ -1,16 +1,18 @@
 freebsd_instance:
-  image: freebsd-12-0-release-amd64
+  image: {{IMAGE}}
 task:
   name: FreeBSD
   env:
-    JULIA_VERSION: {{VERSION}}
+{{#VERSIONS}}
+    JULIA_VERSION: {{.}}
+{{/VERSIONS}}
   install_script:
     - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
   build_script:
     - cirrusjl build
   test_script:
     - cirrusjl test
-{{#COVERAGE}}
+{{#HAS_COVERAGE}}
   coverage_script:
-    - cirrusjl coverage{{#CODECOV}} codecov{{/CODECOV}}{{#COVERALLS}} coveralls{{/COVERALLS}}
-{{/COVERAGE}}
+    - cirrusjl coverage{{#HAS_CODECOV}} codecov{{/HAS_CODECOV}}{{#HAS_COVERALLS}} coveralls{{/HAS_COVERALLS}}
+{{/HAS_COVERAGE}}

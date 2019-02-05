@@ -44,7 +44,7 @@ write(test_file, template_text)
     @test t.license == "MIT"
     @test t.authors == "foo"
     @test t.dir == default_dir
-    @test t.julia_version == PkgTemplates.default_version()
+    @test t.julia_version == PkgTemplates.default_version
     @test !t.ssh
     @test !t.manifest
     @test isempty(t.plugins)
@@ -107,7 +107,7 @@ end
 
 @testset "Show methods" begin
     pkg_dir = replace(default_dir, homedir() => "~")
-    ver = PkgTemplates.version_floor(PkgTemplates.default_version())
+    ver = PkgTemplates.version_floor(PkgTemplates.default_version)
     buf = IOBuffer()
     t = Template(; user=me, authors="foo")
     show(buf, t)
@@ -327,95 +327,11 @@ end
     rm(temp_dir; recursive=true)
 end
 
-@testset "Git-less template creation" begin
-    if isempty(LibGit2.getconfig("user.name", ""))
-        @test_logs Template(; user=me, git=false)
-    end
-end
-
 @testset "Git-less package generation" begin
     t = Template(; user=me)
     generate(test_pkg, t; git=false)
     @test !ispath(joinpath(t.dir, ".git"))
     @test !isfile(joinpath(t.dir, ".gitignore"))
-end
-
-@testset "Version floor" begin
-    @test version_floor(v"1.0.0") == "1.0"
-    @test version_floor(v"1.0.1") == "1.0"
-    @test version_floor(v"1.0.1-pre") == "1.0"
-    @test version_floor(v"1.0.0-pre") == "1.0-"
-end
-
-@testset "Mustache substitution" begin
-    view = Dict{String, Any}()
-    text = substitute(template_text, view)
-    @test !occursin("PKGNAME: $test_pkg", text)
-    @test !occursin("Documenter", text)
-    @test !occursin("Codecov", text)
-    @test !occursin("Coveralls", text)
-    @test !occursin("After", text)
-    @test !occursin("Other", text)
-    view["PKGNAME"] = test_pkg
-    view["OTHER"] = true
-    text = substitute(template_text, view)
-    @test occursin("PKGNAME: $test_pkg", text)
-    @test occursin("Other", text)
-
-    t = Template(; user=me)
-    view["OTHER"] = false
-
-    text = substitute(template_text, t; view=view)
-    @test occursin("PKGNAME: $test_pkg", text)
-    @test occursin("VERSION: $(t.julia_version.major).$(t.julia_version.minor)", text)
-    @test !occursin("Documenter", text)
-    @test !occursin("After", text)
-    @test !occursin("Other", text)
-
-    t.plugins[GitHubPages] = GitHubPages()
-    text = substitute(template_text, t; view=view)
-    @test occursin("Documenter", text)
-    @test occursin("After", text)
-    empty!(t.plugins)
-
-    t.plugins[Codecov] = Codecov()
-    text = substitute(template_text, t; view=view)
-    @test occursin("Codecov", text)
-    @test occursin("After", text)
-    empty!(t.plugins)
-
-    t.plugins[Coveralls] = Coveralls()
-    text = substitute(template_text, t; view=view)
-    @test occursin("Coveralls", text)
-    @test occursin("After", text)
-    empty!(t.plugins)
-
-    view["OTHER"] = true
-    text = substitute(template_text, t; view=view)
-    @test occursin("Other", text)
-end
-
-@testset "License display" begin
-    io = IOBuffer()
-    available_licenses(io)
-    licenses = String(take!(io))
-    show_license(io, "MIT")
-    mit = String(take!(io))
-
-    # Check that all licenses are included in the display.
-    for (short, long) in LICENSES
-        @test occursin("$short: $long", licenses)
-    end
-    @test strip(mit) == strip(read_license("MIT"))
-    @test strip(read_license("MIT")) == strip(read(joinpath(LICENSE_DIR, "MIT"), String))
-    @test_throws ArgumentError read_license(fake_path)
-
-    # Check that all licenses included with the package are displayed.
-    for license in readdir(LICENSE_DIR)
-        @test haskey(LICENSES, license)
-    end
-    # Check that all licenses displayed are included with the package.
-    @test length(readdir(LICENSE_DIR)) == length(LICENSES)
 end
 
 @testset "Plugins" begin
@@ -474,7 +390,8 @@ end
     warn_str = "Ignoring predefined Documenter kwargs \"format\" from additional kwargs"
     check_kwargs(kwargs, warn_str)
 
-    kwargs = Dict(:checkdocs => :none,
+    kwargs = Dict(
+        :checkdocs => :none,
         :strict => true,
         :format => :markdown,
         :stringarg => "string",
@@ -488,5 +405,3 @@ end
 end
 
 include(joinpath("interactive", "interactive.jl"))
-
-rm(test_file)
