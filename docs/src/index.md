@@ -28,7 +28,7 @@ Pkg.activate(mktempdir())
 Pkg.add(PackageSpec(path=dirname(dirname(pwd()))))
 ```
 
-The simplest template requires no arguments.
+The simplest template, assuming that you have set up the `github.user` Git option globally with `git config`, requires no arguments.
 
 
 ```@repl usage
