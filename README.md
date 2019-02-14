@@ -17,7 +17,7 @@ pkg> add PkgTemplates
 
 ## Usage
 
-The simplest template requires no arguments.
+Assuming you have the relatively standard Git options `user.name`, `user.email` and `github.user` set up globally with `git config --global`, the simplest template requires no arguments:
 
 ```julia
 julia> using PkgTemplates
