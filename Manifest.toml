@@ -1,3 +1,5 @@
+# This file is machine-generated - editing it directly is not advised
+
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
@@ -6,12 +8,18 @@ deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
 [[Distributed]]
-deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
+deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[InteractiveUtils]]
-deps = ["LinearAlgebra", "Markdown"]
+deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+
+[[IteratorInterfaceExtensions]]
+deps = ["Test"]
+git-tree-sha1 = "5484e5ede2a4137b9643f4d646e8e7b87b794415"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "0.1.1"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -31,10 +39,10 @@ deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[Mustache]]
-deps = ["Tables", "Test"]
-git-tree-sha1 = "be8d12b4a84ed7b592a6540b71c664440a4dd7f1"
+deps = ["Printf", "Tables", "Test"]
+git-tree-sha1 = "3cc9a0b673519c5c39186e636d747facb12bf075"
 uuid = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
-version = "0.5.8"
+version = "0.5.11"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -67,11 +75,17 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
+[[TableTraits]]
+deps = ["IteratorInterfaceExtensions", "Test"]
+git-tree-sha1 = "eba4b1d0a82bdd773307d652c6e5f8c82104c676"
+uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+version = "0.4.1"
+
 [[Tables]]
-deps = ["Requires", "Test"]
-git-tree-sha1 = "940944e6b68a35046282897a2218891c7cf14a32"
+deps = ["IteratorInterfaceExtensions", "LinearAlgebra", "Requires", "TableTraits", "Test"]
+git-tree-sha1 = "37be2ed169d5771c1ac8d516d3bcb0093c49966e"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "0.1.12"
+version = "0.1.15"
 
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
@@ -84,7 +98,7 @@ uuid = "30578b45-9adc-5946-b283-645ec420af67"
 version = "0.4.0"
 
 [[UUIDs]]
-deps = ["Random"]
+deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
