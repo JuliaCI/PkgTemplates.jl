@@ -9,6 +9,7 @@ const LICENSES = Dict(
     "GPL-3.0+" => "GNU Public License, Version 3.0+",
     "LGPL-2.1+" => "Lesser GNU Public License, Version 2.1+",
     "LGPL-3.0+" => "Lesser GNU Public License, Version 3.0+",
+    "EUPL-1.2+" => "European Union Public Licence, Version 1.2+",
 )
 
 """
