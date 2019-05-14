@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "PkgTemplates.Template",
     "category": "type",
-    "text": "Template(; kwargs...) -> Template\n\nRecords common information used to generate a package. If you don\'t wish to manually create a template, you can use interactive_template instead.\n\nKeyword Arguments\n\nuser::AbstractString=\"\": GitHub (or other code hosting service) username. If left unset, it will take the the global git config\'s value (github.user). If that is not set, an ArgumentError is thrown. This is case-sensitive for some plugins, so take care to enter it correctly.\nhost::AbstractString=\"github.com\": URL to the code hosting service where your package will reside. Note that while hosts other than GitHub won\'t cause errors, they are not officially supported and they will cause certain plugins will produce incorrect output.\nlicense::AbstractString=\"MIT\": Name of the package license. If an empty string is given, no license is created. available_licenses can be used to list all available licenses, and show_license can be used to print out a particular license\'s text.\nauthors::Union{AbstractString, Vector{<:AbstractString}}=\"\": Names that appear on the license. Supply a string for one author or an array for multiple. Similarly to user, it will take the value of of the global git config\'s value if it is left unset.\ndir::AbstractString=~/.julia/dev: Directory in which the package will go. Relative paths are converted to absolute ones at template creation time.\njulia_version::VersionNumber=1.1.0: Minimum allowed Julia version.\nssh::Bool=false: Whether or not to use SSH for the git remote. If false HTTPS will be used.\nmanifest::Bool=false: Whether or not to commit the Manifest.toml.\nplugins::Vector{<:Plugin}=Plugin[]: A list of Plugins that the package will include.\n\n\n\n\n\n"
+    "text": "Template(; kwargs...) -> Template\n\nRecords common information used to generate a package. If you don\'t wish to manually create a template, you can use interactive_template instead.\n\nKeyword Arguments\n\nuser::AbstractString=\"\": GitHub (or other code hosting service) username. If left unset, it will take the the global git config\'s value (github.user). If that is not set, an ArgumentError is thrown. This is case-sensitive for some plugins, so take care to enter it correctly.\nhost::AbstractString=\"github.com\": URL to the code hosting service where your package will reside. Note that while hosts other than GitHub won\'t cause errors, they are not officially supported and they will cause certain plugins will produce incorrect output.\nlicense::AbstractString=\"MIT\": Name of the package license. If an empty string is given, no license is created. available_licenses can be used to list all available licenses, and show_license can be used to print out a particular license\'s text.\nauthors::Union{AbstractString, Vector{<:AbstractString}}=\"\": Names that appear on the license. Supply a string for one author or an array for multiple. Similarly to user, it will take the value of of the global git config\'s value if it is left unset.\ndir::AbstractString=~/.julia/dev: Directory in which the package will go. Relative paths are converted to absolute ones at template creation time.\njulia_version::VersionNumber=1.0.0: Minimum allowed Julia version.\nssh::Bool=false: Whether or not to use SSH for the git remote. If false HTTPS will be used.\nmanifest::Bool=false: Whether or not to commit the Manifest.toml.\nplugins::Vector{<:Plugin}=Plugin[]: A list of Plugins that the package will include.\n\n\n\n\n\n"
 },
 
 {
@@ -121,14 +121,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/package_generation/#PkgTemplates.gen_require",
-    "page": "Package Generation",
-    "title": "PkgTemplates.gen_require",
-    "category": "function",
-    "text": "gen_require(pkg_dir::AbstractString, t::Template) -> Vector{String}\n\nCreate the REQUIRE file in pkg_dir.\n\nArguments\n\npkg_dir::AbstractString: The directory in which the files will be generated.\nt::Template: The template whose REQUIRE we are generating.\n\nReturns an array of generated file/directory names.\n\n\n\n\n\n"
-},
-
-{
     "location": "pages/package_generation/#PkgTemplates.gen_readme",
     "page": "Package Generation",
     "title": "PkgTemplates.gen_readme",
@@ -157,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Package Generation",
     "title": "Helper Functions",
     "category": "section",
-    "text": "gen_tests\ngen_require\ngen_readme\ngen_gitignore\ngen_license"
+    "text": "gen_tests\ngen_readme\ngen_gitignore\ngen_license"
 },
 
 {

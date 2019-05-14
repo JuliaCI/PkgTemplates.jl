@@ -7,7 +7,7 @@ Template:
   → Host: github.com
   → License: MIT (Travis CI User 2019)
   → Package directory: ~/.julia/dev
-  → Minimum Julia version: v1.1
+  → Minimum Julia version: v1.0
   → SSH remote: No
   → Commit Manifest.toml: No
   → Plugins: None
@@ -47,12 +47,12 @@ Generating project MyPkg:
   [6462fe0b] - Sockets 
   [8dfed614] - Test 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
-[ Info: Committed 7 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .gitignore
+[ Info: Committed 6 files/directories: src/, Project.toml, test/, README.md, LICENSE, .gitignore
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [ebc88c6a] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [75fc1c40] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [ebc88c6a] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [75fc1c40] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
 [ Info: New package is at /home/travis/.julia/dev/MyPkg
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
@@ -60,7 +60,6 @@ julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
 LICENSE
 Project.toml
 README.md
-REQUIRE
 src/MyPkg.jl
 test/runtests.jl</code></pre><p>However, we can also configure a number of keyword arguments to <a href="pages/package_generation/#PkgTemplates.Template"><code>Template</code></a>:</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
 
@@ -112,6 +111,7 @@ Generating project MyPkg2:
 [ Info: Set remote origin to git@github.com:myusername/MyPkg2.jl.git
 [ Info: Created empty gh-pages branch
  Resolving package versions...
+[ Warning: julia version requirement for project not satisfied
   Updating `~/code/MyPkg2/Project.toml`
   [8dfed614] + Test 
   Updating `~/code/MyPkg2/Manifest.toml`
@@ -127,6 +127,7 @@ Generating project MyPkg2:
   Updating registry at `~/.julia/registries/General`
   Updating git-repo `https://github.com/JuliaRegistries/General.git`
 [?25l[2K[?25h Resolving package versions...
+[ Warning: julia version requirement for project not satisfied
   Updating `~/code/MyPkg2/Project.toml`
  [no changes]
   Updating `~/code/MyPkg2/Manifest.toml`
@@ -168,13 +169,15 @@ Generating project MyPkg2:
   [cf7118a7] + UUIDs 
   [4ec0a83e] + Unicode 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
-[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .appveyor.yml, docs/, .travis.yml, .gitignore
+[ Info: Committed 9 files/directories: src/, Project.toml, test/, README.md, LICENSE, .travis.yml, docs/, .appveyor.yml, .gitignore
 [ Info: Remember to push all created branches to your remote: git push --all
  Resolving package versions...
+┌ Warning: julia version requirement for package MyPkg2 not satisfied
+└ @ Pkg.Operations /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.1/Pkg/src/Operations.jl:154
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [ee395610] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [786cca88] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [ee395610] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [786cca88] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
 [ Info: New package is at /home/travis/code/MyPkg2
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
@@ -184,7 +187,6 @@ julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
 LICENSE
 Project.toml
 README.md
-REQUIRE
 docs/Manifest.toml
 docs/Project.toml
 docs/make.jl
