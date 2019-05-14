@@ -24,6 +24,16 @@ pkg_dir = joinpath(t.dir, test_pkg)
         @test occursin("$(t.authors)", citation)
         @test occursin("v0.0.1", citation)
     end
+
+    @testset "Readme modification" begin
+        p = Citation(; readme_section=true)
+        t.plugins[Citation] = p
+        isdir(pkg_dir) && rm(pkg_dir; recursive=true)
+        generate(test_pkg, t, git=false)
+        readme = read(joinpath(pkg_dir, "README.md"), String)
+        @test occursin("## Citing", readme)
+        @test occursin("CITATION.bib", readme)
+    end
 end
 
 rm(pkg_dir; recursive=true)
