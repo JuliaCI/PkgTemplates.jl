@@ -1,3 +1,5 @@
+default_version() = VersionNumber(VERSION.major)
+
 """
     Template(; kwargs...) -> Template
 
@@ -21,7 +23,7 @@ create a template, you can use [`interactive_template`](@ref) instead.
   it will take the value of of the global git config's value if it is left unset.
 * `dir::AbstractString=$(replace(Pkg.devdir(), homedir() => "~"))`: Directory in which the
   package will go. Relative paths are converted to absolute ones at template creation time.
-* `julia_version::VersionNumber=$VERSION`: Minimum allowed Julia version.
+* `julia_version::VersionNumber=$(default_version())`: Minimum allowed Julia version.
 * `ssh::Bool=false`: Whether or not to use SSH for the git remote. If `false` HTTPS will be used.
 * `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
@@ -43,7 +45,7 @@ struct Template
         license::AbstractString="MIT",
         authors::Union{AbstractString, Vector{<:AbstractString}}="",
         dir::AbstractString=Pkg.devdir(),
-        julia_version::VersionNumber=VERSION,
+        julia_version::VersionNumber=default_version(),
         ssh::Bool=false,
         manifest::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
