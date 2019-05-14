@@ -24,7 +24,6 @@ create a template, you can use [`interactive_template`](@ref) instead.
 * `julia_version::VersionNumber=$VERSION`: Minimum allowed Julia version.
 * `ssh::Bool=false`: Whether or not to use SSH for the git remote. If `false` HTTPS will be used.
 * `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
-* `citation::Bool=false`: Whether or not to create a `CITATION.bib` file at the top-level.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
 """
 struct Template
@@ -36,7 +35,6 @@ struct Template
     julia_version::VersionNumber
     ssh::Bool
     manifest::Bool
-    citation::Bool
     plugins::Dict{DataType, <:Plugin}
 
     function Template(;
@@ -48,7 +46,6 @@ struct Template
         julia_version::VersionNumber=VERSION,
         ssh::Bool=false,
         manifest::Bool=false,
-        citation::Bool=false,
         plugins::Vector{<:Plugin}=Plugin[],
         git::Bool=true,
     )
@@ -86,7 +83,7 @@ struct Template
             @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
-        new(user, host, license, authors, dir, julia_version, ssh, manifest, citation, plugin_dict)
+        new(user, host, license, authors, dir, julia_version, ssh, manifest, plugin_dict)
     end
 end
 

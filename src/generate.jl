@@ -217,7 +217,7 @@ function gen_readme(pkg_dir::AbstractString, t::Template)
         )
     end
     if haskey(t.plugins, Citation) && p.plugins[Citation].readme_section
-        text *= "## Citing\n\nSee `CITATION.bib` for the relevant reference(s)\n"        
+        text *= "\n## Citing\n\nSee `CITATION.bib` for the relevant reference(s)\n"
     end
 
 
