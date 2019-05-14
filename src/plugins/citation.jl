@@ -31,7 +31,7 @@ interactive(::Type{Citation}) = interactive(Citation; readme_section=false)
 function gen_plugin(p::Citation, t::Template, pkg_name::AbstractString)
     pkg_dir = joinpath(t.dir, pkg_name)
     text = """@misc{$pkg_name.jl,
-              \tauthor  = {{$(t.author)}},\n
+              \tauthor  = {{$(t.authors)}},\n
               \ttitle   = {{$(pkg_name).jl}},\n
               \turl     = {https://$(t.host)/$(t.user)/$(pkg_name).jl},\n
               \tversion = {v0.0.1},\n
