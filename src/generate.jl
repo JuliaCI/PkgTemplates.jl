@@ -63,7 +63,6 @@ function generate(
             gen_require(pkg_dir, t),
             gen_readme(pkg_dir, t),
             gen_license(pkg_dir, t),
-            gen_citation(pkg_dir, t),
             vcat(map(p -> gen_plugin(p, t, pkg), values(t.plugins))...),
         )
 
@@ -216,12 +215,9 @@ function gen_readme(pkg_dir::AbstractString, t::Template)
             badges(t.plugins[plugin_type], t.user, pkg),
             "\n",
         )
-        if plugin_type <: Citation
-            c = t.plugins[plugin_type]
-            if c.readme_section
-                text *= "## Citing\n\nSee `CITATION.bib` for the relevant reference(s)\n"
-            end
-        end
+    end
+    if haskey(p.plugins, Citation) && p.plugins[Citation].readme_section
+        text *= "## Citing\n\nSee `CITATION.bib` for the relevant reference(s)\n"        
     end
 
 
