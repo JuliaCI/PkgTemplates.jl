@@ -50,9 +50,9 @@ Generating project MyPkg:
 [ Info: Committed 7 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .gitignore
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [793ebe2b] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [ebc88c6a] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [793ebe2b] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [ebc88c6a] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
 [ Info: New package is at /home/travis/.julia/dev/MyPkg
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
@@ -141,12 +141,14 @@ Generating project MyPkg2:
   [8dfed614] - Test 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
  Resolving package versions...
- Installed Documenter ─ v0.21.5
+ Installed JSON ─────── v0.20.0
+ Installed Documenter ─ v0.22.4
   Updating `~/code/MyPkg2/docs/Project.toml`
-  [e30172f5] + Documenter v0.21.5
+  [e30172f5] + Documenter v0.22.4
   Updating `~/code/MyPkg2/docs/Manifest.toml`
   [ffbed154] + DocStringExtensions v0.7.0
-  [e30172f5] + Documenter v0.21.5
+  [e30172f5] + Documenter v0.22.4
+  [682c06a0] + JSON v0.20.0
   [2a0f44e3] + Base64 
   [ade2ca70] + Dates 
   [8ba89e20] + Distributed 
@@ -154,6 +156,7 @@ Generating project MyPkg2:
   [76f85450] + LibGit2 
   [56ddb016] + Logging 
   [d6f4376e] + Markdown 
+  [a63ad114] + Mmap 
   [44cfe95a] + Pkg 
   [de0858da] + Printf 
   [3fa0cd96] + REPL 
@@ -165,13 +168,13 @@ Generating project MyPkg2:
   [cf7118a7] + UUIDs 
   [4ec0a83e] + Unicode 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
-[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .travis.yml, .appveyor.yml, docs/, .gitignore
+[ Info: Committed 10 files/directories: src/, Project.toml, test/, REQUIRE, README.md, LICENSE, .appveyor.yml, docs/, .travis.yml, .gitignore
 [ Info: Remember to push all created branches to your remote: git push --all
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [592f397d] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [ee395610] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [592f397d] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [ee395610] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
 [ Info: New package is at /home/travis/code/MyPkg2
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
