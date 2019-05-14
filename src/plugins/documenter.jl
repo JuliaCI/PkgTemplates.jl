@@ -53,7 +53,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_name::AbstractString)
 
         s
     else
-        "[]"
+        "String[]"
     end
 
     kwargs_string = if :additional_kwargs in fieldnames(typeof(p)) &&
