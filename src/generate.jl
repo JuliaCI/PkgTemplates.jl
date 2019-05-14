@@ -63,6 +63,7 @@ function generate(
             gen_require(pkg_dir, t),
             gen_readme(pkg_dir, t),
             gen_license(pkg_dir, t),
+            gen_citation(pkg_dir, t),
             vcat(map(p -> gen_plugin(p, t, pkg), values(t.plugins))...),
         )
 
@@ -269,6 +270,35 @@ function gen_license(pkg_dir::AbstractString, t::Template)
 
     gen_file(joinpath(pkg_dir, "LICENSE"), text)
     return ["LICENSE"]
+end
+
+"""
+    gen_citation(pkg_dir::AbstractString, t::Template) -> Vector{String}
+
+Create a CITATION.bib in `pkg_dir`.
+
+# Arguments
+* `pkg_dir::AbstractString`: The directory in which the files will be generated.
+* `t::Template`: The template whose CITATION.bib file we are generating.
+
+Returns an array of generated file/directory names.
+"""
+function gen_license(pkg_dir::AbstractString, t::Template)
+    if !t.citation
+        return String[]
+    end
+    pkg = basename(pkg_dir)
+    text = "@misc{$pkg,\n"
+    text *= "\tauthor  = {{$(t.author)}},\n"
+    text *= "\ttitle   = {{$(pkg).jl}},\n"
+    text *= "\turl     = {https://$(t.host)/$(t.user)/$(pkg).jl},\n"
+    text *= "\tversion = {v0.0.1},\n"
+    text *= "\tyear    = {$(year(today()))},\n"
+    text *= "\tmonth   = {$(month(today()))},\n"
+    text *= "}"
+
+    gen_file(joinpath(pkg_dir, "CITATION.bib"), text)
+    return ["CITATION.bib"]
 end
 
 """

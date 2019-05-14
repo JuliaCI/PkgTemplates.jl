@@ -86,7 +86,7 @@ struct Template
             @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
-        new(user, host, license, authors, dir, julia_version, ssh, manifest, plugin_dict)
+        new(user, host, license, authors, dir, julia_version, ssh, manifest, citation, plugin_dict)
     end
 end
 
@@ -109,6 +109,7 @@ function Base.show(io::IO, t::Template)
     println(io, spc, "→ Minimum Julia version: v", version_floor(t.julia_version))
     println(io, spc, "→ SSH remote: ", t.ssh ? "Yes" : "No")
     println(io, spc, "→ Commit Manifest.toml: ", t.manifest ? "Yes" : "No")
+    println(io, spc, "→ Add CITATION.bib: ", t.citation ? "Yes" : "No")
 
     print(io, spc, "→ Plugins:")
     if isempty(t.plugins)
@@ -211,6 +212,13 @@ function interactive_template(; git::Bool=true, fast::Bool=false)
         false
     else
         print("Commit Manifest.toml? [no]: ")
+        uppercase(readline()) in ["Y", "YES", "T", "TRUE"]
+    end
+
+    kwargs[:citation] = if fast
+        false
+    else
+        print("Add CITATION.bib? [no]: ")
         uppercase(readline()) in ["Y", "YES", "T", "TRUE"]
     end
 
