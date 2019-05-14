@@ -42,7 +42,7 @@ write(test_file, template_text)
     t = Template(; user=me)
     @test t.user == me
     @test t.license == "MIT"
-    @test t.authors == LibGit2.getconfig("user.name", "")
+    @test t.authors == LibGit2.getconfig("user.name", "") * " <" * LibGit2.getconfig("user.email", "") * ">"
     @test t.dir == default_dir
     @test t.julia_version == PkgTemplates.default_version()
     @test !t.ssh
@@ -108,6 +108,7 @@ end
 @testset "Show methods" begin
     pkg_dir = replace(default_dir, homedir() => "~")
     ver = PkgTemplates.version_floor(PkgTemplates.default_version())
+    author = LibGit2.getconfig("user.name", "") * " <" * LibGit2.getconfig("user.email", "") * ">"
     buf = IOBuffer()
     t = Template(; user=me)
     show(buf, t)
@@ -116,7 +117,7 @@ end
         Template:
           → User: $me
           → Host: github.com
-          → License: MIT ($(LibGit2.getconfig("user.name", "")) $(year(today())))
+          → License: MIT ($author $(year(today())))
           → Package directory: $pkg_dir
           → Minimum Julia version: v$ver
           → SSH remote: No

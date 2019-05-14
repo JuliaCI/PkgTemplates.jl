@@ -74,7 +74,9 @@ struct Template
         # If no author was set, look for one in the global git config.
         if isempty(authors)
             authors = LibGit2.getconfig("user.name", "")
-        elseif isa(authors, Vector)
+            email = LibGit2.getconfig("user.email", "")
+            isempty(email) || (authors *= " <$email>")
+        elseif authors isa Vector
             authors = join(authors, ", ")
         end
 
