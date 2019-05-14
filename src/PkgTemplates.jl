@@ -44,6 +44,7 @@ include(joinpath("plugins", "travisci.jl"))
 include(joinpath("plugins", "gitlabci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 include(joinpath("plugins", "gitlabpages.jl"))
+include(joinpath("plugins", "citation.jl"))
 
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
 const BADGE_ORDER = [GitHubPages, GitLabPages, TravisCI, AppVeyor, GitLabCI, Codecov, Coveralls]
