@@ -283,7 +283,7 @@ Create a CITATION.bib in `pkg_dir`.
 
 Returns an array of generated file/directory names.
 """
-function gen_license(pkg_dir::AbstractString, t::Template)
+function gen_citation(pkg_dir::AbstractString, t::Template)
     if !t.citation
         return String[]
     end
