@@ -25,7 +25,6 @@ generate_interactive
 
 ```@docs
 gen_tests
-gen_require
 gen_readme
 gen_gitignore
 gen_license

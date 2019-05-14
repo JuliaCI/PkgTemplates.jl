@@ -44,7 +44,7 @@ write(test_file, template_text)
     @test t.license == "MIT"
     @test t.authors == LibGit2.getconfig("user.name", "")
     @test t.dir == default_dir
-    @test t.julia_version == VERSION
+    @test t.julia_version == PkgTemplates.default_version()
     @test !t.ssh
     @test !t.manifest
     @test isempty(t.plugins)
@@ -107,6 +107,7 @@ end
 
 @testset "Show methods" begin
     pkg_dir = replace(default_dir, homedir() => "~")
+    ver = PkgTemplates.version_floor(PkgTemplates.default_version())
     buf = IOBuffer()
     t = Template(; user=me)
     show(buf, t)
@@ -117,7 +118,7 @@ end
           → Host: github.com
           → License: MIT ($(LibGit2.getconfig("user.name", "")) $(year(today())))
           → Package directory: $pkg_dir
-          → Minimum Julia version: v$(PkgTemplates.version_floor())
+          → Minimum Julia version: v$ver
           → SSH remote: No
           → Commit Manifest.toml: No
           → Plugins: None
@@ -142,7 +143,7 @@ end
           → Host: github.com
           → License: None
           → Package directory: $pkg_dir
-          → Minimum Julia version: v$(PkgTemplates.version_floor())
+          → Minimum Julia version: v$ver
           → SSH remote: Yes
           → Commit Manifest.toml: Yes
           → Plugins:
@@ -222,13 +223,6 @@ end
     @test occursin(t.authors, license)
     @test occursin(read_license(t.license), license)
 
-    # Test the REQUIRE generation.
-    @test gen_require(pkg_dir, t) == ["REQUIRE"]
-    @test isfile(joinpath(pkg_dir, "REQUIRE"))
-    vf = version_floor(t.julia_version)
-    @test readchomp(joinpath(pkg_dir, "REQUIRE")) == "julia $vf"
-    rm(joinpath(pkg_dir, "REQUIRE"))
-
     # Test the test generation.
     @test gen_tests(pkg_dir, t) == ["test/"]
     @test isfile(joinpath(pkg_dir, "Project.toml"))
@@ -255,7 +249,6 @@ end
     # Check that the expected files all exist.
     @test isfile(joinpath(pkg_dir, "LICENSE"))
     @test isfile(joinpath(pkg_dir, "README.md"))
-    @test isfile(joinpath(pkg_dir, "REQUIRE"))
     @test isfile(joinpath(pkg_dir, ".gitignore"))
     @test isdir(joinpath(pkg_dir, "src"))
     @test isfile(joinpath(pkg_dir, "src", "$test_pkg.jl"))
@@ -272,6 +265,10 @@ end
     @test LibGit2.url(remote) == "https://github.com/$me/$test_pkg.jl"
     @test branches == ["master"]
     @test !LibGit2.isdirty(repo)
+    # Check for the [compat] section.
+    project = read(joinpath(pkg_dir, "Project.toml"), String)
+    @test occursin("[compat]", project)
+    @test occursin("julia = " * PkgTemplates.repr_version(t.julia_version), project)
     rm(pkg_dir; recursive=true)
 
     # Check that the remote is an SSH URL when we want it to be.
