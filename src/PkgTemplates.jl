@@ -23,6 +23,7 @@ export
     AppVeyor,
     TravisCI,
     GitLabCI,
+    CirrusCI,
     Codecov,
     Coveralls,
     Citation
@@ -43,6 +44,7 @@ include(joinpath("plugins", "appveyor.jl"))
 include(joinpath("plugins", "codecov.jl"))
 include(joinpath("plugins", "travisci.jl"))
 include(joinpath("plugins", "gitlabci.jl"))
+include(joinpath("plugins", "cirrusci.jl"))
 include(joinpath("plugins", "githubpages.jl"))
 include(joinpath("plugins", "gitlabpages.jl"))
 include(joinpath("plugins", "citation.jl"))
