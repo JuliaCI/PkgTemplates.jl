@@ -23,6 +23,14 @@ function generate(
             println(io, "\n[compat]\njulia = $(repr_version(t.julia_version))")
         end
 
+        # Replace the authors field with the template's authors.
+        if !isempty(t.authors)
+            path = joinpath(pkg_dir, "Project.toml")
+            project = read(path, String)
+            authors = string("[", join(map(repr ∘ strip, split(t.authors, ",")), ", "), "]")
+            write(path, replace(project, r"authors = .*" => "authors = $authors"))
+        end
+
         if git
             # Initialize the repo.
             repo = LibGit2.init(pkg_dir)
