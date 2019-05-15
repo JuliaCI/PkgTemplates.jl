@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · PkgTemplates.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>PkgTemplates.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>Home</a><ul class="internal"><li><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Usage-1">Usage</a></li><li><a class="toctext" href="#Comparison-to-PkgDev-1">Comparison to PkgDev</a></li><li><a class="toctext" href="#Contributing-1">Contributing</a></li></ul></li><li><a class="toctext" href="pages/package_generation/">Package Generation</a></li><li><a class="toctext" href="pages/plugins/">Plugins</a></li><li><a class="toctext" href="pages/plugin_development/">Plugin Development</a></li><li><a class="toctext" href="pages/licenses/">Licenses</a></li><li><a class="toctext" href="pages/">Index</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Home</a></li></ul><a class="edit-page" href="https://github.com/invenia/PkgTemplates.jl/blob/master/docs/src/index.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Home</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="PkgTemplates-1" href="#PkgTemplates-1">PkgTemplates</a></h1><p><a href="https://invenia.github.io/PkgTemplates.jl/stable"><img src="https://img.shields.io/badge/docs-stable-blue.svg" alt="Stable"/></a> <a href="https://invenia.github.io/PkgTemplates.jl/latest"><img src="https://img.shields.io/badge/docs-latest-blue.svg" alt="Latest"/></a> <a href="https://travis-ci.org/invenia/PkgTemplates.jl"><img src="https://travis-ci.org/invenia/PkgTemplates.jl.svg?branch=master" alt="Build Status"/></a> <a href="https://ci.appveyor.com/project/christopher-dG/pkgtemplates-jl/branch/master"><img src="https://ci.appveyor.com/api/projects/status/r24xamruqlm88uti/branch/master?svg=true" alt="Build Status"/></a> <a href="https://codecov.io/gh/invenia/PkgTemplates.jl"><img src="https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg" alt="Codecov"/></a></p><p><strong>PkgTemplates is a Julia package for creating new Julia packages in an easy, repeatable, and customizable way.</strong></p><h2><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h2><pre><code class="language-julia">pkg&gt; add PkgTemplates</code></pre><h2><a class="nav-anchor" id="Usage-1" href="#Usage-1">Usage</a></h2><div></div><p>Assuming you have the relatively standard Git options <code>user.name</code>, <code>user.email</code> and <code>github.user</code> set up globally with <code>git config --global</code>, the simplest template requires no arguments:</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · PkgTemplates.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>PkgTemplates.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>Home</a><ul class="internal"><li><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Plugins-1">Plugins</a></li><li><a class="toctext" href="#Usage-1">Usage</a></li><li><a class="toctext" href="#Comparison-to-PkgDev-1">Comparison to PkgDev</a></li><li><a class="toctext" href="#Contributing-1">Contributing</a></li></ul></li><li><a class="toctext" href="pages/package_generation/">Package Generation</a></li><li><a class="toctext" href="pages/plugins/">Plugins</a></li><li><a class="toctext" href="pages/plugin_development/">Plugin Development</a></li><li><a class="toctext" href="pages/licenses/">Licenses</a></li><li><a class="toctext" href="pages/">Index</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Home</a></li></ul><a class="edit-page" href="https://github.com/invenia/PkgTemplates.jl/blob/master/docs/src/index.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Home</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="PkgTemplates-1" href="#PkgTemplates-1">PkgTemplates</a></h1><p><a href="https://invenia.github.io/PkgTemplates.jl/stable"><img src="https://img.shields.io/badge/docs-stable-blue.svg" alt="Stable"/></a> <a href="https://invenia.github.io/PkgTemplates.jl/latest"><img src="https://img.shields.io/badge/docs-latest-blue.svg" alt="Latest"/></a> <a href="https://travis-ci.org/invenia/PkgTemplates.jl"><img src="https://travis-ci.org/invenia/PkgTemplates.jl.svg?branch=master" alt="Build Status"/></a> <a href="https://ci.appveyor.com/project/christopher-dG/pkgtemplates-jl/branch/master"><img src="https://ci.appveyor.com/api/projects/status/r24xamruqlm88uti/branch/master?svg=true" alt="Build Status"/></a> <a href="https://codecov.io/gh/invenia/PkgTemplates.jl"><img src="https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg" alt="Codecov"/></a></p><p><strong>PkgTemplates is a Julia package for creating new Julia packages in an easy, repeatable, and customizable way.</strong></p><h2><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h2><pre><code class="language-julia">pkg&gt; add PkgTemplates</code></pre><h2><a class="nav-anchor" id="Plugins-1" href="#Plugins-1">Plugins</a></h2><p><code>PkgTemplates</code> is based on plugins which handle the setup of individual package components. The available plugins are:</p><ul><li>Continuous Integration (CI)<ul><li><a href="https://travis-ci.com">Travis CI</a> (Linux, MacOS)</li><li><a href="https://appveyor.com">AppVeyor</a> (Windows)</li><li><a href="https://gitlab.com">GitLabCI</a> (Linux)</li><li><a href="https://cirrus-ci.org">CirrusCI</a> (FreeBSD)</li></ul></li><li>Code Coverage<ul><li><a href="https://codecov.io">Codecov</a></li><li><a href="https://coveralls.io">Coveralls</a></li></ul></li><li>Documentation<ul><li><a href="https://pages.github.com">GitHubPages</a></li></ul></li></ul><h2><a class="nav-anchor" id="Usage-1" href="#Usage-1">Usage</a></h2><div></div><p>Assuming you have the relatively standard Git options <code>user.name</code>, <code>user.email</code> and <code>github.user</code> set up globally with <code>git config --global</code>, the simplest template requires no arguments:</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
 
 julia&gt; t = Template()
 Template:
@@ -50,9 +50,9 @@ Generating project MyPkg:
 [ Info: Committed 6 files/directories: src/, Project.toml, test/, README.md, LICENSE, .gitignore
  Resolving package versions...
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [06022418] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [cebe762c] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [06022418] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  [cebe762c] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
 [ Info: New package is at /home/travis/.julia/dev/MyPkg
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
@@ -76,6 +76,7 @@ julia&gt; t = Template(;
                Coveralls(),
                AppVeyor(),
                GitHubPages(),
+               CirrusCI(),
            ],
        )
 Template:
@@ -88,6 +89,9 @@ Template:
   → Commit Manifest.toml: No
   → Plugins:
     • AppVeyor:
+      → Config file: Default
+      → 0 gitignore entries
+    • CirrusCI:
       → Config file: Default
       → 0 gitignore entries
     • Codecov:
@@ -142,8 +146,8 @@ Generating project MyPkg2:
   [8dfed614] - Test 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
  Resolving package versions...
- Installed Documenter ─ v0.22.4
  Installed JSON ─────── v0.20.0
+ Installed Documenter ─ v0.22.4
   Updating `~/code/MyPkg2/docs/Project.toml`
   [e30172f5] + Documenter v0.22.4
   Updating `~/code/MyPkg2/docs/Manifest.toml`
@@ -169,19 +173,20 @@ Generating project MyPkg2:
   [cf7118a7] + UUIDs 
   [4ec0a83e] + Unicode 
 [ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
-[ Info: Committed 9 files/directories: src/, Project.toml, test/, README.md, LICENSE, docs/, .appveyor.yml, .travis.yml, .gitignore
+[ Info: Committed 10 files/directories: src/, Project.toml, test/, README.md, LICENSE, .appveyor.yml, .travis.yml, docs/, .cirrus.yml, .gitignore
 [ Info: Remember to push all created branches to your remote: git push --all
  Resolving package versions...
 ┌ Warning: julia version requirement for package MyPkg2 not satisfied
 └ @ Pkg.Operations /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.1/Pkg/src/Operations.jl:154
   Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
-  [0891e718] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [d145d05c] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
   Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
-  [0891e718] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  [d145d05c] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
 [ Info: New package is at /home/travis/code/MyPkg2
 
 julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
 .appveyor.yml
+.cirrus.yml
 .gitignore
 .travis.yml
 LICENSE

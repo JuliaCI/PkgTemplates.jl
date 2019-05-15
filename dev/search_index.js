@@ -25,11 +25,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "#Plugins-1",
+    "page": "Home",
+    "title": "Plugins",
+    "category": "section",
+    "text": "PkgTemplates is based on plugins which handle the setup of individual package components. The available plugins are:Continuous Integration (CI)\nTravis CI (Linux, MacOS)\nAppVeyor (Windows)\nGitLabCI (Linux)\nCirrusCI (FreeBSD)\nCode Coverage\nCodecov\nCoveralls\nDocumentation\nGitHubPages"
+},
+
+{
     "location": "#Usage-1",
     "page": "Home",
     "title": "Usage",
     "category": "section",
-    "text": "using LibGit2: getconfig\nisempty(getconfig(\"user.name\", \"\")) && run(`git config --global user.name \"Travis\"`)\nisempty(getconfig(\"user.email\", \"\")) && run(`git config --global user.email \"travis@c.i\"`)\nisempty(getconfig(\"github.user\", \"\")) && run(`git config --global github.user \"travis\"`)\nusing Pkg\nPkg.activate(mktempdir())\n# This code gets run in docs/build/, so this path evaluates to the repo root.\nPkg.add(PackageSpec(path=dirname(dirname(pwd()))))Assuming you have the relatively standard Git options user.name, user.email and github.user set up globally with git config --global, the simplest template requires no arguments:using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=\"~/code\",\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-files`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
+    "text": "using LibGit2: getconfig\nisempty(getconfig(\"user.name\", \"\")) && run(`git config --global user.name \"Travis\"`)\nisempty(getconfig(\"user.email\", \"\")) && run(`git config --global user.email \"travis@c.i\"`)\nisempty(getconfig(\"github.user\", \"\")) && run(`git config --global github.user \"travis\"`)\nusing Pkg\nPkg.activate(mktempdir())\n# This code gets run in docs/build/, so this path evaluates to the repo root.\nPkg.add(PackageSpec(path=dirname(dirname(pwd()))))Assuming you have the relatively standard Git options user.name, user.email and github.user set up globally with git config --global, the simplest template requires no arguments:using PkgTemplates\nt = Template()\ngenerate(\"MyPkg\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg\")) ls-files`);However, we can also configure a number of keyword arguments to Template:using PkgTemplates\nt = Template(;\n    user=\"myusername\",\n    license=\"MIT\",\n    authors=[\"Chris de Graaf\", \"Invenia Technical Computing Corporation\"],\n    dir=\"~/code\",\n    julia_version=v\"0.7\",\n    ssh=true,\n    plugins=[\n        TravisCI(),\n        Codecov(),\n        Coveralls(),\n        AppVeyor(),\n        GitHubPages(),\n        CirrusCI(),\n    ],\n)\ngenerate(\"MyPkg2\", t)\nrun(`git -C $(joinpath(t.dir, \"MyPkg2\")) ls-files`);If that looks like a lot of work, you can also create templates interactively with interactive_template:(Image: asciicast)And if that\'s still too much work for you, you can call interactive_template with fast=true to use default values for everything but username and plugin selection.You can also use generate_interactive to interactively generate a template and then immediately use it to create a new package."
 },
 
 {
@@ -193,11 +201,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/plugins/#PkgTemplates.CirrusCI",
+    "page": "Plugins",
+    "title": "PkgTemplates.CirrusCI",
+    "category": "type",
+    "text": "CirrusCI(; config_file::Union{AbstractString, Nothing}=\"\") -> CirrusCI\n\nAdd CirrusCI to a template\'s plugins to add a .cirrus.yml configuration file to generated repositories, and an appropriate badge to the README. The default configuration file supports only FreeBSD builds via CirrusCI.jl\n\nKeyword Arguments\n\nconfig_file::Union{AbstractString, Nothing}=\"\": Path to a custom .cirrus.yml. If nothing is supplied, no file will be generated.\n\n\n\n\n\n"
+},
+
+{
     "location": "pages/plugins/#Continuous-Integration-(CI)-1",
     "page": "Plugins",
     "title": "Continuous Integration (CI)",
     "category": "section",
-    "text": "TravisCI\nAppVeyor\nGitLabCI"
+    "text": "TravisCI\nAppVeyor\nGitLabCI\nCirrusCI"
 },
 
 {
