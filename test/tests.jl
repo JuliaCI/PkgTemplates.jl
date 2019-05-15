@@ -39,10 +39,10 @@ write(test_file, template_text)
 
 @testset "Template creation" begin
     # Checking default field assignments.
-    t = Template(; user=me)
+    t = Template(; authors="foo", user=me)
     @test t.user == me
     @test t.license == "MIT"
-    @test t.authors == LibGit2.getconfig("user.name", "") * " <" * LibGit2.getconfig("user.email", "") * ">"
+    @test t.authors == "foo"
     @test t.dir == default_dir
     @test t.julia_version == PkgTemplates.default_version()
     @test !t.ssh
@@ -108,16 +108,15 @@ end
 @testset "Show methods" begin
     pkg_dir = replace(default_dir, homedir() => "~")
     ver = PkgTemplates.version_floor(PkgTemplates.default_version())
-    author = LibGit2.getconfig("user.name", "") * " <" * LibGit2.getconfig("user.email", "") * ">"
     buf = IOBuffer()
-    t = Template(; user=me)
+    t = Template(; user=me, authors="foo")
     show(buf, t)
     text = String(take!(buf))
     expected = """
         Template:
           → User: $me
           → Host: github.com
-          → License: MIT ($author $(year(today())))
+          → License: MIT (foo $(year(today())))
           → Package directory: $pkg_dir
           → Minimum Julia version: v$ver
           → SSH remote: No
