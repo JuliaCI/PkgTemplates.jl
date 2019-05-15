@@ -198,6 +198,10 @@ function gen_readme(pkg_dir::AbstractString, t::Template)
             "\n",
         )
     end
+    if haskey(t.plugins, Citation) && t.plugins[Citation].readme_section
+        text *= "\n## Citing\n\nSee `CITATION.bib` for the relevant reference(s).\n"
+    end
+
 
     gen_file(joinpath(pkg_dir, "README.md"), text)
     return ["README.md"]

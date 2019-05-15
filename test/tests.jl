@@ -442,6 +442,7 @@ end
     include(joinpath("plugins", "coveralls.jl"))
     include(joinpath("plugins", "githubpages.jl"))
     include(joinpath("plugins", "gitlabpages.jl"))
+    include(joinpath("plugins", "citation.jl"))
 end
 
 @testset "Documenter add kwargs" begin
