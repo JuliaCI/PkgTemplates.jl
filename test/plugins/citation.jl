@@ -14,7 +14,6 @@ pkg_dir = joinpath(t.dir, test_pkg)
     end
 
     @testset "File generation" begin
-        # Without a coverage plugin in the template, there should be no post-test step.
         p = Citation()
         @test gen_plugin(p, t, test_pkg) == ["CITATION.bib"]
         @test isfile(joinpath(pkg_dir, "CITATION.bib"))
@@ -22,7 +21,17 @@ pkg_dir = joinpath(t.dir, test_pkg)
 
         @test occursin("@misc", citation)
         @test occursin("$(t.authors)", citation)
-        @test occursin("v0.0.1", citation)
+        @test occursin("v0.1.0", citation)
+    end
+
+    @testset "Readme untouched" begin
+        p = Citation(; readme_section=false)
+        t.plugins[Citation] = p
+        isdir(pkg_dir) && rm(pkg_dir; recursive=true)
+        generate(test_pkg, t, git=false)
+        readme = read(joinpath(pkg_dir, "README.md"), String)
+        @test !occursin("## Citing", readme)
+        @test !occursin("CITATION.bib", readme)
     end
 
     @testset "Readme modification" begin

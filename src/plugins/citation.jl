@@ -30,14 +30,16 @@ interactive(::Type{Citation}) = interactive(Citation; readme_section=false)
 
 function gen_plugin(p::Citation, t::Template, pkg_name::AbstractString)
     pkg_dir = joinpath(t.dir, pkg_name)
-    text = """@misc{$pkg_name.jl,
-              \tauthor  = {{$(t.authors)}},\n
-              \ttitle   = {{$(pkg_name).jl}},\n
-              \turl     = {https://$(t.host)/$(t.user)/$(pkg_name).jl},\n
-              \tversion = {v0.0.1},\n
-              \tyear    = {$(year(today()))},\n
-              \tmonth   = {$(month(today()))}\n
-              }\n"""
+    text = """
+           @misc{$pkg_name.jl,
+           \tauthor  = {$(t.authors)},
+           \ttitle   = {{$(pkg_name).jl}},
+           \turl     = {https://$(t.host)/$(t.user)/$(pkg_name).jl},
+           \tversion = {v0.1.0},
+           \tyear    = {$(year(today()))},
+           \tmonth   = {$(month(today()))}
+           }
+           """
     gen_file(joinpath(pkg_dir, "CITATION.bib"), text)
     return ["CITATION.bib"]
 end
