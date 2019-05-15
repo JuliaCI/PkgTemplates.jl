@@ -12,6 +12,9 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 URIParser = "30578b45-9adc-5946-b283-645ec420af67"
 
+[compat]
+julia = "1"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
