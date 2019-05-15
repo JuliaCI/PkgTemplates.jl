@@ -30,6 +30,7 @@ The available plugins are:
   * [Coveralls](https://coveralls.io)
 * Documentation
   * [GitHubPages](https://pages.github.com)
+* Citation
 
 ## Usage
 
