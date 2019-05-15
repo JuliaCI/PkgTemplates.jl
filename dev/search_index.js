@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Plugins",
     "category": "section",
-    "text": "PkgTemplates is based on plugins which handle the setup of individual package components. The available plugins are:Continuous Integration (CI)\nTravis CI (Linux, MacOS)\nAppVeyor (Windows)\nGitLabCI (Linux)\nCirrusCI (FreeBSD)\nCode Coverage\nCodecov\nCoveralls\nDocumentation\nGitHubPages"
+    "text": "PkgTemplates is based on plugins which handle the setup of individual package components. The available plugins are:Continuous Integration (CI)\nTravis CI (Linux, MacOS)\nAppVeyor (Windows)\nGitLabCI (Linux)\nCirrusCI (FreeBSD)\nCode Coverage\nCodecov\nCoveralls\nDocumentation\nGitHubPages\nCitation"
 },
 
 {
