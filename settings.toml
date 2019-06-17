@@ -1,0 +1,10 @@
+user = ""
+host = "https://github.com"
+license = "MIT"
+authors = ""
+ssh = false
+git = true
+manifest = false
+github_token = ""
+travis_token = ""
+ssh_keygen_file = "ssh-keygen"

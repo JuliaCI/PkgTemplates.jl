@@ -128,7 +128,7 @@ struct MyPlugin <: CustomPlugin
     end
 end
 
-interactive(:Type{MyPlugin}) = MyPlugin()
+interactive(::Type{MyPlugin}) = MyPlugin()
 ```
 
 This plugin doesn't do much, but it demonstrates how [`gen_plugin`](@ref), [`badges`](@ref)

@@ -1,32 +1,47 @@
 default_version() = VersionNumber(VERSION.major)
 
-"""
-    Template(; kwargs...) -> Template
+first_as_symbol(pair) = Symbol(pair.first) => pair.second
+function read_settings(settings_file = SETTINGS_FILE)
+    settings = open(TOML.parse, settings_file)
+    # If github notices a github token committed to a repositiory, it will automatically deactivate it
+    # The test github token replaces a with ~ to get around this. Safe because ~ will not appear in tokens otherwise
+    if haskey(settings, "github_token")
+        settings["github_token"] = replace(settings["github_token"], '~' => "a")
+    end
+    Dict(map(first_as_symbol, collect(settings)))
+end
+export get_user
 
-Records common information used to generate a package. If you don't wish to manually
-create a template, you can use [`interactive_template`](@ref) instead.
+"""
+    Template(settings = read_settings(SETTINGS_FILE); kwargs...) -> Template
+
+Records common information used to generate a package based on your [`SETTINGS_FILE`](@ref).
+If you don't wish to manually create a template, you can use [`interactive_template`](@ref) instead.
 
 # Keyword Arguments
-* `user::AbstractString=""`: GitHub (or other code hosting service) username. If left
+* `user::AbstractString=settings[:user]`: GitHub (or other code hosting service) username. If left
   unset, it will take the the global git config's value (`github.user`). If that is not
   set, an `ArgumentError` is thrown. **This is case-sensitive for some plugins, so take
   care to enter it correctly.**
-* `host::AbstractString="github.com"`: URL to the code hosting service where your package
+* `host::AbstractString=settings[:host]`: URL to the code hosting service where your package
   will reside. Note that while hosts other than GitHub won't cause errors, they are not
   officially supported and they will cause certain plugins will produce incorrect output.
-* `license::AbstractString="MIT"`: Name of the package license. If an empty string is
+* `license::AbstractString=settings[:license]`: Name of the package license. If an empty string is
   given, no license is created. [`available_licenses`](@ref) can be used to list all
   available licenses, and [`show_license`](@ref) can be used to print out a particular
   license's text.
-* `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the
+* `authors::Union{AbstractString, Vector{<:AbstractString}}=settings[:authors]`: Names that appear on the
   license. Supply a string for one author or an array for multiple. Similarly to `user`,
   it will take the value of of the global git config's value if it is left unset.
 * `dir::AbstractString=$(replace(Pkg.devdir(), homedir() => "~"))`: Directory in which the
   package will go. Relative paths are converted to absolute ones at template creation time.
 * `julia_version::VersionNumber=$(default_version())`: Minimum allowed Julia version.
-* `ssh::Bool=false`: Whether or not to use SSH for the git remote. If `false` HTTPS will be used.
-* `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
+* `ssh::Bool=settings[:ssh]`: Whether or not to use SSH for the git remote. If `false` HTTPS will be used.
+* `manifest::Bool=settings[:manifest]`: Whether or not to commit the `Manifest.toml`.
 * `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
+* `github_token::String=settings[:github_token]`: Optional for the `Online` plugin. Get a `github_token` [here](https://github.com/settings/tokens/new). Make sure to check the `repo` scope.
+*  `travis_token::String=settings[:travis_token]`: Optional for the `Online` plugin. Get a `travis_token` [here](https://travis-ci.com/account/preferences).
+* `ssh_keygen_file::String=settings[:ssh_keygen_file]`: Optional for the `Online` plugin. If `ssh-keygen` isn't in your path, it often comes prepacked with git. Check `PATH_TO_GIT/usr/bin/ssh-keygen"`.
 """
 struct Template
     user::String
@@ -38,18 +53,24 @@ struct Template
     ssh::Bool
     manifest::Bool
     plugins::Dict{DataType, <:Plugin}
+    github_token::String
+    travis_token::String
+    ssh_keygen_file::String
 
-    function Template(;
-        user::AbstractString="",
-        host::AbstractString="https://github.com",
-        license::AbstractString="MIT",
-        authors::Union{AbstractString, Vector{<:AbstractString}}="",
+    function Template(settings = read_settings(SETTINGS_FILE);
+        user::AbstractString=settings[:user],
+        host::AbstractString=settings[:host],
+        license::AbstractString=settings[:license],
+        authors::Union{AbstractString, Vector{<:AbstractString}}=settings[:authors],
         dir::AbstractString=Pkg.devdir(),
         julia_version::VersionNumber=default_version(),
-        ssh::Bool=false,
-        manifest::Bool=false,
+        ssh::Bool=settings[:ssh],
+        manifest::Bool=settings[:manifest],
         plugins::Vector{<:Plugin}=Plugin[],
-        git::Bool=true,
+        github_token::AbstractString=settings[:github_token],
+        travis_token::AbstractString=settings[:travis_token],
+        ssh_keygen_file::AbstractString=settings[:ssh_keygen_file],
+        git::Bool=settings[:git],
     )
         # Check for required Git options for package generation
         # (you can't commit to a repository without them).
@@ -87,7 +108,7 @@ struct Template
             @warn "Plugin list contained duplicates, only the last of each type was kept"
         end
 
-        new(user, host, license, authors, dir, julia_version, ssh, manifest, plugin_dict)
+        new(user, host, license, authors, dir, julia_version, ssh, manifest, plugin_dict, github_token, travis_token, ssh_keygen_file)
     end
 end
 
