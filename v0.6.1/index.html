@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · PkgTemplates.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>PkgTemplates.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>Home</a><ul class="internal"><li><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Plugins-1">Plugins</a></li><li><a class="toctext" href="#Usage-1">Usage</a></li><li><a class="toctext" href="#Comparison-to-PkgDev-1">Comparison to PkgDev</a></li><li><a class="toctext" href="#Contributing-1">Contributing</a></li></ul></li><li><a class="toctext" href="pages/package_generation/">Package Generation</a></li><li><a class="toctext" href="pages/plugins/">Plugins</a></li><li><a class="toctext" href="pages/plugin_development/">Plugin Development</a></li><li><a class="toctext" href="pages/licenses/">Licenses</a></li><li><a class="toctext" href="pages/">Index</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Home</a></li></ul><a class="edit-page" href="https://github.com/invenia/PkgTemplates.jl/blob/master/docs/src/index.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Home</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="PkgTemplates-1" href="#PkgTemplates-1">PkgTemplates</a></h1><p><a href="https://invenia.github.io/PkgTemplates.jl/stable"><img src="https://img.shields.io/badge/docs-stable-blue.svg" alt="Stable"/></a> <a href="https://invenia.github.io/PkgTemplates.jl/latest"><img src="https://img.shields.io/badge/docs-latest-blue.svg" alt="Latest"/></a> <a href="https://travis-ci.org/invenia/PkgTemplates.jl"><img src="https://travis-ci.org/invenia/PkgTemplates.jl.svg?branch=master" alt="Build Status"/></a> <a href="https://ci.appveyor.com/project/christopher-dG/pkgtemplates-jl/branch/master"><img src="https://ci.appveyor.com/api/projects/status/r24xamruqlm88uti/branch/master?svg=true" alt="Build Status"/></a> <a href="https://codecov.io/gh/invenia/PkgTemplates.jl"><img src="https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg" alt="Codecov"/></a></p><p><strong>PkgTemplates is a Julia package for creating new Julia packages in an easy, repeatable, and customizable way.</strong></p><h2><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h2><pre><code class="language-julia">pkg&gt; add PkgTemplates</code></pre><h2><a class="nav-anchor" id="Plugins-1" href="#Plugins-1">Plugins</a></h2><p><code>PkgTemplates</code> is based on plugins which handle the setup of individual package components. The available plugins are:</p><ul><li>Continuous Integration (CI)<ul><li><a href="https://travis-ci.com">Travis CI</a> (Linux, MacOS)</li><li><a href="https://appveyor.com">AppVeyor</a> (Windows)</li><li><a href="https://gitlab.com">GitLabCI</a> (Linux)</li><li><a href="https://cirrus-ci.org">CirrusCI</a> (FreeBSD)</li></ul></li><li>Code Coverage<ul><li><a href="https://codecov.io">Codecov</a></li><li><a href="https://coveralls.io">Coveralls</a></li></ul></li><li>Documentation<ul><li><a href="https://pages.github.com">GitHubPages</a></li></ul></li><li>Citation</li></ul><h2><a class="nav-anchor" id="Usage-1" href="#Usage-1">Usage</a></h2><div></div><p>Assuming you have the relatively standard Git options <code>user.name</code>, <code>user.email</code> and <code>github.user</code> set up globally with <code>git config --global</code>, the simplest template requires no arguments:</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
+
+julia&gt; t = Template()
+Template:
+  → User: travis
+  → Host: github.com
+  → License: MIT (Travis CI User &lt;travis@example.org&gt; 2019)
+  → Package directory: ~/.julia/dev
+  → Minimum Julia version: v1.0
+  → SSH remote: No
+  → Add packages to main environment: Yes
+  → Commit Manifest.toml: No
+  → Plugins: None
+
+julia&gt; generate(&quot;MyPkg&quot;, t)
+Generating project MyPkg:
+    /home/travis/.julia/dev/MyPkg/Project.toml
+    /home/travis/.julia/dev/MyPkg/src/MyPkg.jl
+[ Info: Initialized Git repo at /home/travis/.julia/dev/MyPkg
+[ Info: Set remote origin to https://github.com/travis/MyPkg.jl
+ Resolving package versions...
+  Updating `~/.julia/dev/MyPkg/Project.toml`
+  [8dfed614] + Test 
+  Updating `~/.julia/dev/MyPkg/Manifest.toml`
+  [2a0f44e3] + Base64 
+  [8ba89e20] + Distributed 
+  [b77e0a4c] + InteractiveUtils 
+  [56ddb016] + Logging 
+  [d6f4376e] + Markdown 
+  [9a3f8284] + Random 
+  [9e88b42a] + Serialization 
+  [6462fe0b] + Sockets 
+  [8dfed614] + Test 
+  Updating registry at `~/.julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h Resolving package versions...
+  Updating `~/.julia/dev/MyPkg/Project.toml`
+ [no changes]
+  Updating `~/.julia/dev/MyPkg/Manifest.toml`
+  [2a0f44e3] - Base64 
+  [8ba89e20] - Distributed 
+  [b77e0a4c] - InteractiveUtils 
+  [56ddb016] - Logging 
+  [d6f4376e] - Markdown 
+  [9a3f8284] - Random 
+  [9e88b42a] - Serialization 
+  [6462fe0b] - Sockets 
+  [8dfed614] - Test 
+[ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
+[ Info: Committed 6 files/directories: src/, Project.toml, test/, README.md, LICENSE, .gitignore
+ Resolving package versions...
+  Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
+  [797757b8] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+  Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
+  [797757b8] + MyPkg v0.1.0 [`~/.julia/dev/MyPkg`]
+[ Info: New package is at /home/travis/.julia/dev/MyPkg
+
+julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg&quot;)) ls-files`);
+.gitignore
+LICENSE
+Project.toml
+README.md
+src/MyPkg.jl
+test/runtests.jl</code></pre><p>However, we can also configure a number of keyword arguments to <a href="pages/package_generation/#PkgTemplates.Template"><code>Template</code></a>:</p><pre><code class="language-julia-repl">julia&gt; using PkgTemplates
+
+julia&gt; t = Template(;
+           user=&quot;myusername&quot;,
+           license=&quot;MIT&quot;,
+           authors=[&quot;Chris de Graaf&quot;, &quot;Invenia Technical Computing Corporation&quot;],
+           dir=&quot;~/code&quot;,
+           julia_version=v&quot;0.7&quot;,
+           ssh=true,
+           plugins=[
+               TravisCI(),
+               Codecov(),
+               Coveralls(),
+               AppVeyor(),
+               GitHubPages(),
+               CirrusCI(),
+           ],
+       )
+Template:
+  → User: myusername
+  → Host: github.com
+  → License: MIT (Chris de Graaf, Invenia Technical Computing Corporation 2019)
+  → Package directory: ~/code
+  → Minimum Julia version: v0.7
+  → SSH remote: Yes
+  → Add packages to main environment: Yes
+  → Commit Manifest.toml: No
+  → Plugins:
+    • AppVeyor:
+      → Config file: Default
+      → 0 gitignore entries
+    • CirrusCI:
+      → Config file: Default
+      → 0 gitignore entries
+    • Codecov:
+      → Config file: None
+      → 3 gitignore entries: &quot;*.jl.cov&quot;, &quot;*.jl.*.cov&quot;, &quot;*.jl.mem&quot;
+    • Coveralls:
+      → Config file: None
+      → 3 gitignore entries: &quot;*.jl.cov&quot;, &quot;*.jl.*.cov&quot;, &quot;*.jl.mem&quot;
+    • GitHubPages:
+      → 0 asset files
+      → 2 gitignore entries: &quot;/docs/build/&quot;, &quot;/docs/site/&quot;
+    • TravisCI:
+      → Config file: Default
+      → 0 gitignore entries
+
+julia&gt; generate(&quot;MyPkg2&quot;, t)
+Generating project MyPkg2:
+    /home/travis/code/MyPkg2/Project.toml
+    /home/travis/code/MyPkg2/src/MyPkg2.jl
+[ Info: Initialized Git repo at /home/travis/code/MyPkg2
+[ Info: Set remote origin to git@github.com:myusername/MyPkg2.jl.git
+[ Info: Created empty gh-pages branch
+ Resolving package versions...
+[ Warning: julia version requirement for project not satisfied
+  Updating `~/code/MyPkg2/Project.toml`
+  [8dfed614] + Test 
+  Updating `~/code/MyPkg2/Manifest.toml`
+  [2a0f44e3] + Base64 
+  [8ba89e20] + Distributed 
+  [b77e0a4c] + InteractiveUtils 
+  [56ddb016] + Logging 
+  [d6f4376e] + Markdown 
+  [9a3f8284] + Random 
+  [9e88b42a] + Serialization 
+  [6462fe0b] + Sockets 
+  [8dfed614] + Test 
+  Updating registry at `~/.julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h Resolving package versions...
+[ Warning: julia version requirement for project not satisfied
+  Updating `~/code/MyPkg2/Project.toml`
+ [no changes]
+  Updating `~/code/MyPkg2/Manifest.toml`
+  [2a0f44e3] - Base64 
+  [8ba89e20] - Distributed 
+  [b77e0a4c] - InteractiveUtils 
+  [56ddb016] - Logging 
+  [d6f4376e] - Markdown 
+  [9a3f8284] - Random 
+  [9e88b42a] - Serialization 
+  [6462fe0b] - Sockets 
+  [8dfed614] - Test 
+[ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
+ Resolving package versions...
+ Installed Documenter ─ v0.22.4
+ Installed JSON ─────── v0.20.0
+  Updating `~/code/MyPkg2/docs/Project.toml`
+  [e30172f5] + Documenter v0.22.4
+  Updating `~/code/MyPkg2/docs/Manifest.toml`
+  [ffbed154] + DocStringExtensions v0.7.0
+  [e30172f5] + Documenter v0.22.4
+  [682c06a0] + JSON v0.20.0
+  [2a0f44e3] + Base64 
+  [ade2ca70] + Dates 
+  [8ba89e20] + Distributed 
+  [b77e0a4c] + InteractiveUtils 
+  [76f85450] + LibGit2 
+  [56ddb016] + Logging 
+  [d6f4376e] + Markdown 
+  [a63ad114] + Mmap 
+  [44cfe95a] + Pkg 
+  [de0858da] + Printf 
+  [3fa0cd96] + REPL 
+  [9a3f8284] + Random 
+  [ea8e919c] + SHA 
+  [9e88b42a] + Serialization 
+  [6462fe0b] + Sockets 
+  [8dfed614] + Test 
+  [cf7118a7] + UUIDs 
+  [4ec0a83e] + Unicode 
+[ Info: activating new environment at ~/build/invenia/PkgTemplates.jl/docs/Project.toml.
+[ Info: Committed 10 files/directories: src/, Project.toml, test/, README.md, LICENSE, .travis.yml, .appveyor.yml, docs/, .cirrus.yml, .gitignore
+[ Info: Remember to push all created branches to your remote: git push --all
+ Resolving package versions...
+┌ Warning: julia version requirement for package MyPkg2 not satisfied
+└ @ Pkg.Operations /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.1/Pkg/src/Operations.jl:154
+  Updating `~/build/invenia/PkgTemplates.jl/docs/Project.toml`
+  [7c22c222] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+  Updating `~/build/invenia/PkgTemplates.jl/docs/Manifest.toml`
+  [7c22c222] + MyPkg2 v0.1.0 [`~/code/MyPkg2`]
+[ Info: New package is at /home/travis/code/MyPkg2
+
+julia&gt; run(`git -C $(joinpath(t.dir, &quot;MyPkg2&quot;)) ls-files`);
+.appveyor.yml
+.cirrus.yml
+.gitignore
+.travis.yml
+LICENSE
+Project.toml
+README.md
+docs/Manifest.toml
+docs/Project.toml
+docs/make.jl
+docs/src/index.md
+src/MyPkg2.jl
+test/runtests.jl</code></pre><p>If that looks like a lot of work, you can also create templates interactively with <a href="pages/package_generation/#PkgTemplates.interactive_template"><code>interactive_template</code></a>:</p><p><a href="https://asciinema.org/a/31bZqW9u8h5RHpd7gtsemioRV"><img src="https://asciinema.org/a/31bZqW9u8h5RHpd7gtsemioRV.png" alt="asciicast"/></a></p><p>And if that&#39;s <strong>still</strong> too much work for you, you can call <code>interactive_template</code> with <code>fast=true</code> to use default values for everything but username and plugin selection.</p><p>You can also use <a href="pages/package_generation/#PkgTemplates.generate_interactive"><code>generate_interactive</code></a> to interactively generate a template and then immediately use it to create a new package.</p><h2><a class="nav-anchor" id="Comparison-to-PkgDev-1" href="#Comparison-to-PkgDev-1">Comparison to PkgDev</a></h2><p><code>PkgTemplates</code> is similar in functionality to <a href="https://github.com/JuliaLang/PkgDev.jl"><code>PkgDev</code></a>&#39;s <code>generate</code> function. However, <code>PkgTemplates</code> offers more customizability in templates and more extensibility via plugins. For the package registration and release management features that <code>PkgTemplates</code> doesn&#39;t include, you are encouraged to use <a href="https://github.com/apps/attobot">AttoBot</a> instead.</p><h2><a class="nav-anchor" id="Contributing-1" href="#Contributing-1">Contributing</a></h2><p>It&#39;s extremely easy to extend <code>PkgTemplates</code> with new plugins. To get started, check out the <a href="https://invenia.github.io/PkgTemplates.jl/stable/pages/plugin_development.html">plugin development guide</a>.</p><footer><hr/><a class="next" href="pages/package_generation/"><span class="direction">Next</span><span class="title">Package Generation</span></a></footer></article></body></html>
