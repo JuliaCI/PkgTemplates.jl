@@ -120,6 +120,7 @@ end
           → Package directory: $pkg_dir
           → Minimum Julia version: v$ver
           → SSH remote: No
+          → Add packages to main environment: Yes
           → Commit Manifest.toml: No
           → Plugins: None
         """
@@ -145,6 +146,7 @@ end
           → Package directory: $pkg_dir
           → Minimum Julia version: v$ver
           → SSH remote: Yes
+          → Add packages to main environment: Yes
           → Commit Manifest.toml: Yes
           → Plugins:
             • Codecov:
