@@ -1,7 +1,8 @@
 const LICENSE_DIR = normpath(joinpath(@__DIR__, "..", "licenses"))
 const LICENSES = Dict(
     "MIT" => "MIT \"Expat\" License",
-    "BSD" => "Simplified \"2-clause\" BSD License",
+    "BSD2" => "Simplified \"2-clause\" BSD License",
+    "BSD3" => "Modified \"3-clause\" BSD License",
     "ISC" => "Internet Systems Consortium License",
     "ASL" => "Apache License, Version 2.0",
     "MPL" => "Mozilla Public License, Version 2.0",
