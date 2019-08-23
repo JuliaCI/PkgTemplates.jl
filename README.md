@@ -139,7 +139,6 @@ but username and plugin selection.
 You can also use `generate_interactive` to interactively generate a template and then
 immediately use it to create a new package.
 
-
 ## Contributing
 
 It's extremely easy to extend `PkgTemplates` with new plugins. To get started,
