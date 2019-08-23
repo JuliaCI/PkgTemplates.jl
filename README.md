@@ -139,14 +139,6 @@ but username and plugin selection.
 You can also use `generate_interactive` to interactively generate a template and then
 immediately use it to create a new package.
 
-## Comparison to PkgDev
-
-`PkgTemplates` is similar in functionality to
-[`PkgDev`](https://github.com/JuliaLang/PkgDev.jl)'s `generate` function. However,
-`PkgTemplates` offers more customizability in templates and more extensibility via plugins.
-For the package registration and release management features that `PkgTemplates` doesn't
-include, you are encouraged to use [AttoBot](https://github.com/apps/attobot) instead.
-
 ## Contributing
 
 It's extremely easy to extend `PkgTemplates` with new plugins. To get started,
