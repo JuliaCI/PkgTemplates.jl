@@ -1,7 +1,7 @@
 name = "PkgTemplates"
 uuid = "14b8a8f1-9102-5b29-a752-f990bacb7fe1"
 authors = ["Chris de Graaf <chrisadegraaf@gmail.com>"]
-version = "0.6.1"
+version = "0.6.2"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
