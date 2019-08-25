@@ -26,7 +26,12 @@ struct Citation <: GenericPlugin
     end
 end
 
-interactive(::Type{Citation}) = interactive(Citation; readme_section=false)
+function interactive(::Type{Citation})
+    print("Citation: Add a section to README.md mentioning CITATION.bib? [no]: ")
+    readme = uppercase(readline()) in ["Y", "YES", "TRUE"]
+    return Citation(; readme_section=readme)
+end
+
 
 function gen_plugin(p::Citation, t::Template, pkg_name::AbstractString)
     pkg_dir = joinpath(t.dir, pkg_name)
