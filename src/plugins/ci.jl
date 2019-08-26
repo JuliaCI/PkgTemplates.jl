@@ -9,6 +9,31 @@ end
 
 abstract type CI <: Plugin end
 
+# TODO: A template that yields this:
+# os:
+#   - linux
+#   - osx
+#   - windows
+# julia:
+#   - 1.0
+#   - 1.1
+#   - 1.2
+#   - 1.3
+#   - nightly
+# matrix:
+#   fast_finish: true
+#   allow_failures:
+#     - julia: 1.3
+#     - julia: nightly
+#   include:
+#     - os: linux
+#       arch: x86
+#       julia: 1.0
+#     - os: windows
+#       arch: x86
+#       julia: 1.0
+# (and maybe all the other Julia versions for 32-bit too)
+
 @kwdef struct TravisCI <: CI
     file::String = default_file("travis.yml")
     linux::Bool = true

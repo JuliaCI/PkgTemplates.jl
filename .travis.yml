@@ -1,31 +1,51 @@
 language: julia
+notifications:
+  email: false
 os:
   - linux
   - osx
   - windows
 julia:
   - 1.0
+  - 1.1
   - 1.2
+  - 1.3
   - nightly
 matrix:
-  allow_failures:
-    - julia: nightly
   fast_finish: true
-notifications:
-  email: false
-after_success:
-  - julia -e '
-    using Pkg
-    Pkg.add("Coverage")
-    using Coverage
-    Codecov.submit(process_folder())'
-jobs:
+  allow_failures:
+    - julia: 1.3
+    - julia: nightly
   include:
-    - stage: Documentation
+    - os: linux
+      arch: x86
+      julia: 1.0
+    - os: windows
+      arch: x86
+      julia: 1.0
+    - os: linux
+      arch: x86
+      julia: 1.1
+    - os: windows
+      arch: x86
+      julia: 1.1
+    - os: linux
+      arch: x86
       julia: 1.2
+    - os: windows
+      arch: x86
+      julia: 1.2
+    - os: linux
+      arch: x86
+      julia: nightly
+    - os: windows
+      arch: x86
+      julia: nightly
+    - stage: Documentation
+      julia: 1.0
       script: julia --project=docs -e '
-          using Pkg
-          Pkg.develop(PackageSpec(; path=pwd()))
-          Pkg.instantiate()
-          include("docs/make.jl")'
+          using Pkg;
+          Pkg.develop(PackageSpec(; path=pwd()));
+          Pkg.instantiate();
+          include("docs/make.jl");'
       after_success: skip
