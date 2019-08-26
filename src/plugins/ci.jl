@@ -34,7 +34,7 @@ abstract type CI <: Plugin end
 #       julia: 1.0
 # (and maybe all the other Julia versions for 32-bit too)
 
-@kwdef struct TravisCI <: CI
+@with_kw struct TravisCI <: CI
     file::String = default_file("travis.yml")
     linux::Bool = true
     osx::Bool = true
@@ -73,7 +73,7 @@ function view(p::TravisCI, t::Template, ::AbstractString)
     )
 end
 
-@kwdef struct AppVeyor <: CI
+@with_kw struct AppVeyor <: CI
     file::String = default_file("appveyor.yml")
     x86::Bool = false
     coverage::Bool = true
@@ -101,7 +101,7 @@ function view(p::AppVeyor, t::Template, ::AbstractString)
     )
 end
 
-@kwdef struct CirrusCI <: CI
+@with_kw struct CirrusCI <: CI
     file::String = default_file("cirrus.yml")
     image::String = "freebsd-12-0-release-amd64"
     coverage::Bool = true
@@ -128,7 +128,7 @@ function view(p::CirrusCI, t::Template, ::AbstractString)
     )
 end
 
-@kwdef struct GitLabCI <: CI
+@with_kw struct GitLabCI <: CI
     file::String
     documentation::Bool = true
     coverage::Bool = true

@@ -4,7 +4,7 @@
 Add `Citation` to a [`Template`](@ref)'s plugin list to generate a `CITATION.bib` file.
 If `readme` is set, then `README.md` will contain a section about citing.
 """
-@kwdef struct Citation <: BasicPlugin
+@with_kw struct Citation <: BasicPlugin
     file::String = default_file("CITATION.bib")
     readme::Bool = false
 end

@@ -4,7 +4,7 @@ const COVERAGE_GITIGNORE = ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
 
 gitignore(::Coverage) = COVERAGE_GITIGNORE
 
-@kwdef struct Codecov <: Coverage
+@with_kw struct Codecov <: Coverage
     file::Union{String, Nothing} = nothing
 end
 
@@ -17,7 +17,7 @@ badges(::Codecov) = Badge(
     "https://codecov.io/gh/{{USER}}/{{PKG}}.jl",
 )
 
-@kwdef struct Coveralls <: Coverage
+@with_kw struct Coveralls <: Coverage
     file::Union{String, Nothing} = nothing
 end
 

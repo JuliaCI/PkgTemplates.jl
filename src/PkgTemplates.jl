@@ -1,13 +1,16 @@
 module PkgTemplates
 
-using Base: @kwdef, current_project
+using Base: current_project
 using Base.Filesystem: contractuser
+
 using Dates: month, today, year
 using InteractiveUtils: subtypes
 using LibGit2: LibGit2
-using Mustache: render
-using Pkg: PackageSpec, Pkg
+using Pkg: Pkg, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
+
+using Mustache: render
+using Parameters: @with_kw
 using URIParser: URI
 
 export

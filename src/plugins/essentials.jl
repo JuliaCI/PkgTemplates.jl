@@ -13,7 +13,7 @@ const LICENSES = Dict(
     "EUPL-1.2+" => "European Union Public Licence, Version 1.2+",
 )
 
-@kwdef struct Readme <: BasicPlugin
+@with_kw struct Readme <: BasicPlugin
     file::String = default_file("README.md")
     destination::String = "README.md"
     inline_badges::Bool = false
@@ -86,7 +86,7 @@ function gen_plugin(p::Gitignore, t::Template, pkg_dir::AbstractString)
     gen_file(joinpath(pkg_dir, ".gitignore"), render_plugin(p, t))
 end
 
-@kwdef struct Tests <: BasicPlugin
+@with_kw struct Tests <: BasicPlugin
     file::String = default_file("runtests.jl")
 end
 
