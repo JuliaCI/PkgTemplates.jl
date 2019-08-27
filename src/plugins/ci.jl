@@ -9,31 +9,6 @@ end
 
 abstract type CI <: Plugin end
 
-# TODO: A template that yields this:
-# os:
-#   - linux
-#   - osx
-#   - windows
-# julia:
-#   - 1.0
-#   - 1.1
-#   - 1.2
-#   - 1.3
-#   - nightly
-# matrix:
-#   fast_finish: true
-#   allow_failures:
-#     - julia: 1.3
-#     - julia: nightly
-#   include:
-#     - os: linux
-#       arch: x86
-#       julia: 1.0
-#     - os: windows
-#       arch: x86
-#       julia: 1.0
-# (and maybe all the other Julia versions for 32-bit too)
-
 @with_kw struct TravisCI <: CI
     file::String = default_file("travis.yml")
     linux::Bool = true
@@ -54,22 +29,34 @@ badges(::TravisCI) = Badge(
 )
 
 function view(p::TravisCI, t::Template, ::AbstractString)
-    jobs = Dict{String, String}[]
-    for v in collect_versions(p.extra_versions, t)
-        p.linux && push!(jobs, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x64"))
-        p.linux && p.x86 && push!(jobs, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
-        p.osx && push!(jobs, Dict("JULIA" => v, "OS" => "osx"))
-        p.windows && push!(jobs, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x64"))
-        p.windows && p.x86 && push!(jobs, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
+    os = String[]
+    p.linux && push!(os, "linux")
+    p.osx && push!(os, "osx")
+    p.windows && push!(os, "windows")
+
+    # TODO: Update the allowed failures as new versions come out.
+    versions = collect_versions(p.extra_versions, t)
+    allow_failures = filter(v -> v in versions, ("1.3", "nightly"))
+
+    x86 = Dict{String, String}[]
+    if p.x86
+    foreach(versions) do v
+        p.linux && push!(x86, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
+        p.windows && push!(x86, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
     end
+
     return Dict(
+        "ALLOW_FAILURES" => allow_failures,
+        "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => hasplugin(t, Codecov),
         "HAS_COVERAGE" => p.coverage && hasplugin(t, Coverage),
         "HAS_COVERALLS" => hasplugin(t, Coveralls),
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{TravisCI}),
-        "HAS_NIGHTLY" => "nightly" in versions,
+        "HAS_JOBS" => p.x86 || hasplugin(t, Documenter{TravisCI}),
+        "OS" => os,
         "PKG" => pkg,
         "VERSION" => format_version(t.julia_version),
+        "X86" => x86,
     )
 end
 

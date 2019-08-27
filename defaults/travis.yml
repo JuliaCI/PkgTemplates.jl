@@ -2,29 +2,38 @@
 language: julia
 notifications:
   email: false
-{{#HAS_DOCUMENTER}}
+julia:
+{{#VERSIONS}}
+  - {{.}}
+{{/VERSIONS}}
+os:
+{{#OS}}
+  - {{.}}
+{{/OS}}
 jobs:
   fast_finish: true
-{{#HAS_NIGHTLY}}
+{{#HAS_ALLOW_FAILURES}}
   allow_failures:
-    - julia: nightly
-{{/HAS_NIGHTLY}}
+{{/HAS_ALLOW_FAILURES}}
+{{#ALLOW_FAILURES}}
+    - julia: {{.}}
+{{/ALLOW_FAILURES}}
+{{#HAS_JOBS}}
   include:
-{{#JOBS}}
+{{/HAS_JOBS}}
+{{#X86}}
     - julia: {{JULIA}}
       os: {{OS}}
-{{#ARCH}}
-      arch: {{ARCH}}
-{{/ARCH}}
-{{/JOBS}}
+      arch: x86
+{{/X86}}
 {{#HAS_DOCUMENTER}}
     - stage: Documentation
       julia: {{VERSION}}
       script: julia --project=docs -e '
-          using Pkg;
-          Pkg.develop(PackageSpec(; path=pwd()));
-          Pkg.instantiate();
-          include("docs/make.jl");'
+        using Pkg;
+        Pkg.develop(PackageSpec(; path=pwd()));
+        Pkg.instantiate();
+        include("docs/make.jl");'
       after_success: skip
 {{/HAS_DOCUMENTER}}
 {{#HAS_COVERAGE}}
