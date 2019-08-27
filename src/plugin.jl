@@ -1,13 +1,20 @@
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
 
+"""
+A simple plugin that, in general, manages a single file.
+For example, most CI services reply on one configuration file.
+
+TODO: Dev guide.
+"""
 abstract type BasicPlugin <: Plugin end
 
+# Compute the path to a default template file in this repository.
 default_file(paths::AbstractString...) = joinpath(DEFAULTS_DIR, paths...)
 
 """
     view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String}
 
-Return extra string substitutions to be made for this plugin.
+Return the string replacements to be made for this plugin.
 """
 view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
@@ -67,25 +74,23 @@ function badges(p::Plugin, t::Template, pkg_name::AbstractString)
 end
 
 """
-    gen_plugin(p::Plugin, t::Template, pkg::AbstractString) -> Nothing
+    gen_plugin(p::Plugin, t::Template, pkg::AbstractString)
 
 Generate any files associated with a plugin.
-
-## Arguments
-* `p::Plugin`: Plugin whose files are being generated.
-* `t::Template`: Template configuration.
-* `pkg::AbstractString`: Name of the package.
+`pkg` is the name of the package being generated.
 """
 gen_plugin(::Plugin, ::Template, ::AbstractString) = nothing
 
 function gen_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
-    source(p) === nothing && return
-    text = render(source(p), view(p, t, pkg); tags=tags(p))
-    gen_file(joinpath(t.dir, pkg_name, destination(p)), text)
+    src = source(p)
+    src === nothing && return
+    # TODO template rendering code
+    text = render(src, view(p, t, pkg); tags=tags(p))
+    gen_file(joinpath(t.dir, pkg, destination(p)), text)
 end
 
 """
-    gen_file(file::AbstractString, text::AbstractString) -> Int
+    gen_file(file::AbstractString, text::AbstractString)
 
 Create a new file containing some given text.
 Trailing whitespace is removed, and the file will end with a newline.
@@ -96,6 +101,8 @@ function gen_file(file::AbstractString, text::AbstractString)
     endswith(text , "\n") || (text *= "\n")
     write(file, text)
 end
+
+# TODO pls make me better
 
 render_file(file::AbstractString, view, tags) = render_text(read(file, String), view, tags)
 
@@ -120,6 +127,7 @@ const BADGE_ORDER = [
     TravisCI,
     AppVeyor,
     GitLabCI,
+    CirrusCI,
     Codecov,
     Coveralls,
 ]

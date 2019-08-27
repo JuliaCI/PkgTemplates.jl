@@ -15,7 +15,7 @@ source(p::Citation) = p.file
 destination(::Citation) = "CITATION.bib"
 
 view(::Citation, t::Template, pkg::AbstractString) = Dict(
-    "AUTHORS" => t.authors,
+    "AUTHORS" => join(t.authors, ", "),
     "MONTH" => month(today()),
     "PKG" => pkg,
     "URL" => "https://$(t.host)/$(t.user)/$pkg.jl",

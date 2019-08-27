@@ -28,8 +28,6 @@ export
     Tests,
     TravisCI
 
-const DEFAULT_VERSION = VersionNumber(VERSION.major)
-
 """
 A plugin to be added to a [`Template`](@ref), which adds some functionality or integration.
 """

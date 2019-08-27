@@ -63,9 +63,10 @@ end
 read_license(license::AbstractString) = string(readchomp(license_path(license)))
 
 function render_plugin(p::License, t::Template)
-    text = "Copyright (c) $(year(today())) $(t.authors)\n"
-    license = read(p.path, String)
-    startswith(license, "\n") || (text *= "\n")
+    date = year(today())
+    authors = join(t.authors, ", ")
+    text = "Copyright (c) $date $authors\n\n"
+    license = strip(read(p.path, String))
     return text * license
 end
 

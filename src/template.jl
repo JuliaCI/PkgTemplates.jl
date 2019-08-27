@@ -1,4 +1,4 @@
-default_version() = VersionNumber(VERSION.major)
+const DEFAULT_VERSION = VersionNumber(VERSION.major)
 
 """
     Template(interactive::Bool=false; kwargs...) -> Template
@@ -34,7 +34,7 @@ Records common information used to generate a package.
 struct Template
     user::String
     host::String
-    authors::String
+    authors::Vector{String}
     dir::String
     julia_version::VersionNumber
     ssh::Bool
@@ -46,6 +46,7 @@ end
 
 Template(; interactive::Bool=false, kwargs...) = make_template(Val(interactive); kwargs...)
 
+# Non-interactive Template constructor.
 function make_template(::Val{false}; kwargs...)
     user = getkw(kwargs, :user)
     if isempty(user)
@@ -56,7 +57,7 @@ function make_template(::Val{false}; kwargs...)
     host = URI(occursin("://", host) ? host : "https://$host").host
 
     authors = getkw(kwargs, :authors)
-    authors isa Vector && (authors = join(authors, ", "))
+    authors isa Vector || (authors = map(strip, split(authors, ",")))
 
     dir = abspath(expanduser(getkw(kwargs, :dir)))
 
@@ -82,10 +83,13 @@ function make_template(::Val{false}; kwargs...)
     )
 end
 
+# Does the template have a plugin of this type? Subtypes count too.
 hasplugin(t::Template, ::Type{T}) where T <: Plugin = any(U -> U <: T, keys(t.plugins))
 
+# Get a keyword, or compute some default value.
 getkw(kwargs, k) = get(() -> defaultkw(k), kwargs, k)
 
+# Default Template keyword values.
 defaultkw(s::Symbol) = defaultkw(Val(s))
 defaultkw(::Val{:user}) = LibGit2.getconfig("github.user", "")
 defaultkw(::Val{:host}) = "https://github.com"
@@ -103,5 +107,5 @@ function defaultkw(::Val{:authors})
     isempty(name) && return ""
     author = name * " "
     isempty(email) || (author *= "<$email>")
-    return strip(author)
+    return [strip(author)]
 end

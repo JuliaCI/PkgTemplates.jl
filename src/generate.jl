@@ -16,8 +16,7 @@ function (t::Template)(pkg::AbstractString)
         if !isempty(t.authors)
             path = joinpath(pkg_dir, "Project.toml")
             toml = TOML.parsefile(path)
-            # TODO: authors should probably be kept as a vector.
-            toml["authors"] = split(t.authors, ",")
+            toml["authors"] = t.authors
             get!(toml, "compat", Dict())["julia"] = compat_version(t.julia_version)
             open(io -> TOML.print(io, toml), path, "w")
         end
