@@ -28,7 +28,7 @@ badges(::TravisCI) = Badge(
     "https://travis-ci.com/{{USER}}/{{PKG}}.jl",
 )
 
-function view(p::TravisCI, t::Template, ::AbstractString)
+function view(p::TravisCI, t::Template, pkg::AbstractString)
     os = String[]
     p.linux && push!(os, "linux")
     p.osx && push!(os, "osx")
@@ -36,13 +36,14 @@ function view(p::TravisCI, t::Template, ::AbstractString)
 
     # TODO: Update the allowed failures as new versions come out.
     versions = collect_versions(p.extra_versions, t)
-    allow_failures = filter(v -> v in versions, ("1.3", "nightly"))
+    allow_failures = filter(v -> v in versions, ["1.3", "nightly"])
 
     x86 = Dict{String, String}[]
     if p.x86
-    foreach(versions) do v
-        p.linux && push!(x86, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
-        p.windows && push!(x86, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
+        foreach(versions) do v
+            p.linux && push!(x86, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
+            p.windows && push!(x86, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
+        end
     end
 
     return Dict(

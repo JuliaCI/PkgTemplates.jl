@@ -12,11 +12,27 @@ abstract type BasicPlugin <: Plugin end
 default_file(paths::AbstractString...) = joinpath(DEFAULTS_DIR, paths...)
 
 """
-    view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String}
+    view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
 
 Return the string replacements to be made for this plugin.
+`pkg` is the name of the package being generated.
 """
 view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
+
+"""
+    user_view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
+
+The same as [`view`](@ref), but for use only by package *users* for extension.
+TODO better explanation
+"""
+user_view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
+
+"""
+    tags(::Plugin) -> Tuple{String, String}
+
+Return the tags used for Mustache templating.
+"""
+tags(::Plugin) = ("{{", "}}")
 
 """
     gitignore(::Plugin) -> Vector{String}
@@ -66,28 +82,38 @@ end
 Base.string(b::Badge) = "[![$(b.hover)]($(b.image))]($(b.link))"
 
 # Format a plugin's badges as a list of strings, with all substitutions applied.
-function badges(p::Plugin, t::Template, pkg_name::AbstractString)
+function badges(p::Plugin, t::Template, pkg::AbstractString)
     bs = badges(p)
     bs isa Vector || (bs = [bs])
-    bs = map(string, bs)
-    # TODO render
+    return map(b -> render_text(string(b), combined_view(p, t, pkg)), bs)
 end
 
 """
-    gen_plugin(p::Plugin, t::Template, pkg::AbstractString)
+    gen_plugin(::Plugin, ::Template, pkg::AbstractString)
 
-Generate any files associated with a plugin.
+Perform any work associated with a plugin.
 `pkg` is the name of the package being generated.
 """
 gen_plugin(::Plugin, ::Template, ::AbstractString) = nothing
 
-function gen_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
+function gen_plugin(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
+    pkg = basename(pkg_dir)
+    path = joinpath(pkg_dir, destination(p))
+    text = render_plugin(p, t, pkg)
+    gen_file(path, text)
+end
+
+function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
     src = source(p)
     src === nothing && return
     # TODO template rendering code
-    text = render(src, view(p, t, pkg); tags=tags(p))
-    gen_file(joinpath(t.dir, pkg, destination(p)), text)
+    return render_file(src, combined_view(p, t, pkg), tags(p))
 end
+
+function combined_view(p::Plugin, t::Template, pkg::AbstractString)
+    return merge(view(p, t, pkg), user_view(p, t, pkg))
+end
+
 
 """
     gen_file(file::AbstractString, text::AbstractString)
@@ -102,17 +128,22 @@ function gen_file(file::AbstractString, text::AbstractString)
     write(file, text)
 end
 
-# TODO pls make me better
-
+# Render text from a file.
 render_file(file::AbstractString, view, tags) = render_text(read(file, String), view, tags)
 
-render_text(text::AbstractString, view, tags) = render(text, view; tags=tags)
-
-function render_badges(p::BasicPlugin, t::Template, pkg::AbstractString)
-end
-
-function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
-    render_file(source(p), view(p, t, pkg), tags(p))
+# Render text, using Mustache's templating system. HTML escaping is disabled.
+function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
+    saved = copy(entityMap)
+    empty!(entityMap)
+    return try
+        if tags === nothing
+            render(text, view)
+        else
+            render(text, view; tags=tags)
+        end
+    finally
+        append!(entityMap, saved)
+    end
 end
 
 include(joinpath("plugins", "essentials.jl"))

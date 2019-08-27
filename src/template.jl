@@ -1,7 +1,7 @@
 const DEFAULT_VERSION = VersionNumber(VERSION.major)
 
 """
-    Template(interactive::Bool=false; kwargs...) -> Template
+    Template(; interactive::Bool=false, kwargs...) -> Template
 
 Records common information used to generate a package.
 
@@ -26,10 +26,10 @@ Records common information used to generate a package.
 - `disable_default_plugins::Vector{DataType}=DataType[]`: Default plugins to disable.
   The default plugins are [`Readme`](@ref), [`License`](@ref), [`Tests`](@ref), and [`Gitignore`](@ref).
   To override a default plugin instead of disabling it altogether, supply it via `plugins`.
-- `interactive::Bool=false`: When set, creates the template interactively from user input,
-  using the previous keywords as a starting point.
-- `fast::Bool=false`: Only applicable when `interactive` is set.
-  Skips prompts for any unsupplied keywords except `user` and `plugins`.
+
+## Interactive Usage
+- `interactive::Bool=false`: When set, creates the template interactively, filling unset keywords with user input.
+- `fast::Bool=false`: Skips prompts for any unsupplied keywords except `user` and `plugins`.
 """
 struct Template
     user::String

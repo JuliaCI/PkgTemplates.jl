@@ -23,7 +23,7 @@ end
 source(p::Readme) = p.file
 destination(p::Readme) = p.destination
 
-function view(::Readme, t::Template, pkg::AbstractString)
+function view(p::Readme, t::Template, pkg::AbstractString)
     # Explicitly ordered badges go first.
     strings = String[]
     done = DataType[]
@@ -36,12 +36,14 @@ function view(::Readme, t::Template, pkg::AbstractString)
     end
     foreach(setdiff(keys(t.plugins), done)) do T
         bs = badges(t.plugins[T], t, pkg)
-        text *= "\n" * join(badges(t.plugins[T], t.user, pkg), "\n")
+        append!(strings, badges(t.plugins[T], t, pkg))
     end
 
     return Dict(
+        "BADGES" => strings,
         "HAS_CITATION" => hasplugin(t, Citation),
-        "HAS_INLINE_BADGES" => p.inline_badges,
+        "HAS_INLINE_BADGES" =>  !isempty(strings) && p.inline_badges,
+        "PKG" => pkg,
     )
 end
 

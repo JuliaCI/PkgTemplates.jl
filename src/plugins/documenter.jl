@@ -15,6 +15,8 @@ todo
 - `assets::Vector{<:AbstractString}=String[]`:
 - `makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}()`:
 - `canonical_url::Union{Function, Nothing}=nothing`:`
+- `index_md::AbstractString`
+- `make_jl::AbstractString`
 
 !!! note
     If deploying documentation with Travis CI, don't forget to complete the required configuration.
@@ -24,14 +26,18 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
     assets::Vector{String}
     makedocs_kwargs::Dict{Symbol}
     canonical_url::Union{Function, Nothing}
+    make_jl::String
+    index_md::String
 
     # Can't use @kwdef due to some weird precompilation issues.
     function Documenter{T}(
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
         canonical_url::Union{Function, Nothing}=T === TravisCI ? github_pages_url : nothing,
+        index_md::AbstractString=default_file("index.md"),
+        make_jl::AbstractString=default_file("make.jl"),
     ) where T <: Union{TravisCI, GitLabCI, Nothing}
-        return new(assets, makedocs_kwargs, canonical_url)
+        return new(assets, makedocs_kwargs, canonical_url, index_md, make_jl)
     end
 end
 
