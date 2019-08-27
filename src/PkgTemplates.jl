@@ -6,7 +6,7 @@ using Base.Filesystem: contractuser
 using Dates: month, today, year
 using InteractiveUtils: subtypes
 using LibGit2: LibGit2
-using Pkg: Pkg, PackageSpec
+using Pkg: Pkg, TOML, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 
 using Mustache: render

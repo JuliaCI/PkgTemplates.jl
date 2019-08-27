@@ -1,3 +1,4 @@
+const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 const LICENSE_DIR = normpath(joinpath(@__DIR__, "..", "..", "licenses"))
 const LICENSES = Dict(
     "MIT" => "MIT \"Expat\" License",
@@ -98,16 +99,18 @@ function gen_plugin(p::Tests, t::Template, pkg_dir::AbstractString)
     # Do the normal BasicPlugin behaviour to create the test script.
     invoke(gen_plugin, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
 
-    # Add the Test dependency as a test-only dependency.
-    # To avoid visual noise from adding/removing the dependency, insert it manually.
+    # Add Test as a test-only dependency.
+    path = joinpath(pkg_dir, "Project.toml")
+    toml = TOML.parsefile(path)
+    get!(toml, "extras", Dict())["Test"] = TEST_UUID
+    get!(toml, "targets", Dict())["test"] = ["Test"]
+    open(io -> TOML.print(io, toml), path, "w")
+
+    # Generate the manifest.
+    touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
     proj = current_project()
     try
         Pkg.activate(pkg_dir)
-        lines = readlines(joinpath(pkg_dir, "Project.toml"))
-        dep = "Test = $(repr(TEST_UUID))"
-        push!(lines, "[extras]", dep, "", "[targets]", "test = [\"Test\"]")
-        gen_file(joinpath(pkg_dir, "Project.toml"), join(lines, "\n"))
-        touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
         Pkg.update()  # Clean up both Manifest.toml and Project.toml.
     finally
         proj === nothing ? Pkg.activate() : Pkg.activate(proj)

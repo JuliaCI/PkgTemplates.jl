@@ -1,5 +1,3 @@
-const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
 """
     (::Template)(pkg::AbstractString)
 
@@ -14,17 +12,14 @@ function (t::Template)(pkg::AbstractString)
         # Create the directory with some boilerplate inside.
         Pkg.generate(pkg_dir)
 
-        # Add a [compat] section for Julia. By default, Julia 1.x is supported.
-        open(joinpath(pkg_dir, "Project.toml"), "a") do io
-            println(io, "\n[compat]\njulia = \"1\"")
-        end
-
-        # Replace the authors field with the template's authors.
+        # Replace the authors field with the template's authors, and add a compat entry.
         if !isempty(t.authors)
             path = joinpath(pkg_dir, "Project.toml")
-            project = read(path, String)
-            authors = string("[", join(map(repr ∘ strip, split(t.authors, ",")), ", "), "]")
-            write(path, replace(project, r"authors = .*" => "authors = $authors"))
+            toml = TOML.parsefile(path)
+            # TODO: authors should probably be kept as a vector.
+            toml["authors"] = split(t.authors, ",")
+            get!(toml, "compat", Dict())["julia"] = compat_version(t.julia_version)
+            open(io -> TOML.print(io, toml), path, "w")
         end
 
         if t.git
@@ -57,5 +52,16 @@ function (t::Template)(pkg::AbstractString)
     catch
         rm(pkg_dir; recursive=true, force=true)
         rethrow()
+    end
+end
+
+# Format the version to be included in Project.toml's [compat] section.
+function compat_version(v::VersionNumber)
+    return if v.patch == 0 && v.minor == 0
+        string(v.major)
+    elseif v.patch == 0
+        "$(v.major).$(v.minor)"
+    else
+        "$(v.major).$(v.minor).$(v.patch)"
     end
 end
