@@ -2,17 +2,19 @@
 environment:
   matrix:
 {{#VERSIONS}}
-  - julia_version: {{.}}
+    - julia_version: {{.}}
 {{/VERSIONS}}
 platform:
 {{#PLATFORMS}}
   - {{.}}
 {{/PLATFORMS}}
-{{#HAS_NIGHTLY}}
+{{#HAS_ALLOW_FAILURES}}
 matrix:
   allow_failures:
-    - julia_version: nightly
-{{/HAS_NIGHTLY}}
+{{#ALLOW_FAILURES}}
+    - julia_version: {{.}}
+{{/ALLOW_FAILURES}}
+{{/HAS_ALLOW_FAILURES}}
 branches:
   only:
     - master

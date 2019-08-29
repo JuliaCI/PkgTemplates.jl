@@ -1,10 +1,6 @@
-abstract type Coverage <: Plugin end
-
 const COVERAGE_GITIGNORE = ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
 
-gitignore(::Coverage) = COVERAGE_GITIGNORE
-
-@with_kw struct Codecov <: Coverage
+@with_kw struct Codecov <: BasicPlugin
     file::Union{String, Nothing} = nothing
 end
 
@@ -17,7 +13,7 @@ badges(::Codecov) = Badge(
     "https://codecov.io/gh/{{USER}}/{{PKG}}.jl",
 )
 
-@with_kw struct Coveralls <: Coverage
+@with_kw struct Coveralls <: BasicPlugin
     file::Union{String, Nothing} = nothing
 end
 
@@ -29,3 +25,8 @@ badges(::Coveralls) = Badge(
     "https://coveralls.io/repos/github/{{USER}}/{{PKG}}.jl/badge.svg?branch=master",
     "https://coveralls.io/github/{{USER}}/{{PKG}}.jl?branch=master",
 )
+
+gitignore(::Union{Codecov, Coveralls}) = COVERAGE_GITIGNORE
+
+is_coverage(::Type) = false
+is_coverage(::Type{<:Union{Codecov, Coveralls}}) = true

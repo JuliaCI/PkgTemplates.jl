@@ -1,4 +1,14 @@
+const DEFAULT_USER = LibGit2.getconfig("github.user", "")
 const DEFAULT_VERSION = VersionNumber(VERSION.major)
+const DEFAULT_AUTHORS = let
+    name = LibGit2.getconfig("user.name", "")
+    email = LibGit2.getconfig("user.email", "")
+    if isempty(name)
+        ""
+    else
+        isempty(email) ? name : "$name <$email>"
+    end
+end
 
 """
     Template(; interactive::Bool=false, kwargs...) -> Template
@@ -6,52 +16,56 @@ const DEFAULT_VERSION = VersionNumber(VERSION.major)
 Records common information used to generate a package.
 
 ## Keyword Arguments
-- `user::AbstractString=""`: GitHub (or other code hosting service) username.
-  If left unset, it will take the the global Git config's value (`github.user`).
-  If that is not set, an `ArgumentError` is thrown.
-  This is case-sensitive for some plugins, so take care to enter it correctly!
-- `host::AbstractString="github.com"`: URL to the code hosting service where your package will reside.
-  Note that while hosts other than GitHub won't cause errors, they are not officially supported and they will cause certain plugins will produce incorrect output.
-- `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the license.
+
+### User Options
+- `user::AbstractString="$DEFAULT_USER"`: GitHub (or other code hosting service) username.
+  The default value comes from the global Git config (`github.user`).
+  If no value is obtained, an `ArgumentError` is thrown.
+- `authors::Union{AbstractString, Vector{<:AbstractString}}="$DEFAULT_AUTHORS"`: Package authors.
   Supply a string for one author or an array for multiple.
-  Similarly to `user`, it will take the value of of the global Git config's value if it is left unset.
-- `dir::AbstractString=$(contractuser(Pkg.devdir()))`: Directory in which the package will go.
-  Relative paths are converted to absolute ones at template creation time.
-- `julia_version::VersionNumber=$DEFAULT_VERSION`: Minimum allowed Julia version.
-- `ssh::Bool=false`: Whether or not to use SSH for the git remote. If `false` HTTPS will be used.
+  Like `user`, it takes its default value from the global Git config (`user.name` and `user.email`).
+
+### Package Options
+- `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
+- `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
+- `julia_version::VersionNumber=$(repr(DEFAULT_VERSION))`: Minimum allowed Julia version.
+- `develop::Bool=true`: Whether or not to `develop` new packages in the active environment.
+
+### Git Options
+- `git::Bool=true`: Whether or not to create a Git repository for new packages.
+- `ssh::Bool=false`: Whether or not to use SSH for the Git remote.
+  If left unset, HTTPS will be used.
 - `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
-- `git::Bool=true`: Whether or not to create a Git repository for generated packages.
-- `develop::Bool=true`: Whether or not to `develop` generated packages in the active environment.
-- `plugins::Vector{<:Plugin}=Plugin[]`: A list of plugins that the package will include.
-- `disable_default_plugins::Vector{DataType}=DataType[]`: Default plugins to disable.
+
+### Template Plugins
+- `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
+- `disabled_defaults::Vector{DataType}=DataType[]`: Default plugins to disable.
   The default plugins are [`Readme`](@ref), [`License`](@ref), [`Tests`](@ref), and [`Gitignore`](@ref).
   To override a default plugin instead of disabling it altogether, supply it via `plugins`.
 
-## Interactive Usage
-- `interactive::Bool=false`: When set, creates the template interactively, filling unset keywords with user input.
-- `fast::Bool=false`: Skips prompts for any unsupplied keywords except `user` and `plugins`.
+### Interactive Usage
+- `interactive::Bool=false`: When set, the template is created interactively, filling unset keywords with user input.
+- `fast::Bool=false`: Skips prompts for any unsupplied keywords except `user` and `plugins`, accepting default values.
 """
 struct Template
-    user::String
-    host::String
     authors::Vector{String}
-    dir::String
-    julia_version::VersionNumber
-    ssh::Bool
-    manifest::Bool
-    git::Bool
     develop::Bool
+    dir::String
+    git::Bool
+    host::String
+    julia_version::VersionNumber
+    manifest::Bool
     plugins::Dict{DataType, <:Plugin}
+    ssh::Bool
+    user::String
 end
 
-Template(; interactive::Bool=false, kwargs...) = make_template(Val(interactive); kwargs...)
+Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
 
-# Non-interactive Template constructor.
-function make_template(::Val{false}; kwargs...)
+# Non-interactive constructor.
+function Template(::Val{false}; kwargs...)
     user = getkw(kwargs, :user)
-    if isempty(user)
-        throw(ArgumentError("No username found, set one with user=username"))
-    end
+    isempty(user) && throw(ArgumentError("No user set, please pass user=username"))
 
     host = getkw(kwargs, :host)
     host = URI(occursin("://", host) ? host : "https://$host").host
@@ -63,49 +77,43 @@ function make_template(::Val{false}; kwargs...)
 
     disabled = getkw(kwargs, :disabled_defaults)
     defaults = [Readme, License, Tests, Gitignore]
-    plugins = map(T -> T(), filter(T -> !in(T, disabled), defaults))
+    plugins = map(T -> T(), filter(T -> !(T in disabled), defaults))
     append!(plugins, getkw(kwargs, :plugins))
-    # This comprehensions resolves duplicate plugin types by overwriting,
+    # This comprehension resolves duplicate plugin types by overwriting,
     # which means that default plugins get replaced by user values.
     plugin_dict = Dict(typeof(p) => p for p in plugins)
 
     return Template(
-        user,
-        host,
         authors,
-        dir,
-        getkw(kwargs, :julia_version),
-        getkw(kwargs, :ssh),
-        getkw(kwargs, :manifest),
-        getkw(kwargs, :git),
         getkw(kwargs, :develop),
+        dir,
+        getkw(kwargs, :git),
+        host,
+        getkw(kwargs, :julia_version),
+        getkw(kwargs, :manifest),
         plugin_dict,
+        getkw(kwargs, :ssh),
+        user,
     )
 end
 
-# Does the template have a plugin of this type? Subtypes count too.
-hasplugin(t::Template, ::Type{T}) where T <: Plugin = any(U -> U <: T, keys(t.plugins))
+# Does the template have a plugin that satisfies some predicate?
+hasplugin(t::Template, f::Function) = any(f, keys(t.plugins))
+hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, U -> U <: T)
 
 # Get a keyword, or compute some default value.
 getkw(kwargs, k) = get(() -> defaultkw(k), kwargs, k)
 
 # Default Template keyword values.
 defaultkw(s::Symbol) = defaultkw(Val(s))
-defaultkw(::Val{:user}) = LibGit2.getconfig("github.user", "")
-defaultkw(::Val{:host}) = "https://github.com"
-defaultkw(::Val{:dir}) = Pkg.devdir()
-defaultkw(::Val{:julia_version}) = DEFAULT_VERSION
-defaultkw(::Val{:ssh}) = false
-defaultkw(::Val{:manifest}) = false
-defaultkw(::Val{:git}) = true
+defaultkw(::Val{:authors}) = DEFAULT_AUTHORS
 defaultkw(::Val{:develop}) = true
-defaultkw(::Val{:plugins}) = Plugin[]
+defaultkw(::Val{:dir}) = Pkg.devdir()
 defaultkw(::Val{:disabled_defaults}) = DataType[]
-function defaultkw(::Val{:authors})
-    name = LibGit2.getconfig("user.name", "")
-    email = LibGit2.getconfig("user.email", "")
-    isempty(name) && return ""
-    author = name * " "
-    isempty(email) || (author *= "<$email>")
-    return [strip(author)]
-end
+defaultkw(::Val{:git}) = true
+defaultkw(::Val{:host}) = "github.com"
+defaultkw(::Val{:julia_version}) = DEFAULT_VERSION
+defaultkw(::Val{:manifest}) = false
+defaultkw(::Val{:plugins}) = Plugin[]
+defaultkw(::Val{:ssh}) = false
+defaultkw(::Val{:user}) = DEFAULT_USER

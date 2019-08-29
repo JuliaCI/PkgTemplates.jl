@@ -1,15 +1,17 @@
-const DEFAULT_CI_VERSIONS = ["1.0", "nightly"]
+# TODO: Update the allowed failures as new versions come out.
 const VersionsOrStrings = Vector{Union{VersionNumber, String}}
+const ALLOWED_FAILURES = ["1.3", "nightly"]
+const DEFAULT_CI_VERSIONS = VersionsOrStrings([VERSION, "1.0", "nightly"])
 
 format_version(v::VersionNumber) = "$(v.major).$(v.minor)"
+format_version(v::AbstractString) = string(v)
 
-function collect_versions(versions::Vector, t::Template)
-    return unique(sort([versions; format_version(t.julia_version)]; by=string))
+function collect_versions(t::Template, versions::Vector)
+    vs = [format_version(t.julia_version); map(format_version, versions)]
+    return unique!(sort!(vs))
 end
 
-abstract type CI <: Plugin end
-
-@with_kw struct TravisCI <: CI
+@with_kw struct TravisCI <: BasicPlugin
     file::String = default_file("travis.yml")
     linux::Bool = true
     osx::Bool = true
@@ -34,9 +36,9 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     p.osx && push!(os, "osx")
     p.windows && push!(os, "windows")
 
-    # TODO: Update the allowed failures as new versions come out.
-    versions = collect_versions(p.extra_versions, t)
-    allow_failures = filter(v -> v in versions, ["1.3", "nightly"])
+
+    versions = collect_versions(t, p.extra_versions)
+    allow_failures = filter(in(versions), ALLOWED_FAILURES)
 
     x86 = Dict{String, String}[]
     if p.x86
@@ -50,18 +52,20 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
         "ALLOW_FAILURES" => allow_failures,
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => hasplugin(t, Codecov),
-        "HAS_COVERAGE" => p.coverage && hasplugin(t, Coverage),
+        "HAS_COVERAGE" => p.coverage && hasplugin(t, is_coverage),
         "HAS_COVERALLS" => hasplugin(t, Coveralls),
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{TravisCI}),
         "HAS_JOBS" => p.x86 || hasplugin(t, Documenter{TravisCI}),
         "OS" => os,
         "PKG" => pkg,
+        "USER" => t.user,
         "VERSION" => format_version(t.julia_version),
+        "VERSIONS" => versions,
         "X86" => x86,
     )
 end
 
-@with_kw struct AppVeyor <: CI
+@with_kw struct AppVeyor <: BasicPlugin
     file::String = default_file("appveyor.yml")
     x86::Bool = false
     coverage::Bool = true
@@ -77,19 +81,25 @@ badges(::AppVeyor) = Badge(
     "https://ci.appveyor.com/project/{{USER}}/{{PKG}}-jl",
 )
 
-function view(p::AppVeyor, t::Template, ::AbstractString)
+function view(p::AppVeyor, t::Template, pkg::AbstractString)
     platforms = ["x64"]
-    t.x86 && push!(platforms, "x86")
+    p.x86 && push!(platforms, "x86")
+
+    versions = collect_versions(t, p.extra_versions)
+    allow_failures = filter(in(versions), ALLOWED_FAILURES)
+
     return Dict(
-        "HAS_CODECOV" => t.coverage && hasplugin(t, Codecov),
-        "HAS_NIGHTLY" => "nightly" in versions,
+        "ALLOW_FAILURES" => allow_failures,
+        "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
+        "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
         "PKG" => pkg,
-        "PLATFORMS" => os,
-        "VERSIONS" => collect_versions(p.extra_versions, t),
+        "PLATFORMS" => platforms,
+        "USER" => t.user,
+        "VERSIONS" => versions,
     )
 end
 
-@with_kw struct CirrusCI <: CI
+@with_kw struct CirrusCI <: BasicPlugin
     file::String = default_file("cirrus.yml")
     image::String = "freebsd-12-0-release-amd64"
     coverage::Bool = true
@@ -109,14 +119,15 @@ function view(p::CirrusCI, t::Template, ::AbstractString)
     return Dict(
         "HAS_CODECOV" => hasplugin(t, Codecov),
         "HAS_COVERALLS" => hasplugin(t, Coveralls),
-        "HAS_COVERAGE" => p.coverage && hasplugin(t, Coverage),
+        "HAS_COVERAGE" => p.coverage && hasplugin(t, is_coverage),
         "IMAGE" => p.image,
         "PKG" => pkg,
-        "VERSIONS" => collect_versions(p.extra_versions, t),
+        "USER" => t.user,
+        "VERSIONS" => collect_versions(t, p.extra_versions),
     )
 end
 
-@with_kw struct GitLabCI <: CI
+@with_kw struct GitLabCI <: BasicPlugin
     file::String
     documentation::Bool = true
     coverage::Bool = true
@@ -147,7 +158,11 @@ function view(p::GitLabCI, t::Template, ::AbstractString)
         "HAS_COVERAGE" => p.coverage,
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
         "PKG" => pkg,
+        "USER" => t.user,
         "VERSION" => format_version(t.julia_version),
-        "VERSIONS" => collect_versions(p.extra_versions, t),
+        "VERSIONS" => collect_versions(t, p.extra_versions),
     )
 end
+
+is_ci(::Type) = false
+is_ci(::Type{<:Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}}) = true

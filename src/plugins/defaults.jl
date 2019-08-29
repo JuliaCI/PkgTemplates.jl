@@ -76,10 +76,16 @@ function gen_plugin(p::License, t::Template, pkg_dir::AbstractString)
     gen_file(joinpath(pkg_dir, p.destination), render_plugin(p, t))
 end
 
-struct Gitignore <: Plugin end
+@with_kw struct Gitignore <: Plugin
+    ds_store::Bool = true
+    dev::Bool = true
+end
 
 function render_plugin(p::Gitignore, t::Template)
-    entries = mapreduce(gitignore, append!, values(t.plugins); init=[".DS_Store", "/dev/"])
+    init = String[]
+    p.ds_store && push!(init, ".DS_Store")
+    p.dev && push!(init, "/dev/")
+    entries = mapreduce(gitignore, append!, values(t.plugins); init=init)
     # Only ignore manifests at the repo root.
     t.manifest || "Manifest.toml" in entries || push!(entries, "/Manifest.toml")
     unique!(sort!(entries))
@@ -110,6 +116,7 @@ function gen_plugin(p::Tests, t::Template, pkg_dir::AbstractString)
     open(io -> TOML.print(io, toml), path, "w")
 
     # Generate the manifest.
+    # This also ensures that keys in Project.toml are sorted properly.
     touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
     proj = current_project()
     try

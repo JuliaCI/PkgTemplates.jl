@@ -5,16 +5,18 @@ const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict(),
         canonical_url::Union{Function, Nothing}=nothing,
+        make_jl::AbstractString="$(contractuser(default_file("make.jl")))",
+        index_md::AbstractString="$(contractuser(default_file("index.md")))",
     ) -> Documenter{T}
 
 The `Documenter` plugin adds support for documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 Documentation deployment depends on `T`, where `T` is some supported CI plugin, or `Nothing` to only support local documentation builds.
 
 ## Keyword Arguments
-todo
+TODO
 - `assets::Vector{<:AbstractString}=String[]`:
 - `makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}()`:
-- `canonical_url::Union{Function, Nothing}=nothing`:`
+- `canonical_url::Union{Function, Nothing}=nothing`:
 - `index_md::AbstractString`
 - `make_jl::AbstractString`
 
@@ -29,7 +31,7 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
     make_jl::String
     index_md::String
 
-    # Can't use @kwdef due to some weird precompilation issues.
+    # Can't use @with_kw due to some weird precompilation issues.
     function Documenter{T}(
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
@@ -72,6 +74,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "MAKEDOCS_KWARGS" => map((k, v) -> k => repr(v), collect(p.makedocs_kwargs)),
     "PKG" => pkg,
     "REPO" => "https://$(t.host)/$(t.user)/$pkg.jl",
+    "USER" => t.user,
 )
 
 function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
@@ -80,11 +83,20 @@ function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
 end
 
 function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
-    # TODO: gen make.jl
-    # TODO: gen index.md
+    docs_dir = joinpath(pkg_dir, "docs")
+
+    # Generate files.
+    make = render_file(p.make_jl, combined_view(p, t, pkg), tags(p))
+    gen_file(joinpath(docs_dir, "make.jl"), make)
+    index = render_file(p.index_md, combined_view(p, t, pkg), tags(p))
+    gen_file(joinpath(docs_dir, "src", "index.md"), index)
+
+    # Copy over any assets.
+    assets_dir = joinpath(docs_dir, "src", "assets")
+    isempty(p.assets) || mkpath(assets_dir)
+    foreach(a -> cp(a, joinpath(assets_dir, basename(a))), p.assets)
 
     # Create the documentation project.
-    docs_dir = joinpath(pkg_dir, "docs")
     proj = current_project()
     try
         Pkg.activate(docs_dir)
@@ -92,11 +104,6 @@ function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
     finally
         proj === nothing ? Pkg.activate() : Pkg.activate(proj)
     end
-
-    # Copy any assets.
-    assets_dir = joinpath(docs_dir, "src", "assets")
-    isempty(p.assets) || mkpath(assets_dir)
-    foreach(a -> cp(a, joinpath(assets_dir, basename(asset))), p.assets)
 end
 
 function interactive(::Type{Documenter{T}}) where T

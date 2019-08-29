@@ -97,6 +97,7 @@ Perform any work associated with a plugin.
 gen_plugin(::Plugin, ::Template, ::AbstractString) = nothing
 
 function gen_plugin(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
+    source(p) === nothing && return
     pkg = basename(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p, t, pkg)
@@ -104,10 +105,8 @@ function gen_plugin(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
 end
 
 function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
-    src = source(p)
-    src === nothing && return
     # TODO template rendering code
-    return render_file(src, combined_view(p, t, pkg), tags(p))
+    return render_file(source(p), combined_view(p, t, pkg), tags(p))
 end
 
 function combined_view(p::Plugin, t::Template, pkg::AbstractString)
@@ -123,15 +122,16 @@ Trailing whitespace is removed, and the file will end with a newline.
 """
 function gen_file(file::AbstractString, text::AbstractString)
     mkpath(dirname(file))
-    text = join(map(rstrip, split(text, "\n")), "\n")
-    endswith(text , "\n") || (text *= "\n")
+    text = strip(join(map(rstrip, split(text, "\n")), "\n")) * "\n"
     write(file, text)
 end
 
 # Render text from a file.
-render_file(file::AbstractString, view, tags) = render_text(read(file, String), view, tags)
+function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags)
+    render_text(read(file, String), view, tags)
+end
 
-# Render text, using Mustache's templating system. HTML escaping is disabled.
+# Render text using Mustache's templating system. HTML escaping is disabled.
 function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
     saved = copy(entityMap)
     empty!(entityMap)
@@ -146,7 +146,7 @@ function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=no
     end
 end
 
-include(joinpath("plugins", "essentials.jl"))
+include(joinpath("plugins", "defaults.jl"))
 include(joinpath("plugins", "coverage.jl"))
 include(joinpath("plugins", "ci.jl"))
 include(joinpath("plugins", "citation.jl"))
