@@ -1,10 +1,10 @@
 using {{PKG}}
 using Documenter
 
-makedocs(
+makedocs(;
     modules=[{{PKG}}],
     authors="{{AUTHORS}}",
-    repo="{{REPO}}",
+    repo="https://{{REPO}}/blob/{commit}{path}#L{line}",
     sitename="{{PKG}}.jl",
     format=Documenter.HTML(;
         canonical="{{CANONICAL}}",

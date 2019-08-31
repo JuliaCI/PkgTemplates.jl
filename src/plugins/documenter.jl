@@ -73,7 +73,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "HAS_ASSETS" => !isempty(p.assets),
     "MAKEDOCS_KWARGS" => map((k, v) -> k => repr(v), collect(p.makedocs_kwargs)),
     "PKG" => pkg,
-    "REPO" => "https://$(t.host)/$(t.user)/$pkg.jl",
+    "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
     "USER" => t.user,
 )
 
