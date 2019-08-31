@@ -1,25 +1,32 @@
-default_files(pkg::AbstractString) = [
-    ".gitignore",
-    "LICENSE",
-    "Manifest.toml",
-    "Project.toml",
-    "README.md",
-    "src/$pkg.jl",
-    "test/runtests.jl",
-]
+# TODO: License fixtures need to be updated every year because they don't use Mustache.
 
-function reference_test(pkg_dir::AbstractString, path::AbstractString)
-    pkg = basename(pkg_dir)
-    path = replace(path, "/" => path_separator)
-    # All fixture files are .txt because otherwise ReferenceTests/FileIO can't handle them.
-    reference = joinpath(@__DIR__, "fixtures", pkg, path * ".txt")
-    observed = read(joinpath(pkg_dir, path), String)
-    @test_reference reference observed
+function PT.user_view(::Citation, ::Template, ::AbstractString)
+    return Dict("MONTH" => 8, "YEAR" => 2019)
+end
+
+function test_all(pkg::AbstractString; kwargs...)
+    t = tpl(; kwargs...)
+    pkg_dir = joinpath(t.dir, pkg)
+    t(pkg)
+    try
+        foreach(readlines(`git -C $pkg_dir ls-files`)) do f
+            # All fixture files are .txt so that ReferenceTests can't handle them.
+            reference = joinpath(@__DIR__, "fixtures", pkg, f * ".txt")
+            observed = read(joinpath(pkg_dir, f), String)
+            @test_reference reference observed
+        end
+    finally
+        rm(pkg_dir; recursive=true, force=true)
+    end
 end
 
 @testset "Default package" begin
-    pkg = "Basic"
-    t = tpl(; develop=false, authors=USER)
-    t(pkg)
-    foreach(f -> reference_test(joinpath(t.dir, pkg), f), default_files(pkg))
+    test_all("Basic"; authors=USER, develop=false, manifest=true)
+end
+
+@testset "All plugins" begin
+    test_all("AllPlugins"; authors=USER, develop=false, manifest=true, plugins=[
+        AppVeyor(), CirrusCI(), Citation(), Codecov(),
+        Coveralls(), Documenter(), GitLabCI(), TravisCI(),
+    ])
 end

@@ -83,6 +83,7 @@ function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
 end
 
 function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
+    pkg = basename(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
     # Generate files.

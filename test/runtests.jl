@@ -1,5 +1,3 @@
-using Base.Filesystem: path_separator
-
 using Pkg: Pkg
 using Random: Random
 using Test: @test, @testset, @test_throws
@@ -22,9 +20,14 @@ tpl(; kwargs...) = Template(; user=USER, kwargs...)
         pushfirst!(DEPOT_PATH, dir)
         try
             include("template.jl")
-            include("generate.jl")
-            # include("plugin.jl")
-            # include("interactive.jl")
+
+            # Some plugins use the current Julia version in their output,
+            # and the test fixtures are generated with Julia 1.2.
+            if VERSION.major == 1 && VERSION.minor == 2
+                include("generate.jl")
+            else
+                @info "Skipping reference tests (Julia = $VERSION)"
+            end
         finally
             popfirst!(DEPOT_PATH)
         end

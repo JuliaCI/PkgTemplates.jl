@@ -1,0 +1,27 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia
+language: julia
+notifications:
+  email: false
+julia:
+  - 1.0
+  - 1.2
+  - nightly
+os:
+  - linux
+  - osx
+  - windows
+jobs:
+  fast_finish: true
+  allow_failures:
+    - julia: nightly
+after_success:
+  - julia -e '
+      using Pkg;
+      Pkg.add("Coverage");
+      using Coverage;
+      Codecov.submit(process_folder());'
+  - julia -e '
+      using Pkg;
+      Pkg.add("Coverage");
+      using Coverage;
+      Coveralls.submit(process_folder());'

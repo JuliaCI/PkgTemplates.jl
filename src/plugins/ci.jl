@@ -114,7 +114,7 @@ badges(::CirrusCI) = Badge(
     "https://cirrus-ci.com/github/{{USER}}/{{PKG}}.jl",
 )
 
-function view(p::CirrusCI, t::Template, ::AbstractString)
+function view(p::CirrusCI, t::Template, pkg::AbstractString)
     return Dict(
         "HAS_CODECOV" => hasplugin(t, Codecov),
         "HAS_COVERALLS" => hasplugin(t, Coveralls),
@@ -135,7 +135,7 @@ end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
 
-source(p::GitLabCI) = p.source
+source(p::GitLabCI) = p.file
 destination(::GitLabCI) = ".gitlab-ci.yml"
 
 function badges(p::GitLabCI)
@@ -152,7 +152,7 @@ function badges(p::GitLabCI)
     return p.coverage ? [ci, cov] : [ci]
 end
 
-function view(p::GitLabCI, t::Template, ::AbstractString)
+function view(p::GitLabCI, t::Template, pkg::AbstractString)
     return Dict(
         "HAS_COVERAGE" => p.coverage,
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
