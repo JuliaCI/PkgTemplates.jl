@@ -11,7 +11,6 @@ using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 
 using Mustache: entityMap, render
 using Parameters: @with_kw
-using URIParser: URI
 
 export
     Template,
@@ -36,5 +35,6 @@ abstract type Plugin end
 include("template.jl")
 include("generate.jl")
 include("plugin.jl")
+# include("interactive.jl")
 
 end

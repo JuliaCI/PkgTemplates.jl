@@ -11,6 +11,9 @@ julia:
   - 1.2
   - 1.3
   - nightly
+before_script:
+  - git config --global user.name Tester
+  - git config --global user.email te@st.er
 matrix:
   fast_finish: true
   allow_failures:

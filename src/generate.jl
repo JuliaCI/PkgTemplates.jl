@@ -6,7 +6,6 @@ Generate a package named `pkg` from a [`Template`](@ref).
 function (t::Template)(pkg::AbstractString)
     endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
     pkg_dir = joinpath(t.dir, pkg)
-    ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
 
     try
         # Create the directory with some boilerplate inside.

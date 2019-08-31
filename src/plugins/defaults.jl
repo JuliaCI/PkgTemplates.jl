@@ -93,7 +93,7 @@ function render_plugin(p::Gitignore, t::Template)
 end
 
 function gen_plugin(p::Gitignore, t::Template, pkg_dir::AbstractString)
-    gen_file(joinpath(pkg_dir, ".gitignore"), render_plugin(p, t))
+    t.git && gen_file(joinpath(pkg_dir, ".gitignore"), render_plugin(p, t))
 end
 
 @with_kw struct Tests <: BasicPlugin
@@ -121,7 +121,7 @@ function gen_plugin(p::Tests, t::Template, pkg_dir::AbstractString)
     proj = current_project()
     try
         Pkg.activate(pkg_dir)
-        Pkg.update()  # Clean up both Manifest.toml and Project.toml.
+        Pkg.update()
     finally
         proj === nothing ? Pkg.activate() : Pkg.activate(proj)
     end

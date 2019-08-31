@@ -1,14 +1,13 @@
-# TODO: Update the allowed failures as new versions come out.
 const VersionsOrStrings = Vector{Union{VersionNumber, String}}
-const ALLOWED_FAILURES = ["1.3", "nightly"]
-const DEFAULT_CI_VERSIONS = VersionsOrStrings([VERSION, "1.0", "nightly"])
+const ALLOWED_FAILURES = ["1.3", "nightly"]  # TODO: Update this list with new RCs.
+const DEFAULT_CI_VERSIONS = VersionsOrStrings([VERSION, default_version(), "nightly"])
 
 format_version(v::VersionNumber) = "$(v.major).$(v.minor)"
 format_version(v::AbstractString) = string(v)
 
 function collect_versions(t::Template, versions::Vector)
-    vs = [format_version(t.julia_version); map(format_version, versions)]
-    return unique!(sort!(vs))
+    vs = map(format_version, [t.julia_version, versions...])
+    return unique(sort(vs))
 end
 
 @with_kw struct TravisCI <: BasicPlugin
@@ -43,8 +42,8 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     x86 = Dict{String, String}[]
     if p.x86
         foreach(versions) do v
-            p.linux && push!(x86, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
-            p.windows && push!(x86, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
+            p.linux && push!(x86, Dict("JULIA" => v, "OS" => "linux"))
+            p.windows && push!(x86, Dict("JULIA" => v, "OS" => "windows"))
         end
     end
 
@@ -128,10 +127,10 @@ function view(p::CirrusCI, t::Template, ::AbstractString)
 end
 
 @with_kw struct GitLabCI <: BasicPlugin
-    file::String
+    file::String = default_file("gitlab-ci.yml")
     documentation::Bool = true
     coverage::Bool = true
-    extra_versions::Vector{VersionNumber} = [v"1.0"]
+    extra_versions::VersionsOrStrings = ["1.0"]  # Nightly has no Docker image.
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
