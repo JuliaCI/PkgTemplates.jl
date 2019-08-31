@@ -7,7 +7,6 @@ using ReferenceTests: @test_reference
 using PkgTemplates
 const PT = PkgTemplates
 
-const PKG = "TestPkg"
 const USER = "tester"
 
 Random.seed!(1)
@@ -21,7 +20,7 @@ tpl(; kwargs...) = Template(; user=USER, kwargs...)
         try
             include("template.jl")
 
-            # Some plugins use the current Julia version in their output,
+            # Quite a bit of output depends on the Julia version,
             # and the test fixtures are generated with Julia 1.2.
             if VERSION.major == 1 && VERSION.minor == 2
                 include("generate.jl")

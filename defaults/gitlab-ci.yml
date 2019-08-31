@@ -1,32 +1,40 @@
+.definitions:
+  script: &script
+    script:
+      - julia --project=@. -e '
+          using Pkg;
+          Pkg.build();
+          Pkg.test({{#HAS_COVERAGE}}; coverage=true{{/HAS_COVERAGE}});'
+{{#HAS_COVERAGE}}
+  coverage: &coverage
+    coverage: /Test coverage (\d+\.\d+%)/
+    after_script:
+      - julia -e '
+          using Pkg;
+          Pkg.add("Coverage");
+          using Coverage;
+          c, t = get_summary(process_folder());
+          using Printf;
+          @printf "Test coverage %.2f%%\n" 100c / t;'
+{{/HAS_COVERAGE}}
 {{#VERSIONS}}
 Julia {{.}}:
   image: julia:{{.}}
-  script: julia --project=@. -e '
-    using Pkg;
-    Pkg.build();
-    Pkg.test({{#HAS_COVERAGE}}coverage=true{{/HAS_COVERAGE}});'
+  <<: *script
+  {{#HAS_COVERAGE}}
+  <<: *coverage
+  {{/HAS_COVERAGE}}
 {{/VERSIONS}}
-{{#HAS_COVERAGE}}
-  coverage: /Test Coverage (\d+\.\d+%)/
-  after_script:
-    - julia -e '
-        using Pkg;
-        Pkg.add("Coverage");
-        using Coverage;
-        c, t = get_summary(process_folder());
-        using Printf;
-        @printf "Test Coverage %.2f%%\n" 100c/t;'
-{{/HAS_COVERAGE}}
 {{#HAS_DOCUMENTER}}
 pages:
   image: julia:{{VERSION}}
   stage: deploy
   script:
     - julia --project=docs -e '
-          using Pkg;
-          Pkg.develop(PackageSpec(; path=pwd()));
-          Pkg.instantiate();
-          include("docs/make.jl");'
+        using Pkg;
+        Pkg.develop(PackageSpec(; path=pwd()));
+        Pkg.instantiate();
+        include("docs/make.jl");'
     - mkdir -p public
     - mv docs/build public/dev
   artifacts:

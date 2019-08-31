@@ -1,8 +1,15 @@
-# AllPlugins
+using AllPlugins
+using Documenter
 
-```@index
-```
-
-```@autodocs
-Modules = [AllPlugins]
-```
+makedocs(;
+    modules=[AllPlugins],
+    authors="tester",
+    repo="https://github.com/tester/AllPlugins.jl/blob/{commit}{path}#L{line}",
+    sitename="AllPlugins.jl",
+    format=Documenter.HTML(;
+        assets=String[],
+    ),
+    pages=[
+        "Home" => "index.md",
+    ],
+)

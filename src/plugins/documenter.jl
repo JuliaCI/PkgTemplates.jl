@@ -32,14 +32,14 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
     index_md::String
 
     # Can't use @with_kw due to some weird precompilation issues.
-    function Documenter{T}(
+    function Documenter{T}(;
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
-        canonical_url::Union{Function, Nothing}=T === TravisCI ? github_pages_url : nothing,
-        index_md::AbstractString=default_file("index.md"),
+        canonical_url::Union{Function, Nothing}=make_canonical(T),
         make_jl::AbstractString=default_file("make.jl"),
+        index_md::AbstractString=default_file("index.md"),
     ) where T <: Union{TravisCI, GitLabCI, Nothing}
-        return new(assets, makedocs_kwargs, canonical_url, index_md, make_jl)
+        return new(assets, makedocs_kwargs, canonical_url, make_jl, index_md)
     end
 end
 
@@ -71,7 +71,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "AUTHORS" => join(t.authors, ", "),
     "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
     "HAS_ASSETS" => !isempty(p.assets),
-    "MAKEDOCS_KWARGS" => map((k, v) -> k => repr(v), collect(p.makedocs_kwargs)),
+    "MAKEDOCS_KWARGS" => map(((k, v),) -> k => repr(v), collect(p.makedocs_kwargs)),
     "PKG" => pkg,
     "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
     "USER" => t.user,
@@ -107,32 +107,9 @@ function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
     end
 end
 
-function interactive(::Type{Documenter{T}}) where T
-    name = "Documenter{$T}"
-
-    print("$name: Enter any Documenter asset files (separated by spaces) [none]: ")
-    assets = split(readline())
-
-    print("$name: Enter any extra makedocs key-value pairs (joined by '=') [none]\n> ")
-    kwargs = Dict{Symbol, Any}()
-    line = map(split(readline())) do kv
-        k, v = split(kv, "="; limit=2)
-        kwargs[Symbol(k)] = eval(Meta.parse(v))
-    end
-
-    return Documenter{T}(; assets=assets, kwargs=kwargs)
-end
-
-function interactive(::Type{Documenter})
-    types = Dict(
-        "None (local documentation only)" => Nothing,
-        "TravisCI (GitHub Pages)" => TravisCI,
-        "GitLabCI (GitLab Pages)" => GitLabCI,
-    )
-    options = collect(keys(types))
-    menu = RadioMenu(options)
-    T = types[options[request("Documenter: Select integration:", menu)]]
-    return interactive(Documenter{T})
-end
-
 github_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).github.io/$pkg.jl"
+gitlab_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).gitlab.io/$pkg.jl"
+
+make_canonical(::Type{TravisCI}) = github_pages_url
+make_canonical(::Type{GitLabCI}) = gitlab_pages_url
+make_canonical(::Type{Nothing}) = nothing

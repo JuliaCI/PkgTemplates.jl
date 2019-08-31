@@ -7,7 +7,7 @@ format_version(v::AbstractString) = string(v)
 
 function collect_versions(t::Template, versions::Vector)
     vs = map(format_version, [t.julia_version, versions...])
-    return unique(sort(vs))
+    return sort(unique(vs))
 end
 
 @with_kw struct TravisCI <: BasicPlugin
@@ -128,9 +128,9 @@ end
 
 @with_kw struct GitLabCI <: BasicPlugin
     file::String = default_file("gitlab-ci.yml")
-    documentation::Bool = true
     coverage::Bool = true
-    extra_versions::VersionsOrStrings = ["1.0"]  # Nightly has no Docker image.
+    # Nightly has no Docker image.
+    extra_versions::VersionsOrStrings = [VERSION, default_version()]
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]

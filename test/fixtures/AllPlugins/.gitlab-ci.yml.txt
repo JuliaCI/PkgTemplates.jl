@@ -1,15 +1,25 @@
+.definitions:
+  script: &script
+    script:
+      - julia --project=@. -e '
+          using Pkg;
+          Pkg.build();
+          Pkg.test(; coverage=true);'
+  coverage: &coverage
+    coverage: /Test coverage (\d+\.\d+%)/
+    after_script:
+      - julia -e '
+          using Pkg;
+          Pkg.add("Coverage");
+          using Coverage;
+          c, t = get_summary(process_folder());
+          using Printf;
+          @printf "Test coverage %.2f%%\n" 100c / t;'
 Julia 1.0:
   image: julia:1.0
-  script: julia --project=@. -e '
-    using Pkg;
-    Pkg.build();
-    Pkg.test(coverage=true);'
-  coverage: /Test Coverage (\d+\.\d+%)/
-  after_script:
-    - julia -e '
-        using Pkgl
-        Pkg.add("Coverage");
-        using Coverage;
-        c, t = get_summary(process_folder());
-        using Printf;
-        @printf "Test Coverage %.2f%%\n" 100c/t;'
+  <<: *script
+  <<: *coverage
+Julia 1.2:
+  image: julia:1.2
+  <<: *script
+  <<: *coverage
