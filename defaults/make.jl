@@ -7,11 +7,13 @@ makedocs(;
     repo="https://{{REPO}}/blob/{commit}{path}#L{line}",
     sitename="{{PKG}}.jl",
     format=Documenter.HTML(;
+{{#CANONICAL}}
         canonical="{{CANONICAL}}",
+{{/CANONICAL}}
         assets={{^HAS_ASSETS}}String{{/HAS_ASSETS}}[{{^HAS_ASSETS}}],{{/HAS_ASSETS}}
-            {{#ASSETS}}
+{{#ASSETS}}
             "{{.}}",
-            {{/ASSETS}}
+{{/ASSETS}}
 {{#HAS_ASSETS}}
         ],
 {{/HAS_ASSETS}}
@@ -19,9 +21,9 @@ makedocs(;
     pages=[
         "Home" => "index.md",
     ],
-    {{#MAKEDOCS_KWARGS}}
+{{#MAKEDOCS_KWARGS}}
     {{first}}={{second}},
-    {{/MAKEDOCS_KWARGS}}
+{{/MAKEDOCS_KWARGS}}
 )
 {{#HAS_DEPLOY}}
 
