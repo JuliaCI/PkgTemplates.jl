@@ -19,7 +19,7 @@
     end
 
     @testset "dir" begin
-        @test tpl(; dir="/foo/bar").dir == "/foo/bar"
+        @test tpl(; dir="/foo/bar").dir == joinpath(path_separator, "foo", "bar")
         @test tpl(; dir="foo").dir == abspath("foo")
         @test tpl(; dir="~/foo").dir == abspath(expanduser("~/foo"))
     end
