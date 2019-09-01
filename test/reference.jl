@@ -17,13 +17,15 @@ function test_all(pkg::AbstractString; kwargs...)
     end
 end
 
-@testset "Default package" begin
-    test_all("Basic"; authors=USER, manifest=true)
-end
+@testset "Reference tests" begin
+    @testset "Default package" begin
+        test_all("Basic"; authors=USER, manifest=true)
+    end
 
-@testset "All plugins" begin
-    test_all("AllPlugins"; authors=USER, manifest=true, plugins=[
-        AppVeyor(), CirrusCI(), Citation(), Codecov(),
-        Coveralls(), Documenter(), GitLabCI(), TravisCI(),
-    ])
+    @testset "All plugins" begin
+        test_all("AllPlugins"; authors=USER, manifest=true, plugins=[
+            AppVeyor(), CirrusCI(), Citation(), Codecov(),
+            Coveralls(), Documenter(), GitLabCI(), TravisCI(),
+        ])
+    end
 end

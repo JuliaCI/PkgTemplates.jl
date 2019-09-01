@@ -6,6 +6,8 @@ Generate a package named `pkg` from a [`Template`](@ref).
 function (t::Template)(pkg::AbstractString)
     endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
     pkg_dir = joinpath(t.dir, pkg)
+    ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
+    repo = nothing
 
     try
         # Create the directory with some boilerplate inside.
@@ -24,12 +26,15 @@ function (t::Template)(pkg::AbstractString)
             # Initialize the repo, make a commit, and set the remote.
             repo = LibGit2.init(pkg_dir)
             LibGit2.commit(repo, "Initial commit")
-            rmt = if t.ssh
+            url = if t.ssh
                 "git@$(t.host):$(t.user)/$pkg.jl.git"
             else
                 "https://$(t.host)/$(t.user)/$pkg.jl"
             end
-            close(LibGit2.GitRemote(repo, "origin", rmt))
+            remote = LibGit2.GitRemote(repo, "origin", url)
+            # TODO: `git pull` still requires some Git branch config.
+            LibGit2.add_push!(repo, remote, "refs/heads/master")
+            close(remote)
         end
 
         # Generate the files.
@@ -56,6 +61,8 @@ function (t::Template)(pkg::AbstractString)
     catch
         rm(pkg_dir; recursive=true, force=true)
         rethrow()
+    finally
+        repo === nothing || close(repo)
     end
 end
 
