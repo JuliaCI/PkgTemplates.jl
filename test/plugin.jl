@@ -21,6 +21,9 @@ PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 
         pkg_dir = joinpath(t.dir, pkg)
         badge = string(PT.Badge("1", "2", "3"))
         @test occursin(badge, read(joinpath(pkg_dir, "README.md"), String))
-        @test read(joinpath(pkg_dir, "foo.txt"), String) == s
+        observed = read(joinpath(pkg_dir, "foo.txt"), String)
+        # On Travis, everything works with CRLF.
+        Sys.iswindows() && (observed = replace(observed, "\r\n" => "\n"))
+        @test observed == s
     end
 end
