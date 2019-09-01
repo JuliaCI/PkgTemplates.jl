@@ -1,5 +1,16 @@
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
 
+badge_order() = [
+    Documenter{GitLabCI},
+    Documenter{TravisCI},
+    GitLabCI,
+    TravisCI,
+    AppVeyor,
+    CirrusCI,
+    Codecov,
+    Coveralls,
+]
+
 """
 A simple plugin that, in general, manages a single file.
 For example, most CI services reply on one configuration file.
@@ -151,14 +162,3 @@ include(joinpath("plugins", "coverage.jl"))
 include(joinpath("plugins", "ci.jl"))
 include(joinpath("plugins", "citation.jl"))
 include(joinpath("plugins", "documenter.jl"))
-
-const BADGE_ORDER = [
-    Documenter{GitLabCI},
-    Documenter{TravisCI},
-    TravisCI,
-    AppVeyor,
-    GitLabCI,
-    CirrusCI,
-    Codecov,
-    Coveralls,
-]

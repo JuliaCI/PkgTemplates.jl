@@ -27,7 +27,7 @@ function view(p::Readme, t::Template, pkg::AbstractString)
     # Explicitly ordered badges go first.
     strings = String[]
     done = DataType[]
-    foreach(BADGE_ORDER) do T
+    foreach(badge_order()) do T
         if hasplugin(t, T)
             bs = badges(t.plugins[T], t, pkg)
             append!(strings, badges(t.plugins[T], t, pkg))
