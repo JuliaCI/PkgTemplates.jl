@@ -10,9 +10,9 @@ function default_authors()
 end
 
 """
-    Template(; interactive::Bool=false, kwargs...) -> Template
+    Template(; kwargs...) -> Template
 
-Records common information used to generate a package.
+A configuration used to generate packages.
 
 ## Keyword Arguments
 

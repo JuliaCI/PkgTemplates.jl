@@ -2,23 +2,23 @@ const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 
 """
     Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
-        assets::Vector{<:AbstractString}=String[],
-        makedocs_kwargs::Dict{Symbol}=Dict(),
-        canonical_url::Union{Function, Nothing}=nothing,
-        make_jl::AbstractString="$(contractuser(default_file("make.jl")))",
-        index_md::AbstractString="$(contractuser(default_file("index.md")))",
+        make_jl="$(contractuser(default_file("make.jl")))",
+        index_md="$(contractuser(default_file("index.md")))",
+        assets=String[],
+        canonical_url=,
+        makedocs_kwargs=Dict{Symbol, Any}(),
     ) -> Documenter{T}
 
-The `Documenter` plugin adds support for documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
+Sets up documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 Documentation deployment depends on `T`, where `T` is some supported CI plugin, or `Nothing` to only support local documentation builds.
 
 ## Keyword Arguments
-TODO
-- `assets::Vector{<:AbstractString}=String[]`:
-- `makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}()`:
-- `canonical_url::Union{Function, Nothing}=nothing`:
-- `index_md::AbstractString`
-- `make_jl::AbstractString`
+- `make_jl::AbstractString`: Template file for `make.jl`.
+- `index_md::AbstractString`: Template file for `index.md`.
+- `assets::Vector{<:AbstractString}`: Extra assets for the generated site.
+- `canonical_url::Union{Function, Nothing}`: A function to generate the documentation site's canonical URL.
+  The default value will compute GitHub Pages and GitLab Pages URLs for [`TravisCI`](@ref) and [`GitLabCI`](@ref), respectively.
+- `makedocs_kwargs::Dict{Symbol}`: Extra keyword arguments to be inserted into `makedocs`.
 
 !!! note
     If deploying documentation with Travis CI, don't forget to complete the required configuration.

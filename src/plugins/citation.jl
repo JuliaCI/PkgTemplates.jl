@@ -1,8 +1,14 @@
 """
-    Citation(; readme_section::Bool=false) -> Citation
+    Citation(;
+        file="$(contractuser(default_file("CITATION.bib")))",
+        readme=false,
+    ) -> Citation
 
-Add `Citation` to a [`Template`](@ref)'s plugin list to generate a `CITATION.bib` file.
-If `readme` is set, then `README.md` will contain a section about citing.
+Creates a `CITATION.bib` file for citing package repositories.
+
+## Keyword Arguments
+- `file::AbstractString`: Template file for `CITATION.bib`.
+- `readme::Bool`: Whether or not to include a section about citing in the README.
 """
 @with_kw struct Citation <: BasicPlugin
     file::String = default_file("CITATION.bib")

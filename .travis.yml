@@ -27,11 +27,15 @@ matrix:
       julia: 1.0
     - stage: Documentation
       julia: 1.0
-      script: julia --project=docs -e '
-        using Pkg;
-        Pkg.develop(PackageSpec(; path=pwd()));
-        Pkg.instantiate();
-        include("docs/make.jl");'
+      script:
+        - git config --global user.name Your-Name
+        - git config --global user.email your-email
+        - git config --global github.user your-username
+        - julia --project=docs -e '
+            using Pkg;
+            Pkg.develop(PackageSpec(; path=pwd()));
+            Pkg.instantiate();
+            include("docs/make.jl");'
       after_success: skip
 after_success: julia -e '
   using Pkg;

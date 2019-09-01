@@ -1,5 +1,5 @@
 using Documenter
-using PkgTemplates
+using PkgTemplates: PkgTemplates
 
 makedocs(;
     modules=[PkgTemplates],
@@ -11,7 +11,8 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "index.md",
+        "Home" => "user.md",
+        "Developer Guide" => "developer.md",
     ],
 )
 

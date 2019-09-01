@@ -14,6 +14,22 @@ const LICENSES = Dict(
     "EUPL-1.2+" => "European Union Public Licence, Version 1.2+",
 )
 
+"""
+    Readme(;
+        file="$(contractuser(default_file("README.md")))",
+        destination="README.md",
+        inline_badges=false,
+    ) -> Readme,
+
+Creates a `README` file.
+By default, it includes badges for other included plugins
+
+## Keyword Arguments
+- `file::AbstractString`: Template file for the `README`.
+- `destination::AbstractString`: File destination, relative to the repository root.
+  For example, values of `"README"` or `"README.rst"` might be desired.
+- `inline_badges::Bool`: Whether or not to put the badges on the same line as the package name.
+"""
 @with_kw struct Readme <: BasicPlugin
     file::String = default_file("README.md")
     destination::String = "README.md"
@@ -47,6 +63,17 @@ function view(p::Readme, t::Template, pkg::AbstractString)
     )
 end
 
+"""
+    License(; name="MIT", destination="LICENSE") -> License
+
+Creates a license file.
+
+## Keyword Arguments
+- `name::AbstractString`: Name of the desired license.
+  Available licenses can be seen [here](https://github.com/invenia/PkgTemplates.jl/tree/master/licenses).
+- `destination::AbstractString`: File destination, relative to the repository root.
+  For example, `"LICENSE.md"` might be desired.
+"""
 struct License <: Plugin
     path::String
     destination::String
@@ -56,12 +83,14 @@ struct License <: Plugin
     end
 end
 
+# Look up a license and throw an error if it doesn't exist.
 function license_path(license::AbstractString)
     path = joinpath(LICENSE_DIR, license)
     isfile(path) || throw(ArgumentError("License '$license' is not available"))
     return path
 end
 
+# Read a license's text.
 read_license(license::AbstractString) = string(readchomp(license_path(license)))
 
 function render_plugin(p::License, t::Template)
@@ -76,6 +105,15 @@ function gen_plugin(p::License, t::Template, pkg_dir::AbstractString)
     gen_file(joinpath(pkg_dir, p.destination), render_plugin(p, t))
 end
 
+"""
+    Gitignore(; ds_store=true, dev=true) -> Gitignore
+
+Creates a `.gitignore` file.
+
+## Keyword Arguments
+- `ds_store::Bool`: Whether or not to ignore MacOS's `.DS_Store` files.
+- `dev::Bool`: Whether or not to ignore the directory of locally-developed packages.
+"""
 @with_kw struct Gitignore <: Plugin
     ds_store::Bool = true
     dev::Bool = true
@@ -96,6 +134,14 @@ function gen_plugin(p::Gitignore, t::Template, pkg_dir::AbstractString)
     t.git && gen_file(joinpath(pkg_dir, ".gitignore"), render_plugin(p, t))
 end
 
+"""
+    Tests(; file="$(contractuser(default_file("runtests.jl")))" -> Tests
+
+Sets up testing for packages.
+
+## Keyword Arguments
+- `file::AbstractString`: Template file for the `runtests.jl`.
+"""
 @with_kw struct Tests <: BasicPlugin
     file::String = default_file("runtests.jl")
 end

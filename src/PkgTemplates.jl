@@ -35,6 +35,5 @@ abstract type Plugin end
 include("template.jl")
 include("generate.jl")
 include("plugin.jl")
-# include("interactive.jl")
 
 end
