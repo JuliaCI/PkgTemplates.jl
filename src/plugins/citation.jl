@@ -21,8 +21,3 @@ view(::Citation, t::Template, pkg::AbstractString) = Dict(
     "URL" => "https://$(t.host)/$(t.user)/$pkg.jl",
     "YEAR" => year(today()),
 )
-
-function interactive(::Type{Citation})
-    readme = prompt_bool("Citation: Add a section to the README", false)
-    return Citation(; readme_section=readme)
-end
