@@ -30,7 +30,7 @@ By default, it includes badges for other included plugins
   For example, values of `"README"` or `"README.rst"` might be desired.
 - `inline_badges::Bool`: Whether or not to put the badges on the same line as the package name.
 """
-@with_kw struct Readme <: BasicPlugin
+@with_kw_noshow struct Readme <: BasicPlugin
     file::String = default_file("README.md")
     destination::String = "README.md"
     inline_badges::Bool = false
@@ -114,7 +114,7 @@ Creates a `.gitignore` file.
 - `ds_store::Bool`: Whether or not to ignore MacOS's `.DS_Store` files.
 - `dev::Bool`: Whether or not to ignore the directory of locally-developed packages.
 """
-@with_kw struct Gitignore <: Plugin
+@with_kw_noshow struct Gitignore <: Plugin
     ds_store::Bool = true
     dev::Bool = true
 end
@@ -142,7 +142,7 @@ Sets up testing for packages.
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the `runtests.jl`.
 """
-@with_kw struct Tests <: BasicPlugin
+@with_kw_noshow struct Tests <: BasicPlugin
     file::String = default_file("runtests.jl")
 end
 

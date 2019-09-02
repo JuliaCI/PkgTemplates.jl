@@ -10,7 +10,7 @@ using Pkg: Pkg, TOML, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 
 using Mustache: entityMap, render
-using Parameters: @with_kw
+using Parameters: @with_kw_noshow
 
 export
     Template,
@@ -35,5 +35,6 @@ abstract type Plugin end
 include("template.jl")
 include("generate.jl")
 include("plugin.jl")
+include("interactive.jl")
 
 end

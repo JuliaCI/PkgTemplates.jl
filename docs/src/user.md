@@ -65,3 +65,19 @@ Documenter
 ```@docs
 Citation
 ```
+
+## Saving Templates
+
+One of the main reasons for PkgTemplates' existence is for new packages to be consistent.
+This means using the same template more than once, so we want a way to save a template to be used later.
+
+Here's my recommendation for loading a template whenever it's needed:
+
+```julia
+function template()
+    @eval using PkgTemplates
+    Template(; #= ... =#)
+end
+```
+
+Add this to your `startup.jl`, and you can create your template from anywhere, without incurring any startup cost.

@@ -1,4 +1,4 @@
-using Base.Filesystem: path_separator
+using Base.Filesystem: contractuser, path_separator
 
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
 using Pkg: Pkg
@@ -43,6 +43,7 @@ mktempdir() do dir
             include("template.jl")
             include("plugin.jl")
             include("git.jl")
+            include("show.jl")
 
             # Quite a bit of output depends on the Julia version,
             # and the test fixtures are made with Julia 1.2.

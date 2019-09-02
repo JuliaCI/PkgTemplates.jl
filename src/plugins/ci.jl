@@ -40,7 +40,7 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 - `coverage::Bool`: Whether or not to publish code coverage (another code coverage plugin such as [`Codecov`](@ref) must also be included).
 $EXTRA_VERSIONS_DOC
 """
-@with_kw struct TravisCI <: BasicPlugin
+@with_kw_noshow struct TravisCI <: BasicPlugin
     file::String = default_file("travis.yml")
     linux::Bool = true
     osx::Bool = true
@@ -109,7 +109,7 @@ Integrates your packages with [AppVeyor](https://appveyor.com) via [AppVeyor.jl]
 - `coverage::Bool`: Whether or not to publish code coverage ([`Codecov`](@ref) must also be included).
 $EXTRA_VERSIONS_DOC
 """
-@with_kw struct AppVeyor <: BasicPlugin
+@with_kw_noshow struct AppVeyor <: BasicPlugin
     file::String = default_file("appveyor.yml")
     x86::Bool = false
     coverage::Bool = true
@@ -162,7 +162,7 @@ $EXTRA_VERSIONS_DOC
 !!! note
     Code coverage submission from Cirrus CI is not yet supported by [Coverage.jl](https://github.com/JuliaCI/Coverage.jl).
 """
-@with_kw struct CirrusCI <: BasicPlugin
+@with_kw_noshow struct CirrusCI <: BasicPlugin
     file::String = default_file("cirrus.yml")
     image::String = "freebsd-12-0-release-amd64"
     coverage::Bool = true
@@ -211,7 +211,7 @@ See [`Documenter`](@ref) for more information.
 !!! note
     Nightly Julia is not supported.
 """
-@with_kw struct GitLabCI <: BasicPlugin
+@with_kw_noshow struct GitLabCI <: BasicPlugin
     file::String = default_file("gitlab-ci.yml")
     coverage::Bool = true
     # Nightly has no Docker image.
