@@ -441,6 +441,7 @@ end
     include(joinpath("plugins", "appveyor.jl"))
     include(joinpath("plugins", "gitlabci.jl"))
     include(joinpath("plugins", "cirrusci.jl"))
+    include(joinpath("plugins", "droneci.jl"))
     include(joinpath("plugins", "codecov.jl"))
     include(joinpath("plugins", "coveralls.jl"))
     include(joinpath("plugins", "githubpages.jl"))
