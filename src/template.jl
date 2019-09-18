@@ -10,7 +10,7 @@ function default_authors()
 end
 
 """
-    Template(; kwargs...) -> Template
+    Template(; kwargs...)
 
 A configuration used to generate packages.
 
@@ -25,13 +25,13 @@ A configuration used to generate packages.
   Like `user`, it takes its default value from the global Git config (`user.name` and `user.email`).
 
 ### Package Options
-- `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
 - `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
 - `julia_version::VersionNumber=$(repr(default_version()))`: Minimum allowed Julia version.
 - `develop::Bool=true`: Whether or not to `develop` new packages in the active environment.
 
 ### Git Options
 - `git::Bool=true`: Whether or not to create a Git repository for new packages.
+- `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
 - `ssh::Bool=false`: Whether or not to use SSH for the Git remote.
   If left unset, HTTPS will be used.
 - `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
@@ -44,6 +44,16 @@ A configuration used to generate packages.
 
 ### Interactive Usage
 - `interactive::Bool=false`: When set, the template is created interactively, filling unset keywords with user input.
+
+---
+
+To create a package from a `Template`, use the following syntax:
+
+```julia
+julia> t = Template();
+
+julia> t("PkgName")
+```
 """
 struct Template
     authors::Vector{String}

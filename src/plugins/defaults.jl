@@ -14,12 +14,23 @@ const LICENSES = Dict(
     "EUPL-1.2+" => "European Union Public Licence, Version 1.2+",
 )
 
+badge_order() = [
+    Documenter{GitLabCI},
+    Documenter{TravisCI},
+    GitLabCI,
+    TravisCI,
+    AppVeyor,
+    CirrusCI,
+    Codecov,
+    Coveralls,
+]
+
 """
     Readme(;
         file="$(contractuser(default_file("README.md")))",
         destination="README.md",
         inline_badges=false,
-    ) -> Readme,
+    )
 
 Creates a `README` file.
 By default, it includes badges for other included plugins
@@ -57,14 +68,14 @@ function view(p::Readme, t::Template, pkg::AbstractString)
 
     return Dict(
         "BADGES" => strings,
-        "HAS_CITATION" => hasplugin(t, Citation),
-        "HAS_INLINE_BADGES" =>  !isempty(strings) && p.inline_badges,
+        "HAS_CITATION" => hasplugin(t, Citation) && t.plugins[Citation].readme,
+        "HAS_INLINE_BADGES" => !isempty(strings) && p.inline_badges,
         "PKG" => pkg,
     )
 end
 
 """
-    License(; name="MIT", destination="LICENSE") -> License
+    License(; name="MIT", destination="LICENSE")
 
 Creates a license file.
 
@@ -90,9 +101,6 @@ function license_path(license::AbstractString)
     return path
 end
 
-# Read a license's text.
-read_license(license::AbstractString) = string(readchomp(license_path(license)))
-
 function render_plugin(p::License, t::Template)
     date = year(today())
     authors = join(t.authors, ", ")
@@ -106,7 +114,7 @@ function gen_plugin(p::License, t::Template, pkg_dir::AbstractString)
 end
 
 """
-    Gitignore(; ds_store=true, dev=true) -> Gitignore
+    Gitignore(; ds_store=true, dev=true)
 
 Creates a `.gitignore` file.
 

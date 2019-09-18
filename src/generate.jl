@@ -31,10 +31,10 @@ function (t::Template)(pkg::AbstractString)
             else
                 "https://$(t.host)/$(t.user)/$pkg.jl"
             end
-            remote = LibGit2.GitRemote(repo, "origin", url)
-            # TODO: `git pull` still requires some Git branch config.
-            LibGit2.add_push!(repo, remote, "refs/heads/master")
-            close(remote)
+            LibGit2.with(GitRemote(repo, "origin", url)) do remote
+                # TODO: `git pull` still requires some Git branch config.
+                LibGit2.add_push!(repo, remote, "refs/heads/master")
+            end
         end
 
         # Generate the files.
@@ -66,10 +66,14 @@ function (t::Template)(pkg::AbstractString)
     end
 end
 
-# Format the version to be included in Project.toml's [compat] section.
+"""
+    compat_version(v::VersionNumber) -> String
+
+Format a `VersionNumber` to exclude trailing zero components.
+"""
 function compat_version(v::VersionNumber)
     return if v.patch == 0 && v.minor == 0
-        string(v.major)
+        "$(v.major)"
     elseif v.patch == 0
         "$(v.major).$(v.minor)"
     else

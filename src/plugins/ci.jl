@@ -1,4 +1,9 @@
-# Strip everything but the major and minor release from a version number.
+"""
+    format_version(v::Union{VersionNumber, AbstractString}) -> String
+
+Strip everything but the major and minor release from a `VersionNumber`.
+Strings are left in their original form.
+"""
 format_version(v::VersionNumber) = "$(v.major).$(v.minor)"
 format_version(v::AbstractString) = string(v)
 
@@ -6,11 +11,10 @@ const ALLOWED_FAILURES = ["1.3", "nightly"]  # TODO: Update this list with new R
 const DEFAULT_CI_VERSIONS = map(format_version, [default_version(), VERSION, "nightly"])
 const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to test, as strings or `VersionNumber`s."
 
-
 """
     collect_versions(t::Template, versions::Vector) -> Vector{String}
 
-Combine the [`Template`](@ref)'s Julia version and some other versions, and format them as `major.minor`.
+Combine `t`'s Julia version with `versions`, and format them as `major.minor`.
 This is useful for creating lists of versions to be included in CI configurations.
 """
 function collect_versions(t::Template, versions::Vector)
@@ -27,7 +31,7 @@ end
         x86=false,
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
-    ) -> TravisCI
+    )
 
 Integrates your packages with [Travis CI](https://travis-ci.com).
 
@@ -99,7 +103,7 @@ end
         x86=false,
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
-    ) -> AppVeyor
+    )
 
 Integrates your packages with [AppVeyor](https://appveyor.com) via [AppVeyor.jl](https://github.com/JuliaCI/Appveyor.jl).
 
@@ -149,7 +153,7 @@ end
         image="freebsd-12-0-release-amd64",
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
-    ) -> CirrusCI
+    )
 
 Integrates your packages with [Cirrus CI](https://cirrus-ci.org) via [CirrusCI.jl](https://github.com/ararslan/CirrusCI.jl).
 
@@ -195,7 +199,7 @@ end
         file="$(contractuser(default_file("gitlab-ci.yml")))",
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
-    ) -> GitLabCI
+    )
 
 Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci/).
 

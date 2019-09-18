@@ -7,7 +7,7 @@ const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
         assets=String[],
         canonical_url=,
         makedocs_kwargs=Dict{Symbol, Any}(),
-    ) -> Documenter{T}
+    )
 
 Sets up documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 Documentation deployment depends on `T`, where `T` is some supported CI plugin, or `Nothing` to only support local documentation builds.

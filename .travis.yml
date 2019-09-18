@@ -28,9 +28,9 @@ matrix:
     - stage: Documentation
       julia: 1.0
       script:
-        - git config --global user.name Your-Name
-        - git config --global user.email your-email
-        - git config --global github.user your-username
+        - git config --global user.name name
+        - git config --global user.email email
+        - git config --global github.user username
         - julia --project=docs -e '
             using Pkg;
             Pkg.develop(PackageSpec(; path=pwd()));

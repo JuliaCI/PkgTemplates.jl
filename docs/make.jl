@@ -1,4 +1,4 @@
-using Documenter
+using Documenter: Documenter, makedocs, deploydocs
 using PkgTemplates: PkgTemplates
 
 makedocs(;
@@ -11,7 +11,8 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "user.md",
+        "Home" => "index.md",
+        "User Guide" => "user.md",
         "Developer Guide" => "developer.md",
     ],
 )

@@ -1,31 +1,15 @@
 const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
 
-badge_order() = [
-    Documenter{GitLabCI},
-    Documenter{TravisCI},
-    GitLabCI,
-    TravisCI,
-    AppVeyor,
-    CirrusCI,
-    Codecov,
-    Coveralls,
-]
-
 """
 A simple plugin that, in general, creates a single file.
-
-You needn't implement [`gen_plugin`](@ref) for your subtypes.
-Instead, you're left to implement a couple of much simpler functions:
-
-- [`source`](@ref)
-- [`destination`](@ref)
-
-For examples, see the plugins in the [Continuous Integration (CI)](@ref) and [Code Coverage](@ref) sections.
-For an example of a plugin that creates a file and then does some additional work, see [`Tests`](@ref).
 """
 abstract type BasicPlugin <: Plugin end
 
-# Compute the path to a default template file in this repository.
+"""
+    default_file(paths::AbstractString...) -> String
+
+Return a path relative to the default template file directory (`$(contractuser(DEFAULTS_DIR))`).
+"""
 default_file(paths::AbstractString...) = joinpath(DEFAULTS_DIR, paths...)
 
 """
@@ -38,9 +22,6 @@ For [`BasicPlugin`](@ref)s, this is used for both the plugin badges (see [`badge
 For other [`Plugin`](@ref)s, it is used only for badges, but you can always call it yourself as part of your [`gen_plugin`](@ref) implementation.
 
 By default, an empty `Dict` is returned.
-
-!!! note
-    For more information on templating with Mustache, see the [Mustache.jl](https://github.com/jverzani/Mustache.jl) documentation.
 """
 view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
@@ -49,34 +30,34 @@ view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
 The same as [`view`](@ref), but for use by package *users* for extension.
 
-For example, suppose you were using the [`Readme`](@ref) with a custom template file that looked like this:
-
-```md
-# {{PKG}}
-
-Created on *{{TODAY}}*.
-```
-
-The [`view`](@ref) function supplies a value for `PKG`, but it does not supply a value for `TODAY`.
-Rather than override [`view`](@ref), we can implement this function to get both the default values and whatever else we need to add.
-
-```julia
-user_view(::Readme, ::Template, ::AbstractString) = Dict("TODAY" => today())
-```
-
 Values returned by this function will override those from [`view`](@ref) when the keys are the same.
 """
 user_view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
 """
+    combined_view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
+
+This function combines [`view`](@ref) and [`user_view`](@ref) for use in text templating.
+If you're doing manual file creation or text templating (i.e. writing [`Plugin`](@ref)s that are not [`BasicPlugin`](@ref)s), then you should use this function rather than either of the former two.
+
+!!! note
+    Do not implement this function yourself!
+    If you're implementing a plugin, you should implement [`view`](@ref).
+    If you're customizing a plugin as a user, you should implement [`user_view`](@ref).
+"""
+function combined_view(p::Plugin, t::Template, pkg::AbstractString)
+    return merge(view(p, t, pkg), user_view(p, t, pkg))
+end
+
+"""
     tags(::Plugin) -> Tuple{String, String}
 
-Return the tags used for Mustache templating.
+Return the delimiters used for text templating.
 See the [`Citation`](@ref) plugin for a rare case where changing the tags is necessary.
 
 By default, the tags are `"{{"` and `"}}"`.
 """
-tags(::Plugin) = ("{{", "}}")
+tags(::Plugin) = "{{", "}}"
 
 """
     gitignore(::Plugin) -> Vector{String}
@@ -117,7 +98,7 @@ This function **must** be implemented.
 function destination end
 
 """
-    Badge(hover::AbstractString, image::AbstractString, link::AbstractString) -> Badge
+    Badge(hover::AbstractString, image::AbstractString, link::AbstractString)
 
 Container for Markdown badge data.
 Each argument can contain placeholders (which will be filled in with values from [`combined_view`](@ref)).
@@ -164,23 +145,8 @@ function gen_plugin(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
 end
 
 function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
-    # TODO template rendering code
     return render_file(source(p), combined_view(p, t, pkg), tags(p))
 end
-
-"""
-    combined_view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
-
-This function combines [`view`](@ref) and [`user_view`](@ref) for use in text templating.
-If you're doing manual creation (i.e. writing [`Plugin`](@ref)s that are not [`BasicPlugin`](@ref)s, then you should use this function rather than either of the former two.
-
-!!! note
-    You should **not** implement this function yourself.
-"""
-function combined_view(p::Plugin, t::Template, pkg::AbstractString)
-    return merge(view(p, t, pkg), user_view(p, t, pkg))
-end
-
 
 """
     gen_file(file::AbstractString, text::AbstractString)
@@ -194,12 +160,22 @@ function gen_file(file::AbstractString, text::AbstractString)
     write(file, text)
 end
 
-# Render text from a file.
+"""
+    render_file(file::AbstractString view::Dict{<:AbstractString}, tags) -> String
+
+Render a template file with the data in `view`.
+`tags` should be a tuple of two strings, which are the opening and closing delimiters, or `nothing` to use the default delimiters.
+"""
 function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags)
     render_text(read(file, String), view, tags)
 end
 
-# Render text using Mustache's templating system. HTML escaping is disabled.
+"""
+    render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing) -> String
+
+Render some text with the data in `view`.
+`tags` should be a tuple of two strings, which are the opening and closing delimiters, or `nothing` to use the default delimiters.
+"""
 function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
     saved = copy(entityMap)
     empty!(entityMap)

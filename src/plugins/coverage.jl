@@ -1,7 +1,7 @@
 const COVERAGE_GITIGNORE = ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
 
 """
-    Codecov(; file=nothing) -> Codecov
+    Codecov(; file=nothing)
 
 Sets up code coverage submission from CI to [Codecov](https://codecov.io).
 
@@ -22,7 +22,7 @@ badges(::Codecov) = Badge(
 )
 
 """
-    Coveralls(; file=nothing) -> Coverallls
+    Coveralls(; file=nothing)
 
 Sets up code coverage submission from CI to [Coveralls](https://coveralls.io).
 

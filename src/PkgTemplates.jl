@@ -5,7 +5,7 @@ using Base.Filesystem: contractuser
 
 using Dates: month, today, year
 using InteractiveUtils: subtypes
-using LibGit2: LibGit2
+using LibGit2: LibGit2, GitRemote
 using Pkg: Pkg, TOML, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 
@@ -28,7 +28,10 @@ export
     TravisCI
 
 """
-A plugin to be added to a [`Template`](@ref), which adds some functionality or integration.
+Plugins are PkgTemplates' source of customization and extensibility.
+Add plugins to your [`Template`](@ref)s to enable extra pieces of repository setup.
+
+When implementing a new plugin, subtype this type to have full control over its behaviour.
 """
 abstract type Plugin end
 
