@@ -167,7 +167,7 @@ Render a template file with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters, or `nothing` to use the default delimiters.
 """
 function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags)
-    render_text(read(file, String), view, tags)
+    return render_text(read(file, String), view, tags)
 end
 
 """
@@ -177,17 +177,7 @@ Render some text with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters, or `nothing` to use the default delimiters.
 """
 function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
-    saved = copy(entityMap)
-    empty!(entityMap)
-    return try
-        if tags === nothing
-            render(text, view)
-        else
-            render(text, view; tags=tags)
-        end
-    finally
-        append!(entityMap, saved)
-    end
+    return tags === nothing ? render(text, view) : render(text, view; tags=tags)
 end
 
 include(joinpath("plugins", "defaults.jl"))

@@ -1,8 +1,8 @@
-# {{PKG}}
+# {{{PKG}}}
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [{{PKG}}]
+Modules = [{{{PKG}}}]
 ```

@@ -55,18 +55,18 @@ badges(::Documenter{TravisCI}) = [
     Badge(
         "Stable",
         "https://img.shields.io/badge/docs-stable-blue.svg",
-        "https://{{USER}}.github.io/{{PKG}}.jl/stable",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/stable",
     ),
     Badge(
         "Dev",
         "https://img.shields.io/badge/docs-dev-blue.svg",
-        "https://{{USER}}.github.io/{{PKG}}.jl/dev",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/dev",
     ),
 ]
 badges(::Documenter{GitLabCI}) = Badge(
     "Dev",
     "https://img.shields.io/badge/docs-dev-blue.svg",
-    "https://{{USER}}.gitlab.io/{{PKG}}.jl/dev",
+    "https://{{{USER}}}.gitlab.io/{{{PKG}}}.jl/dev",
 )
 
 view(p::Documenter, t::Template, pkg::AbstractString) = Dict(

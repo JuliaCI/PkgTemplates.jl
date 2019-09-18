@@ -75,10 +75,10 @@ If that's the case, a basic understanding of [Mustache](https://mustache.github.
 Here's an example template file:
 
 ```
-Hello, {{name}}.
+Hello, {{{name}}}.
 
 {{#weather}}
-It's {{weather}} outside. 
+It's {{{weather}}} outside. 
 {{/weather}}
 {{^weather}}
 I don't know what the weather outside is.
@@ -88,15 +88,15 @@ I don't know what the weather outside is.
 I have the following things:
 {{/has_things}}
 {{#things}}
-- Here's a thing: {{.}}
+- Here's a thing: {{{.}}}
 {{/things}}
 
 {{#people}}
-- {{name}} is {{mood}}
+- {{{name}}} is {{{mood}}}
 {{/people}}
 ```
 
-In the first section, `name` is a key, and its value replaces `{{name}}`.
+In the first section, `name` is a key, and its value replaces `{{{name}}}`.
 
 In the second section, `weather`'s value may or may not exist.
 If it does exist, then "It's $weather outside" is printed.
@@ -105,11 +105,16 @@ Mustache uses a notion of "truthiness" similar to Python or JavaScript, where va
 
 In the third section, `has_things`' value is printed if it's truthy.
 Then, if the `things` list is truthy (i.e. not empty), its values are each printed on their own line.
-The reason that we have two separate keys is that `{{#things}}` iterates over the whole `things` list, even when there are no `{{.}}` placeholders, which would duplicate "I have the following things:" `n` times.
+The reason that we have two separate keys is that `{{#things}}` iterates over the whole `things` list, even when there are no `{{{.}}}` placeholders, which would duplicate "I have the following things:" `n` times.
 
-The fourth section iterates over the `people` list, but instead of using the `{{.}}` placeholder, we have `name` and `mood`, which are keys or fields of the list elements.
+The fourth section iterates over the `people` list, but instead of using the `{{{.}}}` placeholder, we have `name` and `mood`, which are keys or fields of the list elements.
 Most types are supported here, including `Dict`s and structs.
-`NamedTuple`s require you to use `{{:name}}` instead of the normal `{{name}}`, though.
+`NamedTuple`s require you to use `{{{:name}}}` instead of the normal `{{{name}}}`, though.
+
+You might notice that some curlies are in groups of two (`{{key}}`), and some are in groups of three (`{{{key}}}`).
+Whenever we want to subtitute in a value, using the triple curlies disables HTML escaping, which we rarely want for the types of files we're creating.
+If you do want escaping, just use the double curlies.
+And if you're using different delimiters, for example `<<foo>>`, use `<<&foo>>` to disable escaping.
 
 Assuming the following view:
 

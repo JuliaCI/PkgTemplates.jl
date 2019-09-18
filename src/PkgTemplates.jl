@@ -9,7 +9,7 @@ using LibGit2: LibGit2, GitRemote
 using Pkg: Pkg, TOML, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 
-using Mustache: entityMap, render
+using Mustache: render
 using Parameters: @with_kw_noshow
 
 export

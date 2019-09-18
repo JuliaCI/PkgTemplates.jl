@@ -1,8 +1,8 @@
-# {{PKG}}{{#HAS_INLINE_BADGES}} {{#BADGES}}{{.}} {{/BADGES}}{{/HAS_INLINE_BADGES}}
+# {{{PKG}}}{{#HAS_INLINE_BADGES}} {{#BADGES}}{{{.}}} {{/BADGES}}{{/HAS_INLINE_BADGES}}
 {{^HAS_INLINE_BADGES}}
 
 {{#BADGES}}
-{{.}}
+{{{.}}}
 {{/BADGES}}
 {{/HAS_INLINE_BADGES}}
 {{#HAS_CITATION}}

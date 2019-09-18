@@ -59,8 +59,8 @@ destination(::TravisCI) = ".travis.yml"
 
 badges(::TravisCI) = Badge(
     "Build Status",
-    "https://travis-ci.com/{{USER}}/{{PKG}}.jl.svg?branch=master",
-    "https://travis-ci.com/{{USER}}/{{PKG}}.jl",
+    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch=master",
+    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
 )
 
 function view(p::TravisCI, t::Template, pkg::AbstractString)
@@ -125,8 +125,8 @@ destination(::AppVeyor) = ".appveyor.yml"
 
 badges(::AppVeyor) = Badge(
     "Build Status",
-    "https://ci.appveyor.com/api/projects/status/github/{{USER}}/{{PKG}}.jl?svg=true",
-    "https://ci.appveyor.com/project/{{USER}}/{{PKG}}-jl",
+    "https://ci.appveyor.com/api/projects/status/github/{{{USER}}}/{{{PKG}}}.jl?svg=true",
+    "https://ci.appveyor.com/project/{{{USER}}}/{{{PKG}}}-jl",
 )
 
 function view(p::AppVeyor, t::Template, pkg::AbstractString)
@@ -178,8 +178,8 @@ destination(::CirrusCI) = ".cirrus.yml"
 
 badges(::CirrusCI) = Badge(
     "Build Status",
-    "https://api.cirrus-ci.com/github/{{USER}}/{{PACKAGE}}.jl.svg",
-    "https://cirrus-ci.com/github/{{USER}}/{{PKG}}.jl",
+    "https://api.cirrus-ci.com/github/{{{USER}}}/{{{PKG}}}.jl.svg",
+    "https://cirrus-ci.com/github/{{{USER}}}/{{{PKG}}}.jl",
 )
 
 function view(p::CirrusCI, t::Template, pkg::AbstractString)
@@ -230,13 +230,13 @@ destination(::GitLabCI) = ".gitlab-ci.yml"
 function badges(p::GitLabCI)
     ci = Badge(
         "Build Status",
-        "https://gitlab.com/{{USER}}/{{PKG}}.jl/badges/master/build.svg",
-        "https://gitlab.com/{{USER}}/{{PKG}}.jl/pipelines",
+        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/badges/master/build.svg",
+        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/pipelines",
     )
     cov = Badge(
         "Coverage",
-        "https://gitlab.com/{{USER}}/{{PKG}}.jl/badges/master/coverage.svg",
-        "https://gitlab.com/{{USER}}/{{PKG}}.jl/commits/master",
+        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/badges/master/coverage.svg",
+        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/commits/master",
     )
     return p.coverage ? [ci, cov] : [ci]
 end

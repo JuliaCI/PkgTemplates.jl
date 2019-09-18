@@ -18,16 +18,16 @@
           @printf "Test coverage %.2f%%\n" 100c / t;'
 {{/HAS_COVERAGE}}
 {{#VERSIONS}}
-Julia {{.}}:
-  image: julia:{{.}}
+Julia {{{.}}}:
+  image: julia:{{{.}}}
   <<: *script
-  {{#HAS_COVERAGE}}
+{{#HAS_COVERAGE}}
   <<: *coverage
-  {{/HAS_COVERAGE}}
+{{/HAS_COVERAGE}}
 {{/VERSIONS}}
 {{#HAS_DOCUMENTER}}
 pages:
-  image: julia:{{VERSION}}
+  image: julia:{{{VERSION}}}
   stage: deploy
   script:
     - julia --project=docs -e '
