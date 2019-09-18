@@ -37,6 +37,7 @@ const LICENSE_DIR = contractuser(PT.LICENSE_DIR)
                   inline_badges: false
                 Tests:
                   file: "$DEFAULTS_DIR/runtests.jl"
+                  project: false
             """
         @test sprint(show, MIME("text/plain"), tpl(; authors=USER)) == rstrip(expected)
     end

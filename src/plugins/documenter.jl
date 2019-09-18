@@ -1,4 +1,7 @@
-const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+const DOCUMENTER_DEP = PackageSpec(;
+    name="Documenter",
+    uuid="e30172f5-a6a5-5a46-863b-614d45cd2de4",
+)
 
 """
     Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
@@ -98,13 +101,7 @@ function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
     foreach(a -> cp(a, joinpath(assets_dir, basename(a))), p.assets)
 
     # Create the documentation project.
-    proj = current_project()
-    try
-        Pkg.activate(docs_dir)
-        Pkg.add(PackageSpec(; name="Documenter", uuid=DOCUMENTER_UUID))
-    finally
-        proj === nothing ? Pkg.activate() : Pkg.activate(proj)
-    end
+    with_project(() -> Pkg.add(DOCUMENTER_DEP), docs_dir)
 end
 
 github_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).github.io/$pkg.jl"

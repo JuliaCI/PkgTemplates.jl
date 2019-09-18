@@ -89,13 +89,21 @@ function Template(::Val{false}; kwargs...)
     # which means that default plugins get replaced by user values.
     plugins = Dict(typeof(p) => p for p in enabled)
 
+    # TODO: It might be nice to offer some kind of warn_incompatible function
+    # to be optionally implented by plugins instead of hardcoding this case here.
+    julia = getkw(kwargs, :julia_version)
+    julia < v"1.2" && haskey(plugins, Tests) && plugins[Tests].project && @warn string(
+        "The Tests plugin is set to create a project (supported in Julia 1.2 and later)",
+        "but a Julia version older than 1.2 is supported.",
+    )
+
     return Template(
         authors,
         getkw(kwargs, :develop),
         dir,
         getkw(kwargs, :git),
         host,
-        getkw(kwargs, :julia_version),
+        julia,
         getkw(kwargs, :manifest),
         plugins,
         getkw(kwargs, :ssh),

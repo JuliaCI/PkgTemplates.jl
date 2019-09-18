@@ -40,4 +40,15 @@ include("generate.jl")
 include("plugin.jl")
 include("interactive.jl")
 
+# Run some function with a project activated at the given path.
+function with_project(f::Function, path::AbstractString)
+    proj = current_project()
+    try
+        Pkg.activate(path)
+        f()
+    finally
+        proj === nothing ? Pkg.activate() : Pkg.activate(proj)
+    end
+end
+
 end

@@ -57,6 +57,13 @@ function (t::Template)(pkg::AbstractString)
             Pkg.develop(PackageSpec(; path=pkg_dir))
         end
 
+        manifest = joinpath(pkg_dir, "Manifest.toml")
+        if t.manifest && !isfile(manifest)
+            # If the manifest is going to be committed, make sure it's generated.
+            touch(manifest)
+            with_project(Pkg.update, pkg_dir)
+        end
+
         @info "New package is at $pkg_dir"
     catch
         rm(pkg_dir; recursive=true, force=true)

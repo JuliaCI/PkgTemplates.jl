@@ -1,4 +1,5 @@
 const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
 const LICENSE_DIR = normpath(joinpath(@__DIR__, "..", "..", "licenses"))
 const LICENSES = Dict(
     "MIT" => "MIT \"Expat\" License",
@@ -143,15 +144,21 @@ function gen_plugin(p::Gitignore, t::Template, pkg_dir::AbstractString)
 end
 
 """
-    Tests(; file="$(contractuser(default_file("runtests.jl")))" -> Tests
+    Tests(; file="$(contractuser(default_file("runtests.jl")))", project=false)
 
 Sets up testing for packages.
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the `runtests.jl`.
+- `project::Bool`: Whether or not to create a new project for tests (`test/Project.toml`).
+  See [here](https://julialang.github.io/Pkg.jl/v1/creating-packages/#Test-specific-dependencies-in-Julia-1.2-and-above-1) for more details.
+
+!!! note
+    Managing test dependencies with `test/Project.toml` is only supported in Julia 1.2 and later.
 """
 @with_kw_noshow struct Tests <: BasicPlugin
     file::String = default_file("runtests.jl")
+    project::Bool = false
 end
 
 source(p::Tests) = p.file
@@ -162,21 +169,27 @@ function gen_plugin(p::Tests, t::Template, pkg_dir::AbstractString)
     # Do the normal BasicPlugin behaviour to create the test script.
     invoke(gen_plugin, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
 
-    # Add Test as a test-only dependency.
+    # Then set up the test depdendency in the chosen way.
+    f = p.project ? make_test_project : add_test_dependency
+    f(pkg_dir)
+end
+
+# Create a new test project.
+function make_test_project(pkg_dir::AbstractString)
+    with_project(() -> Pkg.add(TEST_DEP), joinpath(pkg_dir, "test"))
+end
+
+# Add Test as a test-only dependency.
+function add_test_dependency(pkg_dir::AbstractString)
+    # Add the dependency manually since there's no programmatic way to add to [extras].
     path = joinpath(pkg_dir, "Project.toml")
     toml = TOML.parsefile(path)
     get!(toml, "extras", Dict())["Test"] = TEST_UUID
     get!(toml, "targets", Dict())["test"] = ["Test"]
     open(io -> TOML.print(io, toml), path, "w")
 
-    # Generate the manifest.
+    # Generate the manifest by updating the project.
     # This also ensures that keys in Project.toml are sorted properly.
     touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
-    proj = current_project()
-    try
-        Pkg.activate(pkg_dir)
-        Pkg.update()
-    finally
-        proj === nothing ? Pkg.activate() : Pkg.activate(proj)
-    end
+    with_project(Pkg.update, pkg_dir)
 end

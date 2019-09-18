@@ -7,7 +7,3 @@
 [![Build Status](https://api.cirrus-ci.com/github/tester/.jl.svg)](https://cirrus-ci.com/github/tester/AllPlugins.jl)
 [![Coverage](https://codecov.io/gh//.jl/branch/master/graph/badge.svg)](https://codecov.io/gh//.jl)
 [![Coverage](https://coveralls.io/repos/github//.jl/badge.svg?branch=master)](https://coveralls.io/github//.jl?branch=master)
-
-## Citing
-
-See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
