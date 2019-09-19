@@ -19,7 +19,7 @@ Return the view to be passed to the text templating engine for this plugin.
 `pkg` is the name of the package being generated.
 
 For [`BasicPlugin`](@ref)s, this is used for both the plugin badges (see [`badges`](@ref)) and the template file (see [`source`](@ref)).
-For other [`Plugin`](@ref)s, it is used only for badges, but you can always call it yourself as part of your [`gen_plugin`](@ref) implementation.
+For other [`Plugin`](@ref)s, it is used only for badges, but you can always call it yourself as part of your [`hook`](@ref) implementation.
 
 By default, an empty `Dict` is returned.
 """
@@ -124,19 +124,44 @@ function badges(p::Plugin, t::Template, pkg::AbstractString)
 end
 
 """
-    gen_plugin(::Plugin, ::Template, pkg::AbstractString)
+    prehook(::Plugin, ::Template, pkg_dir::AbstractString)
+
+Do some work associated with a plugin **before** any files are generated.
+At this point, `pkg_dir` is an empty directory that will eventually contain the package.
+"""
+prehook(::Plugin, ::Template, ::AbstractString) = nothing
+
+function prehook(p::T, ::Template, ::AbstractString) where T <: BasicPlugin
+    src = source(p)
+    src === nothing && return
+    isfile(src) || throw(ArgumentError("$(nameof(T)): The file $src does not exist"))
+end
+
+"""
+    posthook(::Plugin, ::Template, pkg_dir::AbstractString)
+
+Do some work associated with a plugin **after** after files have been generated.
+"""
+posthook(::Plugin, ::Template, ::AbstractString) = nothing
+
+"""
+    hook(::Plugin, ::Template, pkg_dir::AbstractString)
 
 Perform any work associated with a plugin.
-`pkg` is the name of the package being generated.
+`pkg_dir` is the directory in which the package is being generated (so `basename(pkg_dir)` is the package name).
 
 For [`Plugin`](@ref)s that are not [`BasicPlugin`](@ref)s, this is the only function that really needs to be implemented.
-If you want your plugin to do anything at all during package generation, you should implement it here.
+If you want your plugin to do something during the main phase of package generation, you should implement it here.
 
-You should **not** implement this function for `BasicPlugin`s.
+See also: [`prehook`](@ref) and [`posthook`](@ref).
+
+!!! note
+    You usually shouldn't implement this function for [`BasicPlugin`](@ref)s.
+    If you do, it should probably `invoke` the generic method (otherwise, there's no reason to subtype `BasicPlugin`).
 """
-gen_plugin(::Plugin, ::Template, ::AbstractString) = nothing
+hook(::Plugin, ::Template, ::AbstractString) = nothing
 
-function gen_plugin(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
+function hook(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
     pkg = basename(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
@@ -184,4 +209,5 @@ include(joinpath("plugins", "defaults.jl"))
 include(joinpath("plugins", "coverage.jl"))
 include(joinpath("plugins", "ci.jl"))
 include(joinpath("plugins", "citation.jl"))
+include(joinpath("plugins", "develop.jl"))
 include(joinpath("plugins", "documenter.jl"))

@@ -50,7 +50,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "USER" => t.user,
 )
 
-function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
+function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     pkg = basename(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
@@ -91,10 +91,10 @@ Third, we implement [`view`](@ref), which is used to fill placeholders in badges
 view
 ```
 
-Finally, we implement [`gen_plugin`](@ref), which is the real workhorse for the plugin.
+Finally, we implement [`hook`](@ref), which is the real workhorse for the plugin.
 
 ```@docs
-gen_plugin
+hook
 ```
 
 Inside of this function, we call a few more functions, which help us with text templating.
@@ -167,7 +167,7 @@ Finally, we implement [`view`](@ref) to fill in the placeholders that we saw in 
 
 ## Doing Extra Work With `BasicPlugin`s
 
-Notice that we didn't have to implement [`gen_plugin`](@ref) for our plugin.
+Notice that we didn't have to implement [`hook`](@ref) for our plugin.
 It's implemented for all [`BasicPlugin`](@ref)s, like so:
 
 ```julia
@@ -175,7 +175,7 @@ function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
     return render_file(source(p), combined_view(p, t, pkg), tags(p))
 end
 
-function gen_plugin(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
+function hook(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
     pkg = basename(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
@@ -191,7 +191,7 @@ It creates `runtests.jl`, but it also modifies the `Project.toml` to include the
 
 Of course, we could use a normal [`Plugin`](@ref), but it turns out there's a way to avoid that while still getting the extra capbilities that we want.
 
-The plugin implements its own `gen_plugin`, but uses `invoke` to avoid duplicating the file creation code:
+The plugin implements its own `hook`, but uses `invoke` to avoid duplicating the file creation code:
 
 ```julia
 @with_kw_noshow struct Tests <: BasicPlugin
@@ -202,9 +202,9 @@ source(p::Tests) = p.file
 destination(::Tests) = joinpath("test", "runtests.jl")
 view(::Tests, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 
-function gen_plugin(p::Tests, t::Template, pkg_dir::AbstractString)
+function hook(p::Tests, t::Template, pkg_dir::AbstractString)
     # Do the normal BasicPlugin behaviour to create the test script.
-    invoke(gen_plugin, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+    invoke(hook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
     # Do some other work.
     add_test_dependency()
 end

@@ -1,4 +1,4 @@
-default_plugins() = [Gitignore(), License(), Readme(), Tests()]
+default_plugins() = [ProjectFile(), SrcDir(), Git(), License(), Readme(), Tests()]
 default_user() = LibGit2.getconfig("github.user", "")
 default_version() = VersionNumber(VERSION.major)
 
@@ -26,20 +26,14 @@ A configuration used to generate packages.
 
 ### Package Options
 - `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
+- `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
 - `julia_version::VersionNumber=$(repr(default_version()))`: Minimum allowed Julia version.
 - `develop::Bool=true`: Whether or not to `develop` new packages in the active environment.
-
-### Git Options
-- `git::Bool=true`: Whether or not to create a Git repository for new packages.
-- `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
-- `ssh::Bool=false`: Whether or not to use SSH for the Git remote.
-  If left unset, HTTPS will be used.
-- `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
 
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
 - `disable_defaults::Vector{DataType}=DataType[]`: Default plugins to disable.
-  The default plugins are [`Readme`](@ref), [`License`](@ref), [`Tests`](@ref), and [`Gitignore`](@ref).
+  The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref), [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
   To override a default plugin instead of disabling it altogether, supply it via `plugins`.
 
 ### Interactive Usage
@@ -57,14 +51,10 @@ julia> t("PkgName")
 """
 struct Template
     authors::Vector{String}
-    develop::Bool
     dir::String
-    git::Bool
     host::String
     julia_version::VersionNumber
-    manifest::Bool
     plugins::Dict{DataType, <:Plugin}
-    ssh::Bool
     user::String
 end
 
@@ -78,9 +68,9 @@ function Template(::Val{false}; kwargs...)
     authors = getkw(kwargs, :authors)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
 
-    host = replace(getkw(kwargs, :host), r".*://" => "")
-
     dir = abspath(expanduser(getkw(kwargs, :dir)))
+    host = replace(getkw(kwargs, :host), r".*://" => "")
+    julia_version = getkw(kwargs, :julia_version)
 
     disabled = getkw(kwargs, :disable_defaults)
     enabled = filter(p -> !(typeof(p) in disabled), default_plugins())
@@ -89,26 +79,7 @@ function Template(::Val{false}; kwargs...)
     # which means that default plugins get replaced by user values.
     plugins = Dict(typeof(p) => p for p in enabled)
 
-    # TODO: It might be nice to offer some kind of warn_incompatible function
-    # to be optionally implemented by plugins instead of hardcoding this case here.
-    julia = getkw(kwargs, :julia_version)
-    julia < v"1.2" && haskey(plugins, Tests) && plugins[Tests].project && @warn string(
-        "The Tests plugin is set to create a project (supported in Julia 1.2 and later)",
-        "but a Julia version older than 1.2 is supported.",
-    )
-
-    return Template(
-        authors,
-        getkw(kwargs, :develop),
-        dir,
-        getkw(kwargs, :git),
-        host,
-        julia,
-        getkw(kwargs, :manifest),
-        plugins,
-        getkw(kwargs, :ssh),
-        user,
-    )
+    return Template(authors, dir, host, julia_version, plugins, user)
 end
 
 # Does the template have a plugin that satisfies some predicate?
@@ -121,13 +92,35 @@ getkw(kwargs, k) = get(() -> defaultkw(k), kwargs, k)
 # Default Template keyword values.
 defaultkw(s::Symbol) = defaultkw(Val(s))
 defaultkw(::Val{:authors}) = default_authors()
-defaultkw(::Val{:develop}) = true
 defaultkw(::Val{:dir}) = Pkg.devdir()
 defaultkw(::Val{:disable_defaults}) = DataType[]
-defaultkw(::Val{:git}) = true
 defaultkw(::Val{:host}) = "github.com"
 defaultkw(::Val{:julia_version}) = default_version()
-defaultkw(::Val{:manifest}) = false
 defaultkw(::Val{:plugins}) = Plugin[]
-defaultkw(::Val{:ssh}) = false
 defaultkw(::Val{:user}) = default_user()
+
+"""
+    (::Template)(pkg::AbstractString)
+
+Generate a package named `pkg` from a [`Template`](@ref).
+"""
+function (t::Template)(pkg::AbstractString)
+    endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
+    pkg_dir = joinpath(t.dir, pkg)
+    ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
+    mkpath(pkg_dir)
+
+    try
+        foreach((prehook, hook, posthook)) do h
+            @info "Running $(h)s"
+            foreach(values(t.plugins)) do p
+                h(p, t, pkg_dir)
+            end
+        end
+    catch
+        rm(pkg_dir; recursive=true, force=true)
+        rethrow()
+    end
+
+    @info "New package is at $pkg_dir"
+end

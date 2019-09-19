@@ -28,10 +28,12 @@ These plugins are included by default.
 They can be overridden by supplying another value via the `plugins` keyword, or disabled by supplying the type via the `disable_defaults` keyword.
 
 ```@docs
-Gitignore
-License
-Readme
+ProjectFile
+SrcDir
 Tests
+Readme
+License
+Git
 ```
 
 ### Continuous Integration (CI)
@@ -63,6 +65,7 @@ Documenter
 ### Miscellaneous
 
 ```@docs
+Develop
 Citation
 ```
 

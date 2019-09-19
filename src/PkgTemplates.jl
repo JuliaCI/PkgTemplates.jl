@@ -5,9 +5,10 @@ using Base.Filesystem: contractuser
 
 using Dates: month, today, year
 using InteractiveUtils: subtypes
-using LibGit2: LibGit2, GitRemote
+using LibGit2: LibGit2, GitRemote, GitRepo
 using Pkg: Pkg, TOML, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
+using UUIDs: uuid4
 
 using Mustache: render
 using Parameters: @with_kw_noshow
@@ -19,11 +20,14 @@ export
     Citation,
     Codecov,
     Coveralls,
+    Develop,
     Documenter,
-    Gitignore,
+    Git,
     GitLabCI,
     License,
+    ProjectFile,
     Readme,
+    SrcDir,
     Tests,
     TravisCI
 
@@ -36,7 +40,6 @@ When implementing a new plugin, subtype this type to have full control over its 
 abstract type Plugin end
 
 include("template.jl")
-include("generate.jl")
 include("plugin.jl")
 include("interactive.jl")
 

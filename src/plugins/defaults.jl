@@ -1,18 +1,5 @@
 const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
-const LICENSES = Dict(
-    "MIT" => "MIT \"Expat\" License",
-    "BSD2" => "Simplified \"2-clause\" BSD License",
-    "BSD3" => "Modified \"3-clause\" BSD License",
-    "ISC" => "Internet Systems Consortium License",
-    "ASL" => "Apache License, Version 2.0",
-    "MPL" => "Mozilla Public License, Version 2.0",
-    "GPL-2.0+" => "GNU Public License, Version 2.0+",
-    "GPL-3.0+" => "GNU Public License, Version 3.0+",
-    "LGPL-2.1+" => "Lesser GNU Public License, Version 2.1+",
-    "LGPL-3.0+" => "Lesser GNU Public License, Version 3.0+",
-    "EUPL-1.2+" => "European Union Public Licence, Version 1.2+",
-)
 
 badge_order() = [
     Documenter{GitLabCI},
@@ -24,6 +11,67 @@ badge_order() = [
     Codecov,
     Coveralls,
 ]
+
+"""
+    ProjectFile()
+
+Creates a `Project.toml`.
+"""
+struct ProjectFile <: Plugin end
+
+# Create Project.toml in the prehook because other hooks might depend on it.
+function prehook(::ProjectFile, t::Template, pkg_dir::AbstractString)
+    toml = Dict(
+        "name" => basename(pkg_dir),
+        "uuid" => uuid4(),
+        "authors" => t.authors,
+        "compat" => Dict("julia" => compat_version(t.julia_version)),
+    )
+    open(io -> TOML.print(io, toml), joinpath(pkg_dir, "Project.toml"), "w")
+end
+
+"""
+    compat_version(v::VersionNumber) -> String
+
+Format a `VersionNumber` to exclude trailing zero components.
+"""
+function compat_version(v::VersionNumber)
+    return if v.patch == 0 && v.minor == 0
+        "$(v.major)"
+    elseif v.patch == 0
+        "$(v.major).$(v.minor)"
+    else
+        "$(v.major).$(v.minor).$(v.patch)"
+    end
+end
+
+"""
+    SrcDir(; file="$(contractuser(default_file("src", "module.jl")))")
+
+Creates a module entrypoint.
+"""
+@with_kw_noshow mutable struct SrcDir <: BasicPlugin
+    file::String = default_file("src", "module.jl")
+    destination::String = joinpath("src", "<module>.jl")
+end
+
+# Don't display the destination field.
+function Base.show(io::IO, ::MIME"text/plain", p::SrcDir)
+    indent = get(io, :indent, 0)
+    print(io, repeat(' ', indent), "SrcDir:")
+    print(io, "\n", repeat(' ', indent + 2), "file: ", show_field(p.file))
+end
+
+source(p::SrcDir) = p.file
+destination(p::SrcDir) = p.destination
+view(::SrcDir, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
+
+# Update the destination now that we know the package name.
+# Kind of hacky, but oh well.
+function prehook(p::SrcDir, t::Template, pkg_dir::AbstractString)
+    invoke(prehook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+    p.destination = joinpath("src", basename(pkg_dir) * ".jl")
+end
 
 """
     Readme(;
@@ -113,32 +161,88 @@ view(::License, t::Template, ::AbstractString) = Dict(
 )
 
 """
-    Gitignore(; ds_store=true, dev=true)
+    Git(; ignore=String[], ssh=false, manifest=false, gpgsign=false)
 
-Creates a `.gitignore` file.
+Creates a Git repository and a `.gitignore` file.
 
 ## Keyword Arguments
-- `ds_store::Bool`: Whether or not to ignore MacOS's `.DS_Store` files.
-- `dev::Bool`: Whether or not to ignore the directory of locally-developed packages.
+- `ignore::Vector{<:AbstractString}`: Patterns to add to the `.gitignore`.
+  See also: [`gitignore`](@ref).
+- `ssh::Bool`: Whether or not to use SSH for the remote.
+  If left unset, HTTPS is used.
+- `manifest::Bool`: Whether or not to commit `Manifest.toml`.
+- `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
+  This option requires that the Git CLI is installed.
 """
-@with_kw_noshow struct Gitignore <: Plugin
-    ds_store::Bool = true
-    dev::Bool = true
+@with_kw_noshow struct Git <: Plugin
+    ignore::Vector{String} = []
+    ssh::Bool = false
+    manifest::Bool = false
+    gpgsign::Bool = false
 end
 
-function render_plugin(p::Gitignore, t::Template)
-    init = String[]
-    p.ds_store && push!(init, ".DS_Store")
-    p.dev && push!(init, "/dev/")
-    entries = mapreduce(gitignore, append!, values(t.plugins); init=init)
+gitignore(p::Git) = p.ignore
+
+# Set up the Git repository.
+function prehook(p::Git, t::Template, pkg_dir::AbstractString)
+    if p.gpgsign && try run(pipeline(`git --version`; stdout=devnull)); false catch; true end
+        throw(ArgumentError("Git: gpgsign is set but the Git CLI is not installed"))
+    end
+    LibGit2.with(LibGit2.init(pkg_dir)) do repo
+        commit(p, repo, pkg_dir, "Initial commit")
+        pkg = basename(pkg_dir)
+        url = if p.ssh
+            "git@$(t.host):$(t.user)/$pkg.jl.git"
+        else
+            "https://$(t.host)/$(t.user)/$pkg.jl"
+        end
+        LibGit2.with(GitRemote(repo, "origin", url)) do remote
+            # TODO: `git pull` still requires some Git branch config.
+            LibGit2.add_push!(repo, remote, "refs/heads/master")
+        end
+    end
+end
+
+# Create the .gitignore.
+function hook(p::Git, t::Template, pkg_dir::AbstractString)
+    gen_file(joinpath(pkg_dir, ".gitignore"), render_plugin(p, t))
+end
+
+# Commit the files
+function posthook(p::Git, t::Template, pkg_dir::AbstractString)
+    # Ensure that the manifest exists if it's going to be committed.
+    manifest = joinpath(pkg_dir, "Manifest.toml")
+    if p.manifest && !isfile(manifest)
+        touch(manifest)
+        with_project(Pkg.update, pkg_dir)
+    end
+
+    LibGit2.with(GitRepo(pkg_dir)) do repo
+        LibGit2.add!(repo, ".")
+        msg = "Files generated by PkgTemplates"
+        installed = Pkg.installed()
+        if haskey(installed, "PkgTemplates")
+            ver = string(installed["PkgTemplates"])
+            msg *= "\n\nPkgTemplates version: $ver"
+        end
+        commit(p, repo, pkg_dir, msg)
+    end
+end
+
+function commit(p::Git, repo::GitRepo, pkg_dir::AbstractString, msg::AbstractString)
+    if p.gpgsign
+        run(pipeline(`git -C $pkg_dir commit -S --allow-empty -m $msg`; stdout=devnull))
+    else
+        LibGit2.commit(repo, msg)
+    end
+end
+
+function render_plugin(p::Git, t::Template)
+    ignore = mapreduce(gitignore, append!, values(t.plugins))
     # Only ignore manifests at the repo root.
-    t.manifest || "Manifest.toml" in entries || push!(entries, "/Manifest.toml")
-    unique!(sort!(entries))
-    return join(entries, "\n")
-end
-
-function gen_plugin(p::Gitignore, t::Template, pkg_dir::AbstractString)
-    t.git && gen_file(joinpath(pkg_dir, ".gitignore"), render_plugin(p, t))
+    p.manifest || "Manifest.toml" in ignore || push!(ignore, "/Manifest.toml")
+    unique!(sort!(ignore))
+    return join(ignore, "\n")
 end
 
 """
@@ -163,9 +267,18 @@ source(p::Tests) = p.file
 destination(::Tests) = joinpath("test", "runtests.jl")
 view(::Tests, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 
-function gen_plugin(p::Tests, t::Template, pkg_dir::AbstractString)
+function prehook(p::Tests, t::Template, pkg_dir::AbstractString)
+    invoke(prehook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+    p.project && t.julia_version < v"1.2" && @warn string(
+        "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
+        "but a Julia version older than 1.2 is supported by the Template.",
+    )
+end
+
+
+function hook(p::Tests, t::Template, pkg_dir::AbstractString)
     # Do the normal BasicPlugin behaviour to create the test script.
-    invoke(gen_plugin, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+    invoke(hook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
 
     # Then set up the test depdendency in the chosen way.
     f = p.project ? make_test_project : add_test_dependency

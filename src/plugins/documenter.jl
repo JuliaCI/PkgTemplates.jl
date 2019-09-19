@@ -85,14 +85,14 @@ function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
     return merge(base, Dict("HAS_DEPLOY" => true))
 end
 
-function gen_plugin(p::Documenter, t::Template, pkg_dir::AbstractString)
+function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     pkg = basename(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
     # Generate files.
     make = render_file(p.make_jl, combined_view(p, t, pkg), tags(p))
-    gen_file(joinpath(docs_dir, "make.jl"), make)
     index = render_file(p.index_md, combined_view(p, t, pkg), tags(p))
+    gen_file(joinpath(docs_dir, "make.jl"), make)
     gen_file(joinpath(docs_dir, "src", "index.md"), index)
 
     # Copy over any assets.
