@@ -1,6 +1,5 @@
 const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
-const LICENSE_DIR = normpath(joinpath(@__DIR__, "..", "..", "licenses"))
 const LICENSES = Dict(
     "MIT" => "MIT \"Expat\" License",
     "BSD2" => "Simplified \"2-clause\" BSD License",
@@ -76,43 +75,42 @@ function view(p::Readme, t::Template, pkg::AbstractString)
 end
 
 """
-    License(; name="MIT", destination="LICENSE")
+    License(; name="MIT", path=nothing, destination="LICENSE")
 
 Creates a license file.
 
 ## Keyword Arguments
-- `name::AbstractString`: Name of the desired license.
-  Available licenses can be seen [here](https://github.com/invenia/PkgTemplates.jl/tree/master/licenses).
+- `name::AbstractString`: Name of a license supported by PkgTemplates.
+  Available licenses can be seen [here](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses).
+- `path::Union{AbstractString, Nothing}`: Path to a custom license file.
+  This keyword takes priority over `name`.
 - `destination::AbstractString`: File destination, relative to the repository root.
   For example, `"LICENSE.md"` might be desired.
 """
-struct License <: Plugin
+struct License <: BasicPlugin
     path::String
     destination::String
+end
 
-    function License(name::AbstractString="MIT", destination::AbstractString="LICENSE")
-        return new(license_path(name), destination)
+function License(
+    name::AbstractString="MIT",
+    path::Union{AbstractString, Nothing}=nothing,
+    destination::AbstractString="LICENSE",
+)
+    if path === nothing
+        path = default_file("licenses", name)
+        isfile(path) || throw(ArgumentError("License '$(basename(path))' is not available"))
     end
+    return License(path, destination)
 end
 
-# Look up a license and throw an error if it doesn't exist.
-function license_path(license::AbstractString)
-    path = joinpath(LICENSE_DIR, license)
-    isfile(path) || throw(ArgumentError("License '$license' is not available"))
-    return path
-end
 
-function render_plugin(p::License, t::Template)
-    date = year(today())
-    authors = join(t.authors, ", ")
-    text = "Copyright (c) $date $authors\n\n"
-    license = strip(read(p.path, String))
-    return text * license
-end
-
-function gen_plugin(p::License, t::Template, pkg_dir::AbstractString)
-    gen_file(joinpath(pkg_dir, p.destination), render_plugin(p, t))
-end
+source(p::License) = p.path
+destination(p::License) = p.destination
+view(::License, t::Template, ::AbstractString) = Dict(
+    "AUTHORS" => join(t.authors, ", "),
+    "YEAR" => year(today()),
+)
 
 """
     Gitignore(; ds_store=true, dev=true)
@@ -144,7 +142,7 @@ function gen_plugin(p::Gitignore, t::Template, pkg_dir::AbstractString)
 end
 
 """
-    Tests(; file="$(contractuser(default_file("runtests.jl")))", project=false)
+    Tests(; file="$(contractuser(default_file("test", "runtests.jl")))", project=false)
 
 Sets up testing for packages.
 
@@ -157,7 +155,7 @@ Sets up testing for packages.
     Managing test dependencies with `test/Project.toml` is only supported in Julia 1.2 and later.
 """
 @with_kw_noshow struct Tests <: BasicPlugin
-    file::String = default_file("runtests.jl")
+    file::String = default_file("test", "runtests.jl")
     project::Bool = false
 end
 

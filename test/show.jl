@@ -1,5 +1,5 @@
 const DEFAULTS_DIR = contractuser(PT.DEFAULTS_DIR)
-const LICENSE_DIR = contractuser(PT.LICENSE_DIR)
+const LICENSE_DIR = contractuser(joinpath(PT.DEFAULTS_DIR, "licenses"))
 
 @testset "Show methods" begin
     @testset "Plugins" begin
@@ -36,7 +36,7 @@ const LICENSE_DIR = contractuser(PT.LICENSE_DIR)
                   destination: "README.md"
                   inline_badges: false
                 Tests:
-                  file: "$(joinpath(DEFAULTS_DIR, "runtests.jl"))"
+                  file: "$(joinpath(DEFAULTS_DIR, "test", "runtests.jl"))"
                   project: false
             """
         @test sprint(show, MIME("text/plain"), tpl(; authors=USER)) == rstrip(expected)

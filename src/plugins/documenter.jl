@@ -5,10 +5,10 @@ const DOCUMENTER_DEP = PackageSpec(;
 
 """
     Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
-        make_jl="$(contractuser(default_file("make.jl")))",
-        index_md="$(contractuser(default_file("index.md")))",
+        make_jl="$(contractuser(default_file("docs", "make.jl")))",
+        index_md="$(contractuser(default_file("docs", "index.md")))",
         assets=String[],
-        canonical_url=,
+        canonical_url=make_canonical(T),
         makedocs_kwargs=Dict{Symbol, Any}(),
     )
 
@@ -39,8 +39,8 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
         canonical_url::Union{Function, Nothing}=make_canonical(T),
-        make_jl::AbstractString=default_file("make.jl"),
-        index_md::AbstractString=default_file("index.md"),
+        make_jl::AbstractString=default_file("docs", "make.jl"),
+        index_md::AbstractString=default_file("docs", "index.md"),
     ) where T <: Union{TravisCI, GitLabCI, Nothing}
         return new(assets, makedocs_kwargs, canonical_url, make_jl, index_md)
     end

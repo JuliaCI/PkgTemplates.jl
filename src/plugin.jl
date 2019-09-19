@@ -1,4 +1,4 @@
-const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
+const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 
 """
 A simple plugin that, in general, creates a single file.
