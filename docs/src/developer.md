@@ -93,8 +93,12 @@ view
 
 Finally, we implement [`hook`](@ref), which is the real workhorse for the plugin.
 
+TODO prehook and posthook in examples
+
 ```@docs
+prehook
 hook
+posthook
 ```
 
 Inside of this function, we call a few more functions, which help us with text templating.
@@ -107,7 +111,7 @@ combined_view
 tags
 ```
 
-todo more
+TODO more
 
 ## `BasicPlugin` Walkthrough
 

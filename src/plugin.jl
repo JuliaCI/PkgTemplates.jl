@@ -63,7 +63,7 @@ tags(::Plugin) = "{{", "}}"
     gitignore(::Plugin) -> Vector{String}
 
 Return patterns that should be added to `.gitignore`.
-These are used by the [`Gitignore`](@ref) plugin.
+These are used by the [`Git`](@ref) plugin.
 
 By default, an empty list is returned.
 """
@@ -128,6 +128,10 @@ end
 
 Do some work associated with a plugin **before** any files are generated.
 At this point, `pkg_dir` is an empty directory that will eventually contain the package.
+
+!!! note
+    `pkg_dir` only stays empty until the first plugin chooses to create a file.
+    Don't count on the order in which the plugins are sorted!
 """
 prehook(::Plugin, ::Template, ::AbstractString) = nothing
 
@@ -140,7 +144,7 @@ end
 """
     posthook(::Plugin, ::Template, pkg_dir::AbstractString)
 
-Do some work associated with a plugin **after** after files have been generated.
+Do some work associated with a plugin **after** files have been generated.
 """
 posthook(::Plugin, ::Template, ::AbstractString) = nothing
 
