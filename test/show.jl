@@ -1,11 +1,11 @@
-const DEFAULTS_DIR = contractuser(PT.DEFAULTS_DIR)
-const LICENSE_DIR = contractuser(joinpath(PT.DEFAULTS_DIR, "licenses"))
+const TEMPLATES_DIR = contractuser(PT.TEMPLATES_DIR)
+const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
 
 @testset "Show methods" begin
     @testset "Plugins" begin
         expected = """
             Readme:
-              file: "$(joinpath(DEFAULTS_DIR, "README.md"))"
+              file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
               destination: "README.md"
               inline_badges: false
             """
@@ -15,28 +15,39 @@ const LICENSE_DIR = contractuser(joinpath(PT.DEFAULTS_DIR, "licenses"))
     @testset "Template" begin
         expected = """
             Template:
-              authors: ["$USER"]
-              develop: true
-              dir: "$(contractuser(Pkg.devdir()))"
-              git: true
+              authors: ["Chris de Graaf <chrisadegraaf@gmail.com>"]
+              dir: "~/.local/share/julia/dev"
               host: "github.com"
               julia_version: v"1.0.0"
-              manifest: false
-              ssh: false
               user: "$USER"
               plugins:
-                Gitignore:
-                  ds_store: true
-                  dev: true
+        """
+        expected = """
+            Template:
+              authors: ["$USER"]
+              dir: "$(contractuser(Pkg.devdir()))"
+              host: "github.com"
+              julia_version: v"1.0.0"
+              user: "$USER"
+              plugins:
+                Git:
+                  ignore: String[]
+                  ssh: false
+                  manifest: false
+                  gpgsign: false
+                  ignore_manifest: true
                 License:
-                  path: "$(joinpath(LICENSE_DIR, "MIT"))"
+                  path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
+                ProjectFile:
                 Readme:
-                  file: "$(joinpath(DEFAULTS_DIR, "README.md"))"
+                  file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
                   destination: "README.md"
                   inline_badges: false
+                SrcDir:
+                  file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
                 Tests:
-                  file: "$(joinpath(DEFAULTS_DIR, "test", "runtests.jl"))"
+                  file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
             """
         @test sprint(show, MIME("text/plain"), tpl(; authors=USER)) == rstrip(expected)

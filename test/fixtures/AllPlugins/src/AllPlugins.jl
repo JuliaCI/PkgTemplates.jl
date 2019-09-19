@@ -1,5 +1,5 @@
 module AllPlugins
 
-greet() = print("Hello World!")
+# Write your package code here.
 
-end # module
+end

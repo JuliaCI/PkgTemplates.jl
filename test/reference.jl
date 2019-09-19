@@ -23,8 +23,12 @@ end
 
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, manifest=true, plugins=[
-            AppVeyor(), CirrusCI(), Citation(), Codecov(),
-            Coveralls(), Documenter(), GitLabCI(), TravisCI(),
+            AppVeyor(), CirrusCI(), Citation(), Codecov(), Coveralls(),
+            Develop(), Documenter(), GitLabCI(), TravisCI(),
         ])
+    end
+
+    @testset "Wacky options" begin
+        # TODO
     end
 end

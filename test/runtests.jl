@@ -19,10 +19,10 @@ Random.seed!(1)
 # Creata a template that won't error because of a missing username.
 tpl(; kwargs...) = Template(; user=USER, kwargs...)
 
-const pkg_name = Ref("A")
+const PKG = Ref("A")
 
 # Generate an unused package name.
-pkgname() = pkg_name[] *= "a"
+pkgname() = PKG[] *= "a"
 
 # Create a randomly named package with a template, and delete it afterwards.
 function with_pkg(f::Function, t::Template, pkg::AbstractString=pkgname())

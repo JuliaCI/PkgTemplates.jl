@@ -1,4 +1,4 @@
-const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
+const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 
 """
 A simple plugin that, in general, creates a single file.
@@ -8,9 +8,9 @@ abstract type BasicPlugin <: Plugin end
 """
     default_file(paths::AbstractString...) -> String
 
-Return a path relative to the default template file directory (`$(contractuser(DEFAULTS_DIR))`).
+Return a path relative to the default template file directory (`$(contractuser(TEMPLATES_DIR))`).
 """
-default_file(paths::AbstractString...) = joinpath(DEFAULTS_DIR, paths...)
+default_file(paths::AbstractString...) = joinpath(TEMPLATES_DIR, paths...)
 
 """
     view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
@@ -205,9 +205,14 @@ function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=no
     return tags === nothing ? render(text, view) : render(text, view; tags=tags)
 end
 
-include(joinpath("plugins", "defaults.jl"))
+include(joinpath("plugins", "project_file.jl"))
+include(joinpath("plugins", "src_dir.jl"))
+include(joinpath("plugins", "tests.jl"))
+include(joinpath("plugins", "readme.jl"))
+include(joinpath("plugins", "license.jl"))
+include(joinpath("plugins", "git.jl"))
+include(joinpath("plugins", "develop.jl"))
 include(joinpath("plugins", "coverage.jl"))
 include(joinpath("plugins", "ci.jl"))
 include(joinpath("plugins", "citation.jl"))
-include(joinpath("plugins", "develop.jl"))
 include(joinpath("plugins", "documenter.jl"))

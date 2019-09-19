@@ -35,10 +35,11 @@
             test_plugins([], defaults)
             test_plugins([Citation()], union(defaults, [Citation()]))
             # Overriding a default plugin.
-            gi = Gitignore(; dev=false)
-            test_plugins([gi], union(setdiff(defaults, [Gitignore()]), [gi]))
+            default_g = defaults[findfirst(p -> p isa Git, defaults)]
+            g = Git(; ssh=true)
+            test_plugins([g], union(setdiff(defaults, [default_g]), [g]))
             # Disabling a default plugin.
-            test_plugins([], setdiff(defaults, [Gitignore()]), [Gitignore])
+            test_plugins([], setdiff(defaults, [default_g]), [Git])
         end
     end
 
