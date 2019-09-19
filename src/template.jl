@@ -90,7 +90,7 @@ function Template(::Val{false}; kwargs...)
     plugins = Dict(typeof(p) => p for p in enabled)
 
     # TODO: It might be nice to offer some kind of warn_incompatible function
-    # to be optionally implented by plugins instead of hardcoding this case here.
+    # to be optionally implemented by plugins instead of hardcoding this case here.
     julia = getkw(kwargs, :julia_version)
     julia < v"1.2" && haskey(plugins, Tests) && plugins[Tests].project && @warn string(
         "The Tests plugin is set to create a project (supported in Julia 1.2 and later)",

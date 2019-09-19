@@ -5,7 +5,7 @@ const LICENSE_DIR = contractuser(PT.LICENSE_DIR)
     @testset "Plugins" begin
         expected = """
             Readme:
-              file: "$DEFAULTS_DIR/README.md"
+              file: "$(joinpath(DEFAULTS_DIR, "README.md"))"
               destination: "README.md"
               inline_badges: false
             """
@@ -29,14 +29,14 @@ const LICENSE_DIR = contractuser(PT.LICENSE_DIR)
                   ds_store: true
                   dev: true
                 License:
-                  path: "$LICENSE_DIR/MIT"
+                  path: "$(joinpath(LICENSE_DIR, "MIT"))"
                   destination: "LICENSE"
                 Readme:
-                  file: "$DEFAULTS_DIR/README.md"
+                  file: "$(joinpath(DEFAULTS_DIR, "README.md"))"
                   destination: "README.md"
                   inline_badges: false
                 Tests:
-                  file: "$DEFAULTS_DIR/runtests.jl"
+                  file: "$(joinpath(DEFAULTS_DIR, "runtests.jl"))"
                   project: false
             """
         @test sprint(show, MIME("text/plain"), tpl(; authors=USER)) == rstrip(expected)

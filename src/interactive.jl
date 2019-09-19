@@ -13,7 +13,11 @@ function Base.show(io::IO, ::MIME"text/plain", p::T) where T <: Plugin
 end
 
 show_field(x) = repr(x)
-show_field(x::AbstractString) = repr(contractuser(x))
+if Sys.iswindows()
+    show_field(x::AbstractString) = replace(repr(contractuser(x)), "\\\\" => "\\")
+else
+    show_field(x::AbstractString) = repr(contractuser(x))
+end
 
 function Base.show(io::IO, m::MIME"text/plain", t::Template)
     println(io, "Template:")
