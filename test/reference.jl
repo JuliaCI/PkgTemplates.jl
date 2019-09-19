@@ -9,8 +9,7 @@ function test_all(pkg::AbstractString; kwargs...)
     with_pkg(t, pkg) do pkg
         pkg_dir = joinpath(t.dir, pkg)
         foreach(readlines(`git -C $pkg_dir ls-files`)) do f
-            # All fixture files are .txt so that ReferenceTests can handle them.
-            reference = joinpath(@__DIR__, "fixtures", pkg, f * ".txt")
+            reference = joinpath(@__DIR__, "fixtures", pkg, f)
             observed = read(joinpath(pkg_dir, f), String)
             @test_reference reference observed
         end
