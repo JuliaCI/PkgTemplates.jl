@@ -11,7 +11,7 @@ priority(::ProjectFile) = typemax(Int) - DEFAULT_PRIORITY + 1
 function hook(::ProjectFile, t::Template, pkg_dir::AbstractString)
     toml = Dict(
         "name" => basename(pkg_dir),
-        "uuid" => uuid4(),
+        "uuid" => string(uuid4()),
         "authors" => t.authors,
         "version" => "0.1.0",
         "compat" => Dict("julia" => compat_version(t.julia_version)),

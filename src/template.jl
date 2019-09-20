@@ -96,7 +96,7 @@ function (t::Template)(pkg::AbstractString)
 
     try
         foreach((prehook, hook, posthook)) do h
-            @info "Running $(h)s"
+            @info "Running $(nameof(h))s"
             foreach(t.plugins) do p
                 h(p, t, pkg_dir)
             end
