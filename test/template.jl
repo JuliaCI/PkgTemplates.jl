@@ -28,7 +28,7 @@
         @testset "plugins / disabled_defaults" begin
             function test_plugins(plugins, expected, disabled=DataType[])
                 t = tpl(; plugins=plugins, disable_defaults=disabled)
-                @test issetequal(t.plugins, expected)
+                @test all(map(==, sort(t.plugins; by=string), sort(expected; by=string)))
             end
 
             defaults = PT.default_plugins()
