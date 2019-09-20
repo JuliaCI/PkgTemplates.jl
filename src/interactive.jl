@@ -5,8 +5,10 @@
 
 function Base.show(io::IO, ::MIME"text/plain", p::T) where T <: Plugin
     indent = get(io, :indent, 0)
-    print(io, repeat(' ', indent), T, ":")
-    foreach(fieldnames(T)) do n
+    print(io, repeat(' ', indent), T)
+    ns = fieldnames(T)
+    isempty(ns) || print(io, ":")
+    foreach(ns) do n
         println(io)
         print(io, repeat(' ', indent + 2), n, ": ", show_field(getfield(p, n)))
     end
@@ -28,7 +30,7 @@ function Base.show(io::IO, m::MIME"text/plain", t::Template)
         print(io, "  plugins: None")
     else
         print(io, repeat(' ', 2), "plugins:")
-        foreach(sort(collect(values(t.plugins)); by=string)) do p
+        foreach(sort(t.plugins; by=string)) do p
             println(io)
             show(IOContext(io, :indent => 4), m, p)
         end

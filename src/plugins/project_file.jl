@@ -5,8 +5,10 @@ Creates a `Project.toml`.
 """
 struct ProjectFile <: Plugin end
 
-# Create Project.toml in the prehook because other hooks might depend on it.
-function prehook(::ProjectFile, t::Template, pkg_dir::AbstractString)
+# Other plugins like Tests will modify this file.
+priority(::ProjectFile) = typemax(Int) - DEFAULT_PRIORITY + 1
+
+function hook(::ProjectFile, t::Template, pkg_dir::AbstractString)
     toml = Dict(
         "name" => basename(pkg_dir),
         "uuid" => uuid4(),

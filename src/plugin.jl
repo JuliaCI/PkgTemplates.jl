@@ -1,4 +1,5 @@
 const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
+const DEFAULT_PRIORITY = 1000
 
 """
 A simple plugin that, in general, creates a single file.
@@ -58,6 +59,14 @@ See the [`Citation`](@ref) plugin for a rare case where changing the tags is nec
 By default, the tags are `"{{"` and `"}}"`.
 """
 tags(::Plugin) = "{{", "}}"
+
+"""
+    priority(::Plugin) -> Int
+
+Determines the order in which plugins are processed (higher goes first).
+The default priority (`DEFAULT_PRIORITY`), is `$DEFAULT_PRIORITY`.
+"""
+priority(::Plugin) = DEFAULT_PRIORITY
 
 """
     gitignore(::Plugin) -> Vector{String}
@@ -131,7 +140,7 @@ At this point, `pkg_dir` is an empty directory that will eventually contain the 
 
 !!! note
     `pkg_dir` only stays empty until the first plugin chooses to create a file.
-    Don't count on the order in which the plugins are sorted!
+    See also: [`priority`](@ref).
 """
 prehook(::Plugin, ::Template, ::AbstractString) = nothing
 

@@ -29,19 +29,18 @@ function view(p::Readme, t::Template, pkg::AbstractString)
     done = DataType[]
     foreach(badge_order()) do T
         if hasplugin(t, T)
-            bs = badges(t.plugins[T], t, pkg)
-            append!(strings, badges(t.plugins[T], t, pkg))
+            append!(strings, badges(getplugin(t, T), t, pkg))
             push!(done, T)
         end
     end
-    foreach(setdiff(keys(t.plugins), done)) do T
-        bs = badges(t.plugins[T], t, pkg)
-        append!(strings, badges(t.plugins[T], t, pkg))
+    # And the rest go after, in no particular order.
+    foreach(setdiff(map(typeof, t.plugins), done)) do T
+        append!(strings, badges(getplugin(t, T), t, pkg))
     end
 
     return Dict(
         "BADGES" => strings,
-        "HAS_CITATION" => hasplugin(t, Citation) && t.plugins[Citation].readme,
+        "HAS_CITATION" => hasplugin(t, Citation) && getplugin(t, Citation).readme,
         "HAS_INLINE_BADGES" => !isempty(strings) && p.inline_badges,
         "PKG" => pkg,
     )

@@ -45,10 +45,10 @@ badges(::Coveralls) = Badge(
 gitignore(::Union{Codecov, Coveralls}) = COVERAGE_GITIGNORE
 
 """
-    is_coverage(::Type{T}) -> Bool
+    is_coverage(::Plugin) -> Bool
 
-Determine whether or not `T` is a coverage plugin.
+Determine whether or not a plugin is a coverage plugin.
 If you are adding a coverage plugin, you should implement this function and return `true`.
 """
-is_coverage(::Type) = false
-is_coverage(::Type{<:Union{Codecov, Coveralls}}) = true
+is_coverage(::Plugin) = false
+is_coverage(::Union{Codecov, Coveralls}) = true

@@ -94,6 +94,7 @@ view
 Finally, we implement [`hook`](@ref), which is the real workhorse for the plugin.
 
 TODO prehook and posthook in examples
+TODO priority
 
 ```@docs
 prehook

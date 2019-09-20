@@ -19,9 +19,8 @@ However, it's probably desirable to customize the template to your liking with v
 ```jl
 t = Template(;
     dir="~/code",
-    ssh=true,
-    manifest=true,
     plugins=[
+        Git(; manifest=true, ssh=true),
         Codecov(),
         TravisCI(; x86=true),
         Documenter{TravisCI}(),

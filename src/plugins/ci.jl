@@ -254,10 +254,10 @@ end
 
 
 """
-    is_ci(::Type{T}) -> Bool
+    is_ci(::Plugin) -> Bool
 
-Determine whether or not `T` is a CI plugin.
+Determine whether or not a plugin is a CI plugin.
 If you are adding a CI plugin, you should implement this function and return `true`.
 """
-is_ci(::Type) = false
-is_ci(::Type{<:Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}}) = true
+is_ci(::Plugin) = false
+is_ci(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}) = true

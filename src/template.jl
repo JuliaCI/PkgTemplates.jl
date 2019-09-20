@@ -54,7 +54,7 @@ struct Template
     dir::String
     host::String
     julia_version::VersionNumber
-    plugins::Dict{DataType, <:Plugin}
+    plugins::Vector{<:Plugin}
     user::String
 end
 
@@ -72,32 +72,16 @@ function Template(::Val{false}; kwargs...)
     host = replace(getkw(kwargs, :host), r".*://" => "")
     julia_version = getkw(kwargs, :julia_version)
 
+    # User-supplied plugins come first, so that deduping the list will remove the defaults.
+    plugins = Plugin[]
+    append!(plugins, getkw(kwargs, :plugins))
     disabled = getkw(kwargs, :disable_defaults)
-    enabled = filter(p -> !(typeof(p) in disabled), default_plugins())
-    append!(enabled, getkw(kwargs, :plugins))
-    # This comprehension resolves duplicate plugin types by overwriting,
-    # which means that default plugins get replaced by user values.
-    plugins = Dict(typeof(p) => p for p in enabled)
+    append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
+    plugins = unique(typeof, plugins)
+    sort!(plugins; by=priority, rev=true)
 
     return Template(authors, dir, host, julia_version, plugins, user)
 end
-
-# Does the template have a plugin that satisfies some predicate?
-hasplugin(t::Template, f::Function) = any(f, keys(t.plugins))
-hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, U -> U <: T)
-
-# Get a keyword, or compute some default value.
-getkw(kwargs, k) = get(() -> defaultkw(k), kwargs, k)
-
-# Default Template keyword values.
-defaultkw(s::Symbol) = defaultkw(Val(s))
-defaultkw(::Val{:authors}) = default_authors()
-defaultkw(::Val{:dir}) = Pkg.devdir()
-defaultkw(::Val{:disable_defaults}) = DataType[]
-defaultkw(::Val{:host}) = "github.com"
-defaultkw(::Val{:julia_version}) = default_version()
-defaultkw(::Val{:plugins}) = Plugin[]
-defaultkw(::Val{:user}) = default_user()
 
 """
     (::Template)(pkg::AbstractString)
@@ -113,7 +97,7 @@ function (t::Template)(pkg::AbstractString)
     try
         foreach((prehook, hook, posthook)) do h
             @info "Running $(h)s"
-            foreach(values(t.plugins)) do p
+            foreach(t.plugins) do p
                 h(p, t, pkg_dir)
             end
         end
@@ -124,3 +108,26 @@ function (t::Template)(pkg::AbstractString)
 
     @info "New package is at $pkg_dir"
 end
+
+# Does the template have a plugin that satisfies some predicate?
+hasplugin(t::Template, f::Function) = any(f, t.plugins)
+hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
+
+# Get a plugin by type.
+function getplugin(t::Template, ::Type{T}) where T <: Plugin
+    i = findfirst(p -> p isa T, t.plugins)
+    i === nothing ? nothing : t.plugins[i]
+end
+
+# Get a keyword, or compute some default value.
+getkw(kwargs, k) = get(() -> defaultkw(k), kwargs, k)
+
+# Default Template keyword values.
+defaultkw(s::Symbol) = defaultkw(Val(s))
+defaultkw(::Val{:authors}) = default_authors()
+defaultkw(::Val{:dir}) = Pkg.devdir()
+defaultkw(::Val{:disable_defaults}) = DataType[]
+defaultkw(::Val{:host}) = "github.com"
+defaultkw(::Val{:julia_version}) = default_version()
+defaultkw(::Val{:plugins}) = Plugin[]
+defaultkw(::Val{:user}) = default_user()
