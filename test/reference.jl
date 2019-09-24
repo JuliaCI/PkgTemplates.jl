@@ -1,5 +1,3 @@
-# TODO: License fixtures need to be updated every year because they don't use Mustache.
-
 function PT.user_view(::Citation, ::Template, ::AbstractString)
     return Dict("MONTH" => 8, "YEAR" => 2019)
 end

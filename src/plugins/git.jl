@@ -6,9 +6,9 @@ Creates a Git repository and a `.gitignore` file.
 ## Keyword Arguments
 - `ignore::Vector{<:AbstractString}`: Patterns to add to the `.gitignore`.
   See also: [`gitignore`](@ref).
-- `manifest::Bool`: Whether or not to commit `Manifest.toml`.
 - `ssh::Bool`: Whether or not to use SSH for the remote.
   If left unset, HTTPS is used.
+- `manifest::Bool`: Whether or not to commit `Manifest.toml`.
 - `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
   This option requires that the Git CLI is installed.
 """

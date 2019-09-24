@@ -28,7 +28,6 @@ A configuration used to generate packages.
 - `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
 - `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
 - `julia_version::VersionNumber=$(repr(default_version()))`: Minimum allowed Julia version.
-- `develop::Bool=true`: Whether or not to `develop` new packages in the active environment.
 
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
