@@ -54,12 +54,6 @@
     end
 end
 
-@context ErrorOnRepoInit
-function Cassette.prehook(::ErrorOnRepoInit, ::typeof(LibGit2.init), pkg_dir)
-    @test isdir(pkg_dir)
-    error()
-end
-
 @testset "Package generation errors" begin
     mktempdir() do dir
         t = tpl(; dir=dirname(dir))
@@ -73,6 +67,8 @@ end
 
     t = tpl()
     pkg = pkgname()
-    @test_throws ErrorException @overdub ErrorOnRepoInit() @suppress t(pkg)
+    mock(CTX, LibGit2.init => dir -> (@test isdir(dir); error())) do _init
+        @test_throws ErrorException @suppress t(pkg)
+    end
     @test !isdir(joinpath(t.dir, pkg))
 end

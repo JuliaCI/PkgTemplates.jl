@@ -5,8 +5,8 @@ using Pkg: Pkg
 using Random: Random
 using Test: @test, @testset, @test_throws
 
-using Cassette: Cassette, @context, @overdub
 using ReferenceTests: @test_reference
+using SimpleMock: Mock, mock
 using Suppressor: @suppress
 
 using PkgTemplates
@@ -20,6 +20,7 @@ Random.seed!(1)
 tpl(; kwargs...) = Template(; user=USER, kwargs...)
 
 const PKG = Ref("A")
+const CTX = gensym()
 
 # Generate an unused package name.
 pkgname() = PKG[] *= "a"
