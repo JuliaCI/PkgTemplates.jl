@@ -13,6 +13,8 @@ But it also refers to "template files" and "text templating", which are plaintex
 
 These concepts should be familiar if you've used [Jinja](https://palletsprojects.com/p/jinja) or [Mustache](https://mustache.github.io) (Mustache is the particular flavour used by PkgTemplates, via [Mustache.jl](https://github.com/jverzani/Mustache.jl)).
 
+Please keep the difference between these two things in mind when reading this documentation!
+
 ### Documentation
 
 If you're looking to **create new packages**, see the [User Guide](user.md).
