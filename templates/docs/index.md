@@ -1,3 +1,7 @@
+```@meta
+CurrentModule = {{{PKG}}}
+```
+
 # {{{PKG}}}
 
 ```@index

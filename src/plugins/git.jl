@@ -17,7 +17,6 @@ Creates a Git repository and a `.gitignore` file.
     ssh::Bool = false
     manifest::Bool = false
     gpgsign::Bool = false
-    ignore_manifest::Bool = true
 end
 
 Base.:(==)(a::Git, b::Git) = all(map(n -> getfield(a, n) == getfield(b, n), fieldnames(Git)))
