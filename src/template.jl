@@ -21,7 +21,6 @@ A configuration used to generate packages.
   The default value comes from the global Git config (`github.user`).
   If no value is obtained, an `ArgumentError` is thrown.
 - `authors::Union{AbstractString, Vector{<:AbstractString}}="$(default_authors())"`: Package authors.
-  Supply a string for one author or an array for multiple.
   Like `user`, it takes its default value from the global Git config (`user.name` and `user.email`).
 
 ### Package Options

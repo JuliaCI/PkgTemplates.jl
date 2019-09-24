@@ -20,7 +20,6 @@ Random.seed!(1)
 tpl(; kwargs...) = Template(; user=USER, kwargs...)
 
 const PKG = Ref("A")
-const CTX = gensym()
 
 # Generate an unused package name.
 pkgname() = PKG[] *= "a"

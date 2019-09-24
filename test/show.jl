@@ -35,7 +35,6 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   ssh: false
                   manifest: false
                   gpgsign: false
-                  ignore_manifest: true
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"

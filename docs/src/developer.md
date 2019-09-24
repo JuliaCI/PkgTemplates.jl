@@ -22,7 +22,7 @@ BasicPlugin
 The package generation process looks basically like this:
 
 ```
-- create directory for the package
+- create empty directory for the package
 - for each plugin, ordered by priority:
   - run plugin prehook
 - for each plugin, ordered by priority:
@@ -43,7 +43,7 @@ For example, the [`Git`](@ref) plugin uses [`posthook`](@ref) to commit all gene
 
 But what about dependencies within the same stage?
 In this case, we have [`priority`](@ref) to define which plugins go when.
-The [`Git`](@ref) plugin also uses this function to lower its priority, so that even if other plugins generate files in their posthooks, they still get committed.
+The [`Git`](@ref) plugin also uses this function to lower its posthook's priority, so that even if other plugins generate files in their posthooks, they still get committed (provided that those plugins didn't set an even lower priority).
 
 ```@docs
 prehook
@@ -146,7 +146,7 @@ For more information on text templating, see the [`BasicPlugin` Walkthrough](@re
 
 ### Example: `Git`
 
-```
+```julia
 struct Git <: Plugin end
 
 priority(::Git, ::typeof(posthook)) = 5
@@ -174,15 +174,15 @@ function posthook(::Git, ::Template, pkg_dir::AbstractString)
 end
 ```
 
-As previously mentioned, we use [`priority`](@ref) to make sure that we commit all generated files.
+All three hooks are implemented:
 
-Then, all three hooks are implemented:
+- [`prehook`](@ref) creates the Git repository for the package.
+- [`hook`](@ref) generates the `.gitignore` file, using the special [`gitignore`](@ref) function.
+- [`posthook`](@ref) adds and commits all the generated files.
 
-- [`prehook`](@ref) creates the Git repository for the package
-- [`hook`](@ref) generates the `.gitignore` file, using the special [`gitignore`](@ref) function
-- [`posthook`](@ref) adds and commits all generated files
+As previously mentioned, we use [`priority`](@ref) to make sure that we wait until all other plugins are finished their work before committing files.
 
-Hopefully, this demonstrates the level of control you have over the package generation process when developing plugins.
+Hopefully, this demonstrates the level of control you have over the package generation process when developing plugins, and when it makes sense to exercise that power!
 
 ## `BasicPlugin` Walkthrough
 

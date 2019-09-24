@@ -1,3 +1,7 @@
+```@meta
+CurrentModule = AllPlugins
+```
+
 # AllPlugins
 
 ```@index

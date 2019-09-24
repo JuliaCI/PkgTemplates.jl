@@ -67,7 +67,7 @@ end
 
     t = tpl()
     pkg = pkgname()
-    mock(CTX, LibGit2.init => dir -> (@test isdir(dir); error())) do _init
+    mock(LibGit2.init => dir -> (@test isdir(dir); error())) do _init
         @test_throws ErrorException @suppress t(pkg)
     end
     @test !isdir(joinpath(t.dir, pkg))

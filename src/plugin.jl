@@ -137,8 +137,8 @@ end
 """
     prehook(::Plugin, ::Template, pkg_dir::AbstractString)
 
-Do some work associated with a plugin **before** any files are generated.
-At this point, `pkg_dir` is an empty directory that will eventually contain the package.
+Stage 1 of the package generation process (the "before" stage, in general).
+At this point, `pkg_dir` is an empty directory that will eventually contain the package, and neither the [`hook`](@ref)s nor the [`posthook`](@ref)s have run.
 
 !!! note
     `pkg_dir` only stays empty until the first plugin chooses to create a file.
@@ -146,35 +146,33 @@ At this point, `pkg_dir` is an empty directory that will eventually contain the 
 """
 prehook(::Plugin, ::Template, ::AbstractString) = nothing
 
+"""
+    hook(::Plugin, ::Template, pkg_dir::AbstractString)
+
+Stage 2 of the package generation pipeline (the "main" stage, in general).
+At this point, the [`prehook`](@ref)s have run, but not the [`posthook`](@ref)s.
+
+`pkg_dir` is the directory in which the package is being generated (so `basename(pkg_dir)` is the package name).
+
+!!! note
+    You usually shouldn't implement this function for [`BasicPlugin`](@ref)s.
+    If you do, it should probably `invoke` the generic method (otherwise, there's not much reason to subtype `BasicPlugin`).
+"""
+hook(::Plugin, ::Template, ::AbstractString) = nothing
+
+"""
+    posthook(::Plugin, ::Template, pkg_dir::AbstractString)
+
+Stage 3 of the package generation pipeline (the "after" stage, in general).
+At this point, both the [`prehook`](@ref)s and [`hook`](@ref)s have run.
+"""
+posthook(::Plugin, ::Template, ::AbstractString) = nothing
+
 function prehook(p::T, ::Template, ::AbstractString) where T <: BasicPlugin
     src = source(p)
     src === nothing && return
     isfile(src) || throw(ArgumentError("$(nameof(T)): The file $src does not exist"))
 end
-
-"""
-    posthook(::Plugin, ::Template, pkg_dir::AbstractString)
-
-Do some work associated with a plugin **after** files have been generated.
-"""
-posthook(::Plugin, ::Template, ::AbstractString) = nothing
-
-"""
-    hook(::Plugin, ::Template, pkg_dir::AbstractString)
-
-Perform any work associated with a plugin.
-`pkg_dir` is the directory in which the package is being generated (so `basename(pkg_dir)` is the package name).
-
-For [`Plugin`](@ref)s that are not [`BasicPlugin`](@ref)s, this is the only function that really needs to be implemented.
-If you want your plugin to do something during the main phase of package generation, you should implement it here.
-
-See also: [`prehook`](@ref) and [`posthook`](@ref).
-
-!!! note
-    You usually shouldn't implement this function for [`BasicPlugin`](@ref)s.
-    If you do, it should probably `invoke` the generic method (otherwise, there's no reason to subtype `BasicPlugin`).
-"""
-hook(::Plugin, ::Template, ::AbstractString) = nothing
 
 function hook(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return

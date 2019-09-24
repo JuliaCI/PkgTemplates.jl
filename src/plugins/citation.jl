@@ -1,8 +1,5 @@
 """
-    Citation(;
-        file="$(contractuser(default_file("CITATION.bib")))",
-        readme=false,
-    )
+    Citation(; file="$(contractuser(default_file("CITATION.bib")))", readme=false)
 
 Creates a `CITATION.bib` file for citing package repositories.
 

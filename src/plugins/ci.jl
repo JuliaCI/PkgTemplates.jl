@@ -198,7 +198,7 @@ end
     GitLabCI(;
         file="$(contractuser(default_file("gitlab-ci.yml")))",
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS,
+        extra_versions=$(map(format_version, [default_version(), VERSION])),
     )
 
 Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci/).
