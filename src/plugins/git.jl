@@ -19,6 +19,9 @@ Creates a Git repository and a `.gitignore` file.
     gpgsign::Bool = false
 end
 
+# Try to make sure that no files are created after we commit.
+priority(::Git, ::typeof(posthook)) = 5
+
 Base.:(==)(a::Git, b::Git) = all(map(n -> getfield(a, n) == getfield(b, n), fieldnames(Git)))
 
 function gitignore(p::Git)

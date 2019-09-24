@@ -6,7 +6,7 @@ Creates a `Project.toml`.
 struct ProjectFile <: Plugin end
 
 # Other plugins like Tests will modify this file.
-priority(::ProjectFile) = typemax(Int) - DEFAULT_PRIORITY + 1
+priority(::ProjectFile, ::typeof(hook)) = typemax(Int) - 5
 
 function hook(::ProjectFile, t::Template, pkg_dir::AbstractString)
     toml = Dict(

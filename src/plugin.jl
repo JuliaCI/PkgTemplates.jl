@@ -61,12 +61,14 @@ By default, the tags are `"{{"` and `"}}"`.
 tags(::Plugin) = "{{", "}}"
 
 """
-    priority(::Plugin) -> Int
+    priority(::Plugin, ::Union{typeof(prehook), typeof(hook), typeof(posthook)}) -> Int
 
 Determines the order in which plugins are processed (higher goes first).
 The default priority (`DEFAULT_PRIORITY`), is `$DEFAULT_PRIORITY`.
+
+You can implement this function per-stage (by using `::typeof(hook)`, for example), or for all stages by simply using `::Function`.
 """
-priority(::Plugin) = DEFAULT_PRIORITY
+priority(::Plugin, ::Function) = DEFAULT_PRIORITY
 
 """
     gitignore(::Plugin) -> Vector{String}

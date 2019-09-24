@@ -77,8 +77,7 @@ function Template(::Val{false}; kwargs...)
     append!(plugins, getkw(kwargs, :plugins))
     disabled = getkw(kwargs, :disable_defaults)
     append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
-    plugins = unique(typeof, plugins)
-    sort!(plugins; by=priority, rev=true)
+    plugins = sort(unique(typeof, plugins); by=string)
 
     return Template(authors, dir, host, julia_version, plugins, user)
 end
@@ -97,7 +96,7 @@ function (t::Template)(pkg::AbstractString)
     try
         foreach((prehook, hook, posthook)) do h
             @info "Running $(nameof(h))s"
-            foreach(t.plugins) do p
+            foreach(sort(t.plugins; by=p -> priority(p, h), rev=true)) do p
                 h(p, t, pkg_dir)
             end
         end
