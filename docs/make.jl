@@ -14,6 +14,7 @@ makedocs(;
         "Home" => "index.md",
         "User Guide" => "user.md",
         "Developer Guide" => "developer.md",
+        "Migrating To 0.7+" => "migrating.md",
     ],
 )
 

@@ -21,6 +21,8 @@ If you're looking to **create new packages**, see the [User Guide](user.md).
 
 If you want to **create new plugins**, see the [Developer Guide](developer.md).
 
+if you're trying to **migrate from an older version of PkgTemplates**, see [Migrating To 0.7+](migrating.md).
+
 ### Index
 
 ```@index
