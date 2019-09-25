@@ -7,7 +7,7 @@ const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
 Sets up testing for packages.
 
 ## Keyword Arguments
-- `file::AbstractString`: Template file for the `runtests.jl`.
+- `file::AbstractString`: Template file for `runtests.jl`.
 - `project::Bool`: Whether or not to create a new project for tests (`test/Project.toml`).
   See [here](https://julialang.github.io/Pkg.jl/v1/creating-packages/#Test-specific-dependencies-in-Julia-1.2-and-above-1) for more details.
 
@@ -27,7 +27,7 @@ function validate(p::Tests, t::Template)
     invoke(validate, Tuple{BasicPlugin, Template}, p, t)
     p.project && t.julia < v"1.2" && @warn string(
         "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
-        "but a Julia version older than 1.2 is supported by the Template.",
+        "but a Julia version older than 1.2 is supported by the Template",
     )
 end
 

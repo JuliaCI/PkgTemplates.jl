@@ -25,7 +25,8 @@ The [`Template`](@ref) constructor basically does this:
 ```
 - extract values from keyword arguments
 - create a Template from the values
-- validate each plugin against the constructed Template
+- for each plugin:
+  - validate plugin against the template
 ```
 
 The plugin validation step uses the [`validate`](@ref) function.

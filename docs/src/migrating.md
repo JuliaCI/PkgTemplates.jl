@@ -59,7 +59,6 @@ Although it's unlikely that anyone used these.
 | :------------------: | :--------------------------------------------------------------------------------------------------: |
 | `available_licenses` | [View licenses on GitHub](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses) |
 | `show_license`       | [View licenses on GitHub](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses) |
-|                      |                                                                                                      |
 
 ## Custom Plugins
 
