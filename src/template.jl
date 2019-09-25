@@ -19,7 +19,7 @@ A configuration used to generate packages.
 ### User Options
 - `user::AbstractString="$(default_user())"`: GitHub (or other code hosting service) username.
   The default value comes from the global Git config (`github.user`).
-  If no value is obtained, an `ArgumentError` is thrown.
+  If no value is obtained, many plugins that use this value will not work.
 - `authors::Union{AbstractString, Vector{<:AbstractString}}="$(default_authors())"`: Package authors.
   Like `user`, it takes its default value from the global Git config (`user.name` and `user.email`).
 
@@ -61,14 +61,12 @@ Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwar
 # Non-interactive constructor.
 function Template(::Val{false}; kwargs...)
     user = getkw(kwargs, :user)
-    isempty(user) && throw(ArgumentError("No user set, please pass user=username"))
-
-    authors = getkw(kwargs, :authors)
-    authors isa Vector || (authors = map(strip, split(authors, ",")))
-
     dir = abspath(expanduser(getkw(kwargs, :dir)))
     host = replace(getkw(kwargs, :host), r".*://" => "")
     julia_version = getkw(kwargs, :julia_version)
+
+    authors = getkw(kwargs, :authors)
+    authors isa Vector || (authors = map(strip, split(authors, ",")))
 
     # User-supplied plugins come first, so that deduping the list will remove the defaults.
     plugins = Plugin[]
@@ -76,6 +74,16 @@ function Template(::Val{false}; kwargs...)
     disabled = getkw(kwargs, :disable_defaults)
     append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
     plugins = sort(unique(typeof, plugins); by=string)
+
+    if isempty(user)
+        foreach(plugins) do p
+            if needs_username(p)
+                T = nameof(typeof(p))
+                s = "$T: Git hosting service username is required, supply user=username"
+                throw(ArgumentError(s))
+            end
+        end
+    end
 
     return Template(authors, dir, host, julia_version, plugins, user)
 end

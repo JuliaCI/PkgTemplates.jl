@@ -88,3 +88,5 @@ function commit(p::Git, repo::GitRepo, pkg_dir::AbstractString, msg::AbstractStr
         LibGit2.commit(repo, msg)
     end
 end
+
+needs_username(::Git) = true

@@ -261,3 +261,5 @@ If you are adding a CI plugin, you should implement this function and return `tr
 """
 is_ci(::Plugin) = false
 is_ci(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}) = true
+
+needs_username(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}) = true

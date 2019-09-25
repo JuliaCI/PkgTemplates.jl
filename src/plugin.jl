@@ -218,6 +218,14 @@ function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=no
     return tags === nothing ? render(text, view) : render(text, view; tags=tags)
 end
 
+"""
+    needs_username(::Plugin) -> Bool
+
+Determine whether or not a plugin needs a Git hosting service username to function correctly.
+If you are implementing a plugin that uses the `user` field of a [`Template`](@ref), you should implement this function and return `true`.
+"""
+needs_username(::Plugin) = false
+
 include(joinpath("plugins", "project_file.jl"))
 include(joinpath("plugins", "src_dir.jl"))
 include(joinpath("plugins", "tests.jl"))

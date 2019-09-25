@@ -24,3 +24,5 @@ view(::Citation, t::Template, pkg::AbstractString) = Dict(
     "URL" => "https://$(t.host)/$(t.user)/$pkg.jl",
     "YEAR" => year(today()),
 )
+
+needs_username(::Citation) = true

@@ -297,12 +297,13 @@ For more examples, see the plugins in the [Continuous Integration (CI)](@ref) an
 
 For an overview of writing template files for Mustache.jl, see [Custom Template Files](@ref) in the user guide.
 
-### Traits
+### Predicates
 
-There are a few traits for plugin types that are occassionally used to answer questions like "does this `Template` have any code coverage plugins?".
-If you're implementing a plugin that fits into one of the following categories, it would be wise to implement the corresponding trait function to return `true` for your type.
+There are a few predicate functions for plugins that are occasionally used to answer questions like "does this `Template` have any code coverage plugins?".
+If you're implementing a plugin that fits into one of the following categories, it would be wise to implement the corresponding predicate function to return `true` for instances of your type.
 
 ```@docs
+needs_username
 is_ci
 is_coverage
 ```

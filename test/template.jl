@@ -1,11 +1,13 @@
 @testset "Template" begin
     @testset "Template constructor" begin
         @testset "user" begin
-            if isempty(PT.default_user())
+            mock(PT.default_user => () -> "") do _du
                 @test_throws ArgumentError Template()
-                haskey(ENV, "CI") && run(`git config --global github.user $USER`)
+                @test isempty(Template(; disable_defaults=[Git]).user)
             end
-            @test Template().user == PT.default_user()
+            mock(PT.default_user => () -> "username") do _du
+                @test Template().user == PT.default_user()
+            end
         end
 
         @testset "authors" begin

@@ -52,3 +52,5 @@ If you are adding a coverage plugin, you should implement this function and retu
 """
 is_coverage(::Plugin) = false
 is_coverage(::Union{Codecov, Coveralls}) = true
+
+needs_username(::Union{Codecov, Coveralls}) = true
