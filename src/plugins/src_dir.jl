@@ -24,6 +24,5 @@ view(::SrcDir, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 # Update the destination now that we know the package name.
 # Kind of hacky, but oh well.
 function prehook(p::SrcDir, t::Template, pkg_dir::AbstractString)
-    invoke(prehook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
     p.destination = joinpath("src", basename(pkg_dir) * ".jl")
 end

@@ -135,6 +135,15 @@ function badges(p::Plugin, t::Template, pkg::AbstractString)
 end
 
 """
+    validate(::Plugin, ::Template)
+
+Perform any required validation for a [`Plugin`](@ref).
+
+It is preferred to do validation here instead of in [`prehook`](@ref), because this function is called at [`Template`](@ref) construction time, whereas the prehook is only run at package generation time.
+"""
+validate(::Plugin, ::Template) = nothing
+
+"""
     prehook(::Plugin, ::Template, pkg_dir::AbstractString)
 
 Stage 1 of the package generation process (the "before" stage, in general).
@@ -168,7 +177,7 @@ At this point, both the [`prehook`](@ref)s and [`hook`](@ref)s have run.
 """
 posthook(::Plugin, ::Template, ::AbstractString) = nothing
 
-function prehook(p::T, ::Template, ::AbstractString) where T <: BasicPlugin
+function validate(p::T, ::Template) where T <: BasicPlugin
     src = source(p)
     src === nothing && return
     isfile(src) || throw(ArgumentError("$(nameof(T)): The file $src does not exist"))

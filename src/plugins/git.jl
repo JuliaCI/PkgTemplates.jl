@@ -30,11 +30,20 @@ function gitignore(p::Git)
     return ignore
 end
 
-# Set up the Git repository.
-function prehook(p::Git, t::Template, pkg_dir::AbstractString)
+function validate(p::Git, t::Template)
     if p.gpgsign && try run(pipeline(`git --version`; stdout=devnull)); false catch; true end
         throw(ArgumentError("Git: gpgsign is set but the Git CLI is not installed"))
     end
+
+    foreach(("user.name", "user.email")) do k
+        if isempty(LibGit2.getconfig(k, ""))
+            throw(ArgumentError("Git: Global Git config is missing required value '$k'"))
+        end
+    end
+end
+
+# Set up the Git repository.
+function prehook(p::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
         commit(p, repo, pkg_dir, "Initial commit")
         pkg = basename(pkg_dir)

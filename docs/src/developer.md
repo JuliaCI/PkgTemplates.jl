@@ -17,9 +17,25 @@ Plugin
 BasicPlugin
 ```
 
-## Package Generation Pipeline
+## Template + Package Creation Pipeline
 
-The package generation process looks basically like this:
+
+The [`Template`](@ref) constructor basically does this:
+
+```
+- extract values from keyword arguments
+- create a Template from the values
+- validate each plugin against the constructed Template
+```
+
+The plugin validation step uses the [`validate`](@ref) function.
+It lets us catch mistakes before we try to generate packages.
+
+```@docs
+validate
+```
+
+The package generation process looks like this:
 
 ```
 - create empty directory for the package
@@ -31,7 +47,6 @@ The package generation process looks basically like this:
   - run plugin posthook
 ```
 
-That's it!
 As you can tell, plugins play a central role in setting up a package.
 
 The three main entrypoints for plugins to do work are the [`prehook`](@ref), the [`hook`](@ref), and the [`posthook`](@ref).
@@ -151,6 +166,14 @@ struct Git <: Plugin end
 
 priority(::Git, ::typeof(posthook)) = 5
 
+function validate(::Git, ::Template)
+    foreach(("user.name", "user.email")) do k
+        if isempty(LibGit2.getconfig(k, ""))
+            throw(ArgumentError("Git: Global Git config is missing required value '$k'"))
+        end
+    end
+end
+
 function prehook(::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
         LibGit2.commit(repo, "Initial commit")
@@ -174,8 +197,9 @@ function posthook(::Git, ::Template, pkg_dir::AbstractString)
 end
 ```
 
-All three hooks are implemented:
+Validation and all three hooks are implemented:
 
+- [`validate`](@ref) makes sure that all required Git configuration is present.
 - [`prehook`](@ref) creates the Git repository for the package.
 - [`hook`](@ref) generates the `.gitignore` file, using the special [`gitignore`](@ref) function.
 - [`posthook`](@ref) adds and commits all the generated files.
@@ -286,8 +310,8 @@ function hook(p::Tests, t::Template, pkg_dir::AbstractString)
 end
 ```
 
-There is also a default [`prehook`](@ref) implementation for [`BasicPlugin`](@ref)s, which checks that the plugin's [`source`](@ref) file exists, and throws an `ArgumentError` otherwise.
-If you want to extend the prehook but keep the file existence check, use the `invoke` method as described above.
+There is also a default [`validate`](@ref) implementation for [`BasicPlugin`](@ref)s, which checks that the plugin's [`source`](@ref) file exists, and throws an `ArgumentError` otherwise.
+If you want to extend the validation but keep the file existence check, use the `invoke` method as described above.
 
 For more examples, see the plugins in the [Continuous Integration (CI)](@ref) and [Code Coverage](@ref) sections.
 

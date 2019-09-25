@@ -89,6 +89,16 @@ function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
     return merge(base, Dict("HAS_DEPLOY" => true))
 end
 
+foreach((TravisCI, GitLabCI)) do T
+    @eval function validate(::Documenter{$T}, t::Template)
+        if !hasplugin(t, $T)
+            name = nameof($T)
+            s = "Documenter: The $name plugin must be included for docs deployment to be set up"
+            throw(ArgumentError(s))
+        end
+    end
+end
+
 function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     pkg = basename(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")

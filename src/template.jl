@@ -85,7 +85,9 @@ function Template(::Val{false}; kwargs...)
         end
     end
 
-    return Template(authors, dir, host, julia, plugins, user)
+    t = Template(authors, dir, host, julia, plugins, user)
+    foreach(p -> validate(p, t), t.plugins)
+    return t
 end
 
 """

@@ -23,8 +23,8 @@ source(p::Tests) = p.file
 destination(::Tests) = joinpath("test", "runtests.jl")
 view(::Tests, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 
-function prehook(p::Tests, t::Template, pkg_dir::AbstractString)
-    invoke(prehook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+function validate(p::Tests, t::Template)
+    invoke(validate, Tuple{BasicPlugin, Template}, p, t)
     p.project && t.julia < v"1.2" && @warn string(
         "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
         "but a Julia version older than 1.2 is supported by the Template.",

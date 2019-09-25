@@ -46,13 +46,19 @@
     end
 
     @testset "hasplugin" begin
-        t = tpl(; plugins=[Documenter{TravisCI}()])
+        t = tpl(; plugins=[TravisCI(), Documenter{TravisCI}()])
         @test PT.hasplugin(t, typeof(first(PT.default_plugins())))
         @test PT.hasplugin(t, Documenter)
+        @test PT.hasplugin(t, PT.is_ci)
         @test PT.hasplugin(t, _ -> true)
         @test !PT.hasplugin(t, _ -> false)
         @test !PT.hasplugin(t, Citation)
-        @test !PT.hasplugin(t, PT.is_ci)
+    end
+
+    @testset "validate" begin
+        mock(LibGit2.getconfig => (_k, _d) -> "") do _gc
+            @test_throws ArgumentError tpl(; plugins=[Git()])
+        end
     end
 end
 
