@@ -18,7 +18,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
               authors: ["Chris de Graaf <chrisadegraaf@gmail.com>"]
               dir: "~/.local/share/julia/dev"
               host: "github.com"
-              julia_version: v"1.0.0"
+              julia: v"1.0.0"
               user: "$USER"
               plugins:
         """
@@ -27,7 +27,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
               authors: ["$USER"]
               dir: "$(contractuser(Pkg.devdir()))"
               host: "github.com"
-              julia_version: v"1.0.0"
+              julia: v"1.0.0"
               user: "$USER"
               plugins:
                 Git:

@@ -26,7 +26,7 @@ A configuration used to generate packages.
 ### Package Options
 - `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
 - `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
-- `julia_version::VersionNumber=$(repr(default_version()))`: Minimum allowed Julia version.
+- `julia::VersionNumber=$(repr(default_version()))`: Minimum allowed Julia version.
 
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
@@ -51,7 +51,7 @@ struct Template
     authors::Vector{String}
     dir::String
     host::String
-    julia_version::VersionNumber
+    julia::VersionNumber
     plugins::Vector{<:Plugin}
     user::String
 end
@@ -63,7 +63,7 @@ function Template(::Val{false}; kwargs...)
     user = getkw(kwargs, :user)
     dir = abspath(expanduser(getkw(kwargs, :dir)))
     host = replace(getkw(kwargs, :host), r".*://" => "")
-    julia_version = getkw(kwargs, :julia_version)
+    julia = getkw(kwargs, :julia)
 
     authors = getkw(kwargs, :authors)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
@@ -85,7 +85,7 @@ function Template(::Val{false}; kwargs...)
         end
     end
 
-    return Template(authors, dir, host, julia_version, plugins, user)
+    return Template(authors, dir, host, julia, plugins, user)
 end
 
 """
@@ -133,6 +133,6 @@ defaultkw(::Val{:authors}) = default_authors()
 defaultkw(::Val{:dir}) = Pkg.devdir()
 defaultkw(::Val{:disable_defaults}) = DataType[]
 defaultkw(::Val{:host}) = "github.com"
-defaultkw(::Val{:julia_version}) = default_version()
+defaultkw(::Val{:julia}) = default_version()
 defaultkw(::Val{:plugins}) = Plugin[]
 defaultkw(::Val{:user}) = default_user()

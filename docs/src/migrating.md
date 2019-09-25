@@ -12,13 +12,14 @@ However, it might be easier to just read the [User Guide](user.md).
 
 The recurring theme is "everything is a plugin now".
 
-| Old              | New                               |
-| :-:              | :-:                               |
-| `license="ISC"`  | `plugins=[License(; name="ISC")]` |
-| `develop=true` * | `plugins=[Develop()]`             |
-| `git=false`      | `disable_defaults=[Git]`          |
-| `ssh=true`       | `plugins=[Git(; ssh=true)]`       |
-| `manifest=true`  | `plugins=[Git(; manifest=true)]`  |
+| Old                  | New                               |
+| :------------------: | :-------------------------------: |
+| `license="ISC"`      | `plugins=[License(; name="ISC")]` |
+| `develop=true` *     | `plugins=[Develop()]`             |
+| `git=false`          | `disable_defaults=[Git]`          |
+| `julia_version=v"1"` | `julia=v"1"`                      |
+| `ssh=true`           | `plugins=[Git(; ssh=true)]`       |
+| `manifest=true`      | `plugins=[Git(; manifest=true)]`  |
 
 \* `develop=true` was the default setting.
 

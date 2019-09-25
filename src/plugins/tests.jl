@@ -25,12 +25,11 @@ view(::Tests, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 
 function prehook(p::Tests, t::Template, pkg_dir::AbstractString)
     invoke(prehook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
-    p.project && t.julia_version < v"1.2" && @warn string(
+    p.project && t.julia < v"1.2" && @warn string(
         "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
         "but a Julia version older than 1.2 is supported by the Template.",
     )
 end
-
 
 function hook(p::Tests, t::Template, pkg_dir::AbstractString)
     # Do the normal BasicPlugin behaviour to create the test script.
@@ -56,7 +55,7 @@ function add_test_dependency(pkg_dir::AbstractString)
     open(io -> TOML.print(io, toml), path, "w")
 
     # Generate the manifest by updating the project.
-     # This also ensures that keys in Project.toml are sorted properly.
+    # This also ensures that keys in Project.toml are sorted properly.
     touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
     with_project(Pkg.update, pkg_dir)
 end

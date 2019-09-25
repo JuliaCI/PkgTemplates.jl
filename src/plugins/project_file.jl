@@ -14,7 +14,7 @@ function hook(::ProjectFile, t::Template, pkg_dir::AbstractString)
         "uuid" => string(uuid4()),
         "authors" => t.authors,
         "version" => "0.1.0",
-        "compat" => Dict("julia" => compat_version(t.julia_version)),
+        "compat" => Dict("julia" => compat_version(t.julia)),
     )
     open(io -> TOML.print(io, toml), joinpath(pkg_dir, "Project.toml"), "w")
 end

@@ -18,7 +18,7 @@ Combine `t`'s Julia version with `versions`, and format them as `major.minor`.
 This is useful for creating lists of versions to be included in CI configurations.
 """
 function collect_versions(t::Template, versions::Vector)
-    vs = map(format_version, [t.julia_version, versions...])
+    vs = map(format_version, [t.julia, versions...])
     return sort(unique(vs))
 end
 
@@ -91,7 +91,7 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
         "OS" => os,
         "PKG" => pkg,
         "USER" => t.user,
-        "VERSION" => format_version(t.julia_version),
+        "VERSION" => format_version(t.julia),
         "VERSIONS" => versions,
         "X86" => x86,
     )
@@ -247,7 +247,7 @@ function view(p::GitLabCI, t::Template, pkg::AbstractString)
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
         "PKG" => pkg,
         "USER" => t.user,
-        "VERSION" => format_version(t.julia_version),
+        "VERSION" => format_version(t.julia),
         "VERSIONS" => collect_versions(t, p.extra_versions),
     )
 end
