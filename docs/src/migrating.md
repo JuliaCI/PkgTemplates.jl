@@ -21,7 +21,7 @@ The recurring theme is "everything is a plugin now".
 | `ssh=true`           | `plugins=[Git(; ssh=true)]`       |
 | `manifest=true`      | `plugins=[Git(; manifest=true)]`  |
 
-\* `develop=true` was the default setting.
+\* `develop=true` was the default setting, but it is no longer the default in PkgTemplates 0.7+.
 
 ## Plugins
 
@@ -55,10 +55,11 @@ Two less names to remember!
 Another two less names to remember!
 Although it's unlikely that anyone used these.
 
-| Old                  | New                                                                                 |
-| :------------------: | :---------------------------------------------------------------------------------: |
-| `available_licenses` | [GitHub](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses) |
-| `show_license`       | [GitHub](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses) |
+| Old                  | New                                                                                                  |
+| :------------------: | :--------------------------------------------------------------------------------------------------: |
+| `available_licenses` | [View licenses on GitHub](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses) |
+| `show_license`       | [View licenses on GitHub](https://github.com/invenia/PkgTemplates.jl/tree/master/templates/licenses) |
+|                      |                                                                                                      |
 
 ## Custom Plugins
 

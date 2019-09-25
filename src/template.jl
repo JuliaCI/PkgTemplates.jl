@@ -79,7 +79,7 @@ function Template(::Val{false}; kwargs...)
         foreach(plugins) do p
             if needs_username(p)
                 T = nameof(typeof(p))
-                s = "$T: Git hosting service username is required, supply user=username"
+                s = """$T: Git hosting service username is required, set one with keyword `user="<username>"`"""
                 throw(ArgumentError(s))
             end
         end

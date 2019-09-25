@@ -15,6 +15,11 @@ const DOCUMENTER_DEP = PackageSpec(;
 Sets up documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 Documentation deployment depends on `T`, where `T` is some supported CI plugin, or `Nothing` to only support local documentation builds.
 
+## Supported Type Parameters
+- `TravisCI`: Deploys documentation to [GitHub Pages](https://pages.github.com) with the help of [`TravisCI`](@ref).
+- `GitLabCI`: Deploys documentation to [GitLab Pages](https://pages.gitlab.com) with the help of [`GitLabCI`](@ref).
+- `Nothing` (default): Does not set up documentation deployment.
+
 ## Keyword Arguments
 - `make_jl::AbstractString`: Template file for `make.jl`.
 - `index_md::AbstractString`: Template file for `index.md`.
@@ -24,8 +29,7 @@ Documentation deployment depends on `T`, where `T` is some supported CI plugin, 
 - `makedocs_kwargs::Dict{Symbol}`: Extra keyword arguments to be inserted into `makedocs`.
 
 !!! note
-    If deploying documentation with Travis CI, don't forget to complete the required configuration.
-    See [here](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
+    If deploying documentation with Travis CI, don't forget to complete [the required configuration](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
 """
 struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
     assets::Vector{String}

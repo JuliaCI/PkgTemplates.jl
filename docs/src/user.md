@@ -9,7 +9,13 @@ Pages = ["user.md"]
 ```
 
 Using PkgTemplates is straightforward.
-Just create a [`Template`](@ref), and call it on a package name to generate that package.
+Just create a [`Template`](@ref), and call it on a package name to generate that package:
+
+```julia
+using PkgTemplates
+t = Template()
+t("MyPkg")
+```
 
 ## Template
 
@@ -22,7 +28,7 @@ Template
 Plugins add functionality to `Template`s.
 There are a number of plugins available to automate common boilerplate tasks.
 
-### Defaults
+### Default Plugins
 
 These plugins are included by default.
 They can be overridden by supplying another value via the `plugins` keyword, or disabled by supplying the type via the `disable_defaults` keyword.
@@ -70,6 +76,12 @@ Citation
 ```
 
 ## Custom Template Files
+
+!!! note "Templates vs Templating"
+    This documentation refers plenty to [`Template`](@ref)s, the package's main type, but it also refers to "template files" and "text templating", which are plaintext files with placeholders to be filled with data, and the technique of filling those placeholders with data, respectively.
+    
+    These concepts should be familiar if you've used [Jinja](https://palletsprojects.com/p/jinja) or [Mustache](https://mustache.github.io) (Mustache is the particular flavour used by PkgTemplates, via [Mustache.jl](https://github.com/jverzani/Mustache.jl)).
+    Please keep the difference between these two things in mind!
 
 Many plugins support a `file` argument or similar, which sets the path to the template file to be used for generating files.
 Each plugin has a sensible default that should make sense for most people, but you might have a specialized workflow that requires a totally different template file.

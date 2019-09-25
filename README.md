@@ -7,11 +7,33 @@
 
 **PkgTemplates creates new Julia packages in an easy, repeatable, and customizable way.**
 
-Assuming you have the relatively standard Git options `user.name`, `user.email` and `github.user` set up globally with `git config --global`, creating a `Template` is as simple as:
+## Installation
+
+Install with Pkg, just like any other registered Julia package:
+
+```jl
+pkg> add PkgTemplates  # Press ']' to enter te Pkg REPL mode.
+```
+
+## Usage
+
+Creating a `Template` is as simple as:
 
 ```jl
 using PkgTemplates
 t = Template()
+```
+
+The no-keywords constructor assumes the existence of some preexisting Git configuration (set with `git config --global`):
+
+- `user.name`: Your real name, e.g. John Smith.
+- `user.email`: Your email address, eg. john.smith@acme.corp.
+- `github.user`: Your GitHub username: e.g. john-smith.
+
+Once you have a `Template`, use it to generate a package:
+
+```jl
+t("MyPkg")
 ```
 
 However, it's probably desirable to customize the template to your liking with various options and plugins:
@@ -24,14 +46,14 @@ t = Template(;
         Codecov(),
         TravisCI(; x86=true),
         Documenter{TravisCI}(),
-    ],
+o    ],
 )
 ```
 
-Once you have a template, you can create packages with ease:
+You can also create a `Template` interactively by following a set of prompts:
 
 ```jl
-t("MyPkg")
+julia> t = Template(; interactive=true)
 ```
 
 ---
