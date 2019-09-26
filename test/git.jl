@@ -38,7 +38,7 @@
     @testset "Adds version to commit message" begin
         # We're careful to avoid a Pkg.update as it triggers Cassette#130.
         t = tpl(; disable_defaults=[Tests], plugins=[Git()])
-        mock(Pkg.installed => () -> Dict("PkgTemplates" => v"1.2.3")) do _pi
+        mock(PT.version_of => _p -> v"1.2.3") do _i
             with_pkg(t) do pkg
                 pkg_dir = joinpath(t.dir, pkg)
                 LibGit2.with(GitRepo(pkg_dir)) do repo

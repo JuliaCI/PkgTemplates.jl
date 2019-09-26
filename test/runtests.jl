@@ -6,7 +6,7 @@ using Random: Random
 using Test: @test, @testset, @test_throws
 
 using ReferenceTests: @test_reference
-using SimpleMock: Mock, mock
+using SimpleMock: mock
 using Suppressor: @suppress
 
 using PkgTemplates
@@ -30,7 +30,9 @@ function with_pkg(f::Function, t::Template, pkg::AbstractString=pkgname())
     try
         f(pkg)
     finally
-        haskey(Pkg.installed(), pkg) && @suppress Pkg.rm(pkg)
+        # On 1.4, this sometimes won't work, but the error is that the package isn't installed.
+        # We're going to delete the package directory anyways, so just ignore any errors.
+        PT.version_of(pkg) === nothing || try @suppress Pkg.rm(pkg) catch; end
         rm(joinpath(t.dir, pkg); recursive=true, force=true)
     end
 end
