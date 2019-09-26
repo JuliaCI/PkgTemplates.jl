@@ -52,7 +52,7 @@ end
 
 Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
 
-gitignore(::Documenter) = ["/docs/build/", "/docs/site/"]
+gitignore(::Documenter) = ["/docs/build/"]
 
 badges(::Documenter) = Badge[]
 badges(::Documenter{TravisCI}) = [
