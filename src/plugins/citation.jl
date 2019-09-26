@@ -8,8 +8,8 @@ Creates a `CITATION.bib` file for citing package repositories.
 - `readme::Bool`: Whether or not to include a section about citing in the README.
 """
 @with_defaults struct Citation <: BasicPlugin
-    file::String = default_file("CITATION.bib")
-    readme::Bool = false
+    file::String = default_file("CITATION.bib") <- "Path to CITATION.bib template"
+    readme::Bool = false <- """Enable "Citing" README section"""
 end
 
 tags(::Citation) = "<<", ">>"

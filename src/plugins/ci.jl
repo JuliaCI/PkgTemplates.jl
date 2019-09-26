@@ -45,13 +45,13 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 $EXTRA_VERSIONS_DOC
 """
 @with_defaults struct TravisCI <: BasicPlugin
-    file::String = default_file("travis.yml")
-    linux::Bool = true
-    osx::Bool = true
-    windows::Bool = true
-    x86::Bool = false
-    coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    file::String = default_file("travis.yml") <- "Path to .travis.yml template"
+    linux::Bool = true <- "Enable Linux bulds"
+    osx::Bool = true <- "Enable OSX builds"
+    windows::Bool = true <- "Enable Windows builds"
+    x86::Bool = false <- "Enable 32-bit builds"
+    coverage::Bool = true <- "Enable code coverage submission"
+    extra_versions::Vector = DEFAULT_CI_VERSIONS <- "Extra Julia versions to test"
 end
 
 source(p::TravisCI) = p.file
@@ -114,10 +114,10 @@ Integrates your packages with [AppVeyor](https://appveyor.com) via [AppVeyor.jl]
 $EXTRA_VERSIONS_DOC
 """
 @with_defaults struct AppVeyor <: BasicPlugin
-    file::String = default_file("appveyor.yml")
-    x86::Bool = false
-    coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    file::String = default_file("appveyor.yml") <- "Path to .appveyor.yml template"
+    x86::Bool = false <- "Enable 32-bit builds"
+    coverage::Bool = true <- "Enable code coverage submission"
+    extra_versions::Vector = DEFAULT_CI_VERSIONS <- "Extra Julia versions to test"
 end
 
 source(p::AppVeyor) = p.file
@@ -167,10 +167,10 @@ $EXTRA_VERSIONS_DOC
     Code coverage submission from Cirrus CI is not yet supported by [Coverage.jl](https://github.com/JuliaCI/Coverage.jl).
 """
 @with_defaults struct CirrusCI <: BasicPlugin
-    file::String = default_file("cirrus.yml")
-    image::String = "freebsd-12-0-release-amd64"
-    coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    file::String = default_file("cirrus.yml") <- "Path to .cirrus.yml template"
+    image::String = "freebsd-12-0-release-amd64" <- "FreeBSD image"
+    coverage::Bool = true <- "Enable code coverage submission"
+    extra_versions::Vector = DEFAULT_CI_VERSIONS <- "Extra Julia versions to test"
 end
 
 source(p::CirrusCI) = p.file
@@ -216,10 +216,10 @@ See [`Documenter`](@ref) for more information.
     Nightly Julia is not supported.
 """
 @with_defaults struct GitLabCI <: BasicPlugin
-    file::String = default_file("gitlab-ci.yml")
-    coverage::Bool = true
+    file::String = default_file("gitlab-ci.yml") <- "Path to .gitlab-ci.yml template"
+    coverage::Bool = true <- "Enable code coverage submission"
     # Nightly has no Docker image.
-    extra_versions::Vector = map(format_version, [default_version(), VERSION])
+    extra_versions::Vector = map(format_version, [default_version(), VERSION]) <- "Extra Julia versions to test"
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]

@@ -127,14 +127,14 @@ function getplugin(t::Template, ::Type{T}) where T <: Plugin
 end
 
 # Get a keyword, or compute some default value.
-getkw(kwargs, k) = get(() -> defaultkw(k), kwargs, k)
+getkw(kwargs, k) = get(() -> defaultkw(Template, k), kwargs, k)
 
 # Default Template keyword values.
-defaultkw(s::Symbol) = defaultkw(Val(s))
-defaultkw(::Val{:authors}) = default_authors()
-defaultkw(::Val{:dir}) = Pkg.devdir()
-defaultkw(::Val{:disable_defaults}) = DataType[]
-defaultkw(::Val{:host}) = "github.com"
-defaultkw(::Val{:julia}) = default_version()
-defaultkw(::Val{:plugins}) = Plugin[]
-defaultkw(::Val{:user}) = default_user()
+defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
+defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
+defaultkw(::Type{Template}, ::Val{:dir}) = Pkg.devdir()
+defaultkw(::Type{Template}, ::Val{:disable_defaults}) = DataType[]
+defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
+defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
+defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
+defaultkw(::Type{Template}, ::Val{:user}) = default_user()

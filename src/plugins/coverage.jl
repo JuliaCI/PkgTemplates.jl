@@ -9,7 +9,7 @@ Sets up code coverage submission from CI to [Codecov](https://codecov.io).
 - `file::Union{AbstractString, Nothing}`: Template file for `.codecov.yml`, or `nothing` to create no file.
 """
 @with_defaults struct Codecov <: BasicPlugin
-    file::Union{String, Nothing} = nothing
+    file::Union{String, Nothing} = nothing <- "Path to .codecov.yml template"
 end
 
 source(p::Codecov) = p.file
@@ -30,7 +30,7 @@ Sets up code coverage submission from CI to [Coveralls](https://coveralls.io).
 - `file::Union{AbstractString, Nothing}`: Template file for `.coveralls.yml`, or `nothing` to create no file.
 """
 @with_defaults struct Coveralls <: BasicPlugin
-    file::Union{String, Nothing} = nothing
+    file::Union{String, Nothing} = nothing <- "Path to .coveralls.yml template"
 end
 
 source(p::Coveralls) = p.file
