@@ -6,7 +6,7 @@ const DOCUMENTER_DEP = PackageSpec(;
 """
     Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
-        index_md="$(contractuser(default_file("docs", "index.md")))",
+        index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
         canonical_url=make_canonical(T),
         makedocs_kwargs=Dict{Symbol, Any}(),
@@ -44,13 +44,35 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
         canonical_url::Union{Function, Nothing}=make_canonical(T),
         make_jl::AbstractString=default_file("docs", "make.jl"),
-        index_md::AbstractString=default_file("docs", "index.md"),
+        index_md::AbstractString=default_file("docs", "src", "index.md"),
     ) where T <: Union{TravisCI, GitLabCI, Nothing}
         return new(assets, makedocs_kwargs, canonical_url, make_jl, index_md)
     end
 end
 
 Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
+
+function interactive(::Type{Documenter})
+    kwargs = Dict{Symbol, Any}()
+
+    default = default_file("docs", "make.jl")
+    kwargs[:make_jl] = prompt(String, "Documenter: Path to make.jl template", default)
+
+    default = default_file("docs", "src", "index.md")
+    kwargs[:index_md] = prompt(String, "Documenter: Path to make.jl template", default)
+
+    kwargs[:assets] = prompt(Vector{String}, "Documenter: Extra asset files", String[])
+
+    md_kw = prompt(Dict{String, String}, "Documenter: makedocs keyword arguments", Dict())
+    parsed = Dict{Symbol, Any}(Symbol(p.first) => eval(Meta.parse(p.second)) for p in md_kw)
+    kwargs[:makedocs_kwargs] = parsed
+
+    available = [Nothing, TravisCI, GitLabCI]
+    f = T -> string(nameof(T))
+    T = select(f, "Documenter: Documentation deployment strategy", available, Nothing)
+
+    return Documenter{T}(; kwargs...)
+end
 
 gitignore(::Documenter) = ["/docs/build/"]
 

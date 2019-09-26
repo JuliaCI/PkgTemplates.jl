@@ -173,6 +173,16 @@ function prompt(
     return convert(Vector{String}, map(strip, split(s, ","; keepempty=false)))
 end
 
+function prompt(::Type{<:Dict}, s::AbstractString, default::Dict, required::Bool=false)
+    default_display = join(map(p -> "$(p.first)=$(p.second)", collect(default)), ", ")
+    s = prompt(String, "$s (k=v, comma-delimited)", default_display; required=required)
+    return if isempty(s)
+        Dict{String, String}()
+    else
+        Dict{String, String}(Pair(split(strip(kv), "=")...) for kv in split(s, ","))
+    end
+end
+
 # TODO: These can be made simpler when this is merged:
 # https://github.com/JuliaLang/julia/pull/30043
 
@@ -182,7 +192,7 @@ select(s::AbstractString, xs::Vector, initial) = select(string, s, xs, initial)
 function select(f::Function, s::AbstractString, xs::Vector, initial::Vector)
     m = MultiSelectMenu(map(f, xs); pagesize=length(xs))
     foreach(x -> push!(m.selected, findfirst(==(x), xs)), initial)
-    selection = request(s, m)
+    selection = request("$s:", m)
     return map(i -> xs[i], collect(selection))
 end
 

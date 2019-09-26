@@ -7,7 +7,7 @@ Creates a module entrypoint.
 - `file::AbstractString`: Template file for `src/<module>.jl`.
 """
 @with_defaults mutable struct SrcDir <: BasicPlugin
-    file::String = default_file("src", "module.jl") <- "Path to src/<module>.jl template"
+    file::String = default_file("src", "module.jl") <- "Path to <module>.jl template"
     destination::String = joinpath("src", "<module>.jl")
 end
 
