@@ -14,7 +14,7 @@ Sets up testing for packages.
 !!! note
     Managing test dependencies with `test/Project.toml` is only supported in Julia 1.2 and later.
 """
-@with_kw_noshow struct Tests <: BasicPlugin
+@with_defaults struct Tests <: BasicPlugin
     file::String = default_file("test", "runtests.jl")
     project::Bool = false
 end

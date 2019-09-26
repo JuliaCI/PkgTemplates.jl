@@ -235,6 +235,36 @@ If you are implementing a plugin that uses the `user` field of a [`Template`](@r
 """
 needs_username(::Plugin) = false
 
+"""
+    @with_defaults struct T #= ... =# end
+
+Wraps Parameters.jl's [`@with_kw_noshow`](https://mauro3.github.io/Parameters.jl/stable/api/#Parameters.@with_kw_noshow-Tuple{Any}) to generate keyword constructors,
+
+TODO explain prompt syntax.
+
+## Example
+
+```julia
+struct Foo <: Plugin
+    file::String = "/dev/null" <- "Path to the file to use"
+    n::Int <- "This one has no default, but this is the interactive prompt"
+    xyz::String = "Without a prompt, defaultkw is not implemented for this field"
+end
+```
+"""
+macro with_defaults(ex::Expr)
+    T = esc(ex.args[2].args[1])
+
+    # TODO: Parse out `<- "prompt"` stuff.
+    funcs = map(filter(arg -> arg isa Expr && arg.head === :(=), ex.args[3].args)) do arg
+        name = QuoteNode(arg.args[1].args[1])
+        val = arg.args[2]
+        :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $(esc(arg.args[2])))
+    end
+
+    return Expr(:block, esc(with_kw(ex, __module__, false)), funcs...)
+end
+
 include(joinpath("plugins", "project_file.jl"))
 include(joinpath("plugins", "src_dir.jl"))
 include(joinpath("plugins", "tests.jl"))

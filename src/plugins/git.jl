@@ -12,7 +12,7 @@ Creates a Git repository and a `.gitignore` file.
 - `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
   This option requires that the Git CLI is installed, and for you to have a GPG key associated with your committer identity.
 """
-@with_kw_noshow struct Git <: Plugin
+@with_defaults struct Git <: Plugin
     ignore::Vector{String} = []
     ssh::Bool = false
     manifest::Bool = false

@@ -11,7 +11,7 @@ using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 using UUIDs: uuid4
 
 using Mustache: render
-using Parameters: @with_kw_noshow
+using Parameters: with_kw
 
 export
     Template,
