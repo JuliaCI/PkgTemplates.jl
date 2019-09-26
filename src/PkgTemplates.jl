@@ -1,6 +1,6 @@
 module PkgTemplates
 
-using Base: current_project
+using Base: active_project
 using Base.Filesystem: contractuser
 
 using Dates: month, today, year
@@ -45,7 +45,7 @@ include("interactive.jl")
 
 # Run some function with a project activated at the given path.
 function with_project(f::Function, path::AbstractString)
-    proj = current_project()
+    proj = active_project()
     try
         Pkg.activate(path)
         f()
