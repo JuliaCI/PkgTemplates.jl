@@ -201,3 +201,38 @@ end
 ```
 
 Add this to your `startup.jl`, and you can create your template from anywhere, without incurring any startup cost.
+
+Another strategy is to write the string representation of the template to a Julia file:
+
+```julia
+const t = Template(; #= ... =#)
+open("template.jl", "w") do io
+    println(io, "using PkgTemplates")
+    sprint(show, io, t)
+end
+```
+
+Then the template is just an `include` away:
+
+```julia
+const t = include("template.jl")
+```
+
+The only disadvantage to this approach is that the saved template is much less human-readable than code you wrote yourself.
+
+One more method of saving templates is to simply use the Serialization package in the standard library:
+
+```julia
+const t = Template(; #= ... =#)
+using Serialization
+open(io -> serialize(io, t), "template.bin", "w")
+```
+
+Then simply `deserialize` to load:
+
+```julia
+using Serialization
+const t = open(deserialize, "template.bin")
+```
+
+This approach has the same disadvantage as the previous one, and the serialization format is not guaranteed to be stable across Julia versions.
