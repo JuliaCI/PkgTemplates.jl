@@ -41,6 +41,7 @@ abstract type Plugin end
 
 include("template.jl")
 include("plugin.jl")
+include("show.jl")
 include("interactive.jl")
 
 # Run some function with a project activated at the given path.

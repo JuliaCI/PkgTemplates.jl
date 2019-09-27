@@ -2,6 +2,49 @@ const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
 """
+    @with_defaults struct T #= ... =# end
+
+Wraps Parameters.jl's [`@with_kw_noshow`](https://mauro3.github.io/Parameters.jl/stable/api/#Parameters.@with_kw_noshow-Tuple{Any}) to generate keyword constructors,
+
+## Example
+
+```julia
+struct Foo <: Plugin
+    file::String = "/dev/null" <- "Path to the file to use"
+    n::Int <- "This one has no default, but this is the interactive prompt"
+    xyz::String = "Without a prompt, defaultkw is not implemented for this field"
+end
+```
+"""
+macro with_defaults(ex::Expr)
+    T = esc(ex.args[2].args[1])  # This assumes T <: U.
+
+    # This is a bit nasty.
+    funcs = Expr[]
+    foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do arg
+        if iscall(arg, :<) && iscall(arg.args[3], :-)  # x::T <- "prompt"
+            name = QuoteNode(arg.args[2].args[1])
+            prompt = arg.args[2]
+            push!(funcs, :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))))
+        elseif arg.head === :(=)
+            rhs = arg.args[2]
+            if iscall(rhs, :<) && iscall(rhs.args[3], :-)  # x::T = "foo" <- "prompt"
+                name = QuoteNode(arg.args[1].args[1])
+                prompt = rhs.args[3].args[2]
+                default = arg.args[2] = rhs.args[2]
+                push!(
+                    funcs,
+                    :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))),
+                    :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $(esc(default))),
+                )
+            end
+        end
+    end
+
+    return Expr(:block, esc(with_kw(ex, __module__, false)), funcs...)
+end
+
+"""
 A simple plugin that, in general, creates a single file.
 """
 abstract type BasicPlugin <: Plugin end
@@ -239,51 +282,6 @@ function prompt end
 
 iscall(x, ::Symbol) = false
 iscall(ex::Expr, s::Symbol) = ex.head === :call && ex.args[1] === s
-
-"""
-    @with_defaults struct T #= ... =# end
-
-Wraps Parameters.jl's [`@with_kw_noshow`](https://mauro3.github.io/Parameters.jl/stable/api/#Parameters.@with_kw_noshow-Tuple{Any}) to generate keyword constructors,
-
-TODO explain prompt syntax.
-
-## Example
-
-```julia
-struct Foo <: Plugin
-    file::String = "/dev/null" <- "Path to the file to use"
-    n::Int <- "This one has no default, but this is the interactive prompt"
-    xyz::String = "Without a prompt, defaultkw is not implemented for this field"
-end
-```
-"""
-macro with_defaults(ex::Expr)
-    T = esc(ex.args[2].args[1])  # This assumes T <: U.
-
-    # This is a bit nasty.
-    funcs = Expr[]
-    foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do arg
-        if iscall(arg, :<) && iscall(arg.args[3], :-)  # x::T <- "prompt"
-            name = QuoteNode(arg.args[2].args[1])
-            prompt = arg.args[2]
-            push!(funcs, :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))))
-        elseif arg.head === :(=)
-            rhs = arg.args[2]
-            if iscall(rhs, :<) && iscall(rhs.args[3], :-)  # x::T = "foo" <- "prompt"
-                name = QuoteNode(arg.args[1].args[1])
-                prompt = rhs.args[3].args[2]
-                default = arg.args[2] = rhs.args[2]
-                push!(
-                    funcs,
-                    :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))),
-                    :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $(esc(default))),
-                )
-            end
-        end
-    end
-
-    return Expr(:block, esc(with_kw(ex, __module__, false)), funcs...)
-end
 
 include(joinpath("plugins", "project_file.jl"))
 include(joinpath("plugins", "src_dir.jl"))
