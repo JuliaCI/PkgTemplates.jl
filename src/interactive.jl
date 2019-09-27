@@ -13,8 +13,10 @@ function interactive(::Type{T}) where T <: Plugin
         default = required ? defaultkw(F) : defaultkw(T, v)
         kwargs[name] = if applicable(prompt, T, v)
             prompt(F, "$T: $(prompt(T, v))", default, required=required)
-        else
+        elseif required
             prompt(F, "$T: Value for field '$name' ($F)", default; required=required)
+        else
+            default
         end
     end
 

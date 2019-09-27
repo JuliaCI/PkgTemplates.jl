@@ -28,16 +28,13 @@ macro with_defaults(ex::Expr)
             push!(funcs, :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))))
         elseif arg.head === :(=)
             rhs = arg.args[2]
+            name = QuoteNode(arg.args[1].args[1])
             if iscall(rhs, :<) && iscall(rhs.args[3], :-)  # x::T = "foo" <- "prompt"
-                name = QuoteNode(arg.args[1].args[1])
                 prompt = rhs.args[3].args[2]
-                default = arg.args[2] = rhs.args[2]
-                push!(
-                    funcs,
-                    :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))),
-                    :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $(esc(default))),
-                )
+                push!(funcs, :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))))
             end
+            default = arg.args[2] = rhs.args[2]
+            push!(funcs, :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $(esc(default))))
         end
     end
 
