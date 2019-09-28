@@ -96,7 +96,7 @@ badges(::Documenter{GitLabCI}) = Badge(
 )
 
 view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
-    "ASSETS" => p.assets,
+    "ASSETS" => map(basename, p.assets),
     "AUTHORS" => join(t.authors, ", "),
     "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
     "HAS_ASSETS" => !isempty(p.assets),

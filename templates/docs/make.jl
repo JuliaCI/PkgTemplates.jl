@@ -12,7 +12,7 @@ makedocs(;
 {{/CANONICAL}}
         assets={{^HAS_ASSETS}}String{{/HAS_ASSETS}}[{{^HAS_ASSETS}}],{{/HAS_ASSETS}}
 {{#ASSETS}}
-            "{{{.}}}",
+            "assets/{{{.}}}",
 {{/ASSETS}}
 {{#HAS_ASSETS}}
         ],
