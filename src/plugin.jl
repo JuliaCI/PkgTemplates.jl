@@ -4,15 +4,16 @@ const DEFAULT_PRIORITY = 1000
 """
     @with_defaults struct T #= ... =# end
 
-Wraps Parameters.jl's [`@with_kw_noshow`](https://mauro3.github.io/Parameters.jl/stable/api/#Parameters.@with_kw_noshow-Tuple{Any}) to generate keyword constructors,
+Creates keyword constructors and generates methods needed to interactively create instances with [`interactive`](@ref).
 
 ## Example
 
 ```julia
 struct Foo <: Plugin
-    file::String = "/dev/null" <- "Path to the file to use"
-    n::Int <- "This one has no default, but this is the interactive prompt"
-    xyz::String = "Without a prompt, defaultkw is not implemented for this field"
+    file::String = "/the/default/value" <- "This is the interactive prompt"
+    n::Int <- "This one has no default, so it's a required keyword"
+    abc::String = "No prompt, so the default is always taken in interactive mode"
+    xyz::String  # Required keyword, with a generic interactive prompt.
 end
 ```
 """

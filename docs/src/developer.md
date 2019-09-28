@@ -76,23 +76,23 @@ To understand how they're implemented, let's look at simplified versions of two 
 ### Example: `Documenter`
 
 ```julia
-@with_kw_noshow struct Documenter <: Plugin
-    make_jl::String = default_file("make.jl")
-    index_md::String = default_file("index.md")
+@with_defaults struct Documenter <: Plugin
+    make_jl::String = default_file("docs", "make.jl") <- "Path to make.jl template"
+    index_md::String = default_file("docs", "src", "index.md") <- "Path to index.md template"
 end
 
-gitignore(::Documenter) = ["/docs/build/", "/docs/site/"]
+gitignore(::Documenter) = ["/docs/build/"]
 
 badges(::Documenter) = [
     Badge(
         "Stable",
         "https://img.shields.io/badge/docs-stable-blue.svg",
-        "https://{{USER}}.github.io/{{PKG}}.jl/stable",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/stable",
     ),
     Badge(
         "Dev",
         "https://img.shields.io/badge/docs-dev-blue.svg",
-        "https://{{USER}}.github.io/{{PKG}}.jl/dev",
+        "https://{{{}USER}}.github.io/{{{PKG}}}.jl/dev",
     ),
 ]
 
@@ -118,8 +118,14 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
 end
 ```
 
-First of all, `@with_kw_noshow` comes from [Parameters.jl](https://github.com/mauro3/Parameters.jl), and it just defines a nice keyword constructor for us.
-The default values for our type are using [`default_file`](@ref) to point to files in this repository.
+The first thing you'll notice is the strange struct definition with [`@with_defaults`](@ref).
+
+```@docs
+@with_defaults
+interactive
+```
+
+Inside of our struct definition we're using [`default_file`](@ref) to refer to files in this repository.
 
 ```@docs
 default_file
