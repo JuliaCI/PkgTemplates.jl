@@ -1,8 +1,7 @@
 const STATIC_FILE = joinpath(@__DIR__, "fixtures", "static.txt")
 
-function PT.user_view(::Citation, ::Template, ::AbstractString)
-    return Dict("MONTH" => 8, "YEAR" => 2019)
-end
+PT.user_view(::Citation, ::Template, ::AbstractString) = Dict("MONTH" => 8, "YEAR" => 2019)
+PT.user_view(::License, ::Template, ::AbstractString) = Dict("YEAR" => 2019)
 
 function test_all(pkg::AbstractString; kwargs...)
     t = tpl(; kwargs...)
