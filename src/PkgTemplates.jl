@@ -18,6 +18,7 @@ export
     AppVeyor,
     CirrusCI,
     Citation,
+    DroneCI,
     Codecov,
     Coveralls,
     Develop,
