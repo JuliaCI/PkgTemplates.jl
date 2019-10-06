@@ -9,10 +9,12 @@ Sets up testing for packages.
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `runtests.jl`.
 - `project::Bool`: Whether or not to create a new project for tests (`test/Project.toml`).
-  See [here](https://julialang.github.io/Pkg.jl/v1/creating-packages/#Test-specific-dependencies-in-Julia-1.2-and-above-1) for more details.
+  See [here](https://julialang.github.io/Pkg.jl/v1/creating-packages/#Test-specific-dependencies-in-Julia-1.2-and-above-1)
+  for more details.
 
 !!! note
-    Managing test dependencies with `test/Project.toml` is only supported in Julia 1.2 and later.
+    Managing test dependencies with `test/Project.toml` is only supported
+    in Julia 1.2 and later.
 """
 @with_kw_noshow struct Tests <: BasicPlugin
     file::String = default_file("test", "runtests.jl")

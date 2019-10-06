@@ -21,7 +21,8 @@ A configuration used to generate packages.
   The default value comes from the global Git config (`github.user`).
   If no value is obtained, many plugins that use this value will not work.
 - `authors::Union{AbstractString, Vector{<:AbstractString}}="$(default_authors())"`: Package authors.
-  Like `user`, it takes its default value from the global Git config (`user.name` and `user.email`).
+  Like `user`, it takes its default value from the global Git config
+  (`user.name` and `user.email`).
 
 ### Package Options
 - `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
@@ -31,7 +32,8 @@ A configuration used to generate packages.
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
 - `disable_defaults::Vector{DataType}=DataType[]`: Default plugins to disable.
-  The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref), [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
+  The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
+  [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
   To override a default plugin instead of disabling it altogether, supply it via `plugins`.
 
 ---

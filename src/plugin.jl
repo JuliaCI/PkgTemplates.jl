@@ -9,7 +9,8 @@ abstract type BasicPlugin <: Plugin end
 """
     default_file(paths::AbstractString...) -> String
 
-Return a path relative to the default template file directory (`$(contractuser(TEMPLATES_DIR))`).
+Return a path relative to the default template file directory
+(`$(contractuser(TEMPLATES_DIR))`).
 """
 default_file(paths::AbstractString...) = joinpath(TEMPLATES_DIR, paths...)
 
@@ -19,8 +20,10 @@ default_file(paths::AbstractString...) = joinpath(TEMPLATES_DIR, paths...)
 Return the view to be passed to the text templating engine for this plugin.
 `pkg` is the name of the package being generated.
 
-For [`BasicPlugin`](@ref)s, this is used for both the plugin badges (see [`badges`](@ref)) and the template file (see [`source`](@ref)).
-For other [`Plugin`](@ref)s, it is used only for badges, but you can always call it yourself as part of your [`hook`](@ref) implementation.
+For [`BasicPlugin`](@ref)s, this is used for both the plugin badges
+(see [`badges`](@ref)) and the template file (see [`source`](@ref)).
+For other [`Plugin`](@ref)s, it is used only for badges,
+but you can always call it yourself as part of your [`hook`](@ref) implementation.
 
 By default, an empty `Dict` is returned.
 """
@@ -31,7 +34,8 @@ view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
 The same as [`view`](@ref), but for use by package *users* for extension.
 
-Values returned by this function will override those from [`view`](@ref) when the keys are the same.
+Values returned by this function will override those from [`view`](@ref)
+when the keys are the same.
 """
 user_view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
@@ -39,7 +43,9 @@ user_view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
     combined_view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
 
 This function combines [`view`](@ref) and [`user_view`](@ref) for use in text templating.
-If you're doing manual file creation or text templating (i.e. writing [`Plugin`](@ref)s that are not [`BasicPlugin`](@ref)s), then you should use this function rather than either of the former two.
+If you're doing manual file creation or text templating (i.e. writing [`Plugin`](@ref)s
+that are not [`BasicPlugin`](@ref)s), then you should use this function
+rather than either of the former two.
 
 !!! note
     Do not implement this function yourself!
@@ -66,7 +72,8 @@ tags(::Plugin) = "{{", "}}"
 Determines the order in which plugins are processed (higher goes first).
 The default priority (`DEFAULT_PRIORITY`), is `$DEFAULT_PRIORITY`.
 
-You can implement this function per-stage (by using `::typeof(hook)`, for example), or for all stages by simply using `::Function`.
+You can implement this function per-stage (by using `::typeof(hook)`, for example),
+or for all stages by simply using `::Function`.
 """
 priority(::Plugin, ::Function) = DEFAULT_PRIORITY
 
@@ -112,12 +119,13 @@ function destination end
     Badge(hover::AbstractString, image::AbstractString, link::AbstractString)
 
 Container for Markdown badge data.
-Each argument can contain placeholders (which will be filled in with values from [`combined_view`](@ref)).
+Each argument can contain placeholders,
+which will be filled in with values from [`combined_view`](@ref).
 
 ## Arguments
-* `hover::AbstractString`: Text to appear when the mouse is hovered over the badge.
-* `image::AbstractString`: URL to the image to display.
-* `link::AbstractString`: URL to go to upon clicking the badge.
+- `hover::AbstractString`: Text to appear when the mouse is hovered over the badge.
+- `image::AbstractString`: URL to the image to display.
+- `link::AbstractString`: URL to go to upon clicking the badge.
 """
 struct Badge
     hover::String
@@ -139,7 +147,9 @@ end
 
 Perform any required validation for a [`Plugin`](@ref).
 
-It is preferred to do validation here instead of in [`prehook`](@ref), because this function is called at [`Template`](@ref) construction time, whereas the prehook is only run at package generation time.
+It is preferred to do validation here instead of in [`prehook`](@ref),
+because this function is called at [`Template`](@ref) construction time,
+whereas the prehook is only run at package generation time.
 """
 validate(::Plugin, ::Template) = nothing
 
@@ -147,7 +157,8 @@ validate(::Plugin, ::Template) = nothing
     prehook(::Plugin, ::Template, pkg_dir::AbstractString)
 
 Stage 1 of the package generation process (the "before" stage, in general).
-At this point, `pkg_dir` is an empty directory that will eventually contain the package, and neither the [`hook`](@ref)s nor the [`posthook`](@ref)s have run.
+At this point, `pkg_dir` is an empty directory that will eventually contain the package,
+and neither the [`hook`](@ref)s nor the [`posthook`](@ref)s have run.
 
 !!! note
     `pkg_dir` only stays empty until the first plugin chooses to create a file.
@@ -161,11 +172,13 @@ prehook(::Plugin, ::Template, ::AbstractString) = nothing
 Stage 2 of the package generation pipeline (the "main" stage, in general).
 At this point, the [`prehook`](@ref)s have run, but not the [`posthook`](@ref)s.
 
-`pkg_dir` is the directory in which the package is being generated (so `basename(pkg_dir)` is the package name).
+`pkg_dir` is the directory in which the package is being generated
+(so `basename(pkg_dir)` is the package name).
 
 !!! note
     You usually shouldn't implement this function for [`BasicPlugin`](@ref)s.
-    If you do, it should probably `invoke` the generic method (otherwise, there's not much reason to subtype `BasicPlugin`).
+    If you do, it should probably `invoke` the generic method
+    (otherwise, there's not much reason to subtype `BasicPlugin`).
 """
 hook(::Plugin, ::Template, ::AbstractString) = nothing
 
@@ -211,7 +224,8 @@ end
     render_file(file::AbstractString view::Dict{<:AbstractString}, tags) -> String
 
 Render a template file with the data in `view`.
-`tags` should be a tuple of two strings, which are the opening and closing delimiters, or `nothing` to use the default delimiters.
+`tags` should be a tuple of two strings, which are the opening and closing delimiters,
+or `nothing` to use the default delimiters.
 """
 function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags)
     return render_text(read(file, String), view, tags)
@@ -221,7 +235,8 @@ end
     render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing) -> String
 
 Render some text with the data in `view`.
-`tags` should be a tuple of two strings, which are the opening and closing delimiters, or `nothing` to use the default delimiters.
+`tags` should be a tuple of two strings, which are the opening and closing delimiters,
+or `nothing` to use the default delimiters.
 """
 function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
     return tags === nothing ? render(text, view) : render(text, view; tags=tags)
@@ -231,7 +246,8 @@ end
     needs_username(::Plugin) -> Bool
 
 Determine whether or not a plugin needs a Git hosting service username to function correctly.
-If you are implementing a plugin that uses the `user` field of a [`Template`](@ref), you should implement this function and return `true`.
+If you are implementing a plugin that uses the `user` field of a [`Template`](@ref),
+you should implement this function and return `true`.
 """
 needs_username(::Plugin) = false
 

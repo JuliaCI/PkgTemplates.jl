@@ -91,7 +91,7 @@ badges(::Documenter) = [
     Badge(
         "Dev",
         "https://img.shields.io/badge/docs-dev-blue.svg",
-        "https://{{{}USER}}.github.io/{{{PKG}}}.jl/dev",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/dev",
     ),
 ]
 

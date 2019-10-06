@@ -6,7 +6,8 @@ const COVERAGE_GITIGNORE = ["*.jl.cov", "*.jl.*.cov", "*.jl.mem"]
 Sets up code coverage submission from CI to [Codecov](https://codecov.io).
 
 ## Keyword Arguments
-- `file::Union{AbstractString, Nothing}`: Template file for `.codecov.yml`, or `nothing` to create no file.
+- `file::Union{AbstractString, Nothing}`: Template file for `.codecov.yml`,
+  or `nothing` to create no file.
 """
 @with_kw_noshow struct Codecov <: BasicPlugin
     file::Union{String, Nothing} = nothing
@@ -27,7 +28,8 @@ badges(::Codecov) = Badge(
 Sets up code coverage submission from CI to [Coveralls](https://coveralls.io).
 
 ## Keyword Arguments
-- `file::Union{AbstractString, Nothing}`: Template file for `.coveralls.yml`, or `nothing` to create no file.
+- `file::Union{AbstractString, Nothing}`: Template file for `.coveralls.yml`,
+  or `nothing` to create no file.
 """
 @with_kw_noshow struct Coveralls <: BasicPlugin
     file::Union{String, Nothing} = nothing

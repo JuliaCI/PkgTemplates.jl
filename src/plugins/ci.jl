@@ -41,8 +41,10 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 - `linux::Bool`: Whether or not to run builds on Linux.
 - `osx::Bool`: Whether or not to run builds on OSX (MacOS).
 - `windows::Bool`: Whether or not to run builds on Windows.
-- `x86::Bool`: Whether or not to run builds on 32-bit systems, in addition to the default 64-bit builds.
-- `coverage::Bool`: Whether or not to publish code coverage (another code coverage plugin such as [`Codecov`](@ref) must also be included).
+- `x86::Bool`: Whether or not to run builds on 32-bit systems,
+  in addition to the default 64-bit builds.
+- `coverage::Bool`: Whether or not to publish code coverage.
+  Another code coverage plugin such as [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
 """
 @with_kw_noshow struct TravisCI <: BasicPlugin
@@ -106,12 +108,15 @@ end
         extra_versions=$DEFAULT_CI_VERSIONS,
     )
 
-Integrates your packages with [AppVeyor](https://appveyor.com) via [AppVeyor.jl](https://github.com/JuliaCI/Appveyor.jl).
+Integrates your packages with [AppVeyor](https://appveyor.com)
+via [AppVeyor.jl](https://github.com/JuliaCI/Appveyor.jl).
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `.appveyor.yml`.
-- `x86::Bool`: Whether or not to run builds on 32-bit systems, in addition to the default 64-bit builds.
-- `coverage::Bool`: Whether or not to publish code coverage ([`Codecov`](@ref) must also be included).
+- `x86::Bool`: Whether or not to run builds on 32-bit systems,
+  in addition to the default 64-bit builds.
+- `coverage::Bool`: Whether or not to publish code coverage.
+  [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
 """
 @with_kw_noshow struct AppVeyor <: BasicPlugin
@@ -156,16 +161,19 @@ end
         extra_versions=$DEFAULT_CI_VERSIONS,
     )
 
-Integrates your packages with [Cirrus CI](https://cirrus-ci.org) via [CirrusCI.jl](https://github.com/ararslan/CirrusCI.jl).
+Integrates your packages with [Cirrus CI](https://cirrus-ci.org)
+via [CirrusCI.jl](https://github.com/ararslan/CirrusCI.jl).
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `.cirrus.yml`.
 - `image::AbstractString`: The FreeBSD image to be used.
-- `coverage::Bool`: Whether or not to publish code coverage ([`Codecov`](@ref) must also be included).
+- `coverage::Bool`: Whether or not to publish code coverage.
+  [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
 
 !!! note
-    Code coverage submission from Cirrus CI is not yet supported by [Coverage.jl](https://github.com/JuliaCI/Coverage.jl).
+    Code coverage submission from Cirrus CI is not yet supported by
+    [Coverage.jl](https://github.com/JuliaCI/Coverage.jl).
 """
 @with_kw_noshow struct CirrusCI <: BasicPlugin
     file::String = default_file("cirrus.yml")
@@ -202,7 +210,7 @@ end
         extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
     )
 
-Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci/).
+Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci).
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `.gitlab-ci.yml`.
@@ -270,7 +278,7 @@ Integrates your packages with [Drone CI](https://drone.io).
   For example, you might want to generate a `.drone.yml` instead of the default Starlark file.
 - `amd64::Bool`: Whether or not to run builds on AMD64.
 - `arm::Bool`: Whether or not to run builds on ARM (32-bit).
-- `arm::Bool`: Whether or not to run builds on ARM64.
+- `arm64::Bool`: Whether or not to run builds on ARM64.
 $EXTRA_VERSIONS_DOC
 
 !!! note

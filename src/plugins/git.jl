@@ -10,7 +10,8 @@ Creates a Git repository and a `.gitignore` file.
   If left unset, HTTPS is used.
 - `manifest::Bool`: Whether or not to commit `Manifest.toml`.
 - `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
-  This option requires that the Git CLI is installed, and for you to have a GPG key associated with your committer identity.
+  This option requires that the Git CLI is installed,
+  and for you to have a GPG key associated with your committer identity.
 """
 @with_kw_noshow struct Git <: Plugin
     ignore::Vector{String} = String[]
