@@ -57,18 +57,20 @@ Template(; kwargs...) = Template(Val(false); kwargs...)
 
 # Non-interactive constructor.
 function Template(::Val{false}; kwargs...)
-    user = getkw(kwargs, :user)
-    dir = abspath(expanduser(getkw(kwargs, :dir)))
-    host = replace(getkw(kwargs, :host), r".*://" => "")
-    julia = getkw(kwargs, :julia)
+    kwargs = Dict(kwargs)
 
-    authors = getkw(kwargs, :authors)
+    user = getkw!(kwargs, :user)
+    dir = abspath(expanduser(getkw!(kwargs, :dir)))
+    host = replace(getkw!(kwargs, :host), r".*://" => "")
+    julia = getkw!(kwargs, :julia)
+
+    authors = getkw!(kwargs, :authors)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
 
     # User-supplied plugins come first, so that deduping the list will remove the defaults.
     plugins = Plugin[]
-    append!(plugins, getkw(kwargs, :plugins))
-    disabled = getkw(kwargs, :disable_defaults)
+    append!(plugins, getkw!(kwargs, :plugins))
+    disabled = getkw!(kwargs, :disable_defaults)
     append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
     plugins = sort(unique(typeof, plugins); by=string)
 
@@ -81,6 +83,8 @@ function Template(::Val{false}; kwargs...)
             end
         end
     end
+
+    isempty(kwargs) || @warn "Unrecognized keywords were supplied" kwargs
 
     t = Template(authors, dir, host, julia, plugins, user)
     foreach(p -> validate(p, t), t.plugins)
@@ -120,11 +124,11 @@ hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
 # Get a plugin by type.
 function getplugin(t::Template, ::Type{T}) where T <: Plugin
     i = findfirst(p -> p isa T, t.plugins)
-    i === nothing ? nothing : t.plugins[i]
+    return i === nothing ? nothing : t.plugins[i]
 end
 
-# Get a keyword, or compute some default value.
-getkw(kwargs, k) = get(() -> defaultkw(Template, k), kwargs, k)
+# Get a keyword or a default value.
+getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
 
 # Default Template keyword values.
 defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))

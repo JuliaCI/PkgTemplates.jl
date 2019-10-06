@@ -1,6 +1,6 @@
 name = "PkgTemplates"
 uuid = "14b8a8f1-9102-5b29-a752-f990bacb7fe1"
-authors = ["Chris de Graaf <chrisadegraaf@gmail.com>"]
+authors = ["Chris de Graaf", "Invenia Technical Computing Corporation"]
 version = "0.7.0"
 
 [deps]

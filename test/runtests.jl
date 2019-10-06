@@ -3,7 +3,7 @@ using Base.Filesystem: contractuser, path_separator
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
 using Pkg: Pkg
 using Random: Random
-using Test: @test, @testset, @test_throws
+using Test: @test, @testset, @test_logs, @test_throws
 
 using ReferenceTests: @test_reference
 using SimpleMock: mock

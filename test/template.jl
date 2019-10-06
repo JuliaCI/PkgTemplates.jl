@@ -43,6 +43,11 @@
             # Disabling a default plugin.
             test_plugins([], setdiff(defaults, [default_g]), [Git])
         end
+
+        @testset "Unsupported keywords warning" begin
+            @test_logs tpl()
+            @test_logs (:warn, "Unrecognized keywords were supplied") tpl(; x=1, y=2)
+        end
     end
 
     @testset "hasplugin" begin
