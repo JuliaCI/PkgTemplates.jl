@@ -6,7 +6,7 @@
                 @test isempty(Template(; disable_defaults=[Git]).user)
             end
             mock(PT.default_user => () -> "username") do _du
-                @test Template().user == PT.default_user()
+                @test Template().user == "username"
             end
         end
 

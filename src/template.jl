@@ -34,9 +34,6 @@ A configuration used to generate packages.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref), [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
   To override a default plugin instead of disabling it altogether, supply it via `plugins`.
 
-### Interactive Usage
-- `interactive::Bool=false`: When set, the template is created interactively, filling unset keywords with user input.
-
 ---
 
 To create a package from a `Template`, use the following syntax:
@@ -56,7 +53,7 @@ struct Template
     user::String
 end
 
-Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
+Template(; kwargs...) = Template(Val(false); kwargs...)
 
 # Non-interactive constructor.
 function Template(::Val{false}; kwargs...)

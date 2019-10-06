@@ -47,14 +47,8 @@ t = Template(;
         Codecov(),
         TravisCI(; x86=true),
         Documenter{TravisCI}(),
-o    ],
+    ],
 )
-```
-
-You can also create a `Template` interactively by following a set of prompts:
-
-```jl
-julia> t = Template(; interactive=true)
 ```
 
 ---

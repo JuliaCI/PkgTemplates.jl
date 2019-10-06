@@ -5,8 +5,7 @@
         inline_badges=false,
     )
 
-Creates a `README` file.
-By default, it includes badges for other included plugins
+Creates a `README` file that contains badges for other included plugins.
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the `README`.
@@ -14,10 +13,10 @@ By default, it includes badges for other included plugins
   For example, values of `"README"` or `"README.rst"` might be desired.
 - `inline_badges::Bool`: Whether or not to put the badges on the same line as the package name.
 """
-@with_defaults struct Readme <: BasicPlugin
-    file::String = default_file("README.md") <- "Path to README.md template"
-    destination::String = "README.md" <- "README file destination"
-    inline_badges::Bool = false <- "Enable inline badges"
+@with_kw_noshow struct Readme <: BasicPlugin
+    file::String = default_file("README.md")
+    destination::String = "README.md"
+    inline_badges::Bool = false
 end
 
 source(p::Readme) = p.file

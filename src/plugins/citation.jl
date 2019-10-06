@@ -7,9 +7,9 @@ Creates a `CITATION.bib` file for citing package repositories.
 - `file::AbstractString`: Template file for `CITATION.bib`.
 - `readme::Bool`: Whether or not to include a section about citing in the README.
 """
-@with_defaults struct Citation <: BasicPlugin
-    file::String = default_file("CITATION.bib") <- "Path to CITATION.bib template"
-    readme::Bool = false <- """Enable "Citing" README section"""
+@with_kw_noshow struct Citation <: BasicPlugin
+    file::String = default_file("CITATION.bib")
+    readme::Bool = false
 end
 
 tags(::Citation) = "<<", ">>"

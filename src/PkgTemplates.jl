@@ -4,14 +4,12 @@ using Base: active_project
 using Base.Filesystem: contractuser
 
 using Dates: month, today, year
-using InteractiveUtils: subtypes
 using LibGit2: LibGit2, GitRemote, GitRepo
 using Pkg: Pkg, TOML, PackageSpec
-using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 using UUIDs: uuid4
 
 using Mustache: render
-using Parameters: with_kw
+using Parameters: @with_kw_noshow
 
 export
     Template,
@@ -43,7 +41,6 @@ abstract type Plugin end
 include("template.jl")
 include("plugin.jl")
 include("show.jl")
-include("interactive.jl")
 
 # Run some function with a project activated at the given path.
 function with_project(f::Function, path::AbstractString)

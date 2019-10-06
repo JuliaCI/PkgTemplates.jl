@@ -38,7 +38,7 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
     make_jl::String
     index_md::String
 
-    # Can't use @with_defaults due to some weird precompilation issues.
+    # Can't use @with_kw_noshow due to some weird precompilation issues.
     function Documenter{T}(;
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
@@ -51,28 +51,6 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
 end
 
 Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
-
-function interactive(::Type{Documenter})
-    kwargs = Dict{Symbol, Any}()
-
-    default = default_file("docs", "make.jl")
-    kwargs[:make_jl] = prompt(String, "Documenter: Path to make.jl template", default)
-
-    default = default_file("docs", "src", "index.md")
-    kwargs[:index_md] = prompt(String, "Documenter: Path to make.jl template", default)
-
-    kwargs[:assets] = prompt(Vector{String}, "Documenter: Extra asset files", String[])
-
-    md_kw = prompt(Dict{String, String}, "Documenter: makedocs keyword arguments", Dict())
-    parsed = Dict{Symbol, Any}(Symbol(p.first) => eval(Meta.parse(p.second)) for p in md_kw)
-    kwargs[:makedocs_kwargs] = parsed
-
-    available = [Nothing, TravisCI, GitLabCI]
-    f = T -> string(nameof(T))
-    T = select(f, "Documenter: Documentation deployment strategy", available, Nothing)
-
-    return Documenter{T}(; kwargs...)
-end
 
 gitignore(::Documenter) = ["/docs/build/"]
 

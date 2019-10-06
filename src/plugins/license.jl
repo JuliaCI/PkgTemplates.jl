@@ -34,15 +34,3 @@ view(::License, t::Template, ::AbstractString) = Dict(
     "AUTHORS" => join(t.authors, ", "),
     "YEAR" => year(today()),
 )
-
-function interactive(::Type{License})
-    destination = prompt(String, "License: License file destination", "LICENSE")
-    return if prompt(Bool, "License: Use custom license file", false)
-        path = prompt(String, "License: Path to custom license file", ""; required=true)
-        License(; path=path, destination=destination)
-    else
-        available = sort(readdir(joinpath(TEMPLATES_DIR, "licenses")))
-        name = select("License: Select a license", available, "MIT")
-        License(; name=name, destination=destination)
-    end
-end

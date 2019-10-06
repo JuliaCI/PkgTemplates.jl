@@ -9,6 +9,7 @@ format_version(v::AbstractString) = string(v)
 
 const ALLOWED_FAILURES = ["1.3", "nightly"]  # TODO: Update this list with new RCs.
 const DEFAULT_CI_VERSIONS = map(format_version, [default_version(), VERSION, "nightly"])
+const DEFAULT_CI_VERSIONS_NO_NIGHTLY = map(format_version, [default_version(), VERSION])
 const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to test, as strings or `VersionNumber`s."
 
 """
@@ -44,14 +45,14 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 - `coverage::Bool`: Whether or not to publish code coverage (another code coverage plugin such as [`Codecov`](@ref) must also be included).
 $EXTRA_VERSIONS_DOC
 """
-@with_defaults struct TravisCI <: BasicPlugin
-    file::String = default_file("travis.yml") <- "Path to .travis.yml template"
-    linux::Bool = true <- "Enable Linux bulds"
-    osx::Bool = true <- "Enable OSX builds"
-    windows::Bool = true <- "Enable Windows builds"
-    x86::Bool = false <- "Enable 32-bit builds"
-    coverage::Bool = true <- "Enable code coverage submission"
-    extra_versions::Vector = DEFAULT_CI_VERSIONS <- "Extra Julia versions to test"
+@with_kw_noshow struct TravisCI <: BasicPlugin
+    file::String = default_file("travis.yml")
+    linux::Bool = true
+    osx::Bool = true
+    windows::Bool = true
+    x86::Bool = false
+    coverage::Bool = true
+    extra_versions::Vector = DEFAULT_CI_VERSIONS
 end
 
 source(p::TravisCI) = p.file
@@ -113,11 +114,11 @@ Integrates your packages with [AppVeyor](https://appveyor.com) via [AppVeyor.jl]
 - `coverage::Bool`: Whether or not to publish code coverage ([`Codecov`](@ref) must also be included).
 $EXTRA_VERSIONS_DOC
 """
-@with_defaults struct AppVeyor <: BasicPlugin
-    file::String = default_file("appveyor.yml") <- "Path to .appveyor.yml template"
-    x86::Bool = false <- "Enable 32-bit builds"
-    coverage::Bool = true <- "Enable code coverage submission"
-    extra_versions::Vector = DEFAULT_CI_VERSIONS <- "Extra Julia versions to test"
+@with_kw_noshow struct AppVeyor <: BasicPlugin
+    file::String = default_file("appveyor.yml")
+    x86::Bool = false
+    coverage::Bool = true
+    extra_versions::Vector = DEFAULT_CI_VERSIONS
 end
 
 source(p::AppVeyor) = p.file
@@ -166,11 +167,11 @@ $EXTRA_VERSIONS_DOC
 !!! note
     Code coverage submission from Cirrus CI is not yet supported by [Coverage.jl](https://github.com/JuliaCI/Coverage.jl).
 """
-@with_defaults struct CirrusCI <: BasicPlugin
-    file::String = default_file("cirrus.yml") <- "Path to .cirrus.yml template"
-    image::String = "freebsd-12-0-release-amd64" <- "FreeBSD image"
-    coverage::Bool = true <- "Enable code coverage submission"
-    extra_versions::Vector = DEFAULT_CI_VERSIONS <- "Extra Julia versions to test"
+@with_kw_noshow struct CirrusCI <: BasicPlugin
+    file::String = default_file("cirrus.yml")
+    image::String = "freebsd-12-0-release-amd64"
+    coverage::Bool = true
+    extra_versions::Vector = DEFAULT_CI_VERSIONS
 end
 
 source(p::CirrusCI) = p.file
@@ -198,7 +199,7 @@ end
     GitLabCI(;
         file="$(contractuser(default_file("gitlab-ci.yml")))",
         coverage=true,
-        extra_versions=$(map(format_version, [default_version(), VERSION])),
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
     )
 
 Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci/).
@@ -215,11 +216,11 @@ See [`Documenter`](@ref) for more information.
 !!! note
     Nightly Julia is not supported.
 """
-@with_defaults struct GitLabCI <: BasicPlugin
-    file::String = default_file("gitlab-ci.yml") <- "Path to .gitlab-ci.yml template"
-    coverage::Bool = true <- "Enable code coverage submission"
+@with_kw_noshow struct GitLabCI <: BasicPlugin
+    file::String = default_file("gitlab-ci.yml")
+    coverage::Bool = true
     # Nightly has no Docker image.
-    extra_versions::Vector = map(format_version, [default_version(), VERSION]) <- "Extra Julia versions to test"
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
@@ -251,7 +252,6 @@ function view(p::GitLabCI, t::Template, pkg::AbstractString)
         "VERSIONS" => collect_versions(t, p.extra_versions),
     )
 end
-
 
 """
     is_ci(::Plugin) -> Bool

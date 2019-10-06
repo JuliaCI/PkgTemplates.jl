@@ -6,9 +6,9 @@ Creates a module entrypoint.
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `src/<module>.jl`.
 """
-@with_defaults mutable struct SrcDir <: BasicPlugin
-    file::String = default_file("src", "module.jl") <- "Path to <module>.jl template"
-    destination::String = joinpath("src", "<module>.jl")
+@with_kw_noshow mutable struct SrcDir <: BasicPlugin
+    file::String = default_file("src", "module.jl")
+    destination::String = ""
 end
 
 Base.:(==)(a::SrcDir, b::SrcDir) = a.file == b.file

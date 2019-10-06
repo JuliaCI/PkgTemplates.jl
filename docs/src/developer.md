@@ -19,7 +19,6 @@ BasicPlugin
 
 ## Template + Package Creation Pipeline
 
-
 The [`Template`](@ref) constructor basically does this:
 
 ```
@@ -76,7 +75,7 @@ To understand how they're implemented, let's look at simplified versions of two 
 ### Example: `Documenter`
 
 ```julia
-@with_defaults struct Documenter <: Plugin
+@with_kw_noshow struct Documenter <: Plugin
     make_jl::String = default_file("docs", "make.jl") <- "Path to make.jl template"
     index_md::String = default_file("docs", "src", "index.md") <- "Path to index.md template"
 end
@@ -118,14 +117,8 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
 end
 ```
 
-The first thing you'll notice is the strange struct definition with [`@with_defaults`](@ref).
-
-```@docs
-@with_defaults
-interactive
-```
-
-Inside of our struct definition we're using [`default_file`](@ref) to refer to files in this repository.
+The `@with_kw_noshow` macro defines keyword constructors for us.
+Inside of our struct definition, we're using [`default_file`](@ref) to refer to files in this repository.
 
 ```@docs
 default_file

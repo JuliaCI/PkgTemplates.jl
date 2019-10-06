@@ -2,47 +2,6 @@ const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
 """
-    @with_defaults struct T #= ... =# end
-
-Creates keyword constructors and generates methods needed to interactively create instances with [`interactive`](@ref).
-
-## Example
-
-```julia
-struct Foo <: Plugin
-    file::String = "/the/default/value" <- "This is the interactive prompt"
-    n::Int <- "This one has no default, so it's a required keyword"
-    abc::String = "No prompt, so the default is always taken in interactive mode"
-    xyz::String  # Required keyword, with a generic interactive prompt.
-end
-```
-"""
-macro with_defaults(ex::Expr)
-    T = esc(ex.args[2].args[1])  # This assumes T <: U.
-
-    # This is a bit nasty.
-    funcs = Expr[]
-    foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do arg
-        if iscall(arg, :<) && iscall(arg.args[3], :-)  # x::T <- "prompt"
-            name = QuoteNode(arg.args[2].args[1])
-            prompt = arg.args[2]
-            push!(funcs, :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))))
-        elseif arg.head === :(=)
-            rhs = arg.args[2]
-            name = QuoteNode(arg.args[1].args[1])
-            if iscall(rhs, :<) && iscall(rhs.args[3], :-)  # x::T = "foo" <- "prompt"
-                prompt = rhs.args[3].args[2]
-                push!(funcs, :(PkgTemplates.prompt(::Type{$T}, ::Val{$name}) = $(esc(prompt))))
-            end
-            default = arg.args[2] = rhs.args[2]
-            push!(funcs, :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $(esc(default))))
-        end
-    end
-
-    return Expr(:block, esc(with_kw(ex, __module__, false)), funcs...)
-end
-
-"""
 A simple plugin that, in general, creates a single file.
 """
 abstract type BasicPlugin <: Plugin end
@@ -275,11 +234,6 @@ Determine whether or not a plugin needs a Git hosting service username to functi
 If you are implementing a plugin that uses the `user` field of a [`Template`](@ref), you should implement this function and return `true`.
 """
 needs_username(::Plugin) = false
-
-function prompt end
-
-iscall(x, ::Symbol) = false
-iscall(ex::Expr, s::Symbol) = ex.head === :call && ex.args[1] === s
 
 include(joinpath("plugins", "project_file.jl"))
 include(joinpath("plugins", "src_dir.jl"))

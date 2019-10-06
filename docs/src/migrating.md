@@ -43,16 +43,11 @@ One less name to remember!
 
 ## Interactive Templates
 
-Two less names to remember!
-
-| Old                    | New                                 |
-| :--------------------: | :---------------------------------: |
-| `interactive_template` | `Template(; interactive=true)`      |
-| `generate_interactive` | `Template(; interactive=true)(pkg)` |
+Currently not implemented, but will be in the future.
 
 ## Other Functions
 
-Another two less names to remember!
+Two less names to remember!
 Although it's unlikely that anyone used these.
 
 | Old                  | New                                                                                                  |
