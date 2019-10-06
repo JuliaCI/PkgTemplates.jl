@@ -23,7 +23,7 @@ end
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
             AppVeyor(), CirrusCI(), Citation(), Codecov(), Coveralls(),
-            Develop(), Documenter(), GitLabCI(), TravisCI(),
+            Develop(), Documenter(), DroneCI(), GitLabCI(), TravisCI(),
         ])
     end
 
@@ -39,6 +39,7 @@ end
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
             ),
+            DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.1"]),
             Git(; ignore=["a", "b", "c"], manifest=true),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),

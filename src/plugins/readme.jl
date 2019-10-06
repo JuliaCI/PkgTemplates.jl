@@ -51,6 +51,7 @@ badge_order() = [
     GitLabCI,
     TravisCI,
     AppVeyor,
+    DroneCI,
     CirrusCI,
     Codecov,
     Coveralls,

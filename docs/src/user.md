@@ -49,6 +49,7 @@ These plugins will create the configuration files of common CI services for you.
 ```@docs
 AppVeyor
 CirrusCI
+DroneCI
 GitLabCI
 TravisCI
 ```

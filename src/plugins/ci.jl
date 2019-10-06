@@ -254,12 +254,67 @@ function view(p::GitLabCI, t::Template, pkg::AbstractString)
 end
 
 """
+    DroneCI(;
+        file="$(contractuser(default_file("drone.star")))",
+        amd64=true,
+        arm=false,
+        arm64=false,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+    )
+
+Integrates your packages with [Drone CI](https://drone.io).
+
+## Keyword Arguments
+- `file::AbstractString`: Template file for `.drone.star`.
+- `destination::AbstractString`: File destination, relative to the repository root.
+  For example, you might want to generate a `.drone.yml` instead of the default Starlark file.
+- `amd64::Bool`: Whether or not to run builds on AMD64.
+- `arm::Bool`: Whether or not to run builds on ARM (32-bit).
+- `arm::Bool`: Whether or not to run builds on ARM64.
+$EXTRA_VERSIONS_DOC
+
+!!! note
+    Nightly Julia is not supported.
+"""
+@with_kw_noshow struct DroneCI <: BasicPlugin
+    file::String = default_file("drone.star")
+    destination::String = ".drone.star"
+    amd64::Bool = true
+    arm::Bool = false
+    arm64::Bool = false
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+end
+
+source(p::DroneCI) = p.file
+destination(p::DroneCI) = p.destination
+
+badges(::DroneCI) = Badge(
+    "Build Status",
+    "https://cloud.drone.io/api/badges/{{{USER}}}/{{{PKG}}}.jl/status.svg",
+    "https://cloud.drone.io/{{{USER}}}/{{{PKG}}}.jl",
+)
+
+function view(p::DroneCI, t::Template, pkg::AbstractString)
+    arches = String[]
+    p.amd64 && push!(arches, "amd64")
+    p.arm && push!(arches, "arm")
+    p.arm64 && push!(arches, "arm64")
+
+    return Dict(
+        "ARCHES" => join(map(repr, arches), ", "),
+        "PKG" => pkg,
+        "USER" => t.user,
+        "VERSIONS" => join(map(repr, collect_versions(t, p.extra_versions)), ", "),
+    )
+end
+
+"""
     is_ci(::Plugin) -> Bool
 
 Determine whether or not a plugin is a CI plugin.
 If you are adding a CI plugin, you should implement this function and return `true`.
 """
 is_ci(::Plugin) = false
-is_ci(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}) = true
+is_ci(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
 
-needs_username(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI}) = true
+needs_username(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
