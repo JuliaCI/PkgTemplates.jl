@@ -26,4 +26,12 @@ PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 
             @test read(joinpath(pkg_dir, "foo.txt"), String) == s
         end
     end
+
+    @testset "Tests Project.toml warning on Julia < 1.2" begin
+        p = Tests(; project=true)
+        @test_logs (:warn, r"The project option is set") tpl(; julia=v"1", plugins=[p])
+        @test_logs (:warn, r"The project option is set") tpl(; julia=v"1.1", plugins=[p])
+        @test_logs tpl(; julia=v"1.2", plugins=[p])
+        @test_logs tpl(; julia=v"1.3", plugins=[p])
+    end
 end

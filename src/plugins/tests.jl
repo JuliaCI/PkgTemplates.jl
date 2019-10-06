@@ -29,7 +29,7 @@ function validate(p::Tests, t::Template)
     invoke(validate, Tuple{BasicPlugin, Template}, p, t)
     p.project && t.julia < v"1.2" && @warn string(
         "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
-        "but a Julia version older than 1.2 is supported by the Template",
+        "but a Julia version older than 1.2 ($(t.julia)) is supported by the template",
     )
 end
 
