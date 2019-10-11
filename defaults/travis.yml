@@ -12,6 +12,8 @@ matrix:
   fast_finish: true
 notifications:
   email: false
+# Uncomment the following line to override the default script:
+# script: julia -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
 {{#COVERAGE}}
 after_success:
 {{#CODECOV}}
