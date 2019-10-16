@@ -44,16 +44,21 @@ mktempdir() do dir
         @testset "PkgTemplates.jl" begin
             include("template.jl")
             include("plugin.jl")
-            include("git.jl")
             include("show.jl")
 
-            # Quite a bit of output depends on the Julia version,
-            # and the test fixtures are made with Julia 1.2.
-            # TODO: Keep this on the latest stable Julia version.
-            if VERSION.major == 1 && VERSION.minor == 2
-                include("reference.jl")
+            if PT.git_is_installed()
+                include("git.jl")
+
+                # Quite a bit of output depends on the Julia version,
+                # and the test fixtures are made with Julia 1.2.
+                # TODO: Keep this on the latest stable Julia version.
+                if VERSION.major == 1 && VERSION.minor == 2
+                    include("reference.jl")
+                else
+                    @info "Skipping reference tests" julia=VERSION
+                end
             else
-                @info "Skipping reference tests" julia=VERSION
+                @info "Git is not installed, skipping Git and reference tests"
             end
         end
     finally

@@ -32,7 +32,7 @@ function gitignore(p::Git)
 end
 
 function validate(p::Git, t::Template)
-    if p.gpgsign && try run(pipeline(`git --version`; stdout=devnull)); false catch; true end
+    if p.gpgsign && !git_is_installed()
         throw(ArgumentError("Git: gpgsign is set but the Git CLI is not installed"))
     end
 
@@ -96,6 +96,15 @@ function commit(p::Git, repo::GitRepo, pkg_dir::AbstractString, msg::AbstractStr
 end
 
 needs_username(::Git) = true
+
+function git_is_installed()
+    return try
+        run(pipeline(`git --version`; stdout=devnull))
+        true
+    catch
+        false
+    end
+end
 
 if isdefined(Pkg, :dependencies)
     function version_of(pkg::AbstractString)
