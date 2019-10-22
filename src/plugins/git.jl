@@ -54,7 +54,7 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
             "https://$(t.host)/$(t.user)/$pkg.jl"
         end
         LibGit2.with(GitRemote(repo, "origin", url)) do remote
-            # TODO: `git pull` still requires some Git branch config.
+            LibGit2.add_fetch!(repo, remote, "refs/heads/master")
             LibGit2.add_push!(repo, remote, "refs/heads/master")
         end
     end
