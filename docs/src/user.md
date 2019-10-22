@@ -76,6 +76,42 @@ Develop
 Citation
 ```
 
+## A More Complicated Example
+
+Here are a few example templates that use the options and plugins explained above.
+
+This one includes plugins suitable for a project hosted on GitHub, and some other customizations:
+
+```julia
+Template(; 
+    user="my-username",
+    dir="~/code",
+    authors="Acme Corp",
+    julia=v"1.1",
+    plugins=[
+        License(; name="MPL"),
+        Git(; manifest=true, ssh=true),
+        TravisCI(; x86=true),
+        Codecov(),
+        Documenter{TravisCI}(),
+        Develop(),
+    ],
+)
+```
+
+Here's one that works well for projects hosted on GitLab:
+
+```julia
+Template(;
+    user="my-username",
+    host="gitlab.com",
+    plugins=[
+        GitLabCI(),
+        Documenter{GitLabCI}(),
+    ],
+)
+```
+
 ## Custom Template Files
 
 !!! note "Templates vs Templating"
