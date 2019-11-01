@@ -45,7 +45,13 @@ end
             License(; name="ISC"),
             Readme(; inline_badges=true),
             Tests(; project=true),
-            TravisCI(; coverage=false, windows=false, x86=true, extra_versions=["1.1"]),
+            TravisCI(;
+                coverage=false,
+                windows=false,
+                x86=true,
+                arm=true,
+                extra_versions=["1.1"],
+            ),
         ])
     end
 end

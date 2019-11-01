@@ -30,6 +30,7 @@ end
         osx=true,
         windows=true,
         x86=false,
+        arm=false,
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
     )
@@ -43,6 +44,7 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 - `windows::Bool`: Whether or not to run builds on Windows.
 - `x86::Bool`: Whether or not to run builds on 32-bit systems,
   in addition to the default 64-bit builds.
+- `arm::Bool`: Whether or not to run builds on the ARM architecture, in addition to AMD64.
 - `coverage::Bool`: Whether or not to publish code coverage.
   Another code coverage plugin such as [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
@@ -53,6 +55,7 @@ $EXTRA_VERSIONS_DOC
     osx::Bool = true
     windows::Bool = true
     x86::Bool = false
+    arm::Bool = false
     coverage::Bool = true
     extra_versions::Vector = DEFAULT_CI_VERSIONS
 end
@@ -75,11 +78,16 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     versions = collect_versions(t, p.extra_versions)
     allow_failures = filter(in(versions), ALLOWED_FAILURES)
 
-    x86 = Dict{String, String}[]
+    jobs = Dict{String, String}[]
     if p.x86
         foreach(versions) do v
-            p.linux && push!(x86, Dict("JULIA" => v, "OS" => "linux"))
-            p.windows && push!(x86, Dict("JULIA" => v, "OS" => "windows"))
+            p.linux && push!(jobs, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
+            p.windows && push!(jobs, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
+        end
+    end
+    if p.arm
+        foreach(versions) do v
+            p.linux && push!(jobs, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "arm64"))
         end
     end
 
@@ -90,13 +98,13 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
         "HAS_COVERAGE" => p.coverage && hasplugin(t, is_coverage),
         "HAS_COVERALLS" => hasplugin(t, Coveralls),
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{TravisCI}),
-        "HAS_JOBS" => p.x86 || hasplugin(t, Documenter{TravisCI}),
+        "HAS_JOBS" => !isempty(jobs) || hasplugin(t, Documenter{TravisCI}),
         "OS" => os,
         "PKG" => pkg,
         "USER" => t.user,
         "VERSION" => format_version(t.julia),
         "VERSIONS" => versions,
-        "X86" => x86,
+        "JOBS" => jobs,
     )
 end
 

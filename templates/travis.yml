@@ -21,11 +21,11 @@ jobs:
 {{#HAS_JOBS}}
   include:
 {{/HAS_JOBS}}
-{{#X86}}
+{{#JOBS}}
     - julia: {{{JULIA}}}
       os: {{{OS}}}
-      arch: x86
-{{/X86}}
+      arch: {{{ARCH}}}
+{{/JOBS}}
 {{#HAS_DOCUMENTER}}
     - stage: Documentation
       julia: {{{VERSION}}}
