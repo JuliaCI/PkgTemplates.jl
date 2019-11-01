@@ -7,6 +7,7 @@ makedocs(;
     repo="https://github.com/invenia/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",
     format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://invenia.github.io/PkgTemplates.jl",
         assets=String[],
     ),
