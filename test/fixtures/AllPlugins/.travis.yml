@@ -10,6 +10,8 @@ os:
   - linux
   - osx
   - windows
+arch:
+  - x64
 jobs:
   fast_finish: true
   allow_failures:

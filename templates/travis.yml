@@ -10,6 +10,10 @@ os:
 {{#OS}}
   - {{{.}}}
 {{/OS}}
+arch:
+{{#ARCH}}
+  - {{{.}}}
+{{/ARCH}}
 jobs:
   fast_finish: true
 {{#HAS_ALLOW_FAILURES}}
@@ -18,15 +22,20 @@ jobs:
 {{#ALLOW_FAILURES}}
     - julia: {{{.}}}
 {{/ALLOW_FAILURES}}
-{{#HAS_JOBS}}
-  include:
-{{/HAS_JOBS}}
-{{#JOBS}}
-    - julia: {{{JULIA}}}
-      os: {{{OS}}}
-      arch: {{{ARCH}}}
-{{/JOBS}}
+{{#HAS_EXCLUDES}}
+  exclude:
+{{/HAS_EXCLUDES}}
+{{#EXCLUDES}}
+    - arch: {{{E_ARCH}}}
+      {{#E_OS}}
+      os: {{{E_OS}}}
+      {{/E_OS}}
+      {{#E_JULIA}}
+      julia: {{{E_JULIA}}}
+      {{/E_JULIA}}
+{{/EXCLUDES}}
 {{#HAS_DOCUMENTER}}
+  include:
     - stage: Documentation
       julia: {{{VERSION}}}
       script: julia --project=docs -e '

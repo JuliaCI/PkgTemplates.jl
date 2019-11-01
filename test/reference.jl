@@ -49,7 +49,7 @@ end
                 coverage=false,
                 windows=false,
                 x86=true,
-                arm=true,
+                arm64=true,
                 extra_versions=["1.1"],
             ),
         ])

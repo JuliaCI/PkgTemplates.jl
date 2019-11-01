@@ -29,8 +29,9 @@ end
         linux=true,
         osx=true,
         windows=true,
+        x64=true,
         x86=false,
-        arm=false,
+        arm64=false,
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
     )
@@ -42,9 +43,9 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 - `linux::Bool`: Whether or not to run builds on Linux.
 - `osx::Bool`: Whether or not to run builds on OSX (MacOS).
 - `windows::Bool`: Whether or not to run builds on Windows.
-- `x86::Bool`: Whether or not to run builds on 32-bit systems,
-  in addition to the default 64-bit builds.
-- `arm::Bool`: Whether or not to run builds on the ARM architecture, in addition to AMD64.
+- `x64::Bool`: Whether or not to run builds on 64-bit architecture.
+- `x86::Bool`: Whether or not to run builds on 32-bit architecture.
+- `arm64::Bool`: Whether or not to run builds on the ARM64 architecture.
 - `coverage::Bool`: Whether or not to publish code coverage.
   Another code coverage plugin such as [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
@@ -54,8 +55,9 @@ $EXTRA_VERSIONS_DOC
     linux::Bool = true
     osx::Bool = true
     windows::Bool = true
+    x64::Bool = true
     x86::Bool = false
-    arm::Bool = false
+    arm64::Bool = false
     coverage::Bool = true
     extra_versions::Vector = DEFAULT_CI_VERSIONS
 end
@@ -70,41 +72,34 @@ badges(::TravisCI) = Badge(
 )
 
 function view(p::TravisCI, t::Template, pkg::AbstractString)
-    os = String[]
-    p.linux && push!(os, "linux")
-    p.osx && push!(os, "osx")
-    p.windows && push!(os, "windows")
-
+    os = filter(o -> getfield(p, Symbol(o)), ["linux", "osx", "windows"])
+    arch = filter(a -> getfield(p, Symbol(a)), ["x64", "x86", "arm64"])
     versions = collect_versions(t, p.extra_versions)
     allow_failures = filter(in(versions), ALLOWED_FAILURES)
 
-    jobs = Dict{String, String}[]
-    if p.x86
-        foreach(versions) do v
-            p.linux && push!(jobs, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "x86"))
-            p.windows && push!(jobs, Dict("JULIA" => v, "OS" => "windows", "ARCH" => "x86"))
-        end
-    end
-    if p.arm
-        foreach(versions) do v
-            p.linux && push!(jobs, Dict("JULIA" => v, "OS" => "linux", "ARCH" => "arm64"))
-        end
+    excludes = Dict{String, String}[]
+    p.x86 && p.osx && push!(excludes, Dict("E_OS" => "osx", "E_ARCH" => "x86"))
+    if p.arm64
+        p.osx && push!(excludes, Dict("E_OS" => "osx", "E_ARCH" => "arm64"))
+        p.windows && push!(excludes, Dict("E_OS" => "windows", "E_ARCH" => "arm64"))
+        "nightly" in versions && push!(excludes, Dict("E_JULIA" => "nightly", "E_ARCH" => "arm64"))
     end
 
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
+        "ARCH" => arch,
+        "EXCLUDES" => excludes,
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => hasplugin(t, Codecov),
         "HAS_COVERAGE" => p.coverage && hasplugin(t, is_coverage),
         "HAS_COVERALLS" => hasplugin(t, Coveralls),
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{TravisCI}),
-        "HAS_JOBS" => !isempty(jobs) || hasplugin(t, Documenter{TravisCI}),
+        "HAS_EXCLUDES" => !isempty(excludes),
         "OS" => os,
         "PKG" => pkg,
         "USER" => t.user,
         "VERSION" => format_version(t.julia),
         "VERSIONS" => versions,
-        "JOBS" => jobs,
     )
 end
 
