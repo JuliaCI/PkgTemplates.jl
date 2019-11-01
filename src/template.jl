@@ -86,7 +86,9 @@ function Template(::Val{false}; kwargs...)
         end
     end
 
-    isempty(kwargs) || @warn "Unrecognized keywords were supplied" kwargs
+    if !isempty(kwargs)
+        @warn "Unrecognized keywords were supplied, see the documentation for help" kwargs
+    end
 
     t = Template(authors, dir, host, julia, plugins, user)
     foreach(p -> validate(p, t), t.plugins)

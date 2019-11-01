@@ -46,7 +46,7 @@
 
         @testset "Unsupported keywords warning" begin
             @test_logs tpl()
-            @test_logs (:warn, "Unrecognized keywords were supplied") tpl(; x=1, y=2)
+            @test_logs (:warn, r"Unrecognized keywords were supplied") tpl(; x=1, y=2)
         end
     end
 
