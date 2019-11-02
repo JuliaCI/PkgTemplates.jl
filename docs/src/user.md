@@ -40,6 +40,7 @@ Tests
 Readme
 License
 Git
+TagBot
 ```
 
 ### Continuous Integration (CI)

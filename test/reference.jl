@@ -76,6 +76,7 @@ end
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true),
+            TagBot(; gpgsign=true),
             Tests(; project=true),
             TravisCI(;
                 coverage=false,

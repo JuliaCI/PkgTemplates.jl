@@ -46,6 +46,9 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   inline_badges: false
                 SrcDir:
                   file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
+                TagBot:
+                  destination: "TagBot.yml"
+                  gpgsign: false
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false

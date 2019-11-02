@@ -28,6 +28,7 @@ export
     ProjectFile,
     Readme,
     SrcDir,
+    TagBot,
     Tests,
     TravisCI
 

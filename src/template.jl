@@ -1,4 +1,4 @@
-default_plugins() = [ProjectFile(), SrcDir(), Git(), License(), Readme(), Tests()]
+default_plugins() = [ProjectFile(), SrcDir(), Git(), License(), Readme(), Tests(), TagBot()]
 default_user() = LibGit2.getconfig("github.user", "")
 default_version() = VersionNumber(VERSION.major)
 
