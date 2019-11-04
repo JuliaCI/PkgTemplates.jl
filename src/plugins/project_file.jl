@@ -1,19 +1,24 @@
 """
-    ProjectFile()
+    ProjectFile(; version=v"0.1.0")
 
 Creates a `Project.toml`.
+
+## Keyword Arguments
+- `version::VersionNumber`: The initial version of created packages.
 """
-struct ProjectFile <: Plugin end
+@with_kw_noshow struct ProjectFile <: Plugin
+    version::VersionNumber = v"0.1.0"
+end
 
 # Other plugins like Tests will modify this file.
 priority(::ProjectFile, ::typeof(hook)) = typemax(Int) - 5
 
-function hook(::ProjectFile, t::Template, pkg_dir::AbstractString)
+function hook(p::ProjectFile, t::Template, pkg_dir::AbstractString)
     toml = Dict(
         "name" => basename(pkg_dir),
         "uuid" => string(uuid4()),
         "authors" => t.authors,
-        "version" => "0.1.0",
+        "version" => string(p.version),
         "compat" => Dict("julia" => compat_version(t.julia)),
     )
     open(io -> TOML.print(io, toml), joinpath(pkg_dir, "Project.toml"), "w")
