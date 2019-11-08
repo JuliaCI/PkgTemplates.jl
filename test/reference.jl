@@ -27,6 +27,19 @@ end
         ])
     end
 
+    @testset "Documenter (TravisCI)" begin
+        test_all("DocumenterTravis"; authors=USER, plugins=[
+            Documenter{TravisCI}(), TravisCI(),
+        ])
+    end
+
+    @testset "Documenter (GitHubActions)" begin
+        test_all("DocumenterGitHubActions"; authors=USER, plugins=[
+            Documenter{GitHubActions}(), GitHubActions(),
+        ])
+    end
+
+
     @testset "Wacky options" begin
         test_all("WackyOptions"; authors=USER, julia=v"1.2", plugins=[
             AppVeyor(; x86=true, coverage=true, extra_versions=[v"1.3"]),
