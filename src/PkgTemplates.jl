@@ -22,6 +22,7 @@ export
     Develop,
     Documenter,
     Git,
+    GitHubActions,
     GitLabCI,
     License,
     ProjectFile,

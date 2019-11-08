@@ -22,8 +22,8 @@ end
 
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
-            AppVeyor(), CirrusCI(), Citation(), Codecov(), Coveralls(),
-            Develop(), Documenter(), DroneCI(), GitLabCI(), TravisCI(),
+            AppVeyor(), CirrusCI(), Citation(), Codecov(), Coveralls(), Develop(),
+            Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
         ])
     end
 
@@ -41,6 +41,7 @@ end
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.1"]),
             Git(; ignore=["a", "b", "c"], manifest=true),
+            GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
             ProjectFile(; version=v"1"),

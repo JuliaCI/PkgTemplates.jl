@@ -61,6 +61,9 @@
     end
 
     @testset "validate" begin
+        foreach((GitHubActions, TravisCI, GitLabCI)) do T
+            @test_throws ArgumentError tpl(; plugins=[Documenter{T}()])
+        end
         mock(LibGit2.getconfig => (_k, _d) -> "") do _gc
             @test_throws ArgumentError tpl(; plugins=[Git()])
         end

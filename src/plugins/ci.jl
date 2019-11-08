@@ -13,14 +13,84 @@ const DEFAULT_CI_VERSIONS_NO_NIGHTLY = map(format_version, [default_version(), V
 const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to test, as strings or `VersionNumber`s."
 
 """
-    collect_versions(t::Template, versions::Vector) -> Vector{String}
+    GitHubActions(;
+        file="$(contractuser(default_file("github", "workflows", "ci.yml")))",
+        destination="ci.yml",
+        linux=true,
+        osx=true,
+        windows=true,
+        x64=true,
+        x86=false,
+        coverage=true,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+    )
 
-Combine `t`'s Julia version with `versions`, and format them as `major.minor`.
-This is useful for creating lists of versions to be included in CI configurations.
+Integrates your packages with [GitHub Actions](https://github.com/features/actions).
+
+## Keyword Arguments
+- `file::AbstractString`: Template file for the workflow file.
+- `destination::AbstractString`: Destination of the worflow file,
+  relative to `.github/workflows`.
+- `linux::Bool`: Whether or not to run builds on Linux.
+- `osx::Bool`: Whether or not to run builds on OSX (MacOS).
+- `windows::Bool`: Whether or not to run builds on Windows.
+- `x64::Bool`: Whether or not to run builds on 64-bit architecture.
+- `x86::Bool`: Whether or not to run builds on 32-bit architecture.
+- `coverage::Bool`: Whether or not to publish code coverage.
+  Another code coverage plugin such as [`Codecov`](@ref) must also be included.
+$EXTRA_VERSIONS_DOC
+
+!!! note
+    If using coverage plugins, don't forget to manually add your API tokens as secrets,
+    as described [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets).
+
+!!! note
+    Nightly Julia is not supported.
 """
-function collect_versions(t::Template, versions::Vector)
-    vs = map(format_version, [t.julia, versions...])
-    return sort(unique(vs))
+@with_kw_noshow struct GitHubActions <: BasicPlugin
+    file::String = default_file("github", "workflows", "ci.yml")
+    destination::String = "ci.yml"
+    linux::Bool = true
+    osx::Bool = true
+    windows::Bool = true
+    x64::Bool = true
+    x86::Bool = false
+    coverage::Bool = true
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+end
+
+source(p::GitHubActions) = p.file
+destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
+
+tags(::GitHubActions) = "<<", ">>"
+
+badges(p::GitHubActions) = Badge(
+    "Build Status",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg",
+)
+
+function view(p::GitHubActions, t::Template, pkg::AbstractString)
+    os = String[]
+    p.linux && push!(os, "ubuntu-latest")
+    p.osx && push!(os, "macOS-latest")
+    p.windows && push!(os, "windows-latest")
+    arch = filter(a -> getfield(p, Symbol(a)), ["x64", "x86"])
+    excludes = Dict{String, String}[]
+    p.osx && p.x86 && push!(excludes, Dict("E_OS" => "macOS-latest", "E_ARCH" => "x86"))
+
+    return Dict(
+        "ARCH" => arch,
+        "EXCLUDES" => excludes,
+        "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
+        "HAS_COVERALLS" => p.coverage && hasplugin(t, Coveralls),
+        "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitHubActions}),
+        "HAS_EXCLUDES" => !isempty(excludes),
+        "OS" => os,
+        "PKG" => pkg,
+        "USER" => t.user,
+        "VERSIONS" => collect_versions(t, p.extra_versions),
+    )
 end
 
 """
@@ -320,12 +390,23 @@ function view(p::DroneCI, t::Template, pkg::AbstractString)
 end
 
 """
+    collect_versions(t::Template, versions::Vector) -> Vector{String}
+
+Combine `t`'s Julia version with `versions`, and format them as `major.minor`.
+This is useful for creating lists of versions to be included in CI configurations.
+"""
+function collect_versions(t::Template, versions::Vector)
+    vs = map(format_version, [t.julia, versions...])
+    return sort(unique(vs))
+end
+
+"""
     is_ci(::Plugin) -> Bool
 
 Determine whether or not a plugin is a CI plugin.
 If you are adding a CI plugin, you should implement this function and return `true`.
 """
 is_ci(::Plugin) = false
-is_ci(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
+is_ci(::Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
 
-needs_username(::Union{AppVeyor, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
+needs_username(::Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true

@@ -50,6 +50,7 @@ These plugins will create the configuration files of common CI services for you.
 AppVeyor
 CirrusCI
 DroneCI
+GitHubActions
 GitLabCI
 TravisCI
 ```
@@ -91,9 +92,9 @@ Template(;
     plugins=[
         License(; name="MPL"),
         Git(; manifest=true, ssh=true),
-        TravisCI(; x86=true),
+        GitHubActions(; x86=true),
         Codecov(),
-        Documenter{TravisCI}(),
+        Documenter{GitHubActions}(),
         Develop(),
     ],
 )

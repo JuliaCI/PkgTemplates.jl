@@ -3,6 +3,9 @@ const DOCUMENTER_DEP = PackageSpec(;
     uuid="e30172f5-a6a5-5a46-863b-614d45cd2de4",
 )
 
+const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, Nothing}
+const GitHubPagesStyle = Union{TravisCI, GitHubActions}
+
 """
     Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
@@ -17,6 +20,8 @@ Documentation deployment depends on `T`, where `T` is some supported CI plugin,
 or `Nothing` to only support local documentation builds.
 
 ## Supported Type Parameters
+- `GitHubActions`: Deploys documentation to [GitHub Pages](https://pages.github.com)
+  with the help of [`GitHubActions`](@ref).
 - `TravisCI`: Deploys documentation to [GitHub Pages](https://pages.github.com)
   with the help of [`TravisCI`](@ref).
 - `GitLabCI`: Deploys documentation to [GitLab Pages](https://pages.gitlab.com)
@@ -37,7 +42,7 @@ or `Nothing` to only support local documentation builds.
     If deploying documentation with Travis CI, don't forget to complete
     [the required configuration](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
 """
-struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
+struct Documenter{T<:DeployStyle} <: Plugin
     assets::Vector{String}
     makedocs_kwargs::Dict{Symbol}
     canonical_url::Union{Function, Nothing}
@@ -51,7 +56,7 @@ struct Documenter{T<:Union{TravisCI, GitLabCI, Nothing}} <: Plugin
         canonical_url::Union{Function, Nothing}=make_canonical(T),
         make_jl::AbstractString=default_file("docs", "make.jl"),
         index_md::AbstractString=default_file("docs", "src", "index.md"),
-    ) where T <: Union{TravisCI, GitLabCI, Nothing}
+    ) where T <: DeployStyle
         return new(assets, makedocs_kwargs, canonical_url, make_jl, index_md)
     end
 end
@@ -61,7 +66,7 @@ Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
 gitignore(::Documenter) = ["/docs/build/"]
 
 badges(::Documenter) = Badge[]
-badges(::Documenter{TravisCI}) = [
+badges(::Documenter{<:GitHubPagesStyle}) = [
     Badge(
         "Stable",
         "https://img.shields.io/badge/docs-stable-blue.svg",
@@ -90,18 +95,17 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "USER" => t.user,
 )
 
-function view(p::Documenter{TravisCI}, t::Template, pkg::AbstractString)
+function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractString)
     base = invoke(view, Tuple{Documenter, Template, AbstractString}, p, t, pkg)
     return merge(base, Dict("HAS_DEPLOY" => true))
 end
 
-foreach((TravisCI, GitLabCI)) do T
-    @eval function validate(::Documenter{$T}, t::Template)
-        if !hasplugin(t, $T)
-            name = nameof($T)
-            s = "Documenter: The $name plugin must be included for docs deployment to be set up"
-            throw(ArgumentError(s))
-        end
+validate(::Documenter{Nothing}, ::Template) = nothing
+function validate(::Documenter{T}, t::Template) where T <: DeployStyle
+    if !hasplugin(t, T)
+        name = nameof(T)
+        s = "Documenter: The $name plugin must be included for docs deployment to be set up"
+        throw(ArgumentError(s))
     end
 end
 
@@ -127,7 +131,7 @@ end
 github_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).github.io/$pkg.jl"
 gitlab_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).gitlab.io/$pkg.jl"
 
-make_canonical(::Type{TravisCI}) = github_pages_url
+make_canonical(::Type{<:GitHubPagesStyle}) = github_pages_url
 make_canonical(::Type{GitLabCI}) = gitlab_pages_url
 make_canonical(::Type{Nothing}) = nothing
 

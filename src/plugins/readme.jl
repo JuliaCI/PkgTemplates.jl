@@ -48,6 +48,7 @@ end
 badge_order() = [
     Documenter{GitLabCI},
     Documenter{TravisCI},
+    GitHubActions,
     GitLabCI,
     TravisCI,
     AppVeyor,
