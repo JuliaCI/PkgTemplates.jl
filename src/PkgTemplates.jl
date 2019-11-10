@@ -1,57 +1,57 @@
 module PkgTemplates
 
-using Dates
-using InteractiveUtils
-using LibGit2
-using Mustache
-using Pkg
-using REPL.TerminalMenus
-using URIParser
+using Base: active_project
+using Base.Filesystem: contractuser
+
+using Dates: month, today, year
+using LibGit2: LibGit2, GitRemote, GitRepo
+using Pkg: Pkg, TOML, PackageSpec
+using UUIDs: uuid4
+
+using Mustache: render
+using Parameters: @with_kw_noshow
 
 export
-    # Template/package generation.
     Template,
-    generate,
-    interactive_template,
-    generate_interactive,
-    # Licenses.
-    show_license,
-    available_licenses,
-    # Plugins.
-    GitHubPages,
-    GitLabPages,
     AppVeyor,
-    TravisCI,
-    GitLabCI,
     CirrusCI,
+    Citation,
     DroneCI,
     Codecov,
     Coveralls,
-    Citation
+    Develop,
+    Documenter,
+    Git,
+    GitHubActions,
+    GitLabCI,
+    License,
+    ProjectFile,
+    Readme,
+    SrcDir,
+    Tests,
+    TravisCI
 
 """
-A plugin to be added to a [`Template`](@ref), which adds some functionality or integration.
-New plugins should almost always extend [`GenericPlugin`](@ref) or [`CustomPlugin`](@ref).
+Plugins are PkgTemplates' source of customization and extensibility.
+Add plugins to your [`Template`](@ref)s to enable extra pieces of repository setup.
+
+When implementing a new plugin, subtype this type to have full control over its behaviour.
 """
 abstract type Plugin end
 
-include("licenses.jl")
 include("template.jl")
-include("generate.jl")
 include("plugin.jl")
-include(joinpath("plugins", "documenter.jl"))
-include(joinpath("plugins", "coveralls.jl"))
-include(joinpath("plugins", "appveyor.jl"))
-include(joinpath("plugins", "codecov.jl"))
-include(joinpath("plugins", "travisci.jl"))
-include(joinpath("plugins", "gitlabci.jl"))
-include(joinpath("plugins", "cirrusci.jl"))
-include(joinpath("plugins", "droneci.jl"))
-include(joinpath("plugins", "githubpages.jl"))
-include(joinpath("plugins", "gitlabpages.jl"))
-include(joinpath("plugins", "citation.jl"))
+include("show.jl")
 
-const DEFAULTS_DIR = normpath(joinpath(@__DIR__, "..", "defaults"))
-const BADGE_ORDER = [GitHubPages, GitLabPages, TravisCI, AppVeyor, GitLabCI, Codecov, Coveralls]
+# Run some function with a project activated at the given path.
+function with_project(f::Function, path::AbstractString)
+    proj = active_project()
+    try
+        Pkg.activate(path)
+        f()
+    finally
+        proj === nothing ? Pkg.activate() : Pkg.activate(proj)
+    end
+end
 
 end

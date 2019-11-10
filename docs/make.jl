@@ -1,20 +1,22 @@
-using Documenter, PkgTemplates
+using Documenter: Documenter, makedocs, deploydocs
+using PkgTemplates: PkgTemplates
 
 makedocs(;
     modules=[PkgTemplates],
-    format=Documenter.HTML(),
-    pages=[
-        "Home" => "index.md",
-        "Package Generation" => "pages/package_generation.md",
-        "Plugins" => "pages/plugins.md",
-        "Plugin Development" => "pages/plugin_development.md",
-        "Licenses" => "pages/licenses.md",
-        "Index" => "pages/index.md",
-    ],
+    authors="Chris de Graaf, Invenia Technical Computing Corporation",
     repo="https://github.com/invenia/PkgTemplates.jl/blob/{commit}{path}#L{line}",
     sitename="PkgTemplates.jl",
-    authors="Chris de Graaf, Invenia Technical Computing Corporation",
-    assets=[],
+    format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        canonical="https://invenia.github.io/PkgTemplates.jl",
+        assets=String[],
+    ),
+    pages=[
+        "Home" => "index.md",
+        "User Guide" => "user.md",
+        "Developer Guide" => "developer.md",
+        "Migrating To PkgTemplates 0.7+" => "migrating.md",
+    ],
 )
 
 deploydocs(;

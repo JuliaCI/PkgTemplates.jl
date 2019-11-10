@@ -1,6 +1,4 @@
-.DS_Store
-*.jl.cov
-*.jl.*.cov
-*.jl.mem
 /docs/build/
-/docs/site/
+*.jl.*.cov
+*.jl.cov
+*.jl.mem

@@ -1,50 +1,28 @@
 """
-    Citation(; readme_section::Bool=false)
+    Citation(; file="$(contractuser(default_file("CITATION.bib")))", readme=false)
 
-Add `Citation` to a template's plugins to add a `CITATION.bib` file to
-generated repositories, and an appropriate section in the README.
+Creates a `CITATION.bib` file for citing package repositories.
 
-# Keyword Arguments:
-* `readme_section::Bool=false`: whether to add a section in the readme pointing to `CITATION.bib`.
+## Keyword Arguments
+- `file::AbstractString`: Template file for `CITATION.bib`.
+- `readme::Bool`: Whether or not to include a section about citing in the README.
 """
-struct Citation <: GenericPlugin
-    gitignore::Vector{AbstractString}
-    src::Union{String, Nothing}
-    dest::AbstractString
-    badges::Vector{Badge}
-    view::Dict{String, Any}
-    readme_section::Bool
-    function Citation(; readme_section::Bool=false)
-        new(
-            [],
-            nothing,
-            "CITATION.bib",
-            [],
-            Dict{String, Any}(),
-            readme_section,
-        )
-    end
+@with_kw_noshow struct Citation <: BasicPlugin
+    file::String = default_file("CITATION.bib")
+    readme::Bool = false
 end
 
-function interactive(::Type{Citation})
-    print("Citation: Add a section to README.md mentioning CITATION.bib? [no]: ")
-    readme = uppercase(readline()) in ["Y", "YES", "TRUE"]
-    return Citation(; readme_section=readme)
-end
+tags(::Citation) = "<<", ">>"
 
+source(p::Citation) = p.file
+destination(::Citation) = "CITATION.bib"
 
-function gen_plugin(p::Citation, t::Template, pkg_name::AbstractString)
-    pkg_dir = joinpath(t.dir, pkg_name)
-    text = """
-           @misc{$pkg_name.jl,
-           \tauthor  = {$(t.authors)},
-           \ttitle   = {{$(pkg_name).jl}},
-           \turl     = {https://$(t.host)/$(t.user)/$(pkg_name).jl},
-           \tversion = {v0.1.0},
-           \tyear    = {$(year(today()))},
-           \tmonth   = {$(month(today()))}
-           }
-           """
-    gen_file(joinpath(pkg_dir, "CITATION.bib"), text)
-    return ["CITATION.bib"]
-end
+view(::Citation, t::Template, pkg::AbstractString) = Dict(
+    "AUTHORS" => join(t.authors, ", "),
+    "MONTH" => month(today()),
+    "PKG" => pkg,
+    "URL" => "https://$(t.host)/$(t.user)/$pkg.jl",
+    "YEAR" => year(today()),
+)
+
+needs_username(::Citation) = true

@@ -1,0 +1,7 @@
+name = "WackyOptions"
+uuid = "5b7e9947-ddc0-4b3f-9b55-0d8042f74170"
+authors = ["tester"]
+version = "1.0.0"
+
+[compat]
+julia = "1.2"

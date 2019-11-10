@@ -1,242 +1,145 @@
+default_plugins() = [ProjectFile(), SrcDir(), Git(), License(), Readme(), Tests()]
+default_user() = LibGit2.getconfig("github.user", "")
 default_version() = VersionNumber(VERSION.major)
 
+function default_authors()
+    name = LibGit2.getconfig("user.name", "")
+    isempty(name) && return ""
+    email = LibGit2.getconfig("user.email", "")
+    return isempty(email) ? name : "$name <$email>"
+end
+
 """
-    Template(; kwargs...) -> Template
+    Template(; kwargs...)
 
-Records common information used to generate a package. If you don't wish to manually
-create a template, you can use [`interactive_template`](@ref) instead.
+A configuration used to generate packages.
 
-# Keyword Arguments
-* `user::AbstractString=""`: GitHub (or other code hosting service) username. If left
-  unset, it will take the the global git config's value (`github.user`). If that is not
-  set, an `ArgumentError` is thrown. **This is case-sensitive for some plugins, so take
-  care to enter it correctly.**
-* `host::AbstractString="github.com"`: URL to the code hosting service where your package
-  will reside. Note that while hosts other than GitHub won't cause errors, they are not
-  officially supported and they will cause certain plugins will produce incorrect output.
-* `license::AbstractString="MIT"`: Name of the package license. If an empty string is
-  given, no license is created. [`available_licenses`](@ref) can be used to list all
-  available licenses, and [`show_license`](@ref) can be used to print out a particular
-  license's text.
-* `authors::Union{AbstractString, Vector{<:AbstractString}}=""`: Names that appear on the
-  license. Supply a string for one author or an array for multiple. Similarly to `user`,
-  it will take the value of of the global git config's value if it is left unset.
-* `dir::AbstractString=$(replace(Pkg.devdir(), homedir() => "~"))`: Directory in which the
-  package will go. Relative paths are converted to absolute ones at template creation time.
-* `julia_version::VersionNumber=$(default_version())`: Minimum allowed Julia version.
-* `ssh::Bool=false`: Whether or not to use SSH for the git remote. If `false` HTTPS will be used.
-* `dev::Bool=true`: Whether or not to `Pkg.develop` generated packages.
-* `manifest::Bool=false`: Whether or not to commit the `Manifest.toml`.
-* `plugins::Vector{<:Plugin}=Plugin[]`: A list of `Plugin`s that the package will include.
+## Keyword Arguments
+
+### User Options
+- `user::AbstractString="$(default_user())"`: GitHub (or other code hosting service) username.
+  The default value comes from the global Git config (`github.user`).
+  If no value is obtained, many plugins that use this value will not work.
+- `authors::Union{AbstractString, Vector{<:AbstractString}}="$(default_authors())"`: Package authors.
+  Like `user`, it takes its default value from the global Git config
+  (`user.name` and `user.email`).
+
+### Package Options
+- `dir::AbstractString="$(contractuser(Pkg.devdir()))"`: Directory to place packages in.
+- `host::AbstractString="github.com"`: URL to the code hosting service where packages will reside.
+- `julia::VersionNumber=$(repr(default_version()))`: Minimum allowed Julia version.
+
+### Template Plugins
+- `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
+- `disable_defaults::Vector{DataType}=DataType[]`: Default plugins to disable.
+  The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
+  [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
+  To override a default plugin instead of disabling it altogether, supply it via `plugins`.
+
+---
+
+To create a package from a `Template`, use the following syntax:
+
+```julia
+julia> t = Template();
+
+julia> t("PkgName")
+```
 """
 struct Template
-    user::String
-    host::String
-    license::String
-    authors::String
+    authors::Vector{String}
     dir::String
-    julia_version::VersionNumber
-    ssh::Bool
-    dev::Bool
-    manifest::Bool
-    plugins::Dict{DataType, <:Plugin}
-
-    function Template(;
-        user::AbstractString="",
-        host::AbstractString="https://github.com",
-        license::AbstractString="MIT",
-        authors::Union{AbstractString, Vector{<:AbstractString}}="",
-        dir::AbstractString=Pkg.devdir(),
-        julia_version::VersionNumber=default_version(),
-        ssh::Bool=false,
-        dev::Bool=true,
-        manifest::Bool=false,
-        plugins::Vector{<:Plugin}=Plugin[],
-        git::Bool=true,
-    )
-        # Check for required Git options for package generation
-        # (you can't commit to a repository without them).
-        git && isempty(LibGit2.getconfig("user.name", "")) && missingopt("user.name")
-        git && isempty(LibGit2.getconfig("user.email", "")) && missingopt("user.email")
-
-        # If no username was set, look for one in the global git config.
-        # Note: This is one of a few GitHub specifics (maybe we could use the host value).
-        if isempty(user)
-            user = LibGit2.getconfig("github.user", "")
-        end
-        if isempty(user)
-            throw(ArgumentError("No GitHub username found, set one with user=username"))
-        end
-
-        host = URI(startswith(host, "https://") ? host : "https://$host").host
-
-        if !isempty(license) && !isfile(joinpath(LICENSE_DIR, license))
-            throw(ArgumentError("License '$license' is not available"))
-        end
-
-        # If no author was set, look for one in the global git config.
-        if isempty(authors)
-            authors = LibGit2.getconfig("user.name", "")
-            email = LibGit2.getconfig("user.email", "")
-            isempty(email) || (authors *= " <$email>")
-        elseif authors isa Vector
-            authors = join(authors, ", ")
-        end
-
-        dir = abspath(expanduser(dir))
-
-        plugin_dict = Dict{DataType, Plugin}(typeof(p) => p for p in plugins)
-        if (length(plugins) != length(plugin_dict))
-            @warn "Plugin list contained duplicates, only the last of each type was kept"
-        end
-
-        new(user, host, license, authors, dir, julia_version, ssh, dev, manifest, plugin_dict)
-    end
+    host::String
+    julia::VersionNumber
+    plugins::Vector{<:Plugin}
+    user::String
 end
 
-function Base.show(io::IO, t::Template)
-    maybe(s::String) = isempty(s) ? "None" : s
-    spc = "  "
+Template(; kwargs...) = Template(Val(false); kwargs...)
 
-    println(io, "Template:")
-    println(io, spc, "→ User: ", maybe(t.user))
-    println(io, spc, "→ Host: ", maybe(t.host))
+# Non-interactive constructor.
+function Template(::Val{false}; kwargs...)
+    kwargs = Dict(kwargs)
 
-    print(io, spc, "→ License: ")
-    if isempty(t.license)
-        println(io, "None")
-    else
-        println(io, t.license, " ($(t.authors) ", year(today()), ")")
-    end
+    user = getkw!(kwargs, :user)
+    dir = abspath(expanduser(getkw!(kwargs, :dir)))
+    host = replace(getkw!(kwargs, :host), r".*://" => "")
+    julia = getkw!(kwargs, :julia)
 
-    println(io, spc, "→ Package directory: ", replace(maybe(t.dir), homedir() => "~"))
-    println(io, spc, "→ Minimum Julia version: v", version_floor(t.julia_version))
-    println(io, spc, "→ SSH remote: ", t.ssh ? "Yes" : "No")
-    println(io, spc, "→ Add packages to main environment: ", t.dev ? "Yes" : "No")
-    println(io, spc, "→ Commit Manifest.toml: ", t.manifest ? "Yes" : "No")
+    authors = getkw!(kwargs, :authors)
+    authors isa Vector || (authors = map(strip, split(authors, ",")))
 
-    print(io, spc, "→ Plugins:")
-    if isempty(t.plugins)
-        print(io, " None")
-    else
-        for plugin in sort(collect(values(t.plugins)); by=string)
-            println(io)
-            buf = IOBuffer()
-            show(buf, plugin)
-            print(io, spc^2, "• ")
-            print(io, join(split(String(take!(buf)), "\n"), "\n$(spc^2)"))
+    # User-supplied plugins come first, so that deduping the list will remove the defaults.
+    plugins = Plugin[]
+    append!(plugins, getkw!(kwargs, :plugins))
+    disabled = getkw!(kwargs, :disable_defaults)
+    append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
+    plugins = sort(unique(typeof, plugins); by=string)
+
+    if isempty(user)
+        foreach(plugins) do p
+            if needs_username(p)
+                T = nameof(typeof(p))
+                s = """$T: Git hosting service username is required, set one with keyword `user="<username>"`"""
+                throw(ArgumentError(s))
+            end
         end
     end
+
+    if !isempty(kwargs)
+        @warn "Unrecognized keywords were supplied, see the documentation for help" kwargs
+    end
+
+    t = Template(authors, dir, host, julia, plugins, user)
+    foreach(p -> validate(p, t), t.plugins)
+    return t
 end
 
 """
-    interactive_template(; fast::Bool=false) -> Template
+    (::Template)(pkg::AbstractString)
 
-Interactively create a [`Template`](@ref). If `fast` is set, defaults will be assumed for
-all values except username and plugins.
+Generate a package named `pkg` from a [`Template`](@ref).
 """
-function interactive_template(; git::Bool=true, fast::Bool=false)
-    @info "Default values are shown in [brackets]"
-    # Getting the leaf types in a separate thread eliminates an awkward wait after
-    # "Select plugins" is printed.
-    plugin_types = @async leaves(Plugin)
-    kwargs = Dict{Symbol, Any}()
+function (t::Template)(pkg::AbstractString)
+    endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
+    pkg_dir = joinpath(t.dir, pkg)
+    ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
+    mkpath(pkg_dir)
 
-    default_user = LibGit2.getconfig("github.user", "")
-    print("Username [", isempty(default_user) ? "REQUIRED" : default_user, "]: ")
-    user = readline()
-    kwargs[:user] = if !isempty(user)
-        user
-    elseif !isempty(default_user)
-        default_user
-    else
-        throw(ArgumentError("Username is required"))
+    try
+        foreach((prehook, hook, posthook)) do h
+            @info "Running $(nameof(h))s"
+            foreach(sort(t.plugins; by=p -> priority(p, h), rev=true)) do p
+                h(p, t, pkg_dir)
+            end
+        end
+    catch
+        rm(pkg_dir; recursive=true, force=true)
+        rethrow()
     end
 
-    kwargs[:host] = if fast || !git
-        "https://github.com"  # If Git isn't enabled, this value never gets used.
-    else
-        default_host = "github.com"
-        print("Code hosting service [$default_host]: ")
-        host = readline()
-        isempty(host) ? default_host : host
-    end
-
-    kwargs[:license] = if fast
-        "MIT"
-    else
-        println("License:")
-        io = IOBuffer()
-        available_licenses(io)
-        licenses = ["" => "", collect(LICENSES)...]
-        menu = RadioMenu(String["None", split(String(take!(io)), "\n")...])
-        # If the user breaks out of the menu with Ctrl-c, the result is -1, the absolute
-        # value of which correponds to no license.
-        first(licenses[abs(request(menu))])
-    end
-
-    # We don't need to ask for authors if there is no license,
-    # because the license is the only place that they matter.
-    kwargs[:authors] = if fast || isempty(kwargs[:license])
-        LibGit2.getconfig("user.name", "")
-    else
-        default_authors = LibGit2.getconfig("user.name", "")
-        default_str = isempty(default_authors) ? "None" : default_authors
-        print("Package author(s) [$default_str]: ")
-        authors = readline()
-        isempty(authors) ? default_authors : authors
-    end
-
-    kwargs[:dir] = if fast
-        Pkg.devdir()
-    else
-        default_dir = Pkg.devdir()
-        print("Path to package directory [$default_dir]: ")
-        dir = readline()
-        isempty(dir) ? default_dir : dir
-    end
-
-    kwargs[:julia_version] = if fast
-        VERSION
-    else
-        default_julia_version = VERSION
-        print("Minimum Julia version [", version_floor(default_julia_version), "]: ")
-        julia_version = readline()
-        isempty(julia_version) ? default_julia_version : VersionNumber(julia_version)
-    end
-
-    kwargs[:ssh] = if fast || !git
-        false
-    else
-        print("Set remote to SSH? [no]: ")
-        uppercase(readline()) in ["Y", "YES", "T", "TRUE"]
-    end
-
-    kwargs[:dev] = if fast
-        true
-    else
-        print("Add packages to main environment? [yes]: ")
-        uppercase(readline()) in ["", "Y", "YES", "T", "TRUE"]
-    end
-
-    kwargs[:manifest] = if fast
-        false
-    else
-        print("Commit Manifest.toml? [no]: ")
-        uppercase(readline()) in ["Y", "YES", "T", "TRUE"]
-    end
-
-    println("Plugins:")
-    # Only include plugin types which have an `interactive` method.
-    plugin_types = filter(t -> hasmethod(interactive, (Type{t},)), fetch(plugin_types))
-    type_names = map(t -> split(string(t), ".")[end], plugin_types)
-    menu = MultiSelectMenu(String.(type_names); pagesize=length(type_names))
-    selected = collect(request(menu))
-    kwargs[:plugins] = Vector{Plugin}(map(interactive, getindex(plugin_types, selected)))
-
-    return Template(; git=git, kwargs...)
+    @info "New package is at $pkg_dir"
 end
 
-leaves(T::Type)::Vector{DataType} = isconcretetype(T) ? [T] : vcat(leaves.(subtypes(T))...)
+# Does the template have a plugin that satisfies some predicate?
+hasplugin(t::Template, f::Function) = any(f, t.plugins)
+hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
 
-missingopt(name) = @warn "Git config option '$name' missing, package generation will fail unless you supply a GitConfig"
+# Get a plugin by type.
+function getplugin(t::Template, ::Type{T}) where T <: Plugin
+    i = findfirst(p -> p isa T, t.plugins)
+    return i === nothing ? nothing : t.plugins[i]
+end
+
+# Get a keyword or a default value.
+getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
+
+# Default Template keyword values.
+defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
+defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
+defaultkw(::Type{Template}, ::Val{:dir}) = Pkg.devdir()
+defaultkw(::Type{Template}, ::Val{:disable_defaults}) = DataType[]
+defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
+defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
+defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
+defaultkw(::Type{Template}, ::Val{:user}) = default_user()

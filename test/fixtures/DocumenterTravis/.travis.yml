@@ -1,0 +1,27 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia
+language: julia
+notifications:
+  email: false
+julia:
+  - 1.0
+  - 1.2
+  - nightly
+os:
+  - linux
+  - osx
+  - windows
+arch:
+  - x64
+jobs:
+  fast_finish: true
+  allow_failures:
+    - julia: nightly
+  include:
+    - stage: Documentation
+      julia: 1.0
+      script: julia --project=docs -e '
+        using Pkg;
+        Pkg.develop(PackageSpec(; path=pwd()));
+        Pkg.instantiate();
+        include("docs/make.jl");'
+      after_success: skip

@@ -1,0 +1,21 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia
+language: julia
+notifications:
+  email: false
+julia:
+  - 1.1
+  - 1.2
+os:
+  - linux
+  - osx
+arch:
+  - x64
+  - x86
+  - arm64
+jobs:
+  fast_finish: true
+  exclude:
+    - arch: x86
+      os: osx
+    - arch: arm64
+      os: osx

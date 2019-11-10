@@ -1,0 +1,67 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        version:
+          <<#VERSIONS>>
+          - '<<&.>>'
+          <</VERSIONS>>
+        os:
+          <<#OS>>
+          - <<&.>>
+          <</OS>>
+        arch:
+          <<#ARCH>>
+          - <<&.>>
+          <</ARCH>>
+        <<#HAS_EXCLUDES>>
+        exclude:
+        <</HAS_EXCLUDES>>
+        <<#EXCLUDES>>
+          - os: <<&E_OS>>
+            arch: <<&E_ARCH>>
+            <<#E_VERSION>>
+            version: '<<&E_VERSION>>'
+            <</E_VERSION>>
+        <</EXCLUDES>>
+    steps:
+      - uses: actions/checkout@v1
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/julia-runtest@latest
+      <<#HAS_CODECOV>>
+      - uses: julia-actions/julia-uploadcodecov@latest
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      <</HAS_CODECOV>>
+      <<#HAS_COVERALLS>>
+      - uses: julia-actions/julia-uploadcoveralls@latest
+        env:
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      <</HAS_COVERALLS>>
+  <<#HAS_DOCUMENTER>>
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: '1.0'
+      - run: julia --project=docs -e '
+          using Pkg;
+          Pkg.develop(PackageSpec(; path=pwd()));
+          Pkg.instantiate();'
+      - run: julia --project=docs docs/make.jl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  <</HAS_DOCUMENTER>>

@@ -1,0 +1,64 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia
+language: julia
+notifications:
+  email: false
+julia:
+{{#VERSIONS}}
+  - {{{.}}}
+{{/VERSIONS}}
+os:
+{{#OS}}
+  - {{{.}}}
+{{/OS}}
+arch:
+{{#ARCH}}
+  - {{{.}}}
+{{/ARCH}}
+jobs:
+  fast_finish: true
+{{#HAS_ALLOW_FAILURES}}
+  allow_failures:
+{{/HAS_ALLOW_FAILURES}}
+{{#ALLOW_FAILURES}}
+    - julia: {{{.}}}
+{{/ALLOW_FAILURES}}
+{{#HAS_EXCLUDES}}
+  exclude:
+{{/HAS_EXCLUDES}}
+{{#EXCLUDES}}
+    - arch: {{{E_ARCH}}}
+      {{#E_OS}}
+      os: {{{E_OS}}}
+      {{/E_OS}}
+      {{#E_JULIA}}
+      julia: {{{E_JULIA}}}
+      {{/E_JULIA}}
+{{/EXCLUDES}}
+{{#HAS_DOCUMENTER}}
+  include:
+    - stage: Documentation
+      julia: {{{VERSION}}}
+      script: julia --project=docs -e '
+        using Pkg;
+        Pkg.develop(PackageSpec(; path=pwd()));
+        Pkg.instantiate();
+        include("docs/make.jl");'
+      after_success: skip
+{{/HAS_DOCUMENTER}}
+{{#HAS_COVERAGE}}
+after_success:
+{{#HAS_CODECOV}}
+  - julia -e '
+      using Pkg;
+      Pkg.add("Coverage");
+      using Coverage;
+      Codecov.submit(process_folder());'
+{{/HAS_CODECOV}}
+{{#HAS_COVERALLS}}
+  - julia -e '
+      using Pkg;
+      Pkg.add("Coverage");
+      using Coverage;
+      Coveralls.submit(process_folder());'
+{{/HAS_COVERALLS}}
+{{/HAS_COVERAGE}}

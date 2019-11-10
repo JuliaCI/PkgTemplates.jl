@@ -1,0 +1,18 @@
+freebsd_instance:
+  image: {{{IMAGE}}}
+task:
+  name: FreeBSD
+  env:
+{{#VERSIONS}}
+    JULIA_VERSION: {{{.}}}
+{{/VERSIONS}}
+  install_script:
+    - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
+  build_script:
+    - cirrusjl build
+  test_script:
+    - cirrusjl test
+{{#HAS_COVERAGE}}
+  coverage_script:
+    - cirrusjl coverage{{#HAS_CODECOV}} codecov{{/HAS_CODECOV}}{{#HAS_COVERALLS}} coveralls{{/HAS_COVERALLS}}
+{{/HAS_COVERAGE}}
