@@ -108,7 +108,7 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
 
     make = render_file(p.make_jl, combined_view(p, t, pkg), tags(p))
     gen_file(joinpath(docs_dir, "make.jl"), make)
-    
+
     index = render_file(p.index_md, combined_view(p, t, pkg), tags(p))
     gen_file(joinpath(docs_dir, "src", "index.md"), index)
 
@@ -255,7 +255,7 @@ To see why, it might help to see the template file in its entirety:
 	author  = {<<&AUTHORS>>},
 	title   = {<<&PKG>>.jl},
 	url     = {<<&URL>>},
-	version = {v0.1.0},
+	version = {v1.0.0},
 	year    = {<<&YEAR>>},
 	month   = {<<&MONTH>>}
 }

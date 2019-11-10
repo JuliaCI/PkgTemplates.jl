@@ -39,7 +39,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
                 ProjectFile:
-                  version: v"0.1.0"
+                  version: v"1.0.0"
                 Readme:
                   file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
                   destination: "README.md"
