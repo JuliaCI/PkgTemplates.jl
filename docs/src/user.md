@@ -75,6 +75,7 @@ Documenter
 
 ```@docs
 Develop
+CompatHelper
 Citation
 ```
 

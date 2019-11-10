@@ -61,7 +61,6 @@ end
 
 source(p::GitHubActions) = p.file
 destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
-
 tags(::GitHubActions) = "<<", ">>"
 
 badges(p::GitHubActions) = Badge(
@@ -305,7 +304,6 @@ See [`Documenter`](@ref) for more information.
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
-
 source(p::GitLabCI) = p.file
 destination(::GitLabCI) = ".gitlab-ci.yml"
 
