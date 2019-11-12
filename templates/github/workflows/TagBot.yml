@@ -13,3 +13,12 @@ jobs:
           <<#HAS_GPG>>
           gpg-key: ${{ secrets.GPG_KEY }}
           <</HAS_GPG>>
+          <<#REGISTRY>>
+          registry: <<&REGISTRY>>
+          <</REGISTRY>>
+          <<#GITHUB_SITE>>
+          github-site: <<&GITHUB_SITE>>
+          <</GITHUB_SITE>>
+          <<#GITHUB_API>>
+          github-api: <<&GITHUB_API>>
+          <</GITHUB_API>>

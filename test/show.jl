@@ -49,6 +49,9 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                 TagBot:
                   destination: "TagBot.yml"
                   gpgsign: false
+                  registry: nothing
+                  github_api: nothing
+                  github_site: nothing
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false

@@ -11,3 +11,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           gpg-key: ${{ secrets.GPG_KEY }}
+          registry: Foo/Bar
+          github-site: https://example.com
+          github-api: https://api.example.com
