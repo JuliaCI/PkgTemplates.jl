@@ -13,6 +13,7 @@ julia:
 before_script:
   - git config --global user.name Tester
   - git config --global user.email te@st.er
+script: travis_wait julia --project -e 'using Pkg; Pkg.test(; coverage=true)'
 matrix:
   fast_finish: true
   allow_failures:
