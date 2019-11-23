@@ -29,13 +29,12 @@ export
     GitHubActions,
     GitLabCI,
     License,
+    Online,
     ProjectFile,
     Readme,
     SrcDir,
     Tests,
-    TravisCI,
-    Citation,
-    Online
+    TravisCI
 
 """
 Plugins are PkgTemplates' source of customization and extensibility.
