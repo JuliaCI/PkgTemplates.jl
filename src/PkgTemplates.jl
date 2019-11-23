@@ -3,7 +3,11 @@ module PkgTemplates
 using Base: active_project
 using Base.Filesystem: contractuser
 
+using Base64: base64encode
 using Dates: month, today, year
+import HTTP
+import JSON
+using JSON: json
 using LibGit2: LibGit2, GitRemote, GitRepo
 using Pkg: Pkg, TOML, PackageSpec
 using UUIDs: uuid4
@@ -29,7 +33,9 @@ export
     Readme,
     SrcDir,
     Tests,
-    TravisCI
+    TravisCI,
+    Citation,
+    Online
 
 """
 Plugins are PkgTemplates' source of customization and extensibility.

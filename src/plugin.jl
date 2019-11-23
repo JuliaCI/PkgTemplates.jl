@@ -1,3 +1,4 @@
+
 const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
@@ -262,3 +263,4 @@ include(joinpath("plugins", "coverage.jl"))
 include(joinpath("plugins", "ci.jl"))
 include(joinpath("plugins", "citation.jl"))
 include(joinpath("plugins", "documenter.jl"))
+include(joinpath("plugins", "online.jl"))

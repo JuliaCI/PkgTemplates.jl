@@ -1,0 +1,3 @@
+github_token = ""
+travis_token = ""
+ssh_keygen_file = "ssh-keygen"

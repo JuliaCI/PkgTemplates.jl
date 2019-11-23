@@ -34,4 +34,14 @@ PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 
         @test_logs tpl(; julia=v"1.2", plugins=[p])
         @test_logs tpl(; julia=v"1.3", plugins=[p])
     end
+
+    @testset "Online plugin" begin
+        template = Template(
+            settings_file = joinpath("fixtures", "test_settings.toml"),
+            user = "OnlinePackage",
+            plugins = [Online()]
+        )
+        PkgTemplates.hook(Online(), template, "test.jl")
+        PkgTemplates.delete(template, "test.jl")
+    end
 end

@@ -36,6 +36,14 @@ A configuration used to generate packages.
   [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
   To override a default plugin instead of disabling it altogether, supply it via `plugins`.
 
+### Permanent Options
+- `settings_file::String = "templates/settings.toml")`: where PkgTemplates will
+look for permanent options. These include:
+  - "ssh_keygen_file": the path to your `ssh-keygen` binary. If `ssh-keygen`
+    isn't in your path, it comes prepacked with git. Check
+    `PATH_TO_GIT/usr/bin/ssh-keygen`.
+  - a "github_token": available [here](https://github.com/settings/tokens/new)
+  - a "travis_token": available [here](https://travis-ci.com/account/preferences)
 ---
 
 To create a package from a `Template`, use the following syntax:
@@ -53,6 +61,9 @@ struct Template
     julia::VersionNumber
     plugins::Vector{<:Plugin}
     user::String
+    ssh_keygen_file::String
+    github_token::String
+    travis_token::String
 end
 
 Template(; kwargs...) = Template(Val(false); kwargs...)
@@ -68,6 +79,17 @@ function Template(::Val{false}; kwargs...)
 
     authors = getkw!(kwargs, :authors)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
+
+    settings_file = getkw!(kwargs, :settings_file)
+    settings = open(TOML.parse, settings_file)
+    # If github notices a github token committed to a repositiory, it will automatically deactivate it
+    # The test github token replaces a with ~ to get around this. Safe because ~ will not appear in tokens otherwise
+    if haskey(settings, "github_token")
+        settings["github_token"] = replace(settings["github_token"], '~' => "a")
+    end
+    ssh_keygen_file = settings["ssh_keygen_file"]
+    github_token = settings["github_token"]
+    travis_token = settings["travis_token"]
 
     # User-supplied plugins come first, so that deduping the list will remove the defaults.
     plugins = Plugin[]
@@ -90,7 +112,7 @@ function Template(::Val{false}; kwargs...)
         @warn "Unrecognized keywords were supplied, see the documentation for help" kwargs
     end
 
-    t = Template(authors, dir, host, julia, plugins, user)
+    t = Template(authors, dir, host, julia, plugins, user, ssh_keygen_file, github_token, travis_token)
     foreach(p -> validate(p, t), t.plugins)
     return t
 end
@@ -143,3 +165,5 @@ defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
 defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
 defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
 defaultkw(::Type{Template}, ::Val{:user}) = default_user()
+defaultkw(::Type{Template}, ::Val{:settings_file}) =
+    default_file("settings.toml")
