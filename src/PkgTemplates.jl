@@ -42,6 +42,7 @@ abstract type Plugin end
 include("template.jl")
 include("plugin.jl")
 include("show.jl")
+include("deprecated.jl")
 
 # Run some function with a project activated at the given path.
 function with_project(f::Function, path::AbstractString)
