@@ -1,6 +1,7 @@
 # NOTICE: This version is not yet released
-The current stable release is 0.6, you can find that [readme here](https://github.com/invenia/PkgTemplates.jl/tree/v0.6.3).  
-PkgTemplates has undergone large internal changes (see #61 especially), and at present the user-facing API is still catching up.  
+
+The current stable release is 0.6, you can find that version [here](https://github.com/invenia/PkgTemplates.jl/tree/v0.6.3).  
+PkgTemplates has undergone large internal changes (see [#61](https://github.com/invenia/PkgTemplates.jl/pull/61) especially), and at present the user-facing API is still catching up.  
 Do not fear, while right now it looks very different (e.g. in the `dev` docs), it will not be *incredibly* breaking.
 But right now if you do use master it will be.
 
