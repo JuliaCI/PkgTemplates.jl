@@ -17,7 +17,6 @@ But right now if you do use master it will be.
 
 **PkgTemplates creates new Julia packages in an easy, repeatable, and customizable way.**
 
-
 ## Installation
 
 Install with Pkg, just like any other registered Julia package:
