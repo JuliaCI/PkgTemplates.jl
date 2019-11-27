@@ -4,7 +4,6 @@ PkgTemplates has undergone large internal changes (see #61 especially), and at p
 Do not fear, while right now it looks very different (e.g. in the `dev` docs), it will not be *incredibly* breaking.
 But right now if you do use master it will be.
 
-
 ---
 
 # PkgTemplates
