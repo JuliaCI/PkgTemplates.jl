@@ -22,7 +22,7 @@ const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to 
         x64=true,
         x86=false,
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+        extra_versions=$DEFAULT_CI_VERSIONS,
     )
 
 Integrates your packages with [GitHub Actions](https://github.com/features/actions).
@@ -43,9 +43,6 @@ $EXTRA_VERSIONS_DOC
 !!! note
     If using coverage plugins, don't forget to manually add your API tokens as secrets,
     as described [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets).
-
-!!! note
-    Nightly Julia is not supported.
 """
 @with_kw_noshow struct GitHubActions <: BasicPlugin
     file::String = default_file("github", "workflows", "ci.yml")
