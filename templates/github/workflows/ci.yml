@@ -38,6 +38,7 @@ jobs:
           arch: ${{ matrix.arch }}
       - uses: julia-actions/julia-buildpkg@latest
       - uses: julia-actions/julia-runtest@latest
+      - uses: julia-actions/julia-codeformat@latest
       <<#HAS_CODECOV>>
       - uses: julia-actions/julia-uploadcodecov@latest
         env:
