@@ -24,6 +24,7 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/julia-format@latest
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-uploadcodecov@latest
         env:
