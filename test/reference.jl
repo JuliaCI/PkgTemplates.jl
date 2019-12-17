@@ -76,12 +76,7 @@ end
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true),
-            TagBot(;
-                gpgsign=true,
-                registry="Foo/Bar",
-                github_api="https://api.example.com",
-                github_site="https://example.com",
-            ),
+            TagBot(; registry="Foo/Bar", dispatch=true),
             Tests(; project=true),
             TravisCI(;
                 coverage=false,
