@@ -67,7 +67,7 @@ tags(::GitHubActions) = "<<", ">>"
 badges(p::GitHubActions) = Badge(
     "Build Status",
     "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions"
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions",
 )
 
 function view(p::GitHubActions, t::Template, pkg::AbstractString)
