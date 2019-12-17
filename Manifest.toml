@@ -49,9 +49,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[Mustache]]
 deps = ["Printf", "Tables"]
-git-tree-sha1 = "f39de3a12232eb47bd0629b3a661054287780276"
+git-tree-sha1 = "e06eef2abee113c49695f5347668e15d4c02978a"
 uuid = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
-version = "0.5.13"
+version = "1.0.0"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
@@ -66,7 +66,7 @@ uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 version = "0.12.0"
 
 [[Pkg]]
-deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
+deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[Printf]]

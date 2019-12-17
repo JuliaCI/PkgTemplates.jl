@@ -1,7 +1,7 @@
 using Base.Filesystem: contractuser, path_separator
 
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
-using Pkg: Pkg
+using Pkg: Pkg, PackageSpec, TOML
 using Random: Random, randstring
 using Test: @test, @testset, @test_logs, @test_throws
 
