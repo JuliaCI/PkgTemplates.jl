@@ -1,7 +1,7 @@
 using Base.Filesystem: contractuser, path_separator
 
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
-using Pkg: Pkg
+using Pkg: Pkg, PackageSpec, TOML
 using Random: Random, randstring
 using Test: @test, @testset, @test_logs, @test_throws
 
@@ -48,9 +48,9 @@ mktempdir() do dir
                 include("git.jl")
 
                 # Quite a bit of output depends on the Julia version,
-                # and the test fixtures are made with Julia 1.2.
+                # and the test fixtures are made with Julia 1.3.
                 # TODO: Keep this on the latest stable Julia version.
-                if VERSION.major == 1 && VERSION.minor == 2
+                if VERSION.major == 1 && VERSION.minor == 3
                     include("reference.jl")
                 else
                     @info "Skipping reference tests" julia=VERSION

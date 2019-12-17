@@ -7,7 +7,6 @@ os:
   - windows
 julia:
   - 1.0
-  - 1.2
   - 1.3
   - nightly
 before_script:
@@ -17,7 +16,6 @@ script: travis_wait julia --project -e 'using Pkg; Pkg.test(; coverage=true)'
 matrix:
   fast_finish: true
   allow_failures:
-    - julia: 1.3
     - julia: nightly
   include:
     - arch: x86
