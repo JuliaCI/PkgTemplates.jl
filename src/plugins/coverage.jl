@@ -45,6 +45,10 @@ badges(::Coveralls) = Badge(
 )
 
 gitignore(::Union{Codecov, Coveralls}) = COVERAGE_GITIGNORE
+view(::Union{Codecov, Coveralls}, t::Template, pkg::AbstractString) = Dict(
+    "PKG" => pkg,
+    "USER" => t.user,
+)
 
 """
     is_coverage(::Plugin) -> Bool
