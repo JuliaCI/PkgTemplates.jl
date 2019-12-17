@@ -7,7 +7,7 @@ Strings are left in their original form.
 format_version(v::VersionNumber) = "$(v.major).$(v.minor)"
 format_version(v::AbstractString) = string(v)
 
-const ALLOWED_FAILURES = ["1.3", "nightly"]  # TODO: Update this list with new RCs.
+const ALLOWED_FAILURES = ["nightly"]  # TODO: Update this list with new RCs.
 const DEFAULT_CI_VERSIONS = map(format_version, [default_version(), VERSION, "nightly"])
 const DEFAULT_CI_VERSIONS_NO_NIGHTLY = map(format_version, [default_version(), VERSION])
 const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to test, as strings or `VersionNumber`s."
