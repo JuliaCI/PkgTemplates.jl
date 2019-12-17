@@ -15,15 +15,6 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
     @testset "Template" begin
         expected = """
             Template:
-              authors: ["Chris de Graaf <chrisadegraaf@gmail.com>"]
-              dir: "~/.local/share/julia/dev"
-              host: "github.com"
-              julia: v"1.0.0"
-              user: "$USER"
-              plugins:
-        """
-        expected = """
-            Template:
               authors: ["$USER"]
               dir: "$(contractuser(Pkg.devdir()))"
               host: "github.com"
