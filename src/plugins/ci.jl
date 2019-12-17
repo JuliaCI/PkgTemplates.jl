@@ -53,7 +53,7 @@ $EXTRA_VERSIONS_DOC
     x64::Bool = true
     x86::Bool = false
     coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+    extra_versions::Vector = DEFAULT_CI_VERSIONS
 end
 
 source(p::GitHubActions) = p.file
@@ -61,7 +61,7 @@ destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
 
 tags(::GitHubActions) = "<<", ">>"
 
-badges(p::GitHubActions) = Badge(
+badges(::GitHubActions) = Badge(
     "Build Status",
     "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg",
     "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions",
