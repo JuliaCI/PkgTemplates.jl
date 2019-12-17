@@ -29,7 +29,7 @@ Integrates your packages with [GitHub Actions](https://github.com/features/actio
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the workflow file.
-- `destination::AbstractString`: Destination of the worflow file,
+- `destination::AbstractString`: Destination of the workflow file,
   relative to `.github/workflows`.
 - `linux::Bool`: Whether or not to run builds on Linux.
 - `osx::Bool`: Whether or not to run builds on OSX (MacOS).

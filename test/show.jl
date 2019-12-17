@@ -30,6 +30,9 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
               julia: v"1.0.0"
               user: "$USER"
               plugins:
+                CompatHelper:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CompatHelper.yml"))"
+                  destination: "CompatHelper.yml"
                 Git:
                   ignore: String[]
                   ssh: false

@@ -4,7 +4,7 @@
 Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagBot).
 
 ## Keyword Arguments
-- `destination::AbstractString`: Destination of the worflow file,
+- `destination::AbstractString`: Destination of the workflow file,
   relative to `.github/workflows`.
 - `registry::Union{AbstractString, Nothing}`: Custom registry, in the format `owner/repo`.
 - `dispatch::Bool`: Whether or not to enable the `dispatch` option.

@@ -1,6 +1,15 @@
-default_plugins() = [ProjectFile(), SrcDir(), Git(), License(), Readme(), Tests(), TagBot()]
 default_user() = LibGit2.getconfig("github.user", "")
 default_version() = VersionNumber(VERSION.major)
+default_plugins() = [
+    CompatHelper(),
+    ProjectFile(),
+    SrcDir(),
+    Git(),
+    License(),
+    Readme(),
+    Tests(),
+    TagBot(),
+]
 
 function default_authors()
     name = LibGit2.getconfig("user.name", "")
