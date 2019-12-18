@@ -40,6 +40,7 @@ Tests
 Readme
 License
 Git
+TagBot
 ```
 
 ### Continuous Integration (CI)
@@ -74,6 +75,7 @@ Documenter
 
 ```@docs
 Develop
+CompatHelper
 Citation
 ```
 

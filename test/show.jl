@@ -15,21 +15,15 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
     @testset "Template" begin
         expected = """
             Template:
-              authors: ["Chris de Graaf <chrisadegraaf@gmail.com>"]
-              dir: "~/.local/share/julia/dev"
-              host: "github.com"
-              julia: v"1.0.0"
-              user: "$USER"
-              plugins:
-        """
-        expected = """
-            Template:
               authors: ["$USER"]
               dir: "$(contractuser(Pkg.devdir()))"
               host: "github.com"
               julia: v"1.0.0"
               user: "$USER"
               plugins:
+                CompatHelper:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CompatHelper.yml"))"
+                  destination: "CompatHelper.yml"
                 Git:
                   ignore: String[]
                   ssh: false
@@ -46,6 +40,10 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   inline_badges: false
                 SrcDir:
                   file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
+                TagBot:
+                  destination: "TagBot.yml"
+                  registry: nothing
+                  dispatch: false
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false

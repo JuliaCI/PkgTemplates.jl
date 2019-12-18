@@ -29,7 +29,7 @@ Integrates your packages with [GitHub Actions](https://github.com/features/actio
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the workflow file.
-- `destination::AbstractString`: Destination of the worflow file,
+- `destination::AbstractString`: Destination of the workflow file,
   relative to `.github/workflows`.
 - `linux::Bool`: Whether or not to run builds on Linux.
 - `osx::Bool`: Whether or not to run builds on OSX (MacOS).
@@ -58,7 +58,6 @@ end
 
 source(p::GitHubActions) = p.file
 destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
-
 tags(::GitHubActions) = "<<", ">>"
 
 badges(::GitHubActions) = Badge(
@@ -302,7 +301,6 @@ See [`Documenter`](@ref) for more information.
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
-
 source(p::GitLabCI) = p.file
 destination(::GitLabCI) = ".gitlab-ci.yml"
 

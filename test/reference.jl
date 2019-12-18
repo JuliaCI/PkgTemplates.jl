@@ -39,8 +39,8 @@ end
 
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
-            AppVeyor(), CirrusCI(), Citation(), Codecov(), Coveralls(), Develop(),
-            Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
+            AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(),
+            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
         ])
     end
 
@@ -76,6 +76,7 @@ end
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true),
+            TagBot(; registry="Foo/Bar", dispatch=true),
             Tests(; project=true),
             TravisCI(;
                 coverage=false,
