@@ -100,6 +100,7 @@ end
         arm64=false,
         coverage=true,
         extra_versions=$DEFAULT_CI_VERSIONS,
+        inline=true,
     )
 
 Integrates your packages with [Travis CI](https://travis-ci.com).
@@ -115,6 +116,7 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
 - `coverage::Bool`: Whether or not to publish code coverage.
   Another code coverage plugin such as [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
+- `inline::Bool`: Whether or not inlining should be enabled during the tests. Default is `true`. Setting this to `false` may improve the accuracy of code coverage.
 """
 @with_kw_noshow struct TravisCI <: BasicPlugin
     file::String = default_file("travis.yml")
@@ -126,6 +128,7 @@ $EXTRA_VERSIONS_DOC
     arm64::Bool = false
     coverage::Bool = true
     extra_versions::Vector = DEFAULT_CI_VERSIONS
+    inline::Bool = true
 end
 
 source(p::TravisCI) = p.file
@@ -166,6 +169,7 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
         "USER" => t.user,
         "VERSION" => format_version(t.julia),
         "VERSIONS" => versions,
+        "DISABLE_INLINING" => !p.inline,
     )
 end
 

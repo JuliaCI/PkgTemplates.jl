@@ -34,6 +34,9 @@ jobs:
       julia: {{{E_JULIA}}}
       {{/E_JULIA}}
 {{/EXCLUDES}}
+{{#DISABLE_INLINING}}
+script: julia --code-coverage --inline=no -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
+{{/DISABLE_INLINING}}
 {{#HAS_DOCUMENTER}}
   include:
     - stage: Documentation
