@@ -38,27 +38,30 @@ jobs:
   include:
     - stage: Documentation
       julia: {{{VERSION}}}
-      script: julia --project=docs -e '
-        using Pkg;
-        Pkg.develop(PackageSpec(; path=pwd()));
-        Pkg.instantiate();
-        include("docs/make.jl");'
+      script: |
+        julia --project=docs -e '
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.instantiate()
+          include("docs/make.jl")'
       after_success: skip
 {{/HAS_DOCUMENTER}}
 {{#HAS_COVERAGE}}
 after_success:
 {{#HAS_CODECOV}}
-  - julia -e '
-      using Pkg;
-      Pkg.add("Coverage");
-      using Coverage;
-      Codecov.submit(process_folder());'
+  - |
+    julia -e '
+      using Pkg
+      Pkg.add("Coverage")
+      using Coverage
+      Codecov.submit(process_folder())'
 {{/HAS_CODECOV}}
 {{#HAS_COVERALLS}}
-  - julia -e '
-      using Pkg;
-      Pkg.add("Coverage");
-      using Coverage;
-      Coveralls.submit(process_folder());'
+  - |
+    julia -e '
+      using Pkg
+      Pkg.add("Coverage")
+      using Coverage
+      Coveralls.submit(process_folder())'
 {{/HAS_COVERALLS}}
 {{/HAS_COVERAGE}}
