@@ -6,10 +6,6 @@ os:
 julia:
   - {{VERSION}}
   - nightly
-matrix:
-  allow_failures:
-    - julia: nightly
-  fast_finish: true
 notifications:
   email: false
 {{#COVERAGE}}
@@ -21,8 +17,11 @@ after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 {{/COVERALLS}}
 {{/COVERAGE}}
-{{#DOCUMENTER}}
 jobs:
+  allow_failures:
+    - julia: nightly
+  fast_finish: true
+{{#DOCUMENTER}}
   include:
     - stage: Documentation
       julia: {{VERSION}}
