@@ -1,17 +1,41 @@
 name: TagBot
 on:
   schedule:
-    - cron: 0 * * * *
+    - cron: {{{CRON}}}
 jobs:
   TagBot:
     runs-on: ubuntu-latest
     steps:
       - uses: JuliaRegistries/TagBot@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          <<#REGISTRY>>
-          registry: <<&REGISTRY>>
-          <</REGISTRY>>
-          <<#HAS_DISPATCH>>
-          dispatch: true
-          <</HAS_DISPATCH>>
+          token: {{{TOKEN}}}
+          {{#SSH}}
+          ssh: {{{SSH}}}
+          {{/SSH}}
+          {{#SSH_PASSWORD}}
+          ssh_password: {{{SSH_PASSWORD}}}
+          {{/SSH_PASSWORD}}
+          {{#CHANGELOG}}
+          changelog: {{{CHANGELOG}}}
+          {{/CHANGELOG}}
+          {{#CHANGELOG_IGNORE}}
+          changelog_ignore: {{{CHANGELOG_IGNORE}}}
+          {{/CHANGELOG_IGNORE}}
+          {{#GPG}}
+          gpg: {{{GPG}}}
+          {{/GPG}}
+          {{#GPG_PASSWORD}}
+          gpg_password: {{{GPG_PASSWORD}}}
+          {{/GPG_PASSWORD}}
+          {{#REGISTRY}}
+          registry: {{{REGISTRY}}}
+          {{/REGISTRY}}
+          {{#BRANCHES}}
+          branches: {{{BRANCHES}}}
+          {{/BRANCHES}}
+          {{#DISPATCH}}
+          dispatch: {{{DISPATCH}}}
+          {{/DISPATCH}}
+          {{#DISPATCH_DELAY}}
+          dispatch_delay: {{{DISPATCH_DELAY}}}
+          {{/DISPATCH_DELAY}}

@@ -1,13 +1,25 @@
 name: TagBot
 on:
   schedule:
-    - cron: 0 * * * *
+    - cron: 0 0 */3 * *
 jobs:
   TagBot:
     runs-on: ubuntu-latest
     steps:
       - uses: JuliaRegistries/TagBot@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MYTOKEN }}
+          ssh: ${{ secrets.SSHKEY }}
+          ssh_password: ${{ secrets.SSHPASS }}
+          changelog: |
+            Line 1
+            Line 2
+
+            Line 4
+          changelog_ignore: foo, bar
+          gpg: ${{ secrets.GPGKEY }}
+          gpg_password: ${{ secrets.GPGPASS }}
           registry: Foo/Bar
+          branches: false
           dispatch: true
+          dispatch_delay: 20

@@ -2,6 +2,18 @@ const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
 """
+    Secret(name::AbstractString)
+
+Represents a GitHub repository secret.
+When converted to a string, yields `\${{ secrets.<name> }}`.
+"""
+struct Secret
+    name::String
+end
+
+Base.print(io::IO, s::Secret) = print(io, "\${{ secrets.$(s.name) }}")
+
+"""
 A simple plugin that, in general, creates a single file.
 """
 abstract type BasicPlugin <: Plugin end

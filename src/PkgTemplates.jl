@@ -27,6 +27,7 @@ export
     License,
     ProjectFile,
     Readme,
+    Secret,
     SrcDir,
     TagBot,
     Tests,

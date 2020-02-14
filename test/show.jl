@@ -41,9 +41,20 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                 SrcDir:
                   file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
                 TagBot:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "TagBot.yml"))"
                   destination: "TagBot.yml"
+                  cron: "0 * * * *"
+                  token: \${{ secrets.GITHUB_TOKEN }}
+                  ssh: nothing
+                  ssh_password: nothing
+                  changelog: nothing
+                  changelog_ignore: nothing
+                  gpg: nothing
+                  gpg_password: nothing
                   registry: nothing
-                  dispatch: false
+                  branches: nothing
+                  dispatch: nothing
+                  dispatch_delay: nothing
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
