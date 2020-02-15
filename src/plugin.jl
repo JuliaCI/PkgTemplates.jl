@@ -1,6 +1,10 @@
 const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
+function Base.:(==)(a::T, b::T) where T <: Plugin
+    return all(n -> getfield(a, n) == getfield(b, n), fieldnames(T))
+end
+
 """
     Secret(name::AbstractString)
 

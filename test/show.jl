@@ -44,7 +44,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "TagBot.yml"))"
                   destination: "TagBot.yml"
                   cron: "0 * * * *"
-                  token: \${{ secrets.GITHUB_TOKEN }}
+                  token: Secret("GITHUB_TOKEN")
                   ssh: nothing
                   ssh_password: nothing
                   changelog: nothing
@@ -63,9 +63,8 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
     end
 
     @testset "show as serialization" begin
-        # Equality is not implemented for Template, so check the string form.
         t1 = tpl()
         t2 = eval(Meta.parse(sprint(show, t1)))
-        @test sprint(show, t1) == sprint(show, t2)
+        @test t1 == t2
     end
 end
