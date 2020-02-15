@@ -76,8 +76,8 @@ To understand how they're implemented, let's look at simplified versions of two 
 
 ```julia
 @with_kw_noshow struct Documenter <: Plugin
-    make_jl::String = default_file("docs", "make.jl") <- "Path to make.jl template"
-    index_md::String = default_file("docs", "src", "index.md") <- "Path to index.md template"
+    make_jl::String = default_file("docs", "make.jl")
+    index_md::String = default_file("docs", "src", "index.md")
 end
 
 gitignore(::Documenter) = ["/docs/build/"]

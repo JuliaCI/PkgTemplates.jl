@@ -1,5 +1,6 @@
 """
     TagBot(;
+        file="$(contractuser(default_file("github", "workflows", "TagBot.yml")))",
         destination="TagBot.yml",
         cron="0 * * * *",
         token=Secret("GITHUB_TOKEN"),
@@ -18,6 +19,7 @@
 Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagBot).
 
 ## Keyword Arguments
+- `file::AbstractString`: Template file for the workflow file.
 - `destination::AbstractString`: Destination of the workflow file, relative to `.github/workflows`.
 - `cron::AbstractString`: Cron expression for the schedule interval.
 - `token::Secret`: Name of the token secret to use.
