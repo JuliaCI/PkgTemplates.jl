@@ -24,6 +24,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                 CompatHelper:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CompatHelper.yml"))"
                   destination: "CompatHelper.yml"
+                  cron: "0 0 * * *"
                 Git:
                   ignore: String[]
                   ssh: false

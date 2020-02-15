@@ -63,6 +63,7 @@ end
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.1"]),
             Citation(; readme=true),
             Codecov(; file=STATIC_FILE),
+            CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_FILE),
             Documenter{GitLabCI}(
                 assets=[STATIC_FILE],
