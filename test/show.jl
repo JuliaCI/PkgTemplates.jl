@@ -24,6 +24,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                 CompatHelper:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CompatHelper.yml"))"
                   destination: "CompatHelper.yml"
+                  cron: "0 0 * * *"
                 Git:
                   ignore: String[]
                   ssh: false
@@ -41,9 +42,20 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                 SrcDir:
                   file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
                 TagBot:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "TagBot.yml"))"
                   destination: "TagBot.yml"
+                  cron: "0 * * * *"
+                  token: Secret("GITHUB_TOKEN")
+                  ssh: nothing
+                  ssh_password: nothing
+                  changelog: nothing
+                  changelog_ignore: nothing
+                  gpg: nothing
+                  gpg_password: nothing
                   registry: nothing
-                  dispatch: false
+                  branches: nothing
+                  dispatch: nothing
+                  dispatch_delay: nothing
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
@@ -52,9 +64,8 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
     end
 
     @testset "show as serialization" begin
-        # Equality is not implemented for Template, so check the string form.
         t1 = tpl()
         t2 = eval(Meta.parse(sprint(show, t1)))
-        @test sprint(show, t1) == sprint(show, t2)
+        @test t1 == t2
     end
 end

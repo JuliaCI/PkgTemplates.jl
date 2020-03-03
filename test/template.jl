@@ -50,6 +50,14 @@
         end
     end
 
+    @testset "Equality" begin
+        a = tpl()
+        b = tpl()
+        @test a == b
+        c = tpl(julia=v"0.3")
+        @test a != c
+    end
+
     @testset "hasplugin" begin
         t = tpl(; plugins=[TravisCI(), Documenter{TravisCI}()])
         @test PT.hasplugin(t, typeof(first(PT.default_plugins())))

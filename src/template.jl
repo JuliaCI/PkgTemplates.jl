@@ -130,6 +130,15 @@ function (t::Template)(pkg::AbstractString)
     @info "New package is at $pkg_dir"
 end
 
+function Base.:(==)(a::Template, b::Template)
+    return a.authors == b.authors &&
+        a.dir == b.dir &&
+        a.host == b.host &&
+        a.julia == b.julia &&
+        a.user == b.user &&
+        all(map(==, a.plugins, b.plugins))
+end
+
 # Does the template have a plugin that satisfies some predicate?
 hasplugin(t::Template, f::Function) = any(f, t.plugins)
 hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)

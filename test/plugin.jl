@@ -1,6 +1,9 @@
 # Don't move this line from the top, please. {{X}} {{Y}} {{Z}}
 
-struct BasicTest <: PT.BasicPlugin end
+struct BasicTest <: PT.BasicPlugin
+    a::String
+    b::Bool
+end
 
 PT.gitignore(::BasicTest) = ["a", "aa", "aaa"]
 PT.source(::BasicTest) = @__FILE__
@@ -11,7 +14,7 @@ PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 
 
 @testset "Plugins" begin
     @testset "BasicPlugin" begin
-        p = BasicTest()
+        p = BasicTest("foo", true)
         t = tpl(; plugins=[p])
 
         # The X from user_view should override the X from view.
@@ -33,5 +36,13 @@ PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 
         @test_logs (:warn, r"The project option is set") tpl(; julia=v"1.1", plugins=[p])
         @test_logs tpl(; julia=v"1.2", plugins=[p])
         @test_logs tpl(; julia=v"1.3", plugins=[p])
+    end
+
+    @testset "Equality" begin
+        a = BasicTest("foo", true)
+        b = BasicTest("foo", true)
+        @test a == b
+        c = BasicTest("foo", false)
+        @test a != c
     end
 end

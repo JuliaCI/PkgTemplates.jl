@@ -41,6 +41,7 @@ Readme
 License
 Git
 TagBot
+Secret
 ```
 
 ### Continuous Integration (CI)
