@@ -141,3 +141,13 @@ make_canonical(::Type{GitLabCI}) = gitlab_pages_url
 make_canonical(::Type{Nothing}) = nothing
 
 needs_username(::Documenter) = true
+
+non_customizable(::Type{<:Documenter}) = (:makedocs_kwargs,)
+
+function interactive(::Type{Documenter})
+    styles = (Nothing, TravisCI, GitHubPages)
+    menu = RadioMenu(map(string, styles))
+    print("Documenter deploy style:")
+    idx = request(menu)
+    return interactive(Documenter{styles[idx]})
+end

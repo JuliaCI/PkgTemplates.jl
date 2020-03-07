@@ -396,6 +396,8 @@ function collect_versions(t::Template, versions::Vector)
     return sort(unique(vs))
 end
 
+AllCI = Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}
+
 """
     is_ci(::Plugin) -> Bool
 
@@ -403,6 +405,7 @@ Determine whether or not a plugin is a CI plugin.
 If you are adding a CI plugin, you should implement this function and return `true`.
 """
 is_ci(::Plugin) = false
-is_ci(::Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
+is_ci(::AllCI) = true
 
-needs_username(::Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}) = true
+needs_username(::AllCI) = true
+# not_customizable(::Type{T}) where T <: AllCI = (:extra_versions,)

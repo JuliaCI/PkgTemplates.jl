@@ -5,6 +5,7 @@ using Base: active_project, contractuser
 using Dates: month, today, year
 using LibGit2: LibGit2, GitConfig, GitRemote, GitRepo
 using Pkg: Pkg, TOML, PackageSpec
+using REPL.TerminalMenus: MultiSelectMenu, request
 using UUIDs: uuid4
 
 using Mustache: render
@@ -44,6 +45,7 @@ abstract type Plugin end
 include("template.jl")
 include("plugin.jl")
 include("show.jl")
+include("interactive.jl")
 include("deprecated.jl")
 
 # Run some function with a project activated at the given path.

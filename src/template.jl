@@ -65,9 +65,9 @@ struct Template
     user::String
 end
 
-Template(; kwargs...) = Template(Val(false); kwargs...)
+Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
+Template(::Val{true}) = interactive(Template)
 
-# Non-interactive constructor.
 function Template(::Val{false}; kwargs...)
     kwargs = Dict(kwargs)
 
