@@ -3,9 +3,10 @@ module PkgTemplates
 using Base: active_project, contractuser
 
 using Dates: month, today, year
+using InteractiveUtils: subtypes
 using LibGit2: LibGit2, GitConfig, GitRemote, GitRepo
 using Pkg: Pkg, TOML, PackageSpec
-using REPL.TerminalMenus: MultiSelectMenu, request
+using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 using UUIDs: uuid4
 
 using Mustache: render

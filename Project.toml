@@ -5,6 +5,7 @@ version = "0.7.0-DEV"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 LibGit2 = "76f85450-5226-5b5a-8eaa-529ad045b433"
 Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
