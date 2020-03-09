@@ -64,6 +64,7 @@ end
 Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
 
 gitignore(::Documenter) = ["/docs/build/"]
+priority(::Documenter, ::Function) = DEFAULT_PRIORITY - 1  # We need SrcDir to go first.
 
 badges(::Documenter) = Badge[]
 badges(::Documenter{<:GitHubPagesStyle}) = [
@@ -125,7 +126,10 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     foreach(a -> cp(a, joinpath(assets_dir, basename(a))), p.assets)
 
     # Create the documentation project.
-    with_project(() -> Pkg.add(DOCUMENTER_DEP), docs_dir)
+    with_project(docs_dir) do
+        Pkg.add(DOCUMENTER_DEP)
+        cd(() -> Pkg.develop(PackageSpec(; path="..")), docs_dir)
+    end
 end
 
 github_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).github.io/$pkg.jl"

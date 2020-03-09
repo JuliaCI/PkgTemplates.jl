@@ -90,3 +90,8 @@ uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+
+[[WackyOptions]]
+path = ".."
+uuid = "5b7e9947-ddc0-4b3f-9b55-0d8042f74170"
+version = "1.0.0"
