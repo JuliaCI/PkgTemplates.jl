@@ -3,14 +3,23 @@ const TemplateOrPlugin = Union{Template, Plugin}
 function interactive(::Type{T}) where T <: TemplateOrPlugin
     names = setdiff(fieldnames(T), not_customizable(T))
     pairs = map(name -> name => fieldtype(T, name), names)
-    foreach(pair -> pair.first in names || push!(pairs, pair), extra_customizable(T))
+    foreach(pair -> first(pair) in names || push!(pairs, pair), extra_customizable(T))
+    sort!(pairs; by=first)
+
+    # There must be at least 2 MultiSelectMenu options.
+    # If there are none, return immediately.
+    # If there's just one, add a "dummy" option.
     isempty(pairs) && return T()
     just_one = length(pairs) == 1
-    just_one && push!(pairs, "None")
+    just_one && push!(pairs, :None => Nothing)
+
     menu = MultiSelectMenu(collect(map(pair -> string(first(pair)), pairs)))
     println("$(nameof(T)) keywords to customize:")
     customize = collect(request(menu))
-    just_one && delete!(customize, lastindex(pairs))
+
+    # If the "None" option was selected, don't customize anything.
+    just_one && lastindex(pairs) in customize && return T()
+
     kwargs = Dict{Symbol, Any}()
     foreach(map(i -> pairs[i], customize)) do (name, F)
         kwargs[name] = prompt(T, F, name)
@@ -44,7 +53,7 @@ extra_customizable(::Type{T}) where T <: Plugin = ()
 input_tips(T::Type{<:Vector}) = ["comma-delimited", input_tips(eltype(T))...]
 input_tips(::Type{Union{T, Nothing}}) where T = ["empty for nothing", input_tips(T)...]
 input_tips(::Type{Secret}) = ["name only"]
-input_tips(::Type) = []
+input_tips(::Type) = String[]
 
 convert_input(::Type{<:TemplateOrPlugin}, ::Type{String}, s::AbstractString) = string(s)
 convert_input(::Type{<:TemplateOrPlugin}, ::Type{VersionNumber}, s::AbstractString) = VersionNumber(s)

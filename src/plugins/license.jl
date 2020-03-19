@@ -35,3 +35,16 @@ view(::License, t::Template, ::AbstractString) = Dict(
     "AUTHORS" => join(t.authors, ", "),
     "YEAR" => year(today()),
 )
+
+function prompt(::Type{License}, ::Type, ::Val{:name})
+    options = readdir(default_file("licenses"))
+    # Move MIT to the top.
+    deleteat!(options, findfirst(==("MIT"), options))
+    pushfirst!(options, "MIT")
+    menu = RadioMenu(options; pagesize=length(options))
+    println("Select a license:")
+    idx = request(menu)
+    return options[idx]
+end
+
+extra_customizable(::Type{License}) = (:name => String,)
