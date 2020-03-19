@@ -23,7 +23,4 @@ source(p::CompatHelper) = p.file
 destination(p::CompatHelper) = joinpath(".github", "workflows", p.destination)
 tags(::CompatHelper) = "<<", ">>"
 
-view(p::CompatHelper, t::Template, ::AbstractString) = Dict(
-    "CRON" => p.cron,
-    "VERSION" => format_version(max(v"1.3", t.julia)),
-)
+view(p::CompatHelper, ::Template, ::AbstractString) = Dict("CRON" => p.cron)
