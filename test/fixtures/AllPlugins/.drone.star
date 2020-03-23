@@ -1,7 +1,7 @@
 def main(ctx):
   pipelines = []
   for arch in ["amd64"]:
-    for julia in ["1.0", "1.3"]:
+    for julia in ["1.0", "1.4"]:
       pipelines.append(pipeline(arch, julia))
   return pipelines
 
