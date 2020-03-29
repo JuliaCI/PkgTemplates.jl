@@ -22,7 +22,7 @@ But right now if you do use master it will be.
 Install with Pkg, just like any other registered Julia package:
 
 ```jl
-pkg> add PkgTemplates  # Press ']' to enter te Pkg REPL mode.
+pkg> add PkgTemplates  # Press ']' to enter the Pkg REPL mode.
 ```
 
 ## Usage
