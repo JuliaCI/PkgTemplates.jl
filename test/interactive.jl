@@ -4,7 +4,7 @@ notnothingtype(::Type{Union{T, Nothing}}) where T = T
 @testset "Interactive mode" begin
     @testset "convert_input has all required methods" begin
         Fs = mapreduce(union!, PT.concretes(PT.Plugin); init=Set()) do T
-            map(notnothingtype, fieldtypes(T))
+            map(notnothingtype, map(n -> fieldtype(T, n), fieldnames(T)))
         end
         foreach(Fs) do F
             @test hasmethod(PT.convert_input, Tuple{Type{Template}, Type{F}, AbstractString})

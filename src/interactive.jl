@@ -164,7 +164,7 @@ function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
 
     # Use pushfirst! here so that users can override field types if they wish.
     foreach(pair -> pushfirst!(pairs, pair), extra_customizable(T))
-    unique!(first, pairs)
+    uniqueby!(first, pairs)
     sort!(pairs; by=first)
 
     return pairs
@@ -172,3 +172,17 @@ end
 
 # Compute all the concrete subtypes of T.
 concretes(T::Type) = isconcretetype(T) ? Any[T] : vcat(map(concretes, subtypes(T))...)
+
+if VERSION >= v"1.1"
+    const uniqueby! = unique!
+else
+    function uniqueby!(f, xs)
+        seen = Set()
+        todelete = Int[]
+        foreach(enumerate(map(f, xs))) do (i, out)
+            out in seen && push!(todelete, i)
+            push!(seen, out)
+        end
+        return deleteat!(xs, todelete)
+    end
+end
