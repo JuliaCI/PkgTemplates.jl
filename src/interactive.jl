@@ -18,7 +18,7 @@ function interactive(::Type{T}) where T <: TemplateOrPlugin
 
     menu = MultiSelectMenu(collect(map(pair -> string(first(pair)), pairs)))
     println("$(nameof(T)) keywords to customize:")
-    customize = collect(request(menu))
+    customize = sort!(collect(request(menu)))
 
     # If the "None" option was selected, don't customize anything.
     just_one && lastindex(pairs) in customize && return T()
@@ -74,8 +74,12 @@ A default implementation of `T(s)` exists.
 """
 convert_input(::Type{<:TemplateOrPlugin}, ::Type{String}, s::AbstractString) = string(s)
 convert_input(::Type{<:TemplateOrPlugin}, T::Type{<:Real}, s::AbstractString) = parse(T, s)
-convert_input(::Type{<:TemplateOrPlugin}, ::Type{Bool}, s::AbstractString) = startswith(s, r"[ty]"i)
 convert_input(::Type{<:TemplateOrPlugin}, T::Type, s::AbstractString) = T(s)
+
+function convert_input(::Type{<:TemplateOrPlugin}, ::Type{Bool}, s::AbstractString)
+    s = lowercase(s)
+    return startswith(s, "t") || startswith(s, "y")
+end
 
 function convert_input(P::Type{<:TemplateOrPlugin}, T::Type{<:Vector}, s::AbstractString)
     xs = map(strip, split(s, ","))
@@ -136,7 +140,7 @@ function prompt(::Type{Template}, ::Type, ::Val{:plugins})
     options = concretes(Plugin)
     menu = MultiSelectMenu(map(string, options))
     println("Select plugins:")
-    types = collect(request(menu))
+    types = sort!(collect(request(menu)))
     return map(interactive, options[types])
 end
 
@@ -144,7 +148,7 @@ function prompt(::Type{Template}, ::Type, ::Val{:disable_defaults})
     options = map(typeof, default_plugins())
     menu = MultiSelectMenu(map(string, options))
     println("Select default plugins to disable:")
-    types = collect(request(menu))
+    types = sort!(collect(request(menu)))
     return options[types]
 end
 
@@ -171,7 +175,8 @@ function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
 end
 
 # Compute all the concrete subtypes of T.
-concretes(T::Type) = isconcretetype(T) ? Any[T] : vcat(map(concretes, subtypes(T))...)
+concretes_rec(T::Type) = isconcretetype(T) ? Any[T] : vcat(map(concretes_rec, subtypes(T))...)
+concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 if VERSION >= v"1.1"
     const uniqueby! = unique!
