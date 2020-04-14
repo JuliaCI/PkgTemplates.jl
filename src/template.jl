@@ -51,6 +51,7 @@ A configuration used to generate packages.
 - `interactive::Bool=false`: In addition to specifying the template options with keywords,
   you can also build up a template by following a set of prompts.
   To create a template interactively, set this keyword to `true`.
+  See also the similar [`generate`](@ref) function.
 
 ---
 

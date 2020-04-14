@@ -92,5 +92,7 @@ notnothingtype(::Type{Union{T, Nothing}}) where T = T
             julia=v"0.7",
             user="user",
         )
+
+        println()
     end
 end

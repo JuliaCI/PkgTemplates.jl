@@ -21,6 +21,7 @@ t("MyPkg")
 
 ```@docs
 Template
+generate
 ```
 
 ## Plugins

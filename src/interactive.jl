@@ -1,6 +1,18 @@
 const TemplateOrPlugin = Union{Template, Plugin}
 
 """
+    generate([pkg::AbstractString]) -> Template
+
+Shortcut for `Template(; interactive=true)(pkg)`.
+If no package name is supplied, you will be prompted for one.
+"""
+function generate(pkg::AbstractString=prompt(Template, String, :pkg))
+    t = Template(; interactive=true)
+    t(pkg)
+    return t
+end
+
+"""
     interactive(T::Type{<:Plugin}) -> T
 
 Interactively create a plugin of type `T`. Implement this method and ignore other
