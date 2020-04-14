@@ -1,10 +1,13 @@
 const TemplateOrPlugin = Union{Template, Plugin}
 
+"""
+    interactive(T::Type{<:Plugin}) -> T
+
+Interactively create a plugin of type `T`. Implement this method and ignore other
+related functions only if you want completely custom behaviour.
+"""
 function interactive(::Type{T}) where T <: TemplateOrPlugin
-    names = setdiff(fieldnames(T), not_customizable(T))
-    pairs = map(name -> name => fieldtype(T, name), names)
-    foreach(pair -> first(pair) in names || push!(pairs, pair), extra_customizable(T))
-    sort!(pairs; by=first)
+    pairs = interactive_pairs(T)
 
     # There must be at least 2 MultiSelectMenu options.
     # If there are none, return immediately.
@@ -21,11 +24,28 @@ function interactive(::Type{T}) where T <: TemplateOrPlugin
     just_one && lastindex(pairs) in customize && return T()
 
     kwargs = Dict{Symbol, Any}()
-    foreach(map(i -> pairs[i], customize)) do (name, F)
+    foreach(pairs[customize]) do (name, F)
         kwargs[name] = prompt(T, F, name)
     end
     return T(; kwargs...)
 end
+
+"""
+    not_customizable(::Type{<:Plugin}) -> Vector{Symbol}
+
+Return the names of fields of the given plugin type that cannot be customized
+in interactive mode.
+"""
+not_customizable(::Type{T}) where T <: TemplateOrPlugin = ()
+
+"""
+    extra_customizable(::Type{<:Plugin}) -> Vector{Pair{Symbol, DataType}}
+
+Return a list of keyword arguments that the given plugin type accepts,
+which are not fields of the type, and should be customizable in interactive mode.
+For example, for a constructor `Foo(; x::Bool)`, provide `[x => Bool]`.
+"""
+extra_customizable(::Type{T}) where T <: Plugin = ()
 
 function pretty_message(s::AbstractString)
     replacements = [
@@ -36,30 +56,26 @@ function pretty_message(s::AbstractString)
 end
 
 """
-    not_customizable(::Type{<:Plugin}) -> Vector{Symbol}
+    input_tips(::Type{T}) -> Vector{String}
 
-Return a list of fields of the given plugin type that are not to be customized.
+Provide some extra tips to users on how to structure their input for the type `T`,
+for example if multiple delimited values are expected.
 """
-not_customizable(::Type{T}) where T <: TemplateOrPlugin = ()
-
-"""
-    extra_customizable(::Type{<:Plugin}) -> Vector{Symbol}
-
-Return a list of keyword arguments that the given plugin type accepts,
-which are not fields of the type.
-"""
-extra_customizable(::Type{T}) where T <: Plugin = ()
-
 input_tips(T::Type{<:Vector}) = ["comma-delimited", input_tips(eltype(T))...]
 input_tips(::Type{Union{T, Nothing}}) where T = ["empty for nothing", input_tips(T)...]
 input_tips(::Type{Secret}) = ["name only"]
 input_tips(::Type) = String[]
 
+"""
+    convert_input(::Type{<:Plugin}, ::Type{T}, s::AbstractString) -> T
+
+Convert the user input `s` into an instance of `T`.
+A default implementation of `T(s)` exists.
+"""
 convert_input(::Type{<:TemplateOrPlugin}, ::Type{String}, s::AbstractString) = string(s)
-convert_input(::Type{<:TemplateOrPlugin}, ::Type{VersionNumber}, s::AbstractString) = VersionNumber(s)
-convert_input(::Type{<:TemplateOrPlugin}, ::Type{T}, s::AbstractString) where T <: Real = parse(T, s)
-convert_input(::Type{<:TemplateOrPlugin}, ::Type{Secret}, s::AbstractString) = Secret(s)
+convert_input(::Type{<:TemplateOrPlugin}, T::Type{<:Real}, s::AbstractString) = parse(T, s)
 convert_input(::Type{<:TemplateOrPlugin}, ::Type{Bool}, s::AbstractString) = startswith(s, r"[ty]"i)
+convert_input(::Type{<:TemplateOrPlugin}, T::Type, s::AbstractString) = T(s)
 
 function convert_input(P::Type{<:TemplateOrPlugin}, T::Type{<:Vector}, s::AbstractString)
     xs = map(strip, split(s, ","))
@@ -70,12 +86,12 @@ end
     prompt(P::Type{<:Plugin}, ::Type{T}, ::Val{name::Symbol}) -> Any
 
 Prompts for an input of type `T` for field `name` of plugin type `P`.
-Implement this method to customize interactive logic for particular fields.
+Implement this method to customize particular fields of particular types.
 """
 prompt(P::Type{<:TemplateOrPlugin}, T::Type, name::Symbol) = prompt(P, T, Val(name))
 
 function prompt(P::Type{<:TemplateOrPlugin}, ::Type{T}, ::Val{name}) where {T, name}
-    tips = join(filter(x -> x !== nothing, [T, input_tips(T)...]), ", ")
+    tips = join([T; input_tips(T)], ", ")
     print(pretty_message("Enter value for '$name' ($tips): "))
     input = strip(readline())
     return if isempty(input)
@@ -121,7 +137,7 @@ function prompt(::Type{Template}, ::Type, ::Val{:plugins})
     menu = MultiSelectMenu(map(string, options))
     println("Select plugins:")
     types = collect(request(menu))
-    return map(i -> interactive(options[i]), types)
+    return map(interactive, options[types])
 end
 
 function prompt(::Type{Template}, ::Type, ::Val{:disable_defaults})
@@ -129,15 +145,30 @@ function prompt(::Type{Template}, ::Type, ::Val{:disable_defaults})
     menu = MultiSelectMenu(map(string, options))
     println("Select default plugins to disable:")
     types = collect(request(menu))
-    return collect(map(i -> options[i], types))
+    return options[types]
 end
 
+# Call the default prompt method even if a specialized one exists.
 function fallback_prompt(::Type{T}, name::Symbol) where T
     return invoke(
         prompt,
         Tuple{Type{Plugin}, Type{T}, Val{name}},
-        Plugin, T, Val(:name),
+        Plugin, T, Val(name),
     )
 end
 
+# Compute name => type pairs for T's interactive options.
+function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
+    names = setdiff(fieldnames(T), not_customizable(T))
+    pairs = map(name -> name => fieldtype(T, name), names)
+
+    # Use pushfirst! here so that users can override field types if they wish.
+    foreach(pair -> pushfirst!(pairs, pair), extra_customizable(T))
+    unique!(first, pairs)
+    sort!(pairs; by=first)
+
+    return pairs
+end
+
+# Compute all the concrete subtypes of T.
 concretes(T::Type) = isconcretetype(T) ? Any[T] : vcat(map(concretes, subtypes(T))...)

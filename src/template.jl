@@ -47,6 +47,11 @@ A configuration used to generate packages.
   To disable a default plugin, pass in the negated type: `!PluginType`.
   To override a default plugin instead of disabling it, pass in your own instance.
 
+### Interactive Mode
+- `interactive::Bool=false`: In addition to specifying the template options with keywords,
+  you can also build up a template by following a set of prompts.
+  To create a template interactively, set this keyword to `true`.
+
 ---
 
 To create a package from a `Template`, use the following syntax:

@@ -54,6 +54,7 @@ mktempdir() do dir
             include("template.jl")
             include("plugin.jl")
             include("show.jl")
+            include("interactive.jl")
 
             if PT.git_is_installed()
                 include("git.jl")

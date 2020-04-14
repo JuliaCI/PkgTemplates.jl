@@ -319,6 +319,21 @@ If you want to extend the validation but keep the file existence check, use the 
 
 For more examples, see the plugins in the [Continuous Integration (CI)](@ref) and [Code Coverage](@ref) sections.
 
+## Supporting Interactive Mode
+
+When it comes to supporting interactive mode for your custom plugins, you have two options: write your own [`interactive`](@ref) method, or use the default one.
+If you choose the first option, then you are free to implement the method however you want.
+If you want to use the default implementation, then there are a few functions that you should be aware of, although in many cases you will not need to add any new methods.
+
+```@docs
+interactive
+prompt
+not_customizable
+extra_customizable
+input_tips
+convert_input
+```
+
 ## Miscellaneous Tips
 
 ### Writing Template Files
