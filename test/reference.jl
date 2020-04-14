@@ -1,3 +1,5 @@
+@info "Running reference tests"
+
 const PROMPT = get(ENV, "PT_INTERACTIVE", "false") == "true" || !haskey(ENV, "CI")
 const STATIC_FILE = joinpath(@__DIR__, "fixtures", "static.txt")
 const STATIC_DOCUMENTER = [

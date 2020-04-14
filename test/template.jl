@@ -1,3 +1,5 @@
+@info "Running template tests"
+
 @testset "Template" begin
     @testset "Template constructor" begin
         @testset "user" begin

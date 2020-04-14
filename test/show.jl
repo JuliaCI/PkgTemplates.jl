@@ -1,3 +1,5 @@
+@info "Running show tests"
+
 const TEMPLATES_DIR = contractuser(PT.TEMPLATES_DIR)
 const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
 

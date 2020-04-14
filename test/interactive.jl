@@ -1,3 +1,5 @@
+@info "Running interactive tests"
+
 const CRLF = "\r\n"
 const UP = "\eOA"
 const DOWN = "\eOB"

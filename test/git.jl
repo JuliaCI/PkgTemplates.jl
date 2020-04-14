@@ -1,3 +1,5 @@
+@info "Running Git tests"
+
 @testset "Git repositories" begin
     @testset "Does not create Git repo" begin
         t = tpl(; plugins=[!Git])
