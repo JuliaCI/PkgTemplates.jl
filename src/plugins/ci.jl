@@ -408,4 +408,4 @@ is_ci(::Plugin) = false
 is_ci(::AllCI) = true
 
 needs_username(::AllCI) = true
-# not_customizable(::Type{T}) where T <: AllCI = (:extra_versions,)
+extra_customizable(::Type{<:AllCI}) = (:extra_versions => Vector{VersionNumber},)
