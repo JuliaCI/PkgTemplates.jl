@@ -240,13 +240,13 @@ function gen_file(file::AbstractString, text::AbstractString)
 end
 
 """
-    render_file(file::AbstractString view::Dict{<:AbstractString}, tags) -> String
+    render_file(file::AbstractString view::Dict{<:AbstractString}, tags=nothing) -> String
 
 Render a template file with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters,
 or `nothing` to use the default delimiters.
 """
-function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags)
+function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
     return render_text(read(file, String), view, tags)
 end
 

@@ -138,7 +138,11 @@ Badge
 ```
 
 These two functions, [`gitignore`](@ref) and [`badges`](@ref), are currently the only "special" functions for cross-plugin interactions.
-In other cases, you can still access the [`Template`](@ref)'s plugins to depend on the presence/properties of other plugins, although that's less powerful.
+In other cases, you can still access the [`Template`](@ref)'s plugins to depend on the presence/properties of other plugins via [`getplugin`](@ref), although that's less powerful.
+
+```@docs
+getplugin
+```
 
 Third, we implement [`view`](@ref), which is used to fill placeholders in badges and rendered files.
 

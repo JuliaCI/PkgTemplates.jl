@@ -42,7 +42,8 @@ A configuration used to generate packages.
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
-  [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
+  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref), and
+  [`TagBot`](@ref).
   To disable a default plugin, pass in the negated type: `!PluginType`.
   To override a default plugin instead of disabling it, pass in your own instance.
 
@@ -144,7 +145,11 @@ end
 hasplugin(t::Template, f::Function) = any(f, t.plugins)
 hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
 
-# Get a plugin by type.
+"""
+    getplugin(t::Template, ::Type{T<:Plugin}) -> Union{T, Nothing}
+
+Get the plugin of type `T` from the template `t`, if it's present.
+"""
 function getplugin(t::Template, ::Type{T}) where T <: Plugin
     i = findfirst(p -> p isa T, t.plugins)
     return i === nothing ? nothing : t.plugins[i]

@@ -40,6 +40,7 @@ Tests
 Readme
 License
 Git
+CompatHelper
 TagBot
 Secret
 ```
@@ -76,7 +77,6 @@ Documenter
 
 ```@docs
 Develop
-CompatHelper
 Citation
 ```
 

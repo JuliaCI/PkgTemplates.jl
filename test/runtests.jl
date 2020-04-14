@@ -64,7 +64,7 @@ mktempdir() do dir
                 if VERSION.major == 1 && VERSION.minor == 4
                     include("reference.jl")
                 else
-                    @info "Skipping reference tests" julia=VERSION
+                    @info "Skipping reference tests" VERSION
                 end
             else
                 @info "Git is not installed, skipping Git and reference tests"
