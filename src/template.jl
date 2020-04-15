@@ -13,9 +13,10 @@ default_plugins() = [
 
 function default_authors()
     name = LibGit2.getconfig("user.name", "")
-    isempty(name) && return ""
+    isempty(name) && return "contributors"
     email = LibGit2.getconfig("user.email", "")
-    return isempty(email) ? name : "$name <$email>"
+    authors = isempty(email) ? name : "$name <$email>"
+    return "$authors and contributors"
 end
 
 """
