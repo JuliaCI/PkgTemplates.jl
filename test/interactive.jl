@@ -79,7 +79,7 @@ notnothingtype(::Type{Union{T, Nothing}}) where T = T
             DOWN^4, CRLF, DONE,   # Disable License plugin
             DOWN^3, CRLF,         # Choose "Other" for host
             "x.com", CRLF,        # Enter host
-            DOWN^5, CRLF,         # Choose "Other" for julia
+            DOWN^6, CRLF,         # Choose "Other" for julia
             "0.7", CRLF,          # Enter Julia version
             DONE,                 # Select no plugins
             "user", CRLF,         # Enter user

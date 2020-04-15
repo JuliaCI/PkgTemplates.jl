@@ -124,7 +124,7 @@ function prompt(P::Type{<:TemplateOrPlugin}, ::Type{T}, ::Val{name}) where {T, n
 end
 
 function prompt(::Type{Template}, ::Type, ::Val{:julia})
-    versions = ["1.0", "1.1", "1.2", "1.3", "1.4", format_version(VERSION)]
+    versions = map(format_version, [VERSION; map(v -> VersionNumber(1, v), 0:5)])
     push!(sort!(unique!(versions)), "Other")
     menu = RadioMenu(map(string, versions))
     println("Select minimum Julia version:")
