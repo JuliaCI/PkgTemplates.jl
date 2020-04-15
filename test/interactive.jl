@@ -10,27 +10,23 @@ const DONE = "d"
 notnothingtype(::Type{T}) where T = T
 notnothingtype(::Type{Union{T, Nothing}}) where T = T
 
+struct FromString
+    s::String
+end
+
 @testset "Interactive mode" begin
     @testset "Input conversion" begin
-        @testset "All required methods exist" begin
-            Fs = mapreduce(union!, PT.concretes(PT.Plugin); init=Set()) do T
-                map(notnothingtype, map(n -> fieldtype(T, n), fieldnames(T)))
-            end
-            foreach(Fs) do F
-                @test hasmethod(PT.convert_input, Tuple{Type{Template}, Type{F}, AbstractString})
-            end
-        end
-
         generic(T, x) = PT.convert_input(PT.Plugin, T, x)
         @test generic(String, "foo") == "foo"
         @test generic(Float64, "1.23") == 1.23
         @test generic(Int, "01") == 1
         @test generic(Bool, "yes") === true
-        @test generic(Bool, "true") === true
-        @test generic(Bool, "no") === false
+        @test generic(Bool, "True") === true
+        @test generic(Bool, "No") === false
         @test generic(Bool, "false") === false
         @test generic(Vector{Int}, "1, 2, 3") == [1, 2, 3]
         @test generic(Vector{String}, "a, b,c") == ["a", "b", "c"]
+        @test generic(FromString, "hello") == FromString("hello")
     end
 
     @testset "input_tips" begin
@@ -52,11 +48,7 @@ notnothingtype(::Type{Union{T, Nothing}}) where T = T
             end
 
             @test PT.interactive_pairs($name) == [:x => Int, :y => String]
-
-            PT.not_customizable(::Type{$name}) = (:x,)
-            @test PT.interactive_pairs($name) == [:y => String]
-
-            PT.extra_customizable(::Type{$name}) = (:y => Float64, :z => Int)
+            PT.customizable(::Type{$name}) = (:x => PT.NotCustomizable, :y => Float64, :z => Int)
             @test PT.interactive_pairs($name) == [:y => Float64, :z => Int]
         end
     end
@@ -73,16 +65,16 @@ notnothingtype(::Type{Union{T, Nothing}}) where T = T
 
         print(
             stdin.buffer,
-            ALL, DONE,            # Customize all fields
-            "a, b", CRLF,         # Enter authors
-            "~", CRLF,            # Enter dir
-            DOWN^4, CRLF, DONE,   # Disable License plugin
-            DOWN^3, CRLF,         # Choose "Other" for host
-            "x.com", CRLF,        # Enter host
-            DOWN^6, CRLF,         # Choose "Other" for julia
-            "0.7", CRLF,          # Enter Julia version
-            DONE,                 # Select no plugins
-            "user", CRLF,         # Enter user
+            ALL, DONE,           # Customize all fields
+            "a, b", CRLF,        # Enter authors
+            "~", CRLF,           # Enter dir
+            DOWN^4, CRLF, DONE,  # Disable License plugin
+            DOWN^3, CRLF,        # Choose "Other" for host
+            "x.com", CRLF,       # Enter host
+            DOWN^6, CRLF,        # Choose "Other" for julia
+            "0.7", CRLF,         # Enter Julia version
+            DONE,                # Select no plugins
+            "user", CRLF,        # Enter user
         )
         @test Template(; interactive=true) == Template(;
             authors=["a", "b"],

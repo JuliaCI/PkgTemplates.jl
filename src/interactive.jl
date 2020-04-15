@@ -42,22 +42,17 @@ function interactive(::Type{T}) where T <: TemplateOrPlugin
     return T(; kwargs...)
 end
 
-"""
-    not_customizable(::Type{<:Plugin}) -> Vector{Symbol}
-
-Return the names of fields of the given plugin type that cannot be customized
-in interactive mode.
-"""
-not_customizable(::Type{T}) where T <: TemplateOrPlugin = ()
+struct NotCustomizable end
 
 """
-    extra_customizable(::Type{<:Plugin}) -> Vector{Pair{Symbol, DataType}}
+    customizable(::Type{<:Plugin}) -> Vector{Pair{Symbol, DataType}}
 
 Return a list of keyword arguments that the given plugin type accepts,
 which are not fields of the type, and should be customizable in interactive mode.
 For example, for a constructor `Foo(; x::Bool)`, provide `[x => Bool]`.
+If `T` has fields which should not be customizable, use `NotCustomizable` as the type.
 """
-extra_customizable(::Type{T}) where T <: Plugin = ()
+customizable(::Type{<:TemplateOrPlugin}) = ()
 
 function pretty_message(s::AbstractString)
     replacements = [
@@ -175,19 +170,19 @@ end
 
 # Compute name => type pairs for T's interactive options.
 function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
-    names = setdiff(fieldnames(T), not_customizable(T))
-    pairs = map(name -> name => fieldtype(T, name), names)
+    pairs = collect(map(name -> name => fieldtype(T, name), fieldnames(T)))
 
     # Use pushfirst! here so that users can override field types if they wish.
-    foreach(pair -> pushfirst!(pairs, pair), extra_customizable(T))
+    foreach(pair -> pushfirst!(pairs, pair), customizable(T))
     uniqueby!(first, pairs)
+    deleteat!(pairs, findall(p -> last(p) === NotCustomizable, pairs))
     sort!(pairs; by=first)
 
     return pairs
 end
 
 # Compute all the concrete subtypes of T.
-concretes_rec(T::Type) = isconcretetype(T) ? Any[T] : vcat(map(concretes_rec, subtypes(T))...)
+concretes_rec(T::Type) = isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T))...) : Any[T]
 concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 if VERSION >= v"1.1"

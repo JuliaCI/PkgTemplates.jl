@@ -396,7 +396,7 @@ function collect_versions(t::Template, versions::Vector)
     return sort(unique(vs))
 end
 
-AllCI = Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}
+const AllCI = Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}
 
 """
     is_ci(::Plugin) -> Bool
@@ -408,4 +408,4 @@ is_ci(::Plugin) = false
 is_ci(::AllCI) = true
 
 needs_username(::AllCI) = true
-extra_customizable(::Type{<:AllCI}) = (:extra_versions => Vector{VersionNumber},)
+customizable(::Type{<:AllCI}) = (:extra_versions => Vector{VersionNumber},)

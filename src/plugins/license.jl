@@ -47,4 +47,4 @@ function prompt(::Type{License}, ::Type, ::Val{:name})
     return options[idx]
 end
 
-extra_customizable(::Type{License}) = (:name => String,)
+customizable(::Type{License}) = (:name => String,)

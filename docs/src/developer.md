@@ -328,8 +328,7 @@ If you want to use the default implementation, then there are a few functions th
 ```@docs
 interactive
 prompt
-not_customizable
-extra_customizable
+customizable
 input_tips
 convert_input
 ```

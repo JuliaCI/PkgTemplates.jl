@@ -173,4 +173,4 @@ defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
 defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
 defaultkw(::Type{Template}, ::Val{:user}) = default_user()
 
-extra_customizable(::Type{Template}) = (:disable_defaults => Vector{DataType},)
+customizable(::Type{Template}) = (:disable_defaults => Vector{DataType},)

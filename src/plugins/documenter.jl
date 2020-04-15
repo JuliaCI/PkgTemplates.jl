@@ -141,7 +141,10 @@ make_canonical(::Type{GitLabCI}) = gitlab_pages_url
 make_canonical(::Type{Nothing}) = nothing
 
 needs_username(::Documenter) = true
-non_customizable(::Type{<:Documenter}) = (:makedocs_kwargs,)
+
+function customizable(::Type{<:Documenter})
+    return (:canonical_url => NotCustomizable, :makedocs_kwargs => NotCustomizable)
+end
 
 function interactive(::Type{Documenter})
     styles = [Nothing, TravisCI, GitHubPages]
