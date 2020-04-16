@@ -2,7 +2,7 @@
     TagBot(;
         file="$(contractuser(default_file("github", "workflows", "TagBot.yml")))",
         destination="TagBot.yml",
-        cron="0 * * * *",
+        cron="0 0 * * *",
         token=Secret("GITHUB_TOKEN"),
         ssh=nothing,
         ssh_password=nothing,
@@ -37,7 +37,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 @with_kw_noshow struct TagBot <: BasicPlugin
     file::String = default_file("github", "workflows", "TagBot.yml")
     destination::String = "TagBot.yml"
-    cron::String = "0 * * * *"
+    cron::String = "0 0 * * *"
     token::Secret = Secret("GITHUB_TOKEN")
     ssh::Union{Secret, Nothing} = nothing
     ssh_password::Union{Secret, Nothing} = nothing

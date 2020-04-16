@@ -44,7 +44,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                 TagBot:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "TagBot.yml"))"
                   destination: "TagBot.yml"
-                  cron: "0 * * * *"
+                  cron: "0 0 * * *"
                   token: Secret("GITHUB_TOKEN")
                   ssh: nothing
                   ssh_password: nothing
