@@ -4,7 +4,7 @@ using Documenter
 makedocs(;
     modules=[WackyOptions],
     authors="tester",
-    repo="https://github.com/tester/WackyOptions.jl/blob/{commit}{path}#L{line}",
+    repo="https://x.com/tester/WackyOptions.jl/blob/{commit}{path}#L{line}",
     sitename="WackyOptions.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",

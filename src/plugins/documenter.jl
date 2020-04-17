@@ -82,6 +82,7 @@ badges(::Documenter{<:GitHubPagesStyle}) = [
 badges(::Documenter{GitLabCI}) = Badge(
     "Dev",
     "https://img.shields.io/badge/docs-dev-blue.svg",
+    # TODO: Support custom domain here.
     "https://{{{USER}}}.gitlab.io/{{{PKG}}}.jl/dev",
 )
 
