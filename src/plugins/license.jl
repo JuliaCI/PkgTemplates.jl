@@ -12,7 +12,7 @@ Creates a license file.
 - `destination::AbstractString`: File destination, relative to the repository root.
   For example, `"LICENSE.md"` might be desired.
 """
-struct License <: BasicPlugin
+struct License <: FilePugin
     path::String
     destination::String
 end

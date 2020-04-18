@@ -20,7 +20,7 @@ Base.print(io::IO, s::Secret) = print(io, "\${{ secrets.$(s.name) }}")
 """
 A simple plugin that, in general, creates a single file.
 """
-abstract type BasicPlugin <: Plugin end
+abstract type FilePugin <: Plugin end
 
 """
     default_file(paths::AbstractString...) -> String
@@ -36,7 +36,7 @@ default_file(paths::AbstractString...) = joinpath(TEMPLATES_DIR, paths...)
 Return the view to be passed to the text templating engine for this plugin.
 `pkg` is the name of the package being generated.
 
-For [`BasicPlugin`](@ref)s, this is used for both the plugin badges
+For [`FilePugin`](@ref)s, this is used for both the plugin badges
 (see [`badges`](@ref)) and the template file (see [`source`](@ref)).
 For other [`Plugin`](@ref)s, it is used only for badges,
 but you can always call it yourself as part of your [`hook`](@ref) implementation.
@@ -60,7 +60,7 @@ user_view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
 
 This function combines [`view`](@ref) and [`user_view`](@ref) for use in text templating.
 If you're doing manual file creation or text templating (i.e. writing [`Plugin`](@ref)s
-that are not [`BasicPlugin`](@ref)s), then you should use this function
+that are not [`FilePugin`](@ref)s), then you should use this function
 rather than either of the former two.
 
 !!! note
@@ -114,16 +114,16 @@ By default, an empty list is returned.
 badges(::Plugin) = Badge[]
 
 """
-    source(::BasicPlugin) -> Union{String, Nothing}
+    source(::FilePugin) -> Union{String, Nothing}
 
 Return the path to a plugin's template file, or `nothing` to indicate no file.
 
 By default, `nothing` is returned.
 """
-source(::BasicPlugin) = nothing
+source(::FilePugin) = nothing
 
 """
-    destination(::BasicPlugin) -> String
+    destination(::FilePugin) -> String
 
 Return the destination, relative to the package root, of a plugin's configuration file.
 
@@ -192,9 +192,9 @@ At this point, the [`prehook`](@ref)s have run, but not the [`posthook`](@ref)s.
 (so `basename(pkg_dir)` is the package name).
 
 !!! note
-    You usually shouldn't implement this function for [`BasicPlugin`](@ref)s.
+    You usually shouldn't implement this function for [`FilePugin`](@ref)s.
     If you do, it should probably `invoke` the generic method
-    (otherwise, there's not much reason to subtype `BasicPlugin`).
+    (otherwise, there's not much reason to subtype `FilePugin`).
 """
 hook(::Plugin, ::Template, ::AbstractString) = nothing
 
@@ -206,13 +206,13 @@ At this point, both the [`prehook`](@ref)s and [`hook`](@ref)s have run.
 """
 posthook(::Plugin, ::Template, ::AbstractString) = nothing
 
-function validate(p::T, ::Template) where T <: BasicPlugin
+function validate(p::T, ::Template) where T <: FilePugin
     src = source(p)
     src === nothing && return
     isfile(src) || throw(ArgumentError("$(nameof(T)): The file $src does not exist"))
 end
 
-function hook(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
+function hook(p::FilePugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
     pkg = basename(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
@@ -220,7 +220,7 @@ function hook(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
     gen_file(path, text)
 end
 
-function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
+function render_plugin(p::FilePugin, t::Template, pkg::AbstractString)
     return render_file(source(p), combined_view(p, t, pkg), tags(p))
 end
 
