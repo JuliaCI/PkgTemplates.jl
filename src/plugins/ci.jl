@@ -307,13 +307,13 @@ destination(::GitLabCI) = ".gitlab-ci.yml"
 function badges(p::GitLabCI)
     ci = Badge(
         "Build Status",
-        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/badges/master/build.svg",
-        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/pipelines",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/pipeline.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/pipelines",
     )
     cov = Badge(
         "Coverage",
-        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/badges/master/coverage.svg",
-        "https://gitlab.com/{{{USER}}}/{{{PKG}}}.jl/commits/master",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/coverage.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/master",
     )
     return p.coverage ? [ci, cov] : [ci]
 end
@@ -322,6 +322,7 @@ function view(p::GitLabCI, t::Template, pkg::AbstractString)
     return Dict(
         "HAS_COVERAGE" => p.coverage,
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
+        "HOST" => t.host,
         "PKG" => pkg,
         "USER" => t.user,
         "VERSION" => format_version(t.julia),

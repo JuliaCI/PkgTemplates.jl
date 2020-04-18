@@ -58,7 +58,7 @@ end
 
 
     @testset "Wacky options" begin
-        test_all("WackyOptions"; authors=USER, julia=v"1.2", plugins=[
+        test_all("WackyOptions"; authors=USER, julia=v"1.2", host="x.com", plugins=[
             AppVeyor(; x86=true, coverage=true, extra_versions=[v"1.1"]),
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.1"]),
             Citation(; readme=true),
