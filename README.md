@@ -63,3 +63,8 @@ t = Template(;
 ---
 
 For a much more detailled overview, please see the documentation.
+
+## Contributing
+
+Issues and pull requests are welcome!
+For some more specific tips, see the developer documentation.

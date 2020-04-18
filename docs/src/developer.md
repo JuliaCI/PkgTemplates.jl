@@ -342,3 +342,28 @@ compat_version
 format_version
 collect_versions
 ```
+
+## Testing
+
+If you write a cool new plugin that could be useful to other people, or find and fix a bug, you're encouraged to open a pull request with your changes.
+Here are some testing tips to ensure that your PR goes through as smoothly as possible.
+
+### Updating Reference Tests & Fixtures
+
+If you've added or modified plugins, you should update the reference tests and the associated test fixtures.
+In `test/reference.jl`, you'll find a "Reference tests" test set that basically generates a bunch of packages, and then checks each file against a reference file, which is stored somewhere in `test/fixtures`.
+
+For new plugins, you should add an instance of your plugin to the "All plugins" anad "Wacky options" test sets, then run the tests with `Pkg.test`.
+They should pass, and there will be new files in `test/fixtures`.
+Check them to make sure that they contain exactly what you would expect!
+
+For changes to existing plugins, update the plugin options appropriately in the "Wacky options" test set.
+Rather than using `Pkg.test` to run the tests in this case, use `include("test/runtests.jl")`.
+Running the tests in an interactive session will give you the option to review and accept changes to the fixtures, updating the files automatically (see [ReferenceTests](https://github.com/Evizero/ReferenceTests.jl) for more details).
+Before you can do this, you'll need to add PkgTemplates' test requirements to your current environment.
+
+### Updating "Show" Tests
+
+Depending on what you've changed, the tests in `test/show.jl` might fail.
+To fix those, you'll need to update the `expected` value to match what is actually displayed in a Julia REPL.
+The test error itself is usually not very helpful, so it's easiest to launch a REPL, evaluate `Template()`, and copy-paste the relevant parts back into the test file.
