@@ -7,9 +7,6 @@ const ALL = "a"
 const NONE = "n"
 const DONE = "d"
 
-notnothingtype(::Type{T}) where T = T
-notnothingtype(::Type{Union{T, Nothing}}) where T = T
-
 struct FromString
     s::String
 end

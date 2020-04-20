@@ -69,6 +69,7 @@ Provide some extra tips to users on how to structure their input for the type `T
 for example if multiple delimited values are expected.
 """
 input_tips(T::Type{<:Vector}) = ["comma-delimited", input_tips(eltype(T))...]
+input_tips(::Type{Nothing}) = String[]
 input_tips(::Type{Union{T, Nothing}}) where T = ["empty for nothing", input_tips(T)...]
 input_tips(::Type{Secret}) = ["name only"]
 input_tips(::Type) = String[]
@@ -185,6 +186,7 @@ end
 concretes_rec(T::Type) = isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T))...) : Any[T]
 concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
+# unique!(f, xs) added here: https://github.com/JuliaLang/julia/pull/30141
 if VERSION >= v"1.1"
     const uniqueby! = unique!
 else
