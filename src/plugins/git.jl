@@ -1,11 +1,20 @@
 """
-    Git(; ignore=String[], ssh=false, manifest=false, gpgsign=false)
+    Git(;
+        ignore=String[],
+        name=nothing,
+        email=nothing,
+        ssh=false,
+        manifest=false,
+        gpgsign=false,
+    )
 
 Creates a Git repository and a `.gitignore` file.
 
 ## Keyword Arguments
 - `ignore::Vector{<:AbstractString}`: Patterns to add to the `.gitignore`.
   See also: [`gitignore`](@ref).
+- `name::AbstractString`: Your real name, if you have not set `user.name` with Git.
+- `email::AbstractString`: Your email address, if you have not set `user.email` with Git.
 - `ssh::Bool`: Whether or not to use SSH for the remote.
   If left unset, HTTPS is used.
 - `manifest::Bool`: Whether or not to commit `Manifest.toml`.
@@ -15,6 +24,8 @@ Creates a Git repository and a `.gitignore` file.
 """
 @with_kw_noshow struct Git <: Plugin
     ignore::Vector{String} = String[]
+    name::Union{String, Nothing} = nothing
+    email::Union{String, Nothing} = nothing
     ssh::Bool = false
     manifest::Bool = false
     gpgsign::Bool = false
@@ -36,9 +47,10 @@ function validate(p::Git, t::Template)
         throw(ArgumentError("Git: gpgsign is set but the Git CLI is not installed"))
     end
 
-    foreach(("user.name", "user.email")) do k
-        if isempty(LibGit2.getconfig(k, ""))
-            throw(ArgumentError("Git: Global Git config is missing required value '$k'"))
+    foreach((:name, :email)) do k
+        user_k = "user.$k"
+        if getproperty(p, k) === nothing && isempty(LibGit2.getconfig(user_k, ""))
+            throw(ArgumentError("Git: Global Git config is missing required value '$user_k'"))
         end
     end
 end
@@ -46,6 +58,12 @@ end
 # Set up the Git repository.
 function prehook(p::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
+        LibGit2.with(GitConfig(repo)) do config
+            foreach((:name, :email)) do k
+                v = getproperty(p, k)
+                v === nothing || LibGit2.set!(config, "user.$k", v)
+            end
+        end
         commit(p, repo, pkg_dir, "Initial commit")
         pkg = basename(pkg_dir)
         url = if p.ssh

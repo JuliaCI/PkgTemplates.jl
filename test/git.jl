@@ -35,6 +35,16 @@
         end
     end
 
+    @testset "With custom name/email" begin
+        t = tpl(; plugins=[Git(; name="me", email="a@b.c")])
+        with_pkg(t) do pkg
+            LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
+                @test LibGit2.getconfig(repo, "user.name", "") == "me"
+                @test LibGit2.getconfig(repo, "user.email", "") == "a@b.c"
+            end
+        end
+    end
+
     @testset "Adds version to commit message" begin
         # We're careful to avoid a Pkg.update as it triggers Cassette#130.
         t = tpl(; disable_defaults=[Tests], plugins=[Git()])

@@ -27,6 +27,8 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   cron: "0 0 * * *"
                 Git:
                   ignore: String[]
+                  name: nothing
+                  email: nothing
                   ssh: false
                   manifest: false
                   gpgsign: false

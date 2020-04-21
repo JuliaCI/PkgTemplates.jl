@@ -3,7 +3,7 @@ module PkgTemplates
 using Base: active_project, contractuser
 
 using Dates: month, today, year
-using LibGit2: LibGit2, GitRemote, GitRepo
+using LibGit2: LibGit2, GitConfig, GitRemote, GitRepo
 using Pkg: Pkg, TOML, PackageSpec
 using UUIDs: uuid4
 
