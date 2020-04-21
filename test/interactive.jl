@@ -51,36 +51,81 @@ end
     end
 
     @testset "Simulated inputs" begin
-        # Default template (with required user input)
-        print(
-            stdin.buffer,
-            DOWN^6, CRLF,  # Select user
-            DONE,          # Finish menu
-            USER, CRLF,    # Enter user
-        )
-        @test Template(; interactive=true) == Template(; user=USER)
+        @testset "Default template" begin
+            print(
+                stdin.buffer,
+                DOWN^6, CRLF,  # Select user
+                DONE,          # Finish menu
+                USER, CRLF,    # Enter user
+            )
+            @test Template(; interactive=true) == Template(; user=USER)
+        end
 
-        print(
-            stdin.buffer,
-            ALL, DONE,           # Customize all fields
-            "a, b", CRLF,        # Enter authors
-            "~", CRLF,           # Enter dir
-            DOWN^4, CRLF, DONE,  # Disable License plugin
-            DOWN^3, CRLF,        # Choose "Other" for host
-            "x.com", CRLF,       # Enter host
-            DOWN^6, CRLF,        # Choose "Other" for julia
-            "0.7", CRLF,         # Enter Julia version
-            DONE,                # Select no plugins
-            "user", CRLF,        # Enter user
-        )
-        @test Template(; interactive=true) == Template(;
-            authors=["a", "b"],
-            dir="~",
-            disable_defaults=[License],
-            host="x.com",
-            julia=v"0.7",
-            user="user",
-        )
+        @testset "Custom options except plugins" begin
+            print(
+                stdin.buffer,
+                ALL, DONE,           # Customize all fields
+                "a, b", CRLF,        # Enter authors
+                "~", CRLF,           # Enter dir
+                DOWN^4, CRLF, DONE,  # Disable License plugin
+                DOWN^3, CRLF,        # Choose "Other" for host
+                "x.com", CRLF,       # Enter host
+                DOWN^6, CRLF,        # Choose "Other" for julia
+                "0.7", CRLF,         # Enter Julia version
+                DONE,                # Select no plugins
+                "user", CRLF,        # Enter user
+            )
+            @test Template(; interactive=true) == Template(;
+                authors=["a", "b"],
+                dir="~",
+                disable_defaults=[License],
+                host="x.com",
+                julia=v"0.7",
+                user="user",
+            )
+        end
+
+        @testset "Plugins" begin
+            print(
+                stdin.buffer,
+                ALL, DONE,         # Customize all fields
+                "true", CRLF,      # Enable ARM64
+                "no", CRLF,        # Disable coverage
+                "1.1,v1.2", CRLF,  # Enter extra versions
+                "x.txt", CRLF,     # Enter file
+                "Yes", CRLF,       # Enable Linux
+                "false", CRLF,     # Disable OSX
+                "TRUE", CRLF,      # Enable Windows
+                "YES",  CRLF,      # Enable x64
+                "NO", CRLF,        # Disable x86
+            )
+            @test PT.interactive(TravisCI) == TravisCI(
+                arm64=true,
+                coverage=false,
+                extra_versions=[v"1.1", v"1.2"],
+                file="x.txt",
+                linux=true,
+                osx=false,
+                windows=true,
+                x64=true,
+                x86=false,
+            )
+
+            print(
+                stdin.buffer,
+                DOWN^2, CRLF,      # Select GitLabCI
+                DOWN, CRLF, DONE,  # Customize index_md
+                "x.txt", CRLF,     # Enter index file
+            )
+            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
+
+            print(
+                stdin.buffer,
+                DOWN, CRLF, DONE,  # Customize name
+                CRLF,              # Choose MIT (it's at the top)
+            )
+            @test PT.interactive(License) == License(; name="MIT")
+        end
 
         println()
     end
