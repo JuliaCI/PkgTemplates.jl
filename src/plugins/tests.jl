@@ -16,7 +16,7 @@ Sets up testing for packages.
     Managing test dependencies with `test/Project.toml` is only supported
     in Julia 1.2 and later.
 """
-@with_kw_noshow struct Tests <: BasicPlugin
+@with_kw_noshow struct Tests <: FilePugin
     file::String = default_file("test", "runtests.jl")
     project::Bool = false
 end
@@ -26,7 +26,7 @@ destination(::Tests) = joinpath("test", "runtests.jl")
 view(::Tests, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 
 function validate(p::Tests, t::Template)
-    invoke(validate, Tuple{BasicPlugin, Template}, p, t)
+    invoke(validate, Tuple{FilePugin, Template}, p, t)
     p.project && t.julia < v"1.2" && @warn string(
         "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
         "but a Julia version older than 1.2 ($(t.julia)) is supported by the template",
@@ -34,8 +34,8 @@ function validate(p::Tests, t::Template)
 end
 
 function hook(p::Tests, t::Template, pkg_dir::AbstractString)
-    # Do the normal BasicPlugin behaviour to create the test script.
-    invoke(hook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+    # Do the normal FilePugin behaviour to create the test script.
+    invoke(hook, Tuple{FilePugin, Template, AbstractString}, p, t, pkg_dir)
 
     # Then set up the test depdendency in the chosen way.
     f = p.project ? make_test_project : add_test_dependency

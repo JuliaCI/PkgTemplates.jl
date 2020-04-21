@@ -1,6 +1,6 @@
 # Don't move this line from the top, please. {{X}} {{Y}} {{Z}}
 
-struct BasicTest <: PT.BasicPlugin
+struct BasicTest <: PT.FilePugin
     a::String
     b::Bool
 end
@@ -13,7 +13,7 @@ PT.view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 0, "Y" => 2)
 PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3)
 
 @testset "Plugins" begin
-    @testset "BasicPlugin" begin
+    @testset "FilePugin" begin
         p = BasicTest("foo", true)
         t = tpl(; plugins=[p])
 

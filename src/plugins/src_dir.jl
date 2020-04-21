@@ -6,7 +6,7 @@ Creates a module entrypoint.
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `src/<module>.jl`.
 """
-@with_kw_noshow mutable struct SrcDir <: BasicPlugin
+@with_kw_noshow mutable struct SrcDir <: FilePugin
     file::String = default_file("src", "module.jl")
     destination::String = ""
 end
