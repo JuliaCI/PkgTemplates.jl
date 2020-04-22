@@ -13,7 +13,7 @@ Integrates your packages with [CompatHelper](https://github.com/bcbi/CompatHelpe
   relative to `.github/workflows`.
 - `cron::AbstractString`: Cron expression for the schedule interval.
 """
-@with_kw_noshow struct CompatHelper <: FilePugin
+@with_kw_noshow struct CompatHelper <: FilePlugin
     file::String = default_file("github", "workflows", "CompatHelper.yml")
     destination::String = "CompatHelper.yml"
     cron::String = "0 0 * * *"

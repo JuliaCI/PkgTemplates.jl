@@ -9,7 +9,7 @@ Sets up code coverage submission from CI to [Codecov](https://codecov.io).
 - `file::Union{AbstractString, Nothing}`: Template file for `.codecov.yml`,
   or `nothing` to create no file.
 """
-@with_kw_noshow struct Codecov <: FilePugin
+@with_kw_noshow struct Codecov <: FilePlugin
     file::Union{String, Nothing} = nothing
 end
 
@@ -31,7 +31,7 @@ Sets up code coverage submission from CI to [Coveralls](https://coveralls.io).
 - `file::Union{AbstractString, Nothing}`: Template file for `.coveralls.yml`,
   or `nothing` to create no file.
 """
-@with_kw_noshow struct Coveralls <: FilePugin
+@with_kw_noshow struct Coveralls <: FilePlugin
     file::Union{String, Nothing} = nothing
 end
 

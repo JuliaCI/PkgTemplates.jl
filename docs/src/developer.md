@@ -10,11 +10,11 @@ Pages = ["developer.md"]
 
 PkgTemplates can be easily extended by adding new [`Plugin`](@ref)s.
 
-There are two types of plugins: [`Plugin`](@ref) and [`BasicPlugin`](@ref).
+There are two types of plugins: [`Plugin`](@ref) and [`FilePlugin`](@ref).
 
 ```@docs
 Plugin
-BasicPlugin
+FilePlugin
 ```
 
 ## Template + Package Creation Pipeline
@@ -157,7 +157,7 @@ combined_view
 tags
 ```
 
-For more information on text templating, see the [`BasicPlugin` Walkthrough](@ref) and the section on [Custom Template Files](@ref).
+For more information on text templating, see the [`FilePlugin` Walkthrough](@ref) and the section on [Custom Template Files](@ref).
 
 ### Example: `Git`
 
@@ -208,16 +208,16 @@ As previously mentioned, we use [`priority`](@ref) to make sure that we wait unt
 
 Hopefully, this demonstrates the level of control you have over the package generation process when developing plugins, and when it makes sense to exercise that power!
 
-## `BasicPlugin` Walkthrough
+## `FilePlugin` Walkthrough
 
 Most of the time, you don't really need all of the control that we showed off above.
-Plugins that subtype [`BasicPlugin`](@ref) perform a much more limited task.
+Plugins that subtype [`FilePlugin`](@ref) perform a much more limited task.
 In general, they just generate one templated file.
 
 To illustrate, let's look at the [`Citation`](@ref) plugin, which creates a `CITATION.bib` file.
 
 ```julia
-@with_kw_noshow struct Citation <: BasicPlugin
+@with_kw_noshow struct Citation <: FilePlugin
     file::String = default_file("CITATION.bib")
 end
 
@@ -239,7 +239,7 @@ Similar to the `Documenter` example above, we're defining a keyword constructor,
 This plugin adds nothing to `.gitignore`, and it doesn't add any badges, so implementations for [`gitignore`](@ref) and [`badges`](@ref) are omitted.
 
 First, we implement [`source`](@ref) and [`destination`](@ref) to define where the template file comes from, and where it goes.
-These functions are specific to [`BasicPlugin`](@ref)s, and have no effect on regular [`Plugin`](@ref)s by default.
+These functions are specific to [`FilePlugin`](@ref)s, and have no effect on regular [`Plugin`](@ref)s by default.
 
 ```@docs
 source
@@ -265,17 +265,17 @@ Because the file contains its own `{}` delimiters, we need to use different ones
 
 Finally, we implement [`view`](@ref) to fill in the placeholders that we saw in the template file.
 
-## Doing Extra Work With `BasicPlugin`s
+## Doing Extra Work With `FilePlugin`s
 
 Notice that we didn't have to implement [`hook`](@ref) for our plugin.
-It's implemented for all [`BasicPlugin`](@ref)s, like so:
+It's implemented for all [`FilePlugin`](@ref)s, like so:
 
 ```julia
-function render_plugin(p::BasicPlugin, t::Template, pkg::AbstractString)
+function render_plugin(p::FilePlugin, t::Template, pkg::AbstractString)
     return render_file(source(p), combined_view(p, t, pkg), tags(p))
 end
 
-function hook(p::BasicPlugin, t::Template, pkg_dir::AbstractString)
+function hook(p::FilePlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
     pkg = basename(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
@@ -294,7 +294,7 @@ Of course, we could use a normal [`Plugin`](@ref), but it turns out there's a wa
 The plugin implements its own `hook`, but uses `invoke` to avoid duplicating the file creation code:
 
 ```julia
-@with_kw_noshow struct Tests <: BasicPlugin
+@with_kw_noshow struct Tests <: FilePlugin
     file::String = default_file("runtests.jl")
 end
 
@@ -303,14 +303,14 @@ destination(::Tests) = joinpath("test", "runtests.jl")
 view(::Tests, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 
 function hook(p::Tests, t::Template, pkg_dir::AbstractString)
-    # Do the normal BasicPlugin behaviour to create the test script.
-    invoke(hook, Tuple{BasicPlugin, Template, AbstractString}, p, t, pkg_dir)
+    # Do the normal FilePlugin behaviour to create the test script.
+    invoke(hook, Tuple{FilePlugin, Template, AbstractString}, p, t, pkg_dir)
     # Do some other work.
     add_test_dependency()
 end
 ```
 
-There is also a default [`validate`](@ref) implementation for [`BasicPlugin`](@ref)s, which checks that the plugin's [`source`](@ref) file exists, and throws an `ArgumentError` otherwise.
+There is also a default [`validate`](@ref) implementation for [`FilePlugin`](@ref)s, which checks that the plugin's [`source`](@ref) file exists, and throws an `ArgumentError` otherwise.
 If you want to extend the validation but keep the file existence check, use the `invoke` method as described above.
 
 For more examples, see the plugins in the [Continuous Integration (CI)](@ref) and [Code Coverage](@ref) sections.

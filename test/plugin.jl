@@ -1,20 +1,20 @@
 # Don't move this line from the top, please. {{X}} {{Y}} {{Z}}
 
-struct BasicTest <: PT.FilePugin
+struct FileTest <: PT.FilePlugin
     a::String
     b::Bool
 end
 
-PT.gitignore(::BasicTest) = ["a", "aa", "aaa"]
-PT.source(::BasicTest) = @__FILE__
-PT.destination(::BasicTest) = "foo.txt"
-PT.badges(::BasicTest) = PT.Badge("{{X}}", "{{Y}}", "{{Z}}")
-PT.view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 0, "Y" => 2)
-PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3)
+PT.gitignore(::FileTest) = ["a", "aa", "aaa"]
+PT.source(::FileTest) = @__FILE__
+PT.destination(::FileTest) = "foo.txt"
+PT.badges(::FileTest) = PT.Badge("{{X}}", "{{Y}}", "{{Z}}")
+PT.view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 0, "Y" => 2)
+PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3)
 
 @testset "Plugins" begin
-    @testset "FilePugin" begin
-        p = BasicTest("foo", true)
+    @testset "FilePlugin" begin
+        p = FileTest("foo", true)
         t = tpl(; plugins=[p])
 
         # The X from user_view should override the X from view.
@@ -39,10 +39,10 @@ PT.user_view(::BasicTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 
     end
 
     @testset "Equality" begin
-        a = BasicTest("foo", true)
-        b = BasicTest("foo", true)
+        a = FileTest("foo", true)
+        b = FileTest("foo", true)
         @test a == b
-        c = BasicTest("foo", false)
+        c = FileTest("foo", false)
         @test a != c
     end
 end
