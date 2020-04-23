@@ -179,7 +179,7 @@ function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
     deleteat!(pairs, findall(p -> last(p) === NotCustomizable, pairs))
     sort!(pairs; by=first)
 
-    return pairs
+    return Vector{Pair{Symbol, Type}}(pairs)
 end
 
 # Compute all the concrete subtypes of T.
