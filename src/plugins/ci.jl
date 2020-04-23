@@ -44,7 +44,7 @@ $EXTRA_VERSIONS_DOC
     If using coverage plugins, don't forget to manually add your API tokens as secrets,
     as described [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets).
 """
-@with_kw_noshow struct GitHubActions <: FilePlugin
+@plugin struct GitHubActions <: FilePlugin
     file::String = default_file("github", "workflows", "ci.yml")
     destination::String = "ci.yml"
     linux::Bool = true
@@ -116,7 +116,7 @@ Integrates your packages with [Travis CI](https://travis-ci.com).
   Another code coverage plugin such as [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
 """
-@with_kw_noshow struct TravisCI <: FilePlugin
+@plugin struct TravisCI <: FilePlugin
     file::String = default_file("travis.yml")
     linux::Bool = true
     osx::Bool = true
@@ -188,7 +188,7 @@ via [AppVeyor.jl](https://github.com/JuliaCI/Appveyor.jl).
   [`Codecov`](@ref) must also be included.
 $EXTRA_VERSIONS_DOC
 """
-@with_kw_noshow struct AppVeyor <: FilePlugin
+@plugin struct AppVeyor <: FilePlugin
     file::String = default_file("appveyor.yml")
     x86::Bool = false
     coverage::Bool = true
@@ -244,7 +244,7 @@ $EXTRA_VERSIONS_DOC
     Code coverage submission from Cirrus CI is not yet supported by
     [Coverage.jl](https://github.com/JuliaCI/Coverage.jl).
 """
-@with_kw_noshow struct CirrusCI <: FilePlugin
+@plugin struct CirrusCI <: FilePlugin
     file::String = default_file("cirrus.yml")
     image::String = "freebsd-12-0-release-amd64"
     coverage::Bool = true
@@ -293,7 +293,7 @@ See [`Documenter`](@ref) for more information.
 !!! note
     Nightly Julia is not supported.
 """
-@with_kw_noshow struct GitLabCI <: FilePlugin
+@plugin struct GitLabCI <: FilePlugin
     file::String = default_file("gitlab-ci.yml")
     coverage::Bool = true
     # Nightly has no Docker image.
@@ -353,7 +353,7 @@ $EXTRA_VERSIONS_DOC
 !!! note
     Nightly Julia is not supported.
 """
-@with_kw_noshow struct DroneCI <: FilePlugin
+@plugin struct DroneCI <: FilePlugin
     file::String = default_file("drone.star")
     destination::String = ".drone.star"
     amd64::Bool = true

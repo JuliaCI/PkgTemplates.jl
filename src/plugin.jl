@@ -1,6 +1,31 @@
 const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
+"""
+    @plugin struct ... end
+
+Define a plugin type. (TODO DOC)
+"""
+macro plugin(ex::Expr)
+    @assert ex.head === :struct "Expression must be a struct definition"
+    @assert ex.args[2] isa Expr && ex.args[2].head === :<: "Type must have a supertype"
+    T = ex.args[2].args[1]
+    @assert T isa Symbol "@plugin does not work for parametric types"
+
+    __module__ === PkgTemplates || @eval using PkgTemplates: @with_kw_noshow
+    block = :(begin @with_kw_noshow $ex end)
+
+    foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do field
+        @assert field.head === :(=) "Field must have a default value"
+        name = QuoteNode(field.args[1].args[1])
+        default = field.args[2]
+        def = :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $default)
+        push!(block.args, def)
+    end
+
+    return esc(block)
+end
+
 function Base.:(==)(a::T, b::T) where T <: Plugin
     return all(n -> getfield(a, n) == getfield(b, n), fieldnames(T))
 end

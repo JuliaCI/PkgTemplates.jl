@@ -49,7 +49,7 @@ struct Documenter{T<:DeployStyle} <: Plugin
     make_jl::String
     index_md::String
 
-    # Can't use @with_kw_noshow due to some weird precompilation issues.
+    # Can't use @plugin due to some weird precompilation issues.
     function Documenter{T}(;
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
