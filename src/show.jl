@@ -16,7 +16,7 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", p::T) where T <: Plugin
     indent = get(io, :indent, 0)
-    print(io, repeat(' ', indent), T)
+    print(io, repeat(' ', indent), nameof(T))
     ns = fieldnames(T)
     isempty(ns) || print(io, ":")
     foreach(ns) do n

@@ -93,7 +93,13 @@ end
 
 function convert_input(::Type, ::Type{Bool}, s::AbstractString)
     s = lowercase(s)
-    return startswith(s, "t") || startswith(s, "y")
+    return if startswith(s, "t") || startswith(s, "y")
+        true
+    elseif startswith(s, "f") || startswith(s, "n")
+        false
+    else
+        throw(ArgumentError("Unrecognized boolean response"))
+    end
 end
 
 function convert_input(P::Type, T::Type{<:Vector}, s::AbstractString)
