@@ -134,55 +134,9 @@ function prompt(P::Type, ::Type{T}, ::Val{name}) where {T, name}
     end
 end
 
-function prompt(::Type{Template}, ::Type, ::Val{:julia})
-    versions = map(format_version, [VERSION; map(v -> VersionNumber(1, v), 0:5)])
-    push!(sort!(unique!(versions)), "Other")
-    menu = RadioMenu(map(string, versions))
-    println("Select minimum Julia version:")
-    idx = request(menu)
-    return if idx == lastindex(versions)
-        fallback_prompt(VersionNumber, :julia)
-    else
-        VersionNumber(versions[idx])
-    end
-end
-
-function prompt(::Type{Template}, ::Type, ::Val{:host})
-    hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
-    menu = RadioMenu(hosts)
-    println("Select Git repository hosting service:")
-    idx = request(menu)
-    return if idx == lastindex(hosts)
-        fallback_prompt(String, :host)
-    else
-        hosts[idx]
-    end
-end
-
-function prompt(::Type{Template}, ::Type, ::Val{:plugins})
-    options = concretes(Plugin)
-    menu = MultiSelectMenu(map(string, options))
-    println("Select plugins:")
-    types = sort!(collect(request(menu)))
-    return map(interactive, options[types])
-end
-
-function prompt(::Type{Template}, ::Type, ::Val{:disable_defaults})
-    options = map(typeof, default_plugins())
-    menu = MultiSelectMenu(map(string, options))
-    println("Select default plugins to disable:")
-    types = sort!(collect(request(menu)))
-    return options[types]
-end
-
-# Call the default prompt method even if a specialized one exists.
-function fallback_prompt(::Type{T}, name::Symbol) where T
-    return invoke(
-        prompt,
-        Tuple{Type{Plugin}, Type{T}, Val{name}},
-        Plugin, T, Val(name),
-    )
-end
+# Compute all the concrete subtypes of T.
+concretes_rec(T::Type) = isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T))...) : Any[T]
+concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 # Compute name => type pairs for T's interactive options.
 function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
@@ -196,10 +150,6 @@ function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
 
     return Vector{Pair{Symbol, Type}}(pairs)
 end
-
-# Compute all the concrete subtypes of T.
-concretes_rec(T::Type) = isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T))...) : Any[T]
-concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 # unique!(f, xs) added here: https://github.com/JuliaLang/julia/pull/30141
 if VERSION >= v"1.1"

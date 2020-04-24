@@ -73,7 +73,7 @@ struct Template
 end
 
 Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
-Template(::Val{true}) = interactive(Template)
+Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
 
 function Template(::Val{false}; kwargs...)
     kwargs = Dict(kwargs)
@@ -167,10 +167,93 @@ getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
 # Default Template keyword values.
 defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
 defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
-defaultkw(::Type{Template}, ::Val{:dir}) = Pkg.devdir()
+defaultkw(::Type{Template}, ::Val{:dir}) = contractuser(Pkg.devdir())
 defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
 defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
 defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
 defaultkw(::Type{Template}, ::Val{:user}) = default_user()
 
 customizable(::Type{Template}) = (:disable_defaults => Vector{DataType},)
+
+function interactive(::Type{Template}; kwargs...)
+    # If the user supplied any keywords themselves, don't prompt for them.
+    kwargs = Dict{Symbol, Any}(kwargs)
+    options = [:user, :authors, :dir, :host, :julia, :plugins]
+    customizable = setdiff(options, keys(kwargs))
+
+    # Make sure we don't try to show a menu with < 2 options.
+    isempty(customizable) && return Template(; kwargs...)
+    just_one = length(customizable) == 1
+    just_one && push(customizable, "None")
+
+    println("Template keywords to customize:")
+    menu = MultiSelectMenu(map(string, customizable))
+    customize = customizable[sort!(collect(request(menu)))]
+    just_one && lastindex(customizable) in customize && return Template(; kwargs...)
+
+    # Prompt for each keyword.
+    foreach(k -> kwargs[k] = prompt(Template, fieldtype(Template, k), k), customize)
+
+    # We didn't include :disable_defaults above.
+    # Instead, the :plugins prompt pre-selected default plugins,
+    # so any default plugins that were explicitly excluded from the user's selection
+    # should be disabled.
+    if :plugins in customize && !haskey(kwargs, :disable_defaults)
+        plugin_types = map(typeof, kwargs[:plugins])
+        kwargs[:disable_defaults] = DataType[]
+        foreach(map(typeof, default_plugins())) do T
+            T in plugin_types || push!(kwargs[:disable_defaults], T)
+        end
+    end
+    return Template(; kwargs...)
+end
+
+function prompt(::Type{Template}, ::Type, ::Val{:julia})
+    versions = map(format_version, [VERSION; map(v -> VersionNumber(1, v), 0:5)])
+    push!(sort!(unique!(versions)), "Other")
+    menu = RadioMenu(map(string, versions))
+    println("Select minimum Julia version:")
+    idx = request(menu)
+    return if idx == lastindex(versions)
+        fallback_prompt(VersionNumber, :julia)
+    else
+        VersionNumber(versions[idx])
+    end
+end
+
+function prompt(::Type{Template}, ::Type, ::Val{:host})
+    hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
+    menu = RadioMenu(hosts)
+    println("Select Git repository hosting service:")
+    idx = request(menu)
+    return if idx == lastindex(hosts)
+        fallback_prompt(String, :host)
+    else
+        hosts[idx]
+    end
+end
+
+const CRLF = "\r\n"
+const DOWN = "\eOB"
+
+function prompt(::Type{Template}, ::Type, ::Val{:plugins})
+    defaults = map(typeof, default_plugins())
+    ndefaults = length(defaults)
+    # Put the defaults first.
+    options = unique!([defaults; concretes(Plugin)])
+    menu = MultiSelectMenu(map(T -> string(nameof(T)), options); pagesize=length(options))
+    println("Select plugins:")
+    # Pre-select the default plugins and move the cursor to the first non-default.
+    print(stdin.buffer, (CRLF * DOWN)^ndefaults)
+    types = sort!(collect(request(menu)))
+    return map(interactive, options[types])
+end
+
+# Call the default prompt method even if a specialized one exists.
+function fallback_prompt(::Type{T}, name::Symbol) where T
+    return invoke(
+        prompt,
+        Tuple{Type{Plugin}, Type{T}, Val{name}},
+        Plugin, T, Val(name),
+    )
+end
