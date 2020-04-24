@@ -244,6 +244,7 @@ function prompt(::Type{Template}, ::Type, ::Val{:plugins})
     menu = MultiSelectMenu(map(T -> string(nameof(T)), options); pagesize=length(options))
     println("Select plugins:")
     # Pre-select the default plugins and move the cursor to the first non-default.
+    # To make this better, we need julia#30043.
     print(stdin.buffer, (CRLF * DOWN)^ndefaults)
     types = sort!(collect(request(menu)))
     return map(interactive, options[types])

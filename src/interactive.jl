@@ -1,5 +1,3 @@
-const TemplateOrPlugin = Union{Template, Plugin}
-
 """
     generate([pkg::AbstractString]) -> Template
 
@@ -18,7 +16,7 @@ end
 Interactively create a plugin of type `T`. Implement this method and ignore other
 related functions only if you want completely custom behaviour.
 """
-function interactive(::Type{T}) where T <: TemplateOrPlugin
+function interactive(T::Type)
     pairs = interactive_pairs(T)
 
     # There must be at least 2 MultiSelectMenu options.
@@ -52,7 +50,7 @@ which are not fields of the type, and should be customizable in interactive mode
 For example, for a constructor `Foo(; x::Bool)`, provide `[x => Bool]`.
 If `T` has fields which should not be customizable, use `NotCustomizable` as the type.
 """
-customizable(::Type{<:TemplateOrPlugin}) = ()
+customizable(::Type) = ()
 
 function pretty_message(s::AbstractString)
     replacements = [
@@ -139,7 +137,7 @@ concretes_rec(T::Type) = isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T)
 concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 # Compute name => type pairs for T's interactive options.
-function interactive_pairs(::Type{T}) where T <: TemplateOrPlugin
+function interactive_pairs(T::Type)
     pairs = collect(map(name -> name => fieldtype(T, name), fieldnames(T)))
 
     # Use pushfirst! here so that users can override field types if they wish.
