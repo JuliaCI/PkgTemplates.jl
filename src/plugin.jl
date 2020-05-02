@@ -12,7 +12,8 @@ macro plugin(ex::Expr)
     T = ex.args[2].args[1]
     @assert T isa Symbol "@plugin does not work for parametric types"
 
-    __module__ === PkgTemplates || @eval using PkgTemplates: @with_kw_noshow
+    msg = "Run `using PkgTemplates: @with_kw_noshow` before using this macro"
+    @assert isdefined(__module__, Symbol("@with_kw_noshow")) msg
     block = :(begin @with_kw_noshow $ex end)
 
     foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do field

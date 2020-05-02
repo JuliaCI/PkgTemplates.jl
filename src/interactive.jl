@@ -114,7 +114,8 @@ Implement this method to customize particular fields of particular types.
 """
 prompt(P::Type, T::Type, name::Symbol) = prompt(P, T, Val(name))
 
-function prompt(P::Type, ::Type{T}, ::Val{name}) where {T, name}
+# The trailing `nothing` is a hack for `fallback_prompt` to use, ignore it.
+function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, name}
     tips = join([T; input_tips(T); "default=$(repr(defaultkw(P, name)))"], ", ")
     default = defaultkw(P, name)
     print(pretty_message("Enter value for '$name' ($tips): "))

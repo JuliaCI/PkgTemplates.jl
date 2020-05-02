@@ -208,6 +208,18 @@ function interactive(::Type{Template}; kwargs...)
     return Template(; kwargs...)
 end
 
+function prompt(::Type{Template}, ::Type, ::Val{:host})
+    hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
+    menu = RadioMenu(hosts)
+    println("Select Git repository hosting service:")
+    idx = request(menu)
+    return if idx == lastindex(hosts)
+        fallback_prompt(String, :host)
+    else
+        hosts[idx]
+    end
+end
+
 function prompt(::Type{Template}, ::Type, ::Val{:julia})
     versions = map(format_version, [VERSION; map(v -> VersionNumber(1, v), 0:5)])
     push!(sort!(unique!(versions)), "Other")
@@ -218,18 +230,6 @@ function prompt(::Type{Template}, ::Type, ::Val{:julia})
         fallback_prompt(VersionNumber, :julia)
     else
         VersionNumber(versions[idx])
-    end
-end
-
-function prompt(::Type{Template}, ::Type, ::Val{:host})
-    hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
-    menu = RadioMenu(hosts)
-    println("Select Git repository hosting service:")
-    idx = request(menu)
-    return if idx == lastindex(hosts)
-        fallback_prompt(String, :host)
-    else
-        hosts[idx]
     end
 end
 
@@ -251,10 +251,4 @@ function prompt(::Type{Template}, ::Type, ::Val{:plugins})
 end
 
 # Call the default prompt method even if a specialized one exists.
-function fallback_prompt(::Type{T}, name::Symbol) where T
-    return invoke(
-        prompt,
-        Tuple{Type{Plugin}, Type{T}, Val{name}},
-        Plugin, T, Val(name),
-    )
-end
+fallback_prompt(T::Type, name::Symbol) = prompt(Template, T, Val(name), nothing)

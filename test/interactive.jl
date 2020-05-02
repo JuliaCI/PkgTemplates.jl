@@ -1,11 +1,21 @@
 @info "Running interactive tests"
 
-const CRLF = "\r\n"
+using PkgTemplates: @with_kw_noshow
+
+const CR = "\r"
+const LF = "\n"
 const UP = "\eOA"
 const DOWN = "\eOB"
 const ALL = "a"
 const NONE = "n"
 const DONE = "d"
+
+# Because the plugin selection dialog prints directly to stdin in the same way
+# as we do here, and our input prints happen first, we're going to need to insert
+# the plugin selection prints ourselves, and then "undo" the extra ones at the end
+# by consuming whatever is left in stdin.
+const NDEFAULTS = length(PT.default_plugins())
+const SELECT_DEFAULTS = (CR * DOWN)^NDEFAULTS
 
 struct FromString
     s::String
@@ -24,24 +34,29 @@ end
         @test generic(Vector{Int}, "1, 2, 3") == [1, 2, 3]
         @test generic(Vector{String}, "a, b,c") == ["a", "b", "c"]
         @test generic(FromString, "hello") == FromString("hello")
+        @test generic(Union{String, Nothing}, "nothing") === nothing
+
+        @test_throws ArgumentError generic(Int, "hello")
+        @test_throws ArgumentError generic(Float64, "hello")
+        @test_throws ArgumentError generic(Bool, "hello")
     end
 
     @testset "input_tips" begin
         @test isempty(PT.input_tips(Int))
         @test PT.input_tips(Vector{String}) == ["comma-delimited"]
         @test PT.input_tips(Union{Vector{String}, Nothing}) ==
-            ["empty for nothing", "comma-delimited"]
-        @test PT.input_tips(Union{String, Nothing}) == ["empty for nothing"]
+            ["'nothing' for nothing", "comma-delimited"]
+        @test PT.input_tips(Union{String, Nothing}) == ["'nothing' for nothing"]
         @test PT.input_tips(Union{Vector{Secret}, Nothing}) ==
-            ["empty for nothing", "comma-delimited", "name only"]
+            ["'nothing' for nothing", "comma-delimited", "name only"]
     end
 
     @testset "Interactive name/type pair collection" begin
         name = gensym()
         @eval begin
-            struct $name <: PT.Plugin
-                x::Int
-                y::String
+            PT.@plugin struct $name <: PT.Plugin
+                x::Int = 0
+                y::String = ""
             end
 
             @test PT.interactive_pairs($name) == [:x => Int, :y => String]
@@ -54,52 +69,70 @@ end
         @testset "Default template" begin
             print(
                 stdin.buffer,
-                DOWN^6, CRLF,  # Select user
-                DONE,          # Finish menu
-                USER, CRLF,    # Enter user
+                CR,        # Select user
+                DONE,      # Finish menu
+                USER, LF,  # Enter user
             )
             @test Template(; interactive=true) == Template(; user=USER)
         end
 
-        @testset "Custom options except plugins" begin
+        @testset "Custom options, accept defaults" begin
             print(
                 stdin.buffer,
-                ALL, DONE,           # Customize all fields
-                "a, b", CRLF,        # Enter authors
-                "~", CRLF,           # Enter dir
-                DOWN^4, CRLF, DONE,  # Disable License plugin
-                DOWN^3, CRLF,        # Choose "Other" for host
-                "x.com", CRLF,       # Enter host
-                DOWN^6, CRLF,        # Choose "Other" for julia
-                "0.7", CRLF,         # Enter Julia version
-                DONE,                # Select no plugins
-                "user", CRLF,        # Enter user
+                ALL, DONE,        # Customize all fields
+                "user", LF,       # Enter user (don't assume we have default for this one).
+                LF,               # Enter authors
+                LF,               # Enter dir
+                CR,               # Enter host
+                CR,               # Enter julia
+                SELECT_DEFAULTS,  # Pre-select default plugins
+                DONE,             # Select no additional plugins
+                DONE^NDEFAULTS,   # Don't customize plugins
+            )
+            @test Template(; interactive=true) == Template(; user="user")
+            readavailable(stdin.buffer)
+        end
+
+        @testset "Custom options, custom values" begin
+            print(
+                stdin.buffer,
+                ALL, DONE,        # Customize all fields
+                "user", LF,       # Enter user
+                "a, b", LF,       # Enter authors
+                "~", LF,          # Enter dir
+                DOWN^3, CR,       # Choose "Other" for host
+                "x.com", LF,      # Enter host
+                DOWN^6, CR,       # Choose "Other" for julia
+                "0.7", LF,        # Enter Julia version
+                SELECT_DEFAULTS,  # Pre-select default plugins
+                DONE,             # Select no additional plugins
+                DONE^NDEFAULTS,   # Don't customize plugins
             )
             @test Template(; interactive=true) == Template(;
+                user="user",
                 authors=["a", "b"],
                 dir="~",
-                disable_defaults=[License],
                 host="x.com",
                 julia=v"0.7",
-                user="user",
             )
+            readavailable(stdin.buffer)
         end
 
         @testset "Plugins" begin
             print(
                 stdin.buffer,
-                ALL, DONE,         # Customize all fields
-                "true", CRLF,      # Enable ARM64
-                "no", CRLF,        # Disable coverage
-                "1.1,v1.2", CRLF,  # Enter extra versions
-                "x.txt", CRLF,     # Enter file
-                "Yes", CRLF,       # Enable Linux
-                "false", CRLF,     # Disable OSX
-                "TRUE", CRLF,      # Enable Windows
-                "YES",  CRLF,      # Enable x64
-                "NO", CRLF,        # Disable x86
+                ALL, DONE,       # Customize all fields
+                "true", LF,      # Enable ARM64
+                "no", LF,        # Disable coverage
+                "1.1,v1.2", LF,  # Enter extra versions
+                "x.txt", LF,     # Enter file
+                "Yes", LF,       # Enable Linux
+                "false", LF,     # Disable OSX
+                "TRUE", LF,      # Enable Windows
+                "YES",  LF,      # Enable x64
+                "NO", LF,        # Disable x86
             )
-            @test PT.interactive(TravisCI) == TravisCI(
+            @test PT.interactive(TravisCI) == TravisCI(;
                 arm64=true,
                 coverage=false,
                 extra_versions=[v"1.1", v"1.2"],
@@ -113,16 +146,16 @@ end
 
             print(
                 stdin.buffer,
-                DOWN^2, CRLF,      # Select GitLabCI
-                DOWN, CRLF, DONE,  # Customize index_md
-                "x.txt", CRLF,     # Enter index file
+                DOWN^2, CR,      # Select GitLabCI
+                DOWN, CR, DONE,  # Customize index_md
+                "x.txt", LF,     # Enter index file
             )
             @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
 
             print(
                 stdin.buffer,
-                DOWN, CRLF, DONE,  # Customize name
-                CRLF,              # Choose MIT (it's at the top)
+                DOWN, CR, DONE,  # Customize name
+                CR,              # Choose MIT (it's at the top)
             )
             @test PT.interactive(License) == License(; name="MIT")
         end
