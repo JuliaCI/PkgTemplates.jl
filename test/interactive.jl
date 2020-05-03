@@ -118,6 +118,22 @@ end
             readavailable(stdin.buffer)
         end
 
+        @testset "Disabling default plugins" begin
+            print(
+                stdin.buffer,
+                CR, DOWN^5, CR, DONE,  # Customize user and plugins
+                USER, LF,                # Enter user
+                SELECT_DEFAULTS,         # Pre-select default plugins
+                UP, CR, UP^2, CR, DONE,  # Disable TagBot and Readme
+                DONE^(NDEFAULTS - 2),    # Don't customize plugins
+            )
+            @test Template(; interactive=true) == Template(;
+                user=USER,
+                disable_defaults=[Readme, TagBot],
+            )
+            readavailable(stdin.buffer)
+        end
+
         @testset "Plugins" begin
             print(
                 stdin.buffer,
