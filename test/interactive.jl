@@ -170,10 +170,11 @@ end
 
             print(
                 stdin.buffer,
-                DOWN, CR, DONE,  # Customize name
-                CR,              # Choose MIT (it's at the top)
+                CR, DOWN, CR, DONE,  # Customize name and destination
+                "COPYING", LF,       # Enter destination
+                CR,                  # Choose MIT for name (it's at the top)
             )
-            @test PT.interactive(License) == License(; name="MIT")
+            @test PT.interactive(License) == License(; destination="COPYING", name="MIT")
         end
 
         println()
