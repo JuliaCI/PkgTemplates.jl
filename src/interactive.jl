@@ -26,7 +26,10 @@ function interactive(T::Type)
     just_one = length(pairs) == 1
     just_one && push!(pairs, :None => Nothing)
 
-    menu = MultiSelectMenu(collect(map(pair -> string(first(pair)), pairs)))
+    menu = MultiSelectMenu(
+        collect(map(pair -> string(first(pair)), pairs));
+        pagesize=length(pairs),
+    )
     println("$(nameof(T)) keywords to customize:")
     customize = sort!(collect(request(menu)))
 

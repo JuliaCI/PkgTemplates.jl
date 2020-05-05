@@ -187,7 +187,7 @@ function interactive(::Type{Template}; kwargs...)
     just_one && push(customizable, "None")
 
     println("Template keywords to customize:")
-    menu = MultiSelectMenu(map(string, customizable))
+    menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
     customize = customizable[sort!(collect(request(menu)))]
     just_one && lastindex(customizable) in customize && return Template(; kwargs...)
 
@@ -210,7 +210,7 @@ end
 
 function prompt(::Type{Template}, ::Type, ::Val{:host})
     hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
-    menu = RadioMenu(hosts)
+    menu = RadioMenu(hosts; pagesize=length(hosts))
     println("Select Git repository hosting service:")
     idx = request(menu)
     return if idx == lastindex(hosts)
@@ -223,7 +223,7 @@ end
 function prompt(::Type{Template}, ::Type, ::Val{:julia})
     versions = map(format_version, [VERSION; map(v -> VersionNumber(1, v), 0:5)])
     push!(sort!(unique!(versions)), "Other")
-    menu = RadioMenu(map(string, versions))
+    menu = RadioMenu(map(string, versions); pagesize=length(versions))
     println("Select minimum Julia version:")
     idx = request(menu)
     return if idx == lastindex(versions)

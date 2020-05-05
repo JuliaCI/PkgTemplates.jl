@@ -154,7 +154,7 @@ end
 
 function interactive(::Type{Documenter})
     styles = [Nothing, TravisCI, GitLabCI]
-    menu = RadioMenu(map(string, styles))
+    menu = RadioMenu(map(string, styles); pagesize=length(styles))
     println("Documenter deploy style:")
     idx = request(menu)
     return interactive(Documenter{styles[idx]})
