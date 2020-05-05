@@ -34,7 +34,11 @@ end
         @test generic(Vector{Int}, "1, 2, 3") == [1, 2, 3]
         @test generic(Vector{String}, "a, b,c") == ["a", "b", "c"]
         @test generic(FromString, "hello") == FromString("hello")
-        @test generic(Union{String, Nothing}, "nothing") === nothing
+        if VERSION < v"1.1"
+            @test_broken generic(Union{String, Nothing}, "nothing") === nothing
+        else
+            @test generic(Union{String, Nothing}, "nothing") === nothing
+        end
 
         @test_throws ArgumentError generic(Int, "hello")
         @test_throws ArgumentError generic(Float64, "hello")
@@ -175,6 +179,22 @@ end
                 CR,                  # Choose MIT for name (it's at the top)
             )
             @test PT.interactive(License) == License(; destination="COPYING", name="MIT")
+        end
+
+        @testset "Union{T, Nothing} weirdness" begin
+            print(
+                stdin.buffer,
+                DOWN, CR, DONE,  # Customize changelog
+                "hello", LF,     # Enter changelog
+            )
+            @test PT.interactive(TagBot) == TagBot(; changelog="hello")
+
+            print(
+                stdin.buffer,
+                DOWN, CR, DONE,  # Customize changelog
+                "nothing", LF,   # Set to null
+            )
+            @test PT.interactive(TagBot) == TagBot(; changelog=nothing)
         end
 
         println()

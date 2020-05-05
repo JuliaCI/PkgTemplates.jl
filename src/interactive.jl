@@ -124,7 +124,17 @@ function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, na
         default
     else
         try
-            convert_input(P, T, input)
+            # Working around what appears to be a bug in Julia 1.0:
+            # #145#issuecomment-623049535
+            if VERSION < v"1.1" && T isa Union && Nothing <: T
+                if input == "nothing"
+                    nothing
+                else
+                    convert_input(P, T.a === Nothing ? T.b : T.a, input)
+                end
+            else
+                convert_input(P, T, input)
+            end
         catch ex
             ex isa InterruptException && rethrow()
             @warn "Invalid input" ex
