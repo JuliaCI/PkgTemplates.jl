@@ -6,7 +6,7 @@ using Pkg: Pkg, PackageSpec, TOML
 using Random: Random, randstring
 using Test: @test, @testset, @test_logs, @test_throws
 
-using ReferenceTests: @test_reference
+using DeepDiffs: deepdiff
 using SimpleMock: mock
 using Suppressor: @suppress
 
@@ -33,6 +33,16 @@ function with_pkg(f::Function, t::Template, pkg::AbstractString=pkgname())
         # We're going to delete the package directory anyways, so just ignore any errors.
         PT.version_of(pkg) === nothing || try @suppress Pkg.rm(pkg) catch; end
         rm(joinpath(t.dir, pkg); recursive=true, force=true)
+    end
+end
+
+function print_diff(a, b)
+    old = Base.have_color
+    @eval Base have_color = true
+    try
+        println(deepdiff(a, b))
+    finally
+        @eval Base have_color = $old
     end
 end
 

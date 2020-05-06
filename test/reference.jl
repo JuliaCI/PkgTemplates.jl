@@ -1,3 +1,4 @@
+const PROMPT = get(ENV, "PT_INTERACTIVE", "false") == "true" || !haskey(ENV, "CI")
 const STATIC_FILE = joinpath(@__DIR__, "fixtures", "static.txt")
 const STATIC_DOCUMENTER = [
     PackageSpec(; name="DocStringExtensions", version=v"0.8.1"),
@@ -5,6 +6,51 @@ const STATIC_DOCUMENTER = [
     PackageSpec(; name="JSON", version=v"0.21.0"),
     PackageSpec(; name="Parsers", version=v"0.3.10"),
 ]
+
+function test_reference(reference, comparison)
+    if !isfile(comparison)
+        # If the comparison file doesn't yet exist, create it and pass the test.
+        @info "Creating new reference file $comparison"
+        copy_file(reference, comparison)
+        @test true
+        return
+    end
+
+    a = read(reference, String)
+    b = read(comparison, String)
+    if a == b
+        # If the files are equal, pass the test.
+        @test true
+        return
+    end
+
+    print_diff(a, b)
+    println("Reference and comparison files do not match (see above)")
+    println("Reference: $reference")
+    println("Comparison: $comparison")
+    update = false
+    if PROMPT
+        while true
+            println("Update reference file? [y/n]")
+            answer = lowercase(strip(readline()))
+            if startswith(answer, "y") || startswith(answer, "n")
+                # If the user chooses to update the reference file,
+                # replace its contents with the comparison file.
+                startswith(answer, "y") && copy_file(comparison, reference)
+                break
+            end
+        end
+    end
+
+    # Fail the test, but keep the output short
+    # because we've already showed the diff.
+    @test :reference == :comparison
+end
+
+function copy_file(src::AbstractString, dest::AbstractString)
+    mkpath(dirname(dest))
+    cp(src, dest; force=true)
+end
 
 PT.user_view(::Citation, ::Template, ::AbstractString) = Dict("MONTH" => 8, "YEAR" => 2019)
 PT.user_view(::License, ::Template, ::AbstractString) = Dict("YEAR" => 2019)
@@ -26,8 +72,8 @@ function test_all(pkg::AbstractString; kwargs...)
         PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
         foreach(readlines(`git -C $pkg_dir ls-files`)) do f
             reference = joinpath(@__DIR__, "fixtures", pkg, f)
-            observed = read(joinpath(pkg_dir, f), String)
-            @test_reference reference observed
+            comparison = joinpath(pkg_dir, f)
+            test_reference(reference, comparison)
         end
     end
 end
