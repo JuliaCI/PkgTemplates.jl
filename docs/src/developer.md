@@ -75,7 +75,7 @@ To understand how they're implemented, let's look at simplified versions of two 
 ### Example: `Documenter`
 
 ```julia
-@with_kw_noshow struct Documenter <: Plugin
+@plugin struct Documenter <: Plugin
     make_jl::String = default_file("docs", "make.jl")
     index_md::String = default_file("docs", "src", "index.md")
 end
@@ -117,10 +117,11 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
 end
 ```
 
-The `@with_kw_noshow` macro defines keyword constructors for us.
+The `@plugin` macro defines some helpful methods for us.
 Inside of our struct definition, we're using [`default_file`](@ref) to refer to files in this repository.
 
 ```@docs
+@plugin
 default_file
 ```
 
@@ -201,6 +202,7 @@ function posthook(::Git, ::Template, pkg_dir::AbstractString)
 end
 ```
 
+We didn't use `@plugin` for this one, because there are no fields.
 Validation and all three hooks are implemented:
 
 - [`validate`](@ref) makes sure that all required Git configuration is present.
@@ -221,7 +223,7 @@ In general, they just generate one templated file.
 To illustrate, let's look at the [`Citation`](@ref) plugin, which creates a `CITATION.bib` file.
 
 ```julia
-@with_kw_noshow struct Citation <: FilePlugin
+@plugin struct Citation <: FilePlugin
     file::String = default_file("CITATION.bib")
 end
 
@@ -298,7 +300,7 @@ Of course, we could use a normal [`Plugin`](@ref), but it turns out there's a wa
 The plugin implements its own `hook`, but uses `invoke` to avoid duplicating the file creation code:
 
 ```julia
-@with_kw_noshow struct Tests <: FilePlugin
+@plugin struct Tests <: FilePlugin
     file::String = default_file("runtests.jl")
 end
 

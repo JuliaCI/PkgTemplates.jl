@@ -4,7 +4,57 @@ const DEFAULT_PRIORITY = 1000
 """
     @plugin struct ... end
 
-Define a plugin type. (TODO DOC)
+Define a plugin subtype with keyword constructors and default values.
+
+For details on the general syntax, see
+[Parameters.jl](https://mauro3.github.io/Parameters.jl/stable/manual/#Types-with-default-values-and-keyword-constructors-1).
+
+There are a few extra restrictions:
+
+- Before using this macro, you must have imported `@with_kw_noshow`
+  via `using PkgTemplates: @with_kw_noshow`
+- The type must be a subtype of [`Plugin`](@ref) (or one of its abstract subtypes)
+- The type cannot be parametric
+- All fields must have default values
+
+## Example
+
+```julia
+using PkgTemplates: @plugin, @with_kw_noshow, Plugin
+@plugin struct MyPlugin <: Plugin
+    x::String = "hello!"
+    y::Union{Int, Nothing} = nothing
+end
+```
+
+## Implementing `@plugin` Manually
+
+If for whatever reason, you are unable to meet the criteria outlined above,
+you can manually implement the methods that `@plugin` would have created for you.
+This is only mandatory if you want to use your plugin in interactive mode.
+
+### Keyword Constructors
+
+If possible, use `@with_kw_noshow` to create a keyword constructor for your type.
+Your type must be capable of being instantiated with no arguments.
+
+### Default Values
+
+If your type's fields have sensible default values, implement `defaultkw` like so:
+
+```julia
+using PkgTemplates: PkgTemplates, Plugin
+struct MyPlugin <: Plugin
+    x::String
+end
+PkgTemplates.defaultkw(::Type{MyPlugin}, ::Val{:x}) = "my default"
+```
+
+Remember to add a method to the function belonging to PkgTemplates,
+rather than creating your own function that PkgTemplates won't see.
+
+If your plugin's fields have no sane defaults, then you'll need to implement
+[`prompt`](@ref) appropriately instead.
 """
 macro plugin(ex::Expr)
     @assert ex.head === :struct "Expression must be a struct definition"
