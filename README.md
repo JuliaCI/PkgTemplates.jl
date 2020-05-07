@@ -43,7 +43,7 @@ The no-keywords constructor assumes the existence of some preexisting Git config
 Once you have a `Template`, use it to generate a package:
 
 ```jl
-t("MyPkg")
+generate("MyPkg", t)
 ```
 
 However, it's probably desirable to customize the template to your liking with various options and plugins:
