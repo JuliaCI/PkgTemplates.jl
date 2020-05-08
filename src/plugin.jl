@@ -5,6 +5,9 @@ function Base.:(==)(a::T, b::T) where T <: Plugin
     return all(n -> getfield(a, n) == getfield(b, n), fieldnames(T))
 end
 
+struct Disabled{P<:Plugin} end
+Base.:(!)(P::Type{<:Plugin}) = Disabled{P}()
+
 """
     Secret(name::AbstractString)
 

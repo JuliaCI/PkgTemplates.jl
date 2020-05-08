@@ -41,10 +41,10 @@ A configuration used to generate packages.
 
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
-- `disable_defaults::Vector{DataType}=DataType[]`: Default plugins to disable.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
   [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
-  To override a default plugin instead of disabling it altogether, supply it via `plugins`.
+  To disable a default plugin, pass in the negated type: `!PluginType`.
+  To override a default plugin instead of disabling it, pass in your own instance.
 
 ---
 
@@ -80,11 +80,11 @@ function Template(::Val{false}; kwargs...)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
 
     # User-supplied plugins come first, so that deduping the list will remove the defaults.
-    plugins = Plugin[]
-    append!(plugins, getkw!(kwargs, :plugins))
-    disabled = getkw!(kwargs, :disable_defaults)
+    plugins = Vector{Any}(collect(getkw!(kwargs, :plugins)))
+    disabled = map(d -> first(typeof(d).parameters), filter(p -> p isa Disabled, plugins))
+    filter!(p -> p isa Plugin, plugins)
     append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
-    plugins = sort(unique(typeof, plugins); by=string)
+    plugins = Vector{Plugin}(sort(unique(typeof, plugins); by=string))
 
     if isempty(user)
         foreach(plugins) do p
@@ -157,7 +157,6 @@ getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
 defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
 defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
 defaultkw(::Type{Template}, ::Val{:dir}) = Pkg.devdir()
-defaultkw(::Type{Template}, ::Val{:disable_defaults}) = DataType[]
 defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
 defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
 defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]

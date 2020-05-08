@@ -16,7 +16,7 @@ The recurring theme is "everything is a plugin now".
 | :------------------: | :-------------------------------: |
 | `license="ISC"`      | `plugins=[License(; name="ISC")]` |
 | `develop=true` *     | `plugins=[Develop()]`             |
-| `git=false`          | `disable_defaults=[Git]`          |
+| `git=false`          | `plugins=[!Git]`                  |
 | `julia_version=v"1"` | `julia=v"1"`                      |
 | `ssh=true`           | `plugins=[Git(; ssh=true)]`       |
 | `manifest=true`      | `plugins=[Git(; manifest=true)]`  |
