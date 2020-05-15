@@ -358,12 +358,9 @@ They should pass, and there will be new files in `test/fixtures`.
 Check them to make sure that they contain exactly what you would expect!
 
 For changes to existing plugins, update the plugin options appropriately in the "Wacky options" test set.
-Rather than using `Pkg.test` to run the tests in this case, use `include("test/runtests.jl")`.
-Running the tests in an interactive session will give you the option to review and accept changes to the fixtures, updating the files automatically (see [ReferenceTests](https://github.com/Evizero/ReferenceTests.jl) for more details).
-Before you can do this, you'll need to add PkgTemplates' test requirements to your current environment.
+Failing tests  will give you the option to review and accept changes to the fixtures, updating the files automatically for you.
 
 ### Updating "Show" Tests
 
 Depending on what you've changed, the tests in `test/show.jl` might fail.
-To fix those, you'll need to update the `expected` value to match what is actually displayed in a Julia REPL.
-The test error itself is usually not very helpful, so it's easiest to launch a REPL, evaluate `Template()`, and copy-paste the relevant parts back into the test file.
+To fix those, you'll need to update the `expected` value to match what is actually displayed in a Julia REPL (assuming that the new value is correct).

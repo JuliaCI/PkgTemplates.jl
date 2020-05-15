@@ -1,6 +1,15 @@
 const TEMPLATES_DIR = contractuser(PT.TEMPLATES_DIR)
 const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
 
+function test_show(expected::AbstractString, observed::AbstractString)
+    if expected == observed
+        @test true
+    else
+        print_diff(expected, observed)
+        @test :expected == :observed
+    end
+end
+
 @testset "Show methods" begin
     @testset "Plugins" begin
         expected = """
@@ -9,7 +18,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
               destination: "README.md"
               inline_badges: false
             """
-        @test sprint(show, MIME("text/plain"), Readme()) == rstrip(expected)
+        test_show(rstrip(expected), sprint(show, MIME("text/plain"), Readme()))
     end
 
     @testset "Template" begin
@@ -62,7 +71,7 @@ const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
             """
-        @test sprint(show, MIME("text/plain"), tpl(; authors=USER)) == rstrip(expected)
+        test_show(rstrip(expected), sprint(show, MIME("text/plain"), tpl(; authors=USER)))
     end
 
     @testset "show as serialization" begin
