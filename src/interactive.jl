@@ -69,7 +69,7 @@ end
 Provide some extra tips to users on how to structure their input for the type `T`,
 for example if multiple delimited values are expected.
 """
-input_tips(T::Type{<:Vector}) = ["comma-delimited", input_tips(eltype(T))...]
+input_tips(::Type{Vector{T}}) where T = ["comma-delimited", input_tips(T)...]
 input_tips(::Type{Nothing}) = String[]
 input_tips(::Type{Union{T, Nothing}}) where T = ["'nothing' for nothing", input_tips(T)...]
 input_tips(::Type{Secret}) = ["name only"]
@@ -78,7 +78,7 @@ input_tips(::Type) = String[]
 """
     convert_input(::Type{P}, ::Type{T}, s::AbstractString) -> T
 
-Convert the user input `s` into an instance of `T`.
+Convert the user input `s` into an instance of `T` for plugin of type `P`.
 A default implementation of `T(s)` exists.
 """
 convert_input(::Type, T::Type{<:Real}, s::AbstractString) = parse(T, s)
@@ -94,9 +94,9 @@ end
 
 function convert_input(::Type, ::Type{Bool}, s::AbstractString)
     s = lowercase(s)
-    return if startswith(s, "t") || startswith(s, "y")
+    return if startswith(s, 't') || startswith(s, 'y')
         true
-    elseif startswith(s, "f") || startswith(s, "n")
+    elseif startswith(s, 'f') || startswith(s, 'n')
         false
     else
         throw(ArgumentError("Unrecognized boolean response"))
@@ -104,7 +104,7 @@ function convert_input(::Type, ::Type{Bool}, s::AbstractString)
 end
 
 function convert_input(P::Type, T::Type{<:Vector}, s::AbstractString)
-    startswith(s, "[") && endswith(s, "]") && (s = s[2:end-1])
+    startswith(s, '[') && endswith(s, ']') && (s = s[2:end-1])
     xs = map(strip, split(s, ","))
     return map(x -> convert_input(P, eltype(T), x), xs)
 end

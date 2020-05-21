@@ -192,7 +192,9 @@ function interactive(::Type{Template}; kwargs...)
     just_one && lastindex(customizable) in customize && return Template(; kwargs...)
 
     # Prompt for each keyword.
-    foreach(k -> kwargs[k] = prompt(Template, fieldtype(Template, k), k), customize)
+    foreach(customize) do k
+        kwargs[k] = prompt(Template, fieldtype(Template, k), k)
+    end
 
     # We didn't include :disable_defaults above.
     # Instead, the :plugins prompt pre-selected default plugins,
