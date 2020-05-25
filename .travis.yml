@@ -7,7 +7,7 @@ os:
   - windows
 julia:
   - 1.0
-  - 1.4
+  - 1
   - nightly
 before_script:
   - git config --global user.name Tester
