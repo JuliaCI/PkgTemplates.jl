@@ -152,7 +152,7 @@ concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 # Compute name => type pairs for T's interactive options.
 function interactive_pairs(T::Type)
-    pairs = collect(Pair.(fieldnames(T), fieldtypes(T)))
+    pairs = collect(map(name -> name => fieldtype(T, name), fieldnames(T)))
 
     # Use prepend! here so that users can override field types if they wish.
     prepend!(pairs, reverse(customizable(T)))
