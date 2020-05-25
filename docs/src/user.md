@@ -31,7 +31,7 @@ There are a number of plugins available to automate common boilerplate tasks.
 ### Default Plugins
 
 These plugins are included by default.
-They can be overridden by supplying another value via the `plugins` keyword, or disabled by supplying the type via the `disable_defaults` keyword.
+They can be overridden by supplying another value, or disabled by negating the type (`!Type`), both as elements of the `plugins` keyword.
 
 ```@docs
 ProjectFile

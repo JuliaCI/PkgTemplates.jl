@@ -3,7 +3,7 @@
         @testset "user" begin
             mock(PT.default_user => () -> "") do _du
                 @test_throws ArgumentError Template()
-                @test isempty(Template(; disable_defaults=[Git]).user)
+                @test isempty(Template(; plugins=[!Git]).user)
             end
             mock(PT.default_user => () -> "username") do _du
                 @test Template().user == "username"
@@ -27,9 +27,9 @@
             @test tpl(; dir="~/foo").dir == abspath(expanduser("~/foo"))
         end
 
-        @testset "plugins / disabled_defaults" begin
-            function test_plugins(plugins, expected, disabled=DataType[])
-                t = tpl(; plugins=plugins, disable_defaults=disabled)
+        @testset "plugins" begin
+            function test_plugins(plugins, expected)
+                t = tpl(; plugins=plugins)
                 @test all(map(==, sort(t.plugins; by=string), sort(expected; by=string)))
             end
 
@@ -41,7 +41,7 @@
             g = Git(; ssh=true)
             test_plugins([g], union(setdiff(defaults, [default_g]), [g]))
             # Disabling a default plugin.
-            test_plugins([], setdiff(defaults, [default_g]), [Git])
+            test_plugins([!Git], setdiff(defaults, [default_g]))
         end
 
         @testset "Unsupported keywords warning" begin
