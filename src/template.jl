@@ -204,6 +204,8 @@ function interactive(::Type{Template}; kwargs...)
     end
 end
 
+prompt(::Type{Template}, ::Type, ::Val{:pkg}) = Base.prompt("Package name")
+
 function prompt(::Type{Template}, ::Type, ::Val{:host})
     hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
     menu = RadioMenu(hosts; pagesize=length(hosts))
