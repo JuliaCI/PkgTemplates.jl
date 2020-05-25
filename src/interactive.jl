@@ -121,8 +121,8 @@ prompt(P::Type, T::Type, name::Symbol) = prompt(P, T, Val(name))
 function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, name}
     tips = join([T; input_tips(T); "default=$(repr(defaultkw(P, name)))"], ", ")
     default = defaultkw(P, name)
-    print(pretty_message("Enter value for '$name' ($tips): "))
-    input = strip(readline())
+    input = Base.prompt(pretty_message("Enter value for '$name' ($tips)"))
+    input === nothing && throw(InterruptException())
     return if isempty(input)
         default
     else

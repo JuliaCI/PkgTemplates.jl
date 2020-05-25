@@ -184,17 +184,24 @@ function interactive(::Type{Template}; kwargs...)
     just_one = length(customizable) == 1
     just_one && push(customizable, "None")
 
-    println("Template keywords to customize:")
-    menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
-    customize = customizable[sort!(collect(request(menu)))]
-    just_one && lastindex(customizable) in customize && return Template(; kwargs...)
+    return try
+        println("Template keywords to customize:")
+        menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
+        customize = customizable[sort!(collect(request(menu)))]
+        just_one && lastindex(customizable) in customize && return Template(; kwargs...)
 
-    # Prompt for each keyword.
-    foreach(customize) do k
-        kwargs[k] = prompt(Template, fieldtype(Template, k), k)
+        # Prompt for each keyword.
+        foreach(customize) do k
+            kwargs[k] = prompt(Template, fieldtype(Template, k), k)
+        end
+
+        Template(; kwargs...)
+    catch e
+        e isa InterruptException || rethrow()
+        println()
+        @info "Cancelled"
+        nothing
     end
-
-    return Template(; kwargs...)
 end
 
 function prompt(::Type{Template}, ::Type, ::Val{:host})
