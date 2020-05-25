@@ -155,7 +155,7 @@ function interactive_pairs(T::Type)
     pairs = collect(Pair.(fieldnames(T), fieldtypes(T)))
 
     # Use prepend! here so that users can override field types if they wish.
-    prepend!(pairs, reverse!(customizable(T)))
+    prepend!(pairs, reverse(customizable(T)))
     uniqueby!(first, pairs)
     filter!(p -> last(p) !== NotCustomizable, pairs)
     sort!(pairs; by=first)
