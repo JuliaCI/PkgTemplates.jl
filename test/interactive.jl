@@ -98,19 +98,20 @@ end
         end
 
         @testset "Custom options, custom values" begin
+            nversions = VERSION.minor + 1
             print(
                 stdin.buffer,
-                ALL, DONE,        # Customize all fields
-                "user", LF,       # Enter user
-                "a, b", LF,       # Enter authors
-                "~", LF,          # Enter dir
-                DOWN^3, CR,       # Choose "Other" for host
-                "x.com", LF,      # Enter host
-                DOWN^6, CR,       # Choose "Other" for julia
-                "0.7", LF,        # Enter Julia version
-                SELECT_DEFAULTS,  # Pre-select default plugins
-                DONE,             # Select no additional plugins
-                DONE^NDEFAULTS,   # Don't customize plugins
+                ALL, DONE,           # Customize all fields
+                "user", LF,          # Enter user
+                "a, b", LF,          # Enter authors
+                "~", LF,             # Enter dir
+                DOWN^3, CR,          # Choose "Other" for host
+                "x.com", LF,         # Enter host
+                DOWN^nversions, CR,  # Choose "Other" for julia
+                "0.7", LF,           # Enter Julia version
+                SELECT_DEFAULTS,     # Pre-select default plugins
+                DONE,                # Select no additional plugins
+                DONE^NDEFAULTS,      # Don't customize plugins
             )
             @test Template(; interactive=true) == Template(;
                 user="user",
