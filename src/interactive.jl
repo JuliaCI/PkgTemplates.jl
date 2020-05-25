@@ -152,15 +152,15 @@ concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
 
 # Compute name => type pairs for T's interactive options.
 function interactive_pairs(T::Type)
-    pairs = collect(map(name -> name => fieldtype(T, name), fieldnames(T)))
+    pairs = collect(Pair.(fieldnames(T), fieldtypes(T)))
 
-    # Use pushfirst! here so that users can override field types if they wish.
-    foreach(pair -> pushfirst!(pairs, pair), customizable(T))
+    # Use prepend! here so that users can override field types if they wish.
+    prepend!(pairs, reverse!(customizable(T)))
     uniqueby!(first, pairs)
-    deleteat!(pairs, findall(p -> last(p) === NotCustomizable, pairs))
+    filter!(p -> last(p) !== NotCustomizable, pairs)
     sort!(pairs; by=first)
 
-    return Vector{Pair{Symbol, Type}}(pairs)
+    return pairs
 end
 
 # unique!(f, xs) added here: https://github.com/JuliaLang/julia/pull/30141
