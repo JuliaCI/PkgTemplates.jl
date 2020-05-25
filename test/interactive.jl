@@ -133,7 +133,7 @@ end
             )
             @test Template(; interactive=true) == Template(;
                 user=USER,
-                disable_defaults=[Readme, TagBot],
+                plugins=[!Readme, !TagBot],
             )
             readavailable(stdin.buffer)
         end

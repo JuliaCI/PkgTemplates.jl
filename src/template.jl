@@ -173,8 +173,6 @@ defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
 defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
 defaultkw(::Type{Template}, ::Val{:user}) = default_user()
 
-customizable(::Type{Template}) = (:disable_defaults => Vector{DataType},)
-
 function interactive(::Type{Template}; kwargs...)
     # If the user supplied any keywords themselves, don't prompt for them.
     kwargs = Dict{Symbol, Any}(kwargs)
@@ -196,17 +194,6 @@ function interactive(::Type{Template}; kwargs...)
         kwargs[k] = prompt(Template, fieldtype(Template, k), k)
     end
 
-    # We didn't include :disable_defaults above.
-    # Instead, the :plugins prompt pre-selected default plugins,
-    # so any default plugins that were explicitly excluded from the user's selection
-    # should be disabled.
-    if :plugins in customize && !haskey(kwargs, :disable_defaults)
-        plugin_types = map(typeof, kwargs[:plugins])
-        kwargs[:disable_defaults] = DataType[]
-        foreach(map(typeof, default_plugins())) do T
-            T in plugin_types || push!(kwargs[:disable_defaults], T)
-        end
-    end
     return Template(; kwargs...)
 end
 
@@ -249,7 +236,10 @@ function prompt(::Type{Template}, ::Type, ::Val{:plugins})
     # To make this better, we need julia#30043.
     print(stdin.buffer, (CR * DOWN)^ndefaults)
     types = sort!(collect(request(menu)))
-    return map(interactive, options[types])
+    plugins = Vector{Any}(map(interactive, options[types]))
+    # Find any defaults that were disabled.
+    foreach(i -> i in types || push!(plugins, !defaults[i]), 1:ndefaults)
+    return plugins
 end
 
 # Call the default prompt method even if a specialized one exists.
