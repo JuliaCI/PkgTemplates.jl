@@ -13,7 +13,7 @@ Creates a `README` file that contains badges for other included plugins.
   For example, values of `"README"` or `"README.rst"` might be desired.
 - `inline_badges::Bool`: Whether or not to put the badges on the same line as the package name.
 """
-@with_kw_noshow struct Readme <: FilePlugin
+@plugin struct Readme <: FilePlugin
     file::String = default_file("README.md")
     destination::String = "README.md"
     inline_badges::Bool = false

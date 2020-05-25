@@ -42,9 +42,16 @@ A configuration used to generate packages.
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
-  [`Readme`](@ref), [`License`](@ref), and [`Git`](@ref).
+  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref), and
+  [`TagBot`](@ref).
   To disable a default plugin, pass in the negated type: `!PluginType`.
   To override a default plugin instead of disabling it, pass in your own instance.
+
+### Interactive Mode
+- `interactive::Bool=false`: In addition to specifying the template options with keywords,
+  you can also build up a template by following a set of prompts.
+  To create a template interactively, set this keyword to `true`.
+  See also the similar [`generate`](@ref) function.
 
 ---
 
@@ -65,9 +72,9 @@ struct Template
     user::String
 end
 
-Template(; kwargs...) = Template(Val(false); kwargs...)
+Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
+Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
 
-# Non-interactive constructor.
 function Template(::Val{false}; kwargs...)
     kwargs = Dict(kwargs)
 
@@ -144,7 +151,11 @@ end
 hasplugin(t::Template, f::Function) = any(f, t.plugins)
 hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
 
-# Get a plugin by type.
+"""
+    getplugin(t::Template, ::Type{T<:Plugin}) -> Union{T, Nothing}
+
+Get the plugin of type `T` from the template `t`, if it's present.
+"""
 function getplugin(t::Template, ::Type{T}) where T <: Plugin
     i = findfirst(p -> p isa T, t.plugins)
     return i === nothing ? nothing : t.plugins[i]
@@ -156,8 +167,87 @@ getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
 # Default Template keyword values.
 defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
 defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
-defaultkw(::Type{Template}, ::Val{:dir}) = Pkg.devdir()
+defaultkw(::Type{Template}, ::Val{:dir}) = contractuser(Pkg.devdir())
 defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
 defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
 defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
 defaultkw(::Type{Template}, ::Val{:user}) = default_user()
+
+function interactive(::Type{Template}; kwargs...)
+    # If the user supplied any keywords themselves, don't prompt for them.
+    kwargs = Dict{Symbol, Any}(kwargs)
+    options = [:user, :authors, :dir, :host, :julia, :plugins]
+    customizable = setdiff(options, keys(kwargs))
+
+    # Make sure we don't try to show a menu with < 2 options.
+    isempty(customizable) && return Template(; kwargs...)
+    just_one = length(customizable) == 1
+    just_one && push(customizable, "None")
+
+    return try
+        println("Template keywords to customize:")
+        menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
+        customize = customizable[sort!(collect(request(menu)))]
+        just_one && lastindex(customizable) in customize && return Template(; kwargs...)
+
+        # Prompt for each keyword.
+        foreach(customize) do k
+            kwargs[k] = prompt(Template, fieldtype(Template, k), k)
+        end
+
+        Template(; kwargs...)
+    catch e
+        e isa InterruptException || rethrow()
+        println()
+        @info "Cancelled"
+        nothing
+    end
+end
+
+function prompt(::Type{Template}, ::Type, ::Val{:host})
+    hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
+    menu = RadioMenu(hosts; pagesize=length(hosts))
+    println("Select Git repository hosting service:")
+    idx = request(menu)
+    return if idx == lastindex(hosts)
+        fallback_prompt(String, :host)
+    else
+        hosts[idx]
+    end
+end
+
+function prompt(::Type{Template}, ::Type, ::Val{:julia})
+    versions = map(format_version, VersionNumber.(1, 0:VERSION.minor))
+    push!(versions, "Other")
+    menu = RadioMenu(map(string, versions); pagesize=length(versions))
+    println("Select minimum Julia version:")
+    idx = request(menu)
+    return if idx == lastindex(versions)
+        fallback_prompt(VersionNumber, :julia)
+    else
+        VersionNumber(versions[idx])
+    end
+end
+
+const CR = "\r"
+const DOWN = "\eOB"
+
+function prompt(::Type{Template}, ::Type, ::Val{:plugins})
+    defaults = map(typeof, default_plugins())
+    ndefaults = length(defaults)
+    # Put the defaults first.
+    options = unique!([defaults; concretes(Plugin)])
+    menu = MultiSelectMenu(map(T -> string(nameof(T)), options); pagesize=length(options))
+    println("Select plugins:")
+    # Pre-select the default plugins and move the cursor to the first non-default.
+    # To make this better, we need julia#30043.
+    print(stdin.buffer, (CR * DOWN)^ndefaults)
+    types = sort!(collect(request(menu)))
+    plugins = Vector{Any}(map(interactive, options[types]))
+    # Find any defaults that were disabled.
+    foreach(i -> i in types || push!(plugins, !defaults[i]), 1:ndefaults)
+    return plugins
+end
+
+# Call the default prompt method even if a specialized one exists.
+fallback_prompt(T::Type, name::Symbol) = prompt(Template, T, Val(name), nothing)

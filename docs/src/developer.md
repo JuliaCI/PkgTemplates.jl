@@ -75,7 +75,7 @@ To understand how they're implemented, let's look at simplified versions of two 
 ### Example: `Documenter`
 
 ```julia
-@with_kw_noshow struct Documenter <: Plugin
+@plugin struct Documenter <: Plugin
     make_jl::String = default_file("docs", "make.jl")
     index_md::String = default_file("docs", "src", "index.md")
 end
@@ -117,10 +117,11 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
 end
 ```
 
-The `@with_kw_noshow` macro defines keyword constructors for us.
+The `@plugin` macro defines some helpful methods for us.
 Inside of our struct definition, we're using [`default_file`](@ref) to refer to files in this repository.
 
 ```@docs
+@plugin
 default_file
 ```
 
@@ -138,7 +139,11 @@ Badge
 ```
 
 These two functions, [`gitignore`](@ref) and [`badges`](@ref), are currently the only "special" functions for cross-plugin interactions.
-In other cases, you can still access the [`Template`](@ref)'s plugins to depend on the presence/properties of other plugins, although that's less powerful.
+In other cases, you can still access the [`Template`](@ref)'s plugins to depend on the presence/properties of other plugins via [`getplugin`](@ref), although that's less powerful.
+
+```@docs
+getplugin
+```
 
 Third, we implement [`view`](@ref), which is used to fill placeholders in badges and rendered files.
 
@@ -197,6 +202,7 @@ function posthook(::Git, ::Template, pkg_dir::AbstractString)
 end
 ```
 
+We didn't use `@plugin` for this one, because there are no fields.
 Validation and all three hooks are implemented:
 
 - [`validate`](@ref) makes sure that all required Git configuration is present.
@@ -217,7 +223,7 @@ In general, they just generate one templated file.
 To illustrate, let's look at the [`Citation`](@ref) plugin, which creates a `CITATION.bib` file.
 
 ```julia
-@with_kw_noshow struct Citation <: FilePlugin
+@plugin struct Citation <: FilePlugin
     file::String = default_file("CITATION.bib")
 end
 
@@ -294,7 +300,7 @@ Of course, we could use a normal [`Plugin`](@ref), but it turns out there's a wa
 The plugin implements its own `hook`, but uses `invoke` to avoid duplicating the file creation code:
 
 ```julia
-@with_kw_noshow struct Tests <: FilePlugin
+@plugin struct Tests <: FilePlugin
     file::String = default_file("runtests.jl")
 end
 
@@ -314,6 +320,20 @@ There is also a default [`validate`](@ref) implementation for [`FilePlugin`](@re
 If you want to extend the validation but keep the file existence check, use the `invoke` method as described above.
 
 For more examples, see the plugins in the [Continuous Integration (CI)](@ref) and [Code Coverage](@ref) sections.
+
+## Supporting Interactive Mode
+
+When it comes to supporting interactive mode for your custom plugins, you have two options: write your own [`interactive`](@ref) method, or use the default one.
+If you choose the first option, then you are free to implement the method however you want.
+If you want to use the default implementation, then there are a few functions that you should be aware of, although in many cases you will not need to add any new methods.
+
+```@docs
+interactive
+prompt
+customizable
+input_tips
+convert_input
+```
 
 ## Miscellaneous Tips
 

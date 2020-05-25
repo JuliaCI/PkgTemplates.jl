@@ -6,7 +6,7 @@ Creates a `Project.toml`.
 ## Keyword Arguments
 - `version::VersionNumber`: The initial version of created packages.
 """
-@with_kw_noshow struct ProjectFile <: Plugin
+@plugin struct ProjectFile <: Plugin
     version::VersionNumber = v"0.1.0"
 end
 

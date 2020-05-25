@@ -4,7 +4,7 @@ using Base.Filesystem: path_separator
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
 using Pkg: Pkg, PackageSpec, TOML
 using Random: Random, randstring
-using Test: @test, @testset, @test_logs, @test_throws
+using Test: @test, @testset, @test_broken, @test_logs, @test_throws
 
 using DeepDiffs: deepdiff
 using SimpleMock: mock
@@ -54,6 +54,7 @@ mktempdir() do dir
             include("template.jl")
             include("plugin.jl")
             include("show.jl")
+            include("interactive.jl")
 
             if PT.git_is_installed()
                 include("git.jl")
@@ -64,7 +65,7 @@ mktempdir() do dir
                 if VERSION.major == 1 && VERSION.minor == 4
                     include("reference.jl")
                 else
-                    @info "Skipping reference tests" julia=VERSION
+                    @info "Skipping reference tests" VERSION
                 end
             else
                 @info "Git is not installed, skipping Git and reference tests"

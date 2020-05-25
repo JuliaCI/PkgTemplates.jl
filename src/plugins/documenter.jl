@@ -3,11 +3,12 @@ const DOCUMENTER_DEP = PackageSpec(;
     uuid="e30172f5-a6a5-5a46-863b-614d45cd2de4",
 )
 
-const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, Nothing}
+struct NoDeploy end
+const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, NoDeploy}
 const GitHubPagesStyle = Union{TravisCI, GitHubActions}
 
 """
-    Documenter{T<:Union{TravisCI, GitLabCI, Nothing}}(;
+    Documenter{T<:Union{TravisCI, GitLabCI, NoDeploy}}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
         index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
@@ -26,7 +27,7 @@ or `Nothing` to only support local documentation builds.
   with the help of [`TravisCI`](@ref).
 - `GitLabCI`: Deploys documentation to [GitLab Pages](https://pages.gitlab.com)
   with the help of [`GitLabCI`](@ref).
-- `Nothing` (default): Does not set up documentation deployment.
+- `NoDeploy` (default): Does not set up documentation deployment.
 
 ## Keyword Arguments
 - `make_jl::AbstractString`: Template file for `make.jl`.
@@ -49,7 +50,7 @@ struct Documenter{T<:DeployStyle} <: Plugin
     make_jl::String
     index_md::String
 
-    # Can't use @with_kw_noshow due to some weird precompilation issues.
+    # Can't use @plugin because we're implementing our own no-arguments constructor.
     function Documenter{T}(;
         assets::Vector{<:AbstractString}=String[],
         makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
@@ -61,7 +62,12 @@ struct Documenter{T<:DeployStyle} <: Plugin
     end
 end
 
-Documenter(; kwargs...) = Documenter{Nothing}(; kwargs...)
+Documenter(; kwargs...) = Documenter{NoDeploy}(; kwargs...)
+
+# We have to define these manually because we didn't use @plugin.
+defaultkw(::Type{<:Documenter}, ::Val{:assets}) = String[]
+defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jl")
+defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", "index.md")
 
 gitignore(::Documenter) = ["/docs/build/"]
 priority(::Documenter, ::Function) = DEFAULT_PRIORITY - 1  # We need SrcDir to go first.
@@ -102,7 +108,7 @@ function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractStrin
     return merge(base, Dict("HAS_DEPLOY" => true))
 end
 
-validate(::Documenter{Nothing}, ::Template) = nothing
+validate(::Documenter{NoDeploy}, ::Template) = nothing
 function validate(::Documenter{T}, t::Template) where T <: DeployStyle
     if !hasplugin(t, T)
         name = nameof(T)
@@ -138,6 +144,18 @@ gitlab_pages_url(t::Template, pkg::AbstractString) = "https://$(t.user).gitlab.i
 
 make_canonical(::Type{<:GitHubPagesStyle}) = github_pages_url
 make_canonical(::Type{GitLabCI}) = gitlab_pages_url
-make_canonical(::Type{Nothing}) = nothing
+make_canonical(::Type{NoDeploy}) = nothing
 
 needs_username(::Documenter) = true
+
+function customizable(::Type{<:Documenter})
+    return (:canonical_url => NotCustomizable, :makedocs_kwargs => NotCustomizable)
+end
+
+function interactive(::Type{Documenter})
+    styles = [Nothing, TravisCI, GitLabCI]
+    menu = RadioMenu(map(string, styles); pagesize=length(styles))
+    println("Documenter deploy style:")
+    idx = request(menu)
+    return interactive(Documenter{styles[idx]})
+end

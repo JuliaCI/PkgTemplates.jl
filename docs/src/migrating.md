@@ -41,9 +41,12 @@ One less name to remember!
 | :-----------------------------------------: | :---------------------------------: |
 | `generate(::Template, pkg::AbstractString)` | `(::Template)(pkg::AbstractString)` |
 
-## Interactive Templates
+## Interactive Mode
 
-Currently not implemented, but will be in the future.
+| Old                                         | New                                 |
+| :-----------------------------------------: | :---------------------------------: |
+| `interactive_template()`                    | `Template(; interactive=true)`      |
+| `generate_interactive(pkg::AbstractString)` | `Template(; interactive=true)(pkg)` |
 
 ## Other Functions
 

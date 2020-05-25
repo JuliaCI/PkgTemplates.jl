@@ -29,9 +29,26 @@ function License(;
     return License(path, destination)
 end
 
+defaultkw(::Type{License}, ::Val{:path}) = nothing
+defaultkw(::Type{License}, ::Val{:name}) = "MIT"
+defaultkw(::Type{License}, ::Val{:destination}) = "LICENSE"
+
 source(p::License) = p.path
 destination(p::License) = p.destination
 view(::License, t::Template, ::AbstractString) = Dict(
     "AUTHORS" => join(t.authors, ", "),
     "YEAR" => year(today()),
 )
+
+function prompt(::Type{License}, ::Type, ::Val{:name})
+    options = readdir(default_file("licenses"))
+    # Move MIT to the top.
+    deleteat!(options, findfirst(==("MIT"), options))
+    pushfirst!(options, "MIT")
+    menu = RadioMenu(options; pagesize=length(options))
+    println("Select a license:")
+    idx = request(menu)
+    return options[idx]
+end
+
+customizable(::Type{License}) = (:name => String,)

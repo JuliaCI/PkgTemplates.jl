@@ -4,9 +4,9 @@
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[DataAPI]]
-git-tree-sha1 = "674b67f344687a88310213ddfa8a2b3c76cc4252"
+git-tree-sha1 = "176e23402d80e7743fc26c19c681bfb11246af32"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
-version = "1.1.0"
+version = "1.3.0"
 
 [[DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -29,9 +29,9 @@ version = "0.8.1"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "646ebc3db49889ffeb4c36f89e5d82c6a26295ff"
+git-tree-sha1 = "395fa1554c69735802bba37d9e7d9586fd44326c"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.24.7"
+version = "0.24.11"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
@@ -71,15 +71,14 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[Mustache]]
 deps = ["Printf", "Tables"]
-git-tree-sha1 = "e06eef2abee113c49695f5347668e15d4c02978a"
+git-tree-sha1 = "2e11fc5de3a01d23482a257e22009ddaab058d9a"
 uuid = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
-version = "1.0.0"
+version = "1.0.2"
 
 [[OrderedCollections]]
-deps = ["Random", "Serialization", "Test"]
-git-tree-sha1 = "c4c13474d23c60d20a67b217f1d7f22a40edf8f1"
+git-tree-sha1 = "12ce190210d278e12644bcadf5b21cbdcf225cd3"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.1.0"
+version = "1.2.0"
 
 [[Parameters]]
 deps = ["OrderedCollections"]
@@ -89,16 +88,16 @@ version = "0.12.0"
 
 [[Parsers]]
 deps = ["Dates", "Test"]
-git-tree-sha1 = "0c16b3179190d3046c073440d94172cfc3bb0553"
+git-tree-sha1 = "f8f5d2d4b4b07342e5811d2b6428e45524e241df"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "0.3.12"
+version = "1.0.2"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PkgTemplates]]
-deps = ["Dates", "LibGit2", "Mustache", "Parameters", "Pkg", "UUIDs"]
+deps = ["Dates", "InteractiveUtils", "LibGit2", "Mustache", "Parameters", "Pkg", "REPL", "UUIDs"]
 path = ".."
 uuid = "14b8a8f1-9102-5b29-a752-f990bacb7fe1"
 version = "0.7.0-DEV"
@@ -132,9 +131,9 @@ version = "1.0.0"
 
 [[Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
-git-tree-sha1 = "aaed7b3b00248ff6a794375ad6adf30f30ca5591"
+git-tree-sha1 = "c45dcc27331febabc20d86cb3974ef095257dcf3"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "0.2.11"
+version = "1.0.4"
 
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]

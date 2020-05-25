@@ -21,6 +21,7 @@ t("MyPkg")
 
 ```@docs
 Template
+generate
 ```
 
 ## Plugins
@@ -40,6 +41,7 @@ Tests
 Readme
 License
 Git
+CompatHelper
 TagBot
 Secret
 ```
@@ -76,7 +78,6 @@ Documenter
 
 ```@docs
 Develop
-CompatHelper
 Citation
 ```
 

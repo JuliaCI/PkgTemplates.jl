@@ -34,7 +34,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 - `dispatch::Bool`: Whether or not to enable the `dispatch` option.
 - `dispatch_delay::Int`: Number of minutes to delay for dispatch events.
 """
-@with_kw_noshow struct TagBot <: FilePlugin
+@plugin struct TagBot <: FilePlugin
     file::String = default_file("github", "workflows", "TagBot.yml")
     destination::String = "TagBot.yml"
     cron::String = "0 0 * * *"
