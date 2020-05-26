@@ -4,6 +4,7 @@
         name=nothing,
         email=nothing,
         ssh=false,
+        jl=true,
         manifest=false,
         gpgsign=false,
     )
@@ -17,6 +18,7 @@ Creates a Git repository and a `.gitignore` file.
 - `email::AbstractString`: Your email address, if you have not set `user.email` with Git.
 - `ssh::Bool`: Whether or not to use SSH for the remote.
   If left unset, HTTPS is used.
+- `jl::Bool`: Whether or not to add a `.jl` suffix to the remote URL.
 - `manifest::Bool`: Whether or not to commit `Manifest.toml`.
 - `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
   This option requires that the Git CLI is installed,
@@ -27,6 +29,7 @@ Creates a Git repository and a `.gitignore` file.
     name::Union{String, Nothing} = nothing
     email::Union{String, Nothing} = nothing
     ssh::Bool = false
+    jl::Bool = true
     manifest::Bool = false
     gpgsign::Bool = false
 end
@@ -64,10 +67,11 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
         end
         commit(p, repo, pkg_dir, "Initial commit")
         pkg = basename(pkg_dir)
+        suffix = p.jl ? ".jl" : ""
         url = if p.ssh
-            "git@$(t.host):$(t.user)/$pkg.jl.git"
+            "git@$(t.host):$(t.user)/$pkg$suffix.git"
         else
-            "https://$(t.host)/$(t.user)/$pkg.jl"
+            "https://$(t.host)/$(t.user)/$pkg$suffix"
         end
         LibGit2.with(GitRemote(repo, "origin", url)) do remote
             LibGit2.add_fetch!(repo, remote, "refs/heads/master")

@@ -41,6 +41,7 @@ end
                   name: nothing
                   email: nothing
                   ssh: false
+                  jl: true
                   manifest: false
                   gpgsign: false
                 License:

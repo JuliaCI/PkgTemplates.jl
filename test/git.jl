@@ -37,6 +37,16 @@
         end
     end
 
+    @testset "Without .jl suffix" begin
+        t = tpl(; plugins=[Git(; jl=false)])
+        with_pkg(t) do pkg
+            LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
+                remote = LibGit2.get(GitRemote, repo, "origin")
+                @test !occursin(".jl", LibGit2.url(remote))
+            end
+        end
+    end
+
     @testset "With custom name/email" begin
         t = tpl(; plugins=[Git(; name="me", email="a@b.c")])
         with_pkg(t) do pkg
