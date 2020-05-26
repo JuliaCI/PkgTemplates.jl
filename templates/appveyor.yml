@@ -8,6 +8,8 @@ platform:
 {{#PLATFORMS}}
   - {{{.}}}
 {{/PLATFORMS}}
+cache:
+  - '%USERPROFILE%\.julia\artifacts'
 {{#HAS_ALLOW_FAILURES}}
 matrix:
   allow_failures:
