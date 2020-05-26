@@ -37,7 +37,7 @@ jobs:
 {{#HAS_DOCUMENTER}}
   include:
     - stage: Documentation
-      julia: {{{VERSION}}}
+      julia: 1
       script: |
         julia --project=docs -e '
           using Pkg
