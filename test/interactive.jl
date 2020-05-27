@@ -198,6 +198,14 @@ end
             @test PT.interactive(TagBot) == TagBot(; changelog=nothing)
         end
 
+        @testset "Only one field" begin
+            print(
+                stdin.buffer,
+                DOWN, CR, DONE,  # Select "None" option
+            )
+            @test PT.interactive(Codecov) == Codecov()
+        end
+
         println()
     end
 end

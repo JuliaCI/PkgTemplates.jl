@@ -17,7 +17,7 @@ Interactively create a plugin of type `T`. Implement this method and ignore othe
 related functions only if you want completely custom behaviour.
 """
 function interactive(T::Type)
-    pairs = interactive_pairs(T)
+    pairs = Vector{Pair{Symbol, Type}}(interactive_pairs(T))
 
     # There must be at least 2 MultiSelectMenu options.
     # If there are none, return immediately.
