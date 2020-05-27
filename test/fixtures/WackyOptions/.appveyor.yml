@@ -6,6 +6,8 @@ environment:
 platform:
   - x64
   - x86
+cache:
+  - '%USERPROFILE%\.julia\artifacts'
 branches:
   only:
     - master

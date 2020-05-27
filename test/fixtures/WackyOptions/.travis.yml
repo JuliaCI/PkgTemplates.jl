@@ -12,6 +12,9 @@ arch:
   - x64
   - x86
   - arm64
+cache:
+  directories:
+    - ~/.julia/artifacts
 jobs:
   fast_finish: true
   exclude:

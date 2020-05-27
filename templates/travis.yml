@@ -14,6 +14,9 @@ arch:
 {{#ARCH}}
   - {{{.}}}
 {{/ARCH}}
+cache:
+  directories:
+    - ~/.julia/artifacts
 jobs:
   fast_finish: true
 {{#HAS_ALLOW_FAILURES}}

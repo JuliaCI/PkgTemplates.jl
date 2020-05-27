@@ -2,6 +2,8 @@ freebsd_instance:
   image: {{{IMAGE}}}
 task:
   name: FreeBSD
+  artifacts_cache:
+    folder: ~/.julia/artifacts
   env:
 {{#VERSIONS}}
     JULIA_VERSION: {{{.}}}
