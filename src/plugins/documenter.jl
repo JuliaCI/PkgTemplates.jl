@@ -8,7 +8,7 @@ const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, NoDeploy}
 const GitHubPagesStyle = Union{TravisCI, GitHubActions}
 
 """
-    Documenter{T<:Union{TravisCI, GitLabCI, GithubActions, NoDeploy}}(;
+    Documenter{T<:Union{TravisCI, GitLabCI, GitHubActions, NoDeploy}}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
         index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
