@@ -8,7 +8,7 @@ const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, NoDeploy}
 const GitHubPagesStyle = Union{TravisCI, GitHubActions}
 
 """
-    Documenter{T<:Union{TravisCI, GitLabCI, NoDeploy}}(;
+    Documenter{T<:Union{TravisCI, GitLabCI, GitHubActions, NoDeploy}}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
         index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
@@ -153,7 +153,7 @@ function customizable(::Type{<:Documenter})
 end
 
 function interactive(::Type{Documenter})
-    styles = [Nothing, TravisCI, GitLabCI]
+    styles = [Nothing, TravisCI, GitLabCI, GitHubActions]
     menu = RadioMenu(map(string, styles); pagesize=length(styles))
     println("Documenter deploy style:")
     idx = request(menu)
