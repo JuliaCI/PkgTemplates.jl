@@ -9,6 +9,7 @@ const DOWN = "\eOB"
 const ALL = "a"
 const NONE = "n"
 const DONE = "d"
+const SIGINT = "\x03"
 
 # Because the plugin selection dialog prints directly to stdin in the same way
 # as we do here, and our input prints happen first, we're going to need to insert
@@ -204,6 +205,25 @@ end
                 DOWN, CR, DONE,  # Select "None" option
             )
             @test PT.interactive(Codecov) == Codecov()
+        end
+
+        @testset "Missing user" begin
+            print(
+                stdin.buffer,
+                DONE,            # Customize nothing
+                "username", LF,  # Enter user after it's prompted
+            )
+            mock(PT.default_user => () -> "") do _du
+                @test Template(; interactive=true) == Template(; user="username")
+            end
+        end
+
+        @testset "Interrupts" begin
+            print(
+                stdin.buffer,
+                SIGINT,        # Send keyboard interrupt
+            )
+            @test Template(; interactive=true) === nothing
         end
 
         println()

@@ -3,6 +3,8 @@
 @testset "Template" begin
     @testset "Template constructor" begin
         @testset "user" begin
+            msg = sprint(showerror, PT.MissingUserException{TravisCI}())
+            @test startswith(msg, "TravisCI: ")
             mock(PT.default_user => () -> "") do _du
                 @test_throws PT.MissingUserException Template()
                 @test isempty(Template(; plugins=[!Git]).user)
