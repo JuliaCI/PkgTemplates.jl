@@ -19,6 +19,12 @@ function default_authors()
     return "$authors and contributors"
 end
 
+struct MissingUserException{T} <: Exception end
+function Base.showerror(io::IO, ::MissingUserException{T}) where T
+    s = """$(nameof(T)): Git hosting service username is required, set one with keyword `user="<username>"`"""
+    print(io, s)
+end
+
 """
     Template(; kwargs...)
 
@@ -95,11 +101,7 @@ function Template(::Val{false}; kwargs...)
 
     if isempty(user)
         foreach(plugins) do p
-            if needs_username(p)
-                T = nameof(typeof(p))
-                s = """$T: Git hosting service username is required, set one with keyword `user="<username>"`"""
-                throw(ArgumentError(s))
-            end
+            needs_username(p) && throw(MissingUserException{typeof(p)}())
         end
     end
 
@@ -184,7 +186,7 @@ function interactive(::Type{Template}; kwargs...)
     just_one = length(customizable) == 1
     just_one && push(customizable, "None")
 
-    return try
+    try
         println("Template keywords to customize:")
         menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
         customize = customizable[sort!(collect(request(menu)))]
@@ -195,16 +197,33 @@ function interactive(::Type{Template}; kwargs...)
             kwargs[k] = prompt(Template, fieldtype(Template, k), k)
         end
 
-        Template(; kwargs...)
+        while true
+            try
+                return Template(; kwargs...)
+            catch e
+                e isa MissingUserException || rethrow()
+                kwargs[:user] = prompt(Template, String, :user)
+            end
+        end
     catch e
         e isa InterruptException || rethrow()
         println()
         @info "Cancelled"
-        nothing
+        return nothing
     end
 end
 
 prompt(::Type{Template}, ::Type, ::Val{:pkg}) = Base.prompt("Package name")
+
+function prompt(::Type{Template}, ::Type, ::Val{:user})
+    return if isempty(default_user())
+        input = Base.prompt("Enter value for 'user' (String, required)")
+        input === nothing && throw(InterruptException())
+        return input
+    else
+        fallback_prompt(String, :user)
+    end
+end
 
 function prompt(::Type{Template}, ::Type, ::Val{:host})
     hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
