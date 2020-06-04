@@ -392,7 +392,8 @@ Combine `t`'s Julia version with `versions`, and format them as `major.minor`.
 This is useful for creating lists of versions to be included in CI configurations.
 """
 function collect_versions(t::Template, versions::Vector)
-    vs = map(format_version, [t.julia, versions...])
+    custom = map(v -> v isa VersionNumber ? format_version(v) : string(v), versions)
+    vs = map(v -> lstrip(v, 'v'), [format_version(t.julia); custom])
     return sort(unique(vs))
 end
 
@@ -408,4 +409,4 @@ is_ci(::Plugin) = false
 is_ci(::AllCI) = true
 
 needs_username(::AllCI) = true
-customizable(::Type{<:AllCI}) = (:extra_versions => Vector{VersionNumber},)
+customizable(::Type{<:AllCI}) = (:extra_versions => Vector{String},)
