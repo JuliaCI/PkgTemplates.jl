@@ -157,7 +157,7 @@ end
             @test PT.interactive(TravisCI) == TravisCI(;
                 arm64=true,
                 coverage=false,
-                extra_versions=[v"1.1", v"1.2"],
+                extra_versions=["1.1", "v1.2"],
                 file="x.txt",
                 linux=true,
                 osx=false,
@@ -181,6 +181,25 @@ end
                 CR,                  # Choose MIT for name (it's at the top)
             )
             @test PT.interactive(License) == License(; destination="COPYING", name="MIT")
+        end
+
+        @testset "Quotes" begin
+            print(
+                stdin.buffer,
+                CR, DOWN^2, CR, DONE,  # Customize user and dir
+                "\"me\"", LF,          # Enter user with quotes
+                "\"~\"", LF,           # Enter home dir with quotes
+            )
+            @test Template(; interactive=true) == Template(; user="me", dir="~")
+
+            print(
+                stdin.buffer,
+                DOWN^2, CR, DONE,                        # Customize extra_versions
+                "\"1.1.1\", \"^1.5\", \"nightly\"", LF,  # Enter versions with quotes
+            )
+            @test PT.interactive(TravisCI) == TravisCI(;
+                extra_versions=["1.1.1", "^1.5", "nightly"],
+            )
         end
 
         @testset "Union{T, Nothing} weirdness" begin

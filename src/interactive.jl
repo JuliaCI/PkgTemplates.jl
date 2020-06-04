@@ -105,7 +105,7 @@ end
 
 function convert_input(P::Type, T::Type{<:Vector}, s::AbstractString)
     startswith(s, '[') && endswith(s, ']') && (s = s[2:end-1])
-    xs = map(strip, split(s, ","))
+    xs = map(x -> strip(x, [' ', '\t', '"']), split(s, ","))
     return map(x -> convert_input(P, eltype(T), x), xs)
 end
 
@@ -123,6 +123,7 @@ function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, na
     default = defaultkw(P, name)
     input = Base.prompt(pretty_message("Enter value for '$name' ($tips)"))
     input === nothing && throw(InterruptException())
+    input = strip(input, '"')
     return if isempty(input)
         default
     else
