@@ -46,6 +46,7 @@ function view(p::Readme, t::Template, pkg::AbstractString)
 end
 
 badge_order() = [
+    Documenter{GitHubActions},
     Documenter{GitLabCI},
     Documenter{TravisCI},
     GitHubActions,
