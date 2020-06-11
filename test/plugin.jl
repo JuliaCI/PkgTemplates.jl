@@ -40,6 +40,13 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @test_logs tpl(; julia=v"1.3", plugins=[p])
     end
 
+    @testset "CI versions" begin
+        t = tpl(; julia=v"1")
+        @test PT.collect_versions(t, ["1.0", "1.5", "nightly"]) == ["1.0", "1.5", "nightly"]
+        t = tpl(; julia=v"2")
+        @test PT.collect_versions(t, ["1.0", "1.5", "nightly"]) == ["2.0", "nightly"]
+    end
+
     @testset "Equality" begin
         a = FileTest("foo", true)
         b = FileTest("foo", true)

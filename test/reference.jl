@@ -108,7 +108,7 @@ end
     @testset "Wacky options" begin
         test_all("WackyOptions"; authors=USER, julia=v"1.2", host="x.com", plugins=[
             AppVeyor(; x86=true, coverage=true, extra_versions=[v"1.1"]),
-            CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.1"]),
+            CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),
             Citation(; readme=true),
             Codecov(; file=STATIC_FILE),
             CompatHelper(; cron="0 0 */3 * *"),
@@ -118,7 +118,7 @@ end
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
             ),
-            DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.1"]),
+            DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Git(; ignore=["a", "b", "c"], manifest=true),
             GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),

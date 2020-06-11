@@ -5,10 +5,6 @@
         using Pkg
         Pkg.build()
         Pkg.test()'
-Julia 0.6:
-  image: julia:0.6
-  extends:
-    - .script
 Julia 1.2:
   image: julia:1.2
   extends:
