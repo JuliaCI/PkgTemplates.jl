@@ -394,6 +394,15 @@ This is useful for creating lists of versions to be included in CI configuration
 function collect_versions(t::Template, versions::Vector)
     custom = map(v -> v isa VersionNumber ? format_version(v) : string(v), versions)
     vs = map(v -> lstrip(v, 'v'), [format_version(t.julia); custom])
+    filter!(vs) do v
+        # Throw away any versions lower than the template's minimum.
+        try
+            VersionNumber(v) >= t.julia
+        catch e
+            e isa ArgumentError || rethrow()
+            true
+        end
+    end
     return sort(unique(vs))
 end
 
