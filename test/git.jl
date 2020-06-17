@@ -57,6 +57,15 @@
         end
     end
 
+    @testset "With custom default branch" begin
+        t = tpl(; plugins=[Git(; branch="main")])
+        with_pkg(t) do pkg
+            LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
+                @test LibGit2.branch(repo) == "main"
+            end
+        end
+    end
+
     @testset "Adds version to commit message" begin
         # We're careful to avoid a Pkg.update as it triggers Cassette#130.
         t = tpl(; plugins=[Git(), !Tests])
