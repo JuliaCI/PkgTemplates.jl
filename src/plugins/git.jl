@@ -62,7 +62,6 @@ end
 # Set up the Git repository.
 function prehook(p::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
-        branch = something(p.branch, "master")
         LibGit2.with(GitConfig(repo)) do config
             foreach((:name, :email)) do k
                 v = getproperty(p, k)
@@ -77,9 +76,11 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
         else
             "https://$(t.host)/$(t.user)/$pkg$suffix"
         end
-        if branch != "master"
-            LibGit2.branch!(repo, p.branch)
-            delete_branch(GitReference(repo, "refs/heads/master"))
+        default = LibGit2.branch(repo)
+        branch = something(p.branch, default)
+        if branch != default
+            LibGit2.branch!(repo, branch)
+            delete_branch(GitReference(repo, "refs/heads/$default"))
         end
         LibGit2.with(GitRemote(repo, "origin", url)) do remote
             LibGit2.add_fetch!(repo, remote, "refs/heads/$branch")
