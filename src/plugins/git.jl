@@ -3,6 +3,7 @@
         ignore=String[],
         name=nothing,
         email=nothing,
+        branch=nothing,
         ssh=false,
         jl=true,
         manifest=false,
@@ -16,6 +17,7 @@ Creates a Git repository and a `.gitignore` file.
   See also: [`gitignore`](@ref).
 - `name::AbstractString`: Your real name, if you have not set `user.name` with Git.
 - `email::AbstractString`: Your email address, if you have not set `user.email` with Git.
+- `branch::AbstractString`: The desired name of the repository's default branch.
 - `ssh::Bool`: Whether or not to use SSH for the remote.
   If left unset, HTTPS is used.
 - `jl::Bool`: Whether or not to add a `.jl` suffix to the remote URL.
@@ -28,6 +30,7 @@ Creates a Git repository and a `.gitignore` file.
     ignore::Vector{String} = String[]
     name::Union{String, Nothing} = nothing
     email::Union{String, Nothing} = nothing
+    branch::Union{String, Nothing} = nothing
     ssh::Bool = false
     jl::Bool = true
     manifest::Bool = false
@@ -59,6 +62,7 @@ end
 # Set up the Git repository.
 function prehook(p::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
+        branch = something(p.branch, "master")
         LibGit2.with(GitConfig(repo)) do config
             foreach((:name, :email)) do k
                 v = getproperty(p, k)
@@ -73,9 +77,13 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
         else
             "https://$(t.host)/$(t.user)/$pkg$suffix"
         end
+        if branch != "master"
+            LibGit2.branch!(repo, p.branch)
+            delete_branch(GitReference(repo, "refs/heads/master"))
+        end
         LibGit2.with(GitRemote(repo, "origin", url)) do remote
-            LibGit2.add_fetch!(repo, remote, "refs/heads/master")
-            LibGit2.add_push!(repo, remote, "refs/heads/master")
+            LibGit2.add_fetch!(repo, remote, "refs/heads/$branch")
+            LibGit2.add_push!(repo, remote, "refs/heads/$branch")
         end
     end
 end

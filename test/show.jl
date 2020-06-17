@@ -40,6 +40,7 @@ end
                   ignore: String[]
                   name: nothing
                   email: nothing
+                  branch: nothing
                   ssh: false
                   jl: true
                   manifest: false
