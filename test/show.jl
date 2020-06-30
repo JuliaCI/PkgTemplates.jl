@@ -82,5 +82,11 @@ end
         t1 = tpl()
         t2 = eval(Meta.parse(sprint(show, t1)))
         @test t1 == t2
+
+        foreach((NoDeploy, GitHubActions)) do T
+            p1 = Documenter{T}()
+            p2 = eval(Meta.parse(sprint(show, p1)))
+            @test p1 == p2
+        end
     end
 end
