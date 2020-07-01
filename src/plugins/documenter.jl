@@ -49,17 +49,17 @@ struct Documenter{T<:DeployStyle} <: Plugin
     canonical_url::Union{Function, Nothing}
     make_jl::String
     index_md::String
+end
 
-    # Can't use @plugin because we're implementing our own no-arguments constructor.
-    function Documenter{T}(;
-        assets::Vector{<:AbstractString}=String[],
-        makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
-        canonical_url::Union{Function, Nothing}=make_canonical(T),
-        make_jl::AbstractString=default_file("docs", "make.jl"),
-        index_md::AbstractString=default_file("docs", "src", "index.md"),
-    ) where T <: DeployStyle
-        return new(assets, makedocs_kwargs, canonical_url, make_jl, index_md)
-    end
+# Can't use @plugin because we're implementing our own no-arguments constructor.
+function Documenter{T}(;
+    assets::Vector{<:AbstractString}=String[],
+    makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
+    canonical_url::Union{Function, Nothing}=make_canonical(T),
+    make_jl::AbstractString=default_file("docs", "make.jl"),
+    index_md::AbstractString=default_file("docs", "src", "index.md"),
+) where T <: DeployStyle
+    return Documenter{T}(assets, makedocs_kwargs, canonical_url, make_jl, index_md)
 end
 
 Documenter(; kwargs...) = Documenter{NoDeploy}(; kwargs...)
