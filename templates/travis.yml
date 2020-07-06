@@ -46,6 +46,9 @@ jobs:
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
+          import Documenter
+          import {{{PKG}}}
+          Documenter.doctest({{{PKG}}})
           include("docs/make.jl")'
       after_success: skip
 {{/HAS_DOCUMENTER}}
