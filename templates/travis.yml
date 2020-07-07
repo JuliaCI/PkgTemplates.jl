@@ -48,7 +48,7 @@ jobs:
           Pkg.instantiate()
           using Documenter: doctest
           using {{{PKG}}}
-          Documenter.doctest({{{PKG}}})
+          doctest({{{PKG}}})
           include("docs/make.jl")'
       after_success: skip
 {{/HAS_DOCUMENTER}}
