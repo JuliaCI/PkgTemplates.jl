@@ -156,7 +156,7 @@ I have the following things:
 In the first section, `name` is a key, and its value replaces `{{{name}}}`.
 
 In the second section, `weather`'s value may or may not exist.
-If it does exist, then "It's $weather outside" is printed.
+If it does exist, then "It's \$weather outside" is printed.
 Otherwise, "I don't know what the weather outside is" is printed.
 Mustache uses a notion of "truthiness" similar to Python or JavaScript, where values of `nothing`, `false`, or empty collections are all considered to not exist.
 
