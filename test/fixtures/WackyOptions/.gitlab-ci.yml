@@ -18,6 +18,9 @@ pages:
         using Pkg
         Pkg.develop(PackageSpec(path=pwd()))
         Pkg.instantiate()
+        using Documenter: doctest
+        using WackyOptions
+        doctest(WackyOptions)
         include("docs/make.jl")'
     - mkdir -p public
     - mv docs/build public/dev
