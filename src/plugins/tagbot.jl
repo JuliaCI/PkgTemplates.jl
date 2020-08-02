@@ -4,7 +4,7 @@
         destination="TagBot.yml",
         cron="0 0 * * *",
         token=Secret("GITHUB_TOKEN"),
-        ssh=nothing,
+        ssh=Secret("DOCUMENTER_KEY"),
         ssh_password=nothing,
         changelog=nothing,
         changelog_ignore=nothing,
