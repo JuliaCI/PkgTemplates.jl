@@ -60,9 +60,9 @@ mktempdir() do dir
                 include("git.jl")
 
                 # Quite a bit of output depends on the Julia version,
-                # and the test fixtures are made with Julia 1.4.
+                # and the test fixtures are made with Julia 1.5.
                 # TODO: Keep this on the latest stable Julia version.
-                if VERSION.major == 1 && VERSION.minor == 4
+                if VERSION.major == 1 && VERSION.minor == 5
                     include("reference.jl")
                 else
                     @info "Skipping reference tests" VERSION
