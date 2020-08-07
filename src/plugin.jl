@@ -106,7 +106,9 @@ abstract type FilePlugin <: Plugin end
 Return a path relative to the default template file directory
 (`PkgTemplates/templates`).
 """
-default_file(paths::AbstractString...) = joinpath(dirname(dirname(pathof(PkgTemplates))), "templates", paths...)
+function default_file(paths::AbstractString...)
+    return joinpath(dirname(dirname(pathof(PkgTemplates))), "templates", paths...)
+end
 
 """
     view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
