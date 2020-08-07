@@ -1,6 +1,6 @@
 @info "Running show tests"
 
-const TEMPLATES_DIR = contractuser(PT.TEMPLATES_DIR)
+const TEMPLATES_DIR = PT.default_file()
 const LICENSES_DIR = joinpath(TEMPLATES_DIR, "licenses")
 
 function test_show(expected::AbstractString, observed::AbstractString)
