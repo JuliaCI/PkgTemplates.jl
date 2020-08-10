@@ -1,4 +1,3 @@
-const TEMPLATES_DIR = normpath(joinpath(@__DIR__, "..", "templates"))
 const DEFAULT_PRIORITY = 1000
 
 """
@@ -105,9 +104,11 @@ abstract type FilePlugin <: Plugin end
     default_file(paths::AbstractString...) -> String
 
 Return a path relative to the default template file directory
-(`$(contractuser(TEMPLATES_DIR))`).
+(`PkgTemplates/templates`).
 """
-default_file(paths::AbstractString...) = joinpath(TEMPLATES_DIR, paths...)
+function default_file(paths::AbstractString...)
+    return joinpath(dirname(dirname(pathof(PkgTemplates))), "templates", paths...)
+end
 
 """
     view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
