@@ -1,6 +1,7 @@
-pass = success(`julia --project -e 'using Pkg; Pkg.test(coverage=true)'`)
+cmd = Cmd(`julia --project -e 'using Pkg; Pkg.test(coverage=true)'`; ignorestatus=true)
 version = ARGS[1]
-if !pass
+proc = run(cmd)
+if proc.exitcode != 0
     if version == "nightly"
         println("::error ::Tests failed on nightly Julia")
     else
