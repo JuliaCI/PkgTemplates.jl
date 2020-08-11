@@ -100,6 +100,12 @@ end
 
 # Commit the files.
 function posthook(p::Git, ::Template, pkg_dir::AbstractString)
+    # Special case for issue 211.
+    if Sys.iswindows()
+        files = filter(f -> startswith(f, "_git2_"), readdir(pkg_dir))
+        foreach(f -> rm(joinpath(pkg_dir, f)), files)
+    end
+
     # Ensure that the manifest exists if it's going to be committed.
     manifest = joinpath(pkg_dir, "Manifest.toml")
     if p.manifest && !isfile(manifest)
