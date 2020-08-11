@@ -18,7 +18,6 @@ jobs:
           - windows-latest
         arch:
           - x64
-    continue-on-error: ${{ matrix.version == 'nightly' }}
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -39,7 +38,7 @@ jobs:
       - run: |
           git config --global user.name Tester
           git config --global user.email te@st.er
-      - uses: julia-actions/julia-runtest@latest
+      - run: julia .github/workflows/ci.jl "${{ matrix.version }}"
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v1
         with:
