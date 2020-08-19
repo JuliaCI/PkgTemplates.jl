@@ -1,7 +1,8 @@
 @info "Running reference tests"
 
 const PROMPT = get(ENV, "PT_INTERACTIVE", "false") == "true" || !haskey(ENV, "CI")
-const STATIC_FILE = joinpath(@__DIR__, "fixtures", "static.txt")
+const STATIC_TXT = joinpath(@__DIR__, "fixtures", "static.txt")
+const STATIC_PNG = joinpath(@__DIR__, "fixtures", "static.png")
 const STATIC_DOCUMENTER = [
     PackageSpec(; name="DocStringExtensions", version=v"0.8.1"),
     PackageSpec(; name="Documenter", version=v"0.24.2"),
@@ -110,11 +111,12 @@ end
             AppVeyor(; x86=true, coverage=true, extra_versions=[v"1.1"]),
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),
             Citation(; readme=true),
-            Codecov(; file=STATIC_FILE),
+            Codecov(; file=STATIC_TXT),
             CompatHelper(; cron="0 0 */3 * *"),
-            Coveralls(; file=STATIC_FILE),
+            Coveralls(; file=STATIC_TXT),
             Documenter{GitLabCI}(
-                assets=[STATIC_FILE],
+                assets=[STATIC_TXT],
+                logo=STATIC_PNG,
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
             ),
