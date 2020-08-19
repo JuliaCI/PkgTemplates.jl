@@ -39,12 +39,7 @@ end
 
 # Try to make sure that no files are created after we commit.
 priority(::Git, ::typeof(posthook)) = 5
-
-function gitignore(p::Git)
-    ignore = copy(p.ignore)
-    p.manifest || push!(ignore, "Manifest.toml")
-    return ignore
-end
+gitignore(p::Git) = p.ignore
 
 function validate(p::Git, t::Template)
     if p.gpgsign && !git_is_installed()

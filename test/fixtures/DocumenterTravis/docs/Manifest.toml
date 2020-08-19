@@ -1,10 +1,5 @@
 # This file is machine-generated - editing it directly is not advised
 
-[[AllPlugins]]
-path = ".."
-uuid = "5b7e9947-ddc0-4b3f-9b55-0d8042f74170"
-version = "0.1.0"
-
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
@@ -27,6 +22,11 @@ deps = ["Base64", "Dates", "DocStringExtensions", "InteractiveUtils", "JSON", "L
 git-tree-sha1 = "0be9bf63e854a2408c2ecd3c600d68d4d87d8a73"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "0.24.2"
+
+[[DocumenterTravis]]
+path = ".."
+uuid = "5b7e9947-ddc0-4b3f-9b55-0d8042f74170"
+version = "0.1.0"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
