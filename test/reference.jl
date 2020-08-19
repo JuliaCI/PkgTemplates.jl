@@ -11,11 +11,11 @@ const STATIC_DOCUMENTER = [
 ]
 
 function test_reference(reference, comparison)
-    if !isfile(comparison)
-        # If the comparison file doesn't yet exist, create it and pass the test.
-        @info "Creating new reference file $comparison"
-        copy_file(reference, comparison)
-        @test true
+    if !isfile(reference)
+        # If the reference file doesn't yet exist, create it but fail the test.
+        @info "Creating new reference file $reference"
+        copy_file(comparison, reference)
+        @test false
         return
     end
 
