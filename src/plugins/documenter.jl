@@ -5,6 +5,7 @@ const DOCUMENTER_DEP = PackageSpec(;
 
 struct NoDeploy end
 const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, NoDeploy}
+const YesDeploy = Union{TravisCI, GitHubActions, GitLabCI}
 const GitHubPagesStyle = Union{TravisCI, GitHubActions}
 
 """
@@ -112,8 +113,17 @@ function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractStrin
     return merge(base, Dict("HAS_DEPLOY" => true))
 end
 
-validate(::Documenter{NoDeploy}, ::Template) = nothing
-function validate(::Documenter{T}, t::Template) where T <: DeployStyle
+function validate(p::Documenter, ::Template)
+    foreach(p.assets) do a
+        isfile(a) || throw(ArgumentError("Asset file $a does not exist"))
+    end
+    if p.logo !== nothing && !isfile(p.logo)
+        throw(ArgumentError("Logo file $(p.logo) does not exist"))
+    end
+end
+
+function validate(p::Documenter{T}, t::Template) where T <: YesDeploy
+    invoke(validate, Tuple{Documenter, Template}, p, t)
     if !hasplugin(t, T)
         name = nameof(T)
         s = "Documenter: The $name plugin must be included for docs deployment to be set up"
