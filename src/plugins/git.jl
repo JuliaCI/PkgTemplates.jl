@@ -82,10 +82,7 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
             LibGit2.branch!(repo, branch)
             delete_branch(GitReference(repo, "refs/heads/$default"))
         end
-        LibGit2.with(GitRemote(repo, "origin", url)) do remote
-            LibGit2.add_fetch!(repo, remote, "refs/heads/$branch")
-            LibGit2.add_push!(repo, remote, "refs/heads/$branch")
-        end
+        close(GitRemote(repo, "origin", url))
     end
 end
 
