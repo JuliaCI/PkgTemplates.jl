@@ -116,7 +116,7 @@ end
             Coveralls(; file=STATIC_TXT),
             Documenter{GitLabCI}(;
                 assets=[STATIC_TXT],
-                logo=STATIC_PNG,
+                logo=Logo(; light=STATIC_PNG),
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
             ),

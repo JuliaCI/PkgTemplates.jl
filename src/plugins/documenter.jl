@@ -9,12 +9,25 @@ const YesDeploy = Union{TravisCI, GitHubActions, GitLabCI}
 const GitHubPagesStyle = Union{TravisCI, GitHubActions}
 
 """
+    Logo(; light=nothing, dark=nothing)
+
+Logo information for documentation.
+
+## Keyword Arguments
+- `light::AbstractString`: Path to a logo file for the light (default) theme.
+- `dark::AbstractString`: Path to a logo file for the dark theme.
+"""
+@with_kw_noshow struct Logo
+    light::Union{String, Nothing} = nothing
+    dark::Union{String, Nothing} = nothing
+end
+
+"""
     Documenter{T<:Union{TravisCI, GitLabCI, GitHubActions, NoDeploy}}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
         index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
-        logo=nothing,
-        logo_dark=nothing,
+        logo=Logo(),
         canonical_url=make_canonical(T),
         makedocs_kwargs=Dict{Symbol, Any}(),
     )
@@ -36,8 +49,7 @@ or `Nothing` to only support local documentation builds.
 - `make_jl::AbstractString`: Template file for `make.jl`.
 - `index_md::AbstractString`: Template file for `index.md`.
 - `assets::Vector{<:AbstractString}`: Extra assets for the generated site.
-- `logo::AbstractString`: Path to a logo file.
-- `logo_dark::AbstractString`: Path to a logo file for the dark theme.
+- `logo::Logo`: A [`Logo`](@ref) containing documentation logo information.
 - `canonical_url::Union{Function, Nothing}`: A function to generate the site's canonical URL.
   The default value will compute GitHub Pages and GitLab Pages URLs
   for [`TravisCI`](@ref) and [`GitLabCI`](@ref), respectively.
@@ -50,8 +62,7 @@ or `Nothing` to only support local documentation builds.
 """
 struct Documenter{T<:DeployStyle} <: Plugin
     assets::Vector{String}
-    logo::Union{String, Nothing}
-    logo_dark::Union{String, Nothing}
+    logo::Logo
     makedocs_kwargs::Dict{Symbol}
     canonical_url::Union{Function, Nothing}
     make_jl::String
@@ -61,22 +72,20 @@ end
 # Can't use @plugin because we're implementing our own no-arguments constructor.
 function Documenter{T}(;
     assets::Vector{<:AbstractString}=String[],
-    logo::Union{AbstractString, Nothing}=nothing,
-    logo_dark::Union{AbstractString, Nothing}=nothing,
+    logo::Logo=Logo(),
     makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
     canonical_url::Union{Function, Nothing}=make_canonical(T),
     make_jl::AbstractString=default_file("docs", "make.jl"),
     index_md::AbstractString=default_file("docs", "src", "index.md"),
 ) where T <: DeployStyle
-    return Documenter{T}(
-        assets, logo, logo_dark,makedocs_kwargs, canonical_url, make_jl, index_md,
-    )
+    return Documenter{T}(assets, logo, makedocs_kwargs, canonical_url, make_jl, index_md)
 end
 
 Documenter(; kwargs...) = Documenter{NoDeploy}(; kwargs...)
 
 # We have to define these manually because we didn't use @plugin.
 defaultkw(::Type{<:Documenter}, ::Val{:assets}) = String[]
+defaultkw(::Type{<:Documenter}, ::Val{:logo}) = Logo()
 defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jl")
 defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", "index.md")
 
@@ -123,8 +132,8 @@ function validate(p::Documenter, ::Template)
     foreach(p.assets) do a
         isfile(a) || throw(ArgumentError("Asset file $a does not exist"))
     end
-    foreach((:logo, :logo_dark)) do k
-        logo = getfield(p, k)
+    foreach((:light, :dark)) do k
+        logo = getfield(p.logo, k)
         if logo !== nothing && !isfile(logo)
             throw(ArgumentError("Logo file $logo does not exist"))
         end
@@ -154,8 +163,8 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     assets_dir = joinpath(docs_dir, "src", "assets")
     (isempty(p.assets) && p.logo === nothing) || mkpath(assets_dir)
     foreach(a -> cp(a, joinpath(assets_dir, basename(a))), p.assets)
-    foreach((:logo => "logo", :logo_dark => "logo-dark")) do (k, f)
-        logo = getfield(p, k)
+    foreach((:light => "logo", :dark => "logo-dark")) do (k, f)
+        logo = getfield(p.logo, k)
         if logo !== nothing
             _, ext = splitext(logo)
             cp(logo, joinpath(assets_dir, "$f$ext"))
@@ -188,4 +197,10 @@ function interactive(::Type{Documenter})
     println("Documenter deploy style:")
     idx = request(menu)
     return interactive(Documenter{styles[idx]})
+end
+
+function prompt(::Type{<:Documenter}, ::Type{Logo}, ::Val{:logo})
+    light = Base.prompt("Enter value for 'logo.light' (String, default=nothing)")
+    dark = Base.prompt("Enter value for 'logo.dark' (String, default=nothing)")
+    return Logo(; light=light, dark=dark)
 end
