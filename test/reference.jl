@@ -114,7 +114,7 @@ end
             Codecov(; file=STATIC_TXT),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
-            Documenter{GitLabCI}(
+            Documenter{GitLabCI}(;
                 assets=[STATIC_TXT],
                 logo=STATIC_PNG,
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
