@@ -192,7 +192,7 @@ function customizable(::Type{<:Documenter})
 end
 
 function interactive(::Type{Documenter})
-    styles = [Nothing, TravisCI, GitLabCI, GitHubActions]
+    styles = [NoDeploy, TravisCI, GitLabCI, GitHubActions]
     menu = RadioMenu(map(string, styles); pagesize=length(styles))
     println("Documenter deploy style:")
     idx = request(menu)
