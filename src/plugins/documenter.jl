@@ -161,7 +161,7 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
 
     # Copy over any assets.
     assets_dir = joinpath(docs_dir, "src", "assets")
-    (isempty(p.assets) && p.logo === nothing) || mkpath(assets_dir)
+    mkpath(assets_dir)
     foreach(a -> cp(a, joinpath(assets_dir, basename(a))), p.assets)
     foreach((:light => "logo", :dark => "logo-dark")) do (k, f)
         logo = getfield(p.logo, k)
@@ -170,6 +170,7 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
             cp(logo, joinpath(assets_dir, "$f$ext"))
         end
     end
+    isempty(readdir(assets_dir)) && rm(assets_dir)
 
     # Create the documentation project.
     with_project(docs_dir) do
