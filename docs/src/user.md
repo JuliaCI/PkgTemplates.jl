@@ -72,6 +72,7 @@ Coveralls
 
 ```@docs
 Documenter
+Logo
 ```
 
 ### Miscellaneous

@@ -27,6 +27,7 @@ export
     GitHubActions,
     GitLabCI,
     License,
+    Logo,
     NoDeploy,
     ProjectFile,
     Readme,
