@@ -238,8 +238,10 @@ Here's my recommendation for loading a template whenever it's needed:
 
 ```julia
 function template()
-    @eval using PkgTemplates
-    Template(; #= ... =#)
+    @eval begin
+        using PkgTemplates
+        Template(; #= ... =#)
+    end
 end
 ```
 
