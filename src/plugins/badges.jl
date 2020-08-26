@@ -29,6 +29,6 @@ function badges(::ColPracBadge)
     return Badge(
         "ColPrac: Contributor's Guide on Collaborative Practices for Community Packages",
         "https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet",
-        "https://github.com/SciML/ColPrac"
+        "https://github.com/SciML/ColPrac",
     )
 end
