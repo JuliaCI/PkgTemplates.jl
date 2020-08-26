@@ -10,11 +10,12 @@ Pages = ["developer.md"]
 
 PkgTemplates can be easily extended by adding new [`Plugin`](@ref)s.
 
-There are two types of plugins: [`Plugin`](@ref) and [`FilePlugin`](@ref).
+There are three types of plugins: [`Plugin`](@ref), [`FilePlugin`](@ref), and [`BadgePlugin`](@ref).
 
 ```@docs
 Plugin
 FilePlugin
+BadgePlugin
 ```
 
 ## Template + Package Creation Pipeline

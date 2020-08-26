@@ -57,4 +57,5 @@ badge_order() = [
     CirrusCI,
     Codecov,
     Coveralls,
+    subtypes(BadgePlugin)...
 ]

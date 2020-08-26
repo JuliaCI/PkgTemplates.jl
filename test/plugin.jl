@@ -66,4 +66,24 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         p = Documenter{TravisCI}()
         @test_throws ArgumentError PT.validate(p, t)
     end
+
+    @testset "Custom badge plugins" begin
+        t = tpl(; plugins=[!Readme, BlueStyleBadge()])
+        with_pkg(t) do pkg
+            pkg_dir = joinpath(t.dir, pkg)
+            @test !isfile(joinpath(pkg_dir, "README.md"))
+        end
+        @testset "$BadgeType" for (BadgeType, text) in (
+            BlueStyleBadge => "BlueStyle",
+            ColPracBadge => "ColPrac",
+        )
+            @test BadgeType <: PT.BadgePlugin
+            t = tpl(; plugins=[BadgeType()])
+            @test PT.hasplugin(t, BadgeType)
+            with_pkg(t) do pkg
+                pkg_dir = joinpath(t.dir, pkg)
+                @test occursin(text, read(joinpath(pkg_dir, "README.md"), String))
+            end
+        end
+    end
 end
