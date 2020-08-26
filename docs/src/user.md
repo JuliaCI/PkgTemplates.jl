@@ -75,6 +75,12 @@ Documenter
 Logo
 ```
 
+### Badges
+```@docs
+BlueStyleBadge
+ColPracBadge
+```
+
 ### Miscellaneous
 
 ```@docs

@@ -1,5 +1,7 @@
 """
 A [`Plugin`](@ref) that only adds a [`Badge`](@ref) to the [`Readme`](@ref) file.
+
+Concrete subtypes only need to implement a [`badges`](@ref) method.
 """
 abstract type BadgePlugin <: Plugin end
 
