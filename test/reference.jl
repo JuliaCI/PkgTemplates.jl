@@ -128,7 +128,7 @@ end
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true),
             TagBot(;
-                cron="0 0 */3 * *",
+                trigger="OtherUser",
                 token=Secret("MYTOKEN"),
                 ssh=Secret("SSHKEY"),
                 ssh_password=Secret("SSHPASS"),

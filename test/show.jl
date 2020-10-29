@@ -59,7 +59,7 @@ end
                 TagBot:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "TagBot.yml"))"
                   destination: "TagBot.yml"
-                  cron: "0 0 * * *"
+                  trigger: "JuliaTagBot"
                   token: Secret("GITHUB_TOKEN")
                   ssh: Secret("DOCUMENTER_KEY")
                   ssh_password: nothing
