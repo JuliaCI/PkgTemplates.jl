@@ -124,11 +124,6 @@ badges(::Documenter{GitLabCI}) = Badge(
     "https://{{{USER}}}.gitlab.io/{{{PKG}}}.jl/dev",
 )
 
-function default_branch(t::Template)
-    git = getplugin(t, Git)
-    return git === nothing ? nothing : git.branch
-end
-
 view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "ASSETS" => map(basename, p.assets),
     "AUTHORS" => join(t.authors, ", "),

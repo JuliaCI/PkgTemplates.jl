@@ -272,3 +272,8 @@ end
 
 # Call the default prompt method even if a specialized one exists.
 fallback_prompt(T::Type, name::Symbol) = prompt(Template, T, Val(name), nothing)
+
+function default_branch(t::Template)
+    git = getplugin(t, Git)
+    return git === nothing ? nothing : git.branch
+end
