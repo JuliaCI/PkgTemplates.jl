@@ -42,7 +42,7 @@ end
                   ignore: String[]
                   name: nothing
                   email: nothing
-                  branch: nothing
+                  branch: "main"
                   ssh: false
                   jl: true
                   manifest: false
@@ -79,7 +79,9 @@ end
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
             """
-        test_show(rstrip(expected), sprint(show, MIME("text/plain"), tpl(; authors=USER)))
+        with_clean_gitconfig() do
+            test_show(rstrip(expected), sprint(show, MIME("text/plain"), tpl(; authors=USER)))
+        end
     end
 
     @testset "show as serialization" begin

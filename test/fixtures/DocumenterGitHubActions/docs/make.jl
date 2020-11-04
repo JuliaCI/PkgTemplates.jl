@@ -20,4 +20,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/tester/DocumenterGitHubActions.jl",
+    devbranch="main",
 )
