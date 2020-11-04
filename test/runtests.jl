@@ -46,6 +46,22 @@ function print_diff(a, b)
     end
 end
 
+# LibGit2 doesn't respect the $GIT_CONFIG environment variable,
+# but we need to use it to avoid modifying the user's environment.
+function with_clean_gitconfig(f)
+    function getconfig(key, default)
+        io = IOBuffer()
+        proc = run(pipeline(`git config --get $key`; stdout=io); wait=false)
+        success(proc) ? strip(String(take!(io))) : default
+    end
+    mktemp() do file, _io
+        withenv("GIT_CONFIG" => file) do
+            mock(_gc -> f(), LibGit2.getconfig => getconfig)
+        end
+    end
+end
+
+
 mktempdir() do dir
     Pkg.activate(dir)
     pushfirst!(DEPOT_PATH, dir)
@@ -63,7 +79,17 @@ mktempdir() do dir
                 # and the test fixtures are made with Julia 1.5.
                 # TODO: Keep this on the latest stable Julia version.
                 if VERSION.major == 1 && VERSION.minor == 5
-                    include("reference.jl")
+                    # Ideally we'd use `with_clean_gitconfig`, but it's way too slow.
+                    branch = LibGit2.getconfig(
+                        "init.defaultBranch",
+                        PT.DEFAULT_DEFAULT_BRANCH,
+                    )
+                    if branch == PT.DEFAULT_DEFAULT_BRANCH
+                        include("reference.jl")
+                    else
+                        "Skipping reference tests, init.defaultBranch is set"
+                    end
+
                 else
                     @info "Skipping reference tests" VERSION
                 end

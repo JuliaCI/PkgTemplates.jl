@@ -13,7 +13,7 @@ matrix:
     - julia_version: nightly
 branches:
   only:
-    - master
+    - main
     - /release-.*/
 notifications:
   - provider: Email

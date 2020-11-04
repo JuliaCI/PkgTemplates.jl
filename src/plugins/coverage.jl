@@ -18,7 +18,7 @@ destination(::Codecov) = ".codecov.yml"
 
 badges(::Codecov) = Badge(
     "Coverage",
-    "https://codecov.io/gh/{{{USER}}}/{{{PKG}}}.jl/branch/master/graph/badge.svg",
+    "https://codecov.io/gh/{{{USER}}}/{{{PKG}}}.jl/branch/{{{BRANCH}}}/graph/badge.svg",
     "https://codecov.io/gh/{{{USER}}}/{{{PKG}}}.jl",
 )
 
@@ -40,12 +40,13 @@ destination(::Coveralls) = ".coveralls.yml"
 
 badges(::Coveralls) = Badge(
     "Coverage",
-    "https://coveralls.io/repos/github/{{{USER}}}/{{{PKG}}}.jl/badge.svg?branch=master",
-    "https://coveralls.io/github/{{{USER}}}/{{{PKG}}}.jl?branch=master",
+    "https://coveralls.io/repos/github/{{{USER}}}/{{{PKG}}}.jl/badge.svg?branch={{{BRANCH}}}",
+    "https://coveralls.io/github/{{{USER}}}/{{{PKG}}}.jl?branch={{{BRANCH}}}",
 )
 
 gitignore(::Union{Codecov, Coveralls}) = COVERAGE_GITIGNORE
 view(::Union{Codecov, Coveralls}, t::Template, pkg::AbstractString) = Dict(
+    "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
     "PKG" => pkg,
     "USER" => t.user,
 )
