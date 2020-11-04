@@ -127,7 +127,7 @@ end
         @testset "Disabling default plugins" begin
             print(
                 stdin.buffer,
-                CR, DOWN^5, CR, DONE,  # Customize user and plugins
+                CR, DOWN^5, CR, DONE,    # Customize user and plugins
                 USER, LF,                # Enter user
                 SELECT_DEFAULTS,         # Pre-select default plugins
                 UP, CR, UP^2, CR, DONE,  # Disable TagBot and Readme
@@ -168,9 +168,9 @@ end
 
             print(
                 stdin.buffer,
-                DOWN^2, CR,      # Select GitLabCI
+                DOWN^2, CR,        # Select GitLabCI
                 DOWN^2, CR, DONE,  # Customize index_md
-                "x.txt", LF,     # Enter index file
+                "x.txt", LF,       # Enter index file
             )
             @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
 
@@ -245,7 +245,7 @@ end
         @testset "Interrupts" begin
             print(
                 stdin.buffer,
-                SIGINT,        # Send keyboard interrupt
+                SIGINT,  # Send keyboard interrupt
             )
             @test Template(; interactive=true) === nothing
         end
