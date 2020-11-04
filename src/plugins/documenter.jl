@@ -55,7 +55,7 @@ or `Nothing` to only support local documentation builds.
   for [`TravisCI`](@ref) and [`GitLabCI`](@ref), respectively.
   If set to `nothing`, no canonical URL is set.
 - `makedocs_kwargs::Dict{Symbol}`: Extra keyword arguments to be inserted into `makedocs`.
-- `devbranch::Union{String, Nothing}`: Branch that will trigger the deployment of the site.
+- `devbranch::Union{AbstractString, Nothing}`: Branch that will trigger docs deployment.
 
 !!! note
     If deploying documentation with Travis CI, don't forget to complete
@@ -138,7 +138,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "PKG" => pkg,
     "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
     "USER" => t.user,
-    "DEVBRANCH" => something(p.devbranch, default_branch(t)),
+    "BRANCH" => p.devbranch === nothing ? default_branch(t) : p.devbranch,
 )
 
 function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractString)
