@@ -55,6 +55,7 @@ or `Nothing` to only support local documentation builds.
   for [`TravisCI`](@ref) and [`GitLabCI`](@ref), respectively.
   If set to `nothing`, no canonical URL is set.
 - `makedocs_kwargs::Dict{Symbol}`: Extra keyword arguments to be inserted into `makedocs`.
+- `devbranch::Union{String, Nothing}`: Branch that will trigger the deployment of the site.
 
 !!! note
     If deploying documentation with Travis CI, don't forget to complete
@@ -67,6 +68,7 @@ struct Documenter{T<:DeployStyle} <: Plugin
     canonical_url::Union{Function, Nothing}
     make_jl::String
     index_md::String
+    devbranch::Union{String, Nothing}
 end
 
 # Can't use @plugin because we're implementing our own no-arguments constructor.
@@ -77,8 +79,17 @@ function Documenter{T}(;
     canonical_url::Union{Function, Nothing}=make_canonical(T),
     make_jl::AbstractString=default_file("docs", "make.jl"),
     index_md::AbstractString=default_file("docs", "src", "index.md"),
+    devbranch::Union{String, Nothing}=nothing,
 ) where T <: DeployStyle
-    return Documenter{T}(assets, logo, makedocs_kwargs, canonical_url, make_jl, index_md)
+    return Documenter{T}(
+        assets,
+        logo,
+        makedocs_kwargs,
+        canonical_url,
+        make_jl,
+        index_md,
+        devbranch,
+    )
 end
 
 Documenter(; kwargs...) = Documenter{NoDeploy}(; kwargs...)
@@ -88,6 +99,7 @@ defaultkw(::Type{<:Documenter}, ::Val{:assets}) = String[]
 defaultkw(::Type{<:Documenter}, ::Val{:logo}) = Logo()
 defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jl")
 defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", "index.md")
+defaultkw(::Type{<:Documenter}, ::Val{:devbranch}) = nothing
 
 gitignore(::Documenter) = ["/docs/build/"]
 priority(::Documenter, ::Function) = DEFAULT_PRIORITY - 1  # We need SrcDir to go first.
@@ -112,6 +124,11 @@ badges(::Documenter{GitLabCI}) = Badge(
     "https://{{{USER}}}.gitlab.io/{{{PKG}}}.jl/dev",
 )
 
+function default_branch(t::Template)
+    git = getplugin(t, Git)
+    return git === nothing ? nothing : git.branch
+end
+
 view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "ASSETS" => map(basename, p.assets),
     "AUTHORS" => join(t.authors, ", "),
@@ -121,6 +138,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "PKG" => pkg,
     "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
     "USER" => t.user,
+    "DEVBRANCH" => something(p.devbranch, default_branch(t)),
 )
 
 function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractString)
