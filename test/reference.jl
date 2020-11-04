@@ -114,11 +114,12 @@ end
             Codecov(; file=STATIC_TXT),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
-            Documenter{GitLabCI}(;
+            Documenter{GitHubActions}(;
                 assets=[STATIC_TXT],
                 logo=Logo(; light=STATIC_PNG),
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
+                devbranch="foobar",
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Git(; ignore=["a", "b", "c"], manifest=true),

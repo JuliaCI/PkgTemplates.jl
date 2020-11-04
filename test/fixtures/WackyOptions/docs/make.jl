@@ -21,3 +21,8 @@ makedocs(;
     bar="baz",
     foo="bar",
 )
+
+deploydocs(;
+    repo="x.com/tester/WackyOptions.jl",
+    devbranch="foobar",
+)

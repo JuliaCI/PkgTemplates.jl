@@ -32,5 +32,8 @@ makedocs(;
 
 deploydocs(;
     repo="{{{REPO}}}",
+{{#BRANCH}}
+    devbranch="{{{BRANCH}}}",
+{{/BRANCH}}
 )
 {{/HAS_DEPLOY}}

@@ -169,7 +169,7 @@ end
             print(
                 stdin.buffer,
                 DOWN^2, CR,      # Select GitLabCI
-                DOWN, CR, DONE,  # Customize index_md
+                DOWN^2, CR, DONE,  # Customize index_md
                 "x.txt", LF,     # Enter index file
             )
             @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
