@@ -1,6 +1,8 @@
 using {{{PKG}}}
 using Documenter
 
+DocMeta.setdocmeta!({{{PKG}}}, :DocTestSetup, :(using {{{PKG}}}); recursive=true)
+
 makedocs(;
     modules=[{{{PKG}}}],
     authors="{{{AUTHORS}}}",
