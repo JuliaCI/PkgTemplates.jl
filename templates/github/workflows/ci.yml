@@ -76,8 +76,9 @@ jobs:
             Pkg.instantiate()'
       - run: |
           julia --project=docs -e '
-            using Documenter: doctest
+            using Documenter: DocMeta, doctest
             using <<&PKG>>
+            DocMeta.setdocmeta!(<<&PKG>>, :DocTestSetup, :(using <<&PKG>>); recursive=true)
             doctest(<<&PKG>>)'
       - run: julia --project=docs docs/make.jl
         env:

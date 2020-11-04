@@ -46,8 +46,9 @@ jobs:
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
-          using Documenter: doctest
+          using Documenter: DocMeta, doctest
           using {{{PKG}}}
+          DocMeta.setdocmeta!({{{PKG}}}, :DocTestSetup, :(using {{{PKG}}}); recursive=true)
           doctest({{{PKG}}})
           include("docs/make.jl")'
       after_success: skip
