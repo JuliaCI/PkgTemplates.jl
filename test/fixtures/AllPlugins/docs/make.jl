@@ -1,6 +1,8 @@
 using AllPlugins
 using Documenter
 
+DocMeta.setdocmeta!(AllPlugins, :DocTestSetup, :(using AllPlugins); recursive=true)
+
 makedocs(;
     modules=[AllPlugins],
     authors="tester",

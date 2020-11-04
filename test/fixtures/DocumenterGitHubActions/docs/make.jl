@@ -1,6 +1,8 @@
 using DocumenterGitHubActions
 using Documenter
 
+DocMeta.setdocmeta!(DocumenterGitHubActions, :DocTestSetup, :(using DocumenterGitHubActions); recursive=true)
+
 makedocs(;
     modules=[DocumenterGitHubActions],
     authors="tester",
