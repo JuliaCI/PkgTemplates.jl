@@ -1,6 +1,8 @@
 using DocumenterTravis
 using Documenter
 
+DocMeta.setdocmeta!(DocumenterTravis, :DocTestSetup, :(using DocumenterTravis); recursive=true)
+
 makedocs(;
     modules=[DocumenterTravis],
     authors="tester",

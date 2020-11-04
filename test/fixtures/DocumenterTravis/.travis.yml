@@ -27,8 +27,9 @@ jobs:
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
-          using Documenter: doctest
+          using Documenter: DocMeta, doctest
           using DocumenterTravis
+          DocMeta.setdocmeta!(DocumenterTravis, :DocTestSetup, :(using DocumenterTravis); recursive=true)
           doctest(DocumenterTravis)
           include("docs/make.jl")'
       after_success: skip

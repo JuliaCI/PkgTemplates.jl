@@ -1,6 +1,8 @@
 using WackyOptions
 using Documenter
 
+DocMeta.setdocmeta!(WackyOptions, :DocTestSetup, :(using WackyOptions); recursive=true)
+
 makedocs(;
     modules=[WackyOptions],
     authors="tester",
