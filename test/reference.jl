@@ -105,6 +105,11 @@ end
         ])
     end
 
+    @testset "Documenter (GitLabCI)" begin
+        test_all("DocumenterGitLabCI"; authors=USER, plugins=[
+            Documenter{GitLabCI}(), GitLabCI(),
+        ])
+    end
 
     @testset "Wacky options" begin
         test_all("WackyOptions"; authors=USER, julia=v"1.2", host="x.com", plugins=[
