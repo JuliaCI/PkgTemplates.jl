@@ -4,7 +4,7 @@ using PkgTemplates: PkgTemplates
 makedocs(;
     modules=[PkgTemplates],
     authors="Chris de Graaf, Invenia Technical Computing Corporation",
-    repo="https://github.com/invenia/PkgTemplates.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/invenia/PkgTemplates.jl/blob/{commit}{path}#{line}",
     sitename="PkgTemplates.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",

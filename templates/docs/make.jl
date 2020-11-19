@@ -6,7 +6,7 @@ DocMeta.setdocmeta!({{{PKG}}}, :DocTestSetup, :(using {{{PKG}}}); recursive=true
 makedocs(;
     modules=[{{{PKG}}}],
     authors="{{{AUTHORS}}}",
-    repo="https://{{{REPO}}}/blob/{commit}{path}#L{line}",
+    repo="https://{{{REPO}}}/blob/{commit}{path}#{line}",
     sitename="{{{PKG}}}.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",

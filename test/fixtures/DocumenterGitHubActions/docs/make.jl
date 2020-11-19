@@ -6,7 +6,7 @@ DocMeta.setdocmeta!(DocumenterGitHubActions, :DocTestSetup, :(using DocumenterGi
 makedocs(;
     modules=[DocumenterGitHubActions],
     authors="tester",
-    repo="https://github.com/tester/DocumenterGitHubActions.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/tester/DocumenterGitHubActions.jl/blob/{commit}{path}#{line}",
     sitename="DocumenterGitHubActions.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
