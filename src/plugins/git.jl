@@ -5,6 +5,7 @@
         email=nothing,
         branch=nothing,
         ssh=false,
+        prefix=nothing,
         jl=true,
         manifest=false,
         gpgsign=false,
@@ -20,6 +21,8 @@ Creates a Git repository and a `.gitignore` file.
 - `branch::AbstractString`: The desired name of the repository's default branch.
 - `ssh::Bool`: Whether or not to use SSH for the remote.
   If left unset, HTTPS is used.
+- `prefix::AbstractString`: Prefix string to be used when building the remote url.  
+  If left unset, either `"https://"` or `"git@"` is used, depending on `ssh` argument.  
 - `jl::Bool`: Whether or not to add a `.jl` suffix to the remote URL.
 - `manifest::Bool`: Whether or not to commit `Manifest.toml`.
 - `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
@@ -32,6 +35,7 @@ Creates a Git repository and a `.gitignore` file.
     email::Union{String, Nothing} = nothing
     branch::Union{String, Nothing} = nothing
     ssh::Bool = false
+    prefix::Union{String, Nothing} = nothing
     jl::Bool = true
     manifest::Bool = false
     gpgsign::Bool = false
@@ -66,10 +70,11 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
         commit(p, repo, pkg_dir, "Initial commit")
         pkg = basename(pkg_dir)
         suffix = p.jl ? ".jl" : ""
+        prefix = isnothing(p.prefix) ? ( p.ssh ? "git@" : "https://" ) : p.prefix
         url = if p.ssh
-            "git@$(t.host):$(t.user)/$pkg$suffix.git"
+            "$(prefix)$(t.host):$(t.user)/$pkg$suffix.git"
         else
-            "https://$(t.host)/$(t.user)/$pkg$suffix"
+            "$(prefix)$(t.host)/$(t.user)/$pkg$suffix"
         end
         default = LibGit2.branch(repo)
         branch = something(p.branch, default)
