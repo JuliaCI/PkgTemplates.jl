@@ -22,7 +22,7 @@ Creates a Git repository and a `.gitignore` file.
 - `ssh::Bool`: Whether or not to use SSH for the remote.
   If left unset, HTTPS is used.
 - `prefix::AbstractString`: Prefix string to be used when building the remote url.  
-  If left unset, either `"https://"` or `"git@"` is used, depending on `ssh` argument.  
+  If left unset either `"https://"` or `"git@"` is used, depending on the `ssh` argument.  
 - `jl::Bool`: Whether or not to add a `.jl` suffix to the remote URL.
 - `manifest::Bool`: Whether or not to commit `Manifest.toml`.
 - `gpgsign::Bool`: Whether or not to sign commits with your GPG key.
