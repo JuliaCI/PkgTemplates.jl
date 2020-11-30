@@ -1,4 +1,5 @@
 const DEFAULT_PRIORITY = 1000
+const DEFAULT_TEMPLATE_DIR = Ref{String}(joinpath(pkgdir(PkgTemplates), "templates"))
 
 """
     @plugin struct ... end
@@ -107,7 +108,7 @@ Return a path relative to the default template file directory
 (`PkgTemplates/templates`).
 """
 function default_file(paths::AbstractString...)
-    return joinpath(dirname(dirname(pathof(PkgTemplates))), "templates", paths...)
+    return joinpath(DEFAULT_TEMPLATE_DIR[], paths...)
 end
 
 """
