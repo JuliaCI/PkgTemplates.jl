@@ -11,12 +11,12 @@ jobs:
       matrix:
         version:
           - '1.0'
-          - '1' # Expands to latest 1.x
+          - '1' 
           - 'nightly'
         os:
           - ubuntu-latest
-          # - macOS-latest
-          # - windows-latest
+          - macOS-latest
+          - windows-latest
         arch:
           - x64
     steps:
