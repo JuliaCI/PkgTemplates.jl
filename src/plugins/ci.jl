@@ -15,7 +15,7 @@ const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to 
 """
     GitHubActions(;
         file="$(contractuser(default_file("github", "workflows", "CI.yml")))",
-        destination="ci.yml",
+        destination="CI.yml",
         linux=true,
         osx=false,
         windows=false,
@@ -45,8 +45,8 @@ $EXTRA_VERSIONS_DOC
     as described [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets).
 """
 @plugin struct GitHubActions <: FilePlugin
-    file::String = default_file("github", "workflows", "ci.yml")
-    destination::String = "ci.yml"
+    file::String = default_file("github", "workflows", "CI.yml")
+    destination::String = "CI.yml"
     linux::Bool = true
     osx::Bool = false
     windows::Bool = false
