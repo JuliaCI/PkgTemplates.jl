@@ -15,8 +15,6 @@ jobs:
           - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
         arch:
           - x64
     steps:
@@ -37,26 +35,10 @@ jobs:
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/julia-processcoverage@v1
+      - uses: codecov/codecov-action@v1
         with:
-          version: '1'
-      - run: |
-          julia --project=docs -e '
-            using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.instantiate()'
-      - run: |
-          julia --project=docs -e '
-            using Documenter: DocMeta, doctest
-            using DocumenterGitHubActions
-            DocMeta.setdocmeta!(DocumenterGitHubActions, :DocTestSetup, :(using DocumenterGitHubActions); recursive=true)
-            doctest(DocumenterGitHubActions)'
-      - run: julia --project=docs docs/make.jl
+          file: lcov.info
+      - uses: julia-actions/julia-uploadcoveralls@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
