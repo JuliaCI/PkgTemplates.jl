@@ -119,8 +119,8 @@ $EXTRA_VERSIONS_DOC
 @plugin struct TravisCI <: FilePlugin
     file::String = default_file("travis.yml")
     linux::Bool = true
-    osx::Bool = true
-    windows::Bool = true
+    osx::Bool = false
+    windows::Bool = false
     x64::Bool = true
     x86::Bool = false
     arm64::Bool = false
