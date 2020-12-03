@@ -10,15 +10,13 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.0'
+          - '1.2'
           - '1.5'
           - 'nightly'
         os:
-          - ubuntu-latest
-          - macOS-latest
-          - windows-latest
         arch:
           - x64
+          - x86
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -53,9 +51,9 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using DocumenterGitHubActions
-            DocMeta.setdocmeta!(DocumenterGitHubActions, :DocTestSetup, :(using DocumenterGitHubActions); recursive=true)
-            doctest(DocumenterGitHubActions)'
+            using WackyOptions
+            DocMeta.setdocmeta!(WackyOptions, :DocTestSetup, :(using WackyOptions); recursive=true)
+            doctest(WackyOptions)'
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

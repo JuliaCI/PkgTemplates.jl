@@ -374,7 +374,7 @@ Here are some testing tips to ensure that your PR goes through as smoothly as po
 If you've added or modified plugins, you should update the reference tests and the associated test fixtures.
 In `test/reference.jl`, you'll find a "Reference tests" test set that basically generates a bunch of packages, and then checks each file against a reference file, which is stored somewhere in `test/fixtures`.
 
-For new plugins, you should add an instance of your plugin to the "All plugins" anad "Wacky options" test sets, then run the tests with `Pkg.test`.
+For new plugins, you should add an instance of your plugin to the "All plugins" and "Wacky options" test sets, then run the tests with `Pkg.test`.
 They should pass, and there will be new files in `test/fixtures`.
 Check them to make sure that they contain exactly what you would expect!
 

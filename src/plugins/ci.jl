@@ -14,11 +14,11 @@ const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to 
 
 """
     GitHubActions(;
-        file="$(contractuser(default_file("github", "workflows", "ci.yml")))",
-        destination="ci.yml",
+        file="$(contractuser(default_file("github", "workflows", "CI.yml")))",
+        destination="CI.yml",
         linux=true,
-        osx=true,
-        windows=true,
+        osx=false,
+        windows=false,
         x64=true,
         x86=false,
         coverage=true,
@@ -45,11 +45,11 @@ $EXTRA_VERSIONS_DOC
     as described [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets).
 """
 @plugin struct GitHubActions <: FilePlugin
-    file::String = default_file("github", "workflows", "ci.yml")
-    destination::String = "ci.yml"
+    file::String = default_file("github", "workflows", "CI.yml")
+    destination::String = "CI.yml"
     linux::Bool = true
-    osx::Bool = true
-    windows::Bool = true
+    osx::Bool = false
+    windows::Bool = false
     x64::Bool = true
     x86::Bool = false
     coverage::Bool = true
@@ -93,8 +93,8 @@ end
     TravisCI(;
         file="$(contractuser(default_file("travis.yml")))",
         linux=true,
-        osx=true,
-        windows=true,
+        osx=false,
+        windows=false,
         x64=true,
         x86=false,
         arm64=false,
@@ -119,8 +119,8 @@ $EXTRA_VERSIONS_DOC
 @plugin struct TravisCI <: FilePlugin
     file::String = default_file("travis.yml")
     linux::Bool = true
-    osx::Bool = true
-    windows::Bool = true
+    osx::Bool = false
+    windows::Bool = false
     x64::Bool = true
     x86::Bool = false
     arm64::Bool = false
