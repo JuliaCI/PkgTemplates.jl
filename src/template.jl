@@ -70,14 +70,14 @@ julia> t("PkgName")
 ```
 """
 @option struct Template
+    user::String = default_user()
     authors::Vector{String} = default_authors()
     dir::String = contractuser(Pkg.devdir())
     host::String = "github.com"
     julia::VersionNumber = default_version()
     plugins::Vector{<:Plugin} = default_plugins()
-    user::String = default_user()
 
-    function Template(authors, dir, host, julia, plugins, user)
+    function Template(user, authors, dir, host, julia, plugins)
         dir = abspath(expanduser(dir))
         host = replace(host, r".*://" => "")
         authors isa Vector || (authors = map(strip, split(authors, ",")))
@@ -93,7 +93,7 @@ julia> t("PkgName")
             end
         end
 
-        t = new(authors, dir, host, julia, plugins, user)
+        t = new(user, authors, dir, host, julia, plugins)
         foreach(p -> validate(p, t), plugins)
         return t
     end
@@ -103,6 +103,58 @@ julia> t("PkgName")
         Configurations.validate_keywords(Template; kwargs...)
         return Configurations.create(Template; kwargs...)
     end
+end
+
+function Configurations.dictionalize(t::Template)
+    d = OrderedDict{String, Any}(
+        "user" => t.user,
+        "authors" => t.authors,
+        "dir" => t.dir,
+        "host" => t.host,
+        "julia" => t.julia,
+    )
+
+    for plugin in t.plugins
+        P = typeof(plugin)
+        alias = Configurations.alias(P)
+        name = isnothing(alias) ? string(nameof(P)) : alias
+        d[name] = Configurations.dictionalize(plugin)
+    end
+    return d
+end
+
+function _get_default(d::AbstractDict{String}, name::Symbol)
+    return get(d, string(name), field_default(Template, name))
+end
+
+function collect_plugins!(plugins::Vector{Any}, ::Type{T}, d::AbstractDict{String}) where T
+    for each in subtypes(T)
+        if isabstracttype(each)
+            collect_plugins!(plugins, each, d)
+            continue
+        end
+        
+        alias = Configurations.alias(each)
+        name = isnothing(alias) ? string(nameof(each)) : alias
+        if name in keys(d)
+            push!(plugins, from_dict(each, d[name]))
+        end
+    end
+    return plugins
+end
+
+function collect_plugins(d::AbstractDict{String})
+    return collect_plugins!([], Plugin, d)
+end
+
+function Configurations.from_dict_validate(::Type{Template}, d::AbstractDict{String})
+    user = _get_default(d, :user)
+    authors = _get_default(d, :authors)
+    dir = _get_default(d, :dir)
+    host = _get_default(d, :host)
+    julia = _get_default(d, :julia)
+    plugins = collect_plugins(d)
+    return Template(user, authors, dir, host, julia, plugins)
 end
 
 """

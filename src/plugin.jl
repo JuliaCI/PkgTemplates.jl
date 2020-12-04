@@ -83,6 +83,7 @@ struct Secret
 end
 
 Base.print(io::IO, s::Secret) = print(io, "\${{ secrets.$(s.name) }}")
+Configurations.toml_convert(::Type, x::Secret) = x.name
 
 """
 A simple plugin that, in general, creates a single file.
