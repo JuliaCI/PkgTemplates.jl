@@ -12,26 +12,16 @@ Creates a license file.
 - `destination::AbstractString`: File destination, relative to the repository root.
   For example, `"LICENSE.md"` might be desired.
 """
-struct License <: FilePlugin
-    path::String
-    destination::String
-end
+@plugin struct License <: FilePlugin
+    name::String = "MIT"
+    path::String = default_file("licenses", name)
+    destination::String = "LICENSE"
 
-function License(;
-    name::AbstractString="MIT",
-    path::Union{AbstractString, Nothing}=nothing,
-    destination::AbstractString="LICENSE",
-)
-    if path === nothing
-        path = default_file("licenses", name)
+    function License(name, path, destination)
         isfile(path) || throw(ArgumentError("License '$(basename(path))' is not available"))
+        new(name, path, destination)
     end
-    return License(path, destination)
 end
-
-defaultkw(::Type{License}, ::Val{:path}) = nothing
-defaultkw(::Type{License}, ::Val{:name}) = "MIT"
-defaultkw(::Type{License}, ::Val{:destination}) = "LICENSE"
 
 source(p::License) = p.path
 destination(p::License) = p.destination

@@ -11,15 +11,6 @@ Creates a module entrypoint.
     destination::String = ""
 end
 
-Base.:(==)(a::SrcDir, b::SrcDir) = a.file == b.file
-
-# Don't display the destination field.
-function Base.show(io::IO, ::MIME"text/plain", p::SrcDir)
-    indent = get(io, :indent, 0)
-    print(io, repeat(' ', indent), "SrcDir:")
-    print(io, "\n", repeat(' ', indent + 2), "file: ", show_field(p.file))
-end
-
 source(p::SrcDir) = p.file
 destination(p::SrcDir) = p.destination
 view(::SrcDir, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)

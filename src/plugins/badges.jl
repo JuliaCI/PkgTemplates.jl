@@ -10,7 +10,7 @@ abstract type BadgePlugin <: Plugin end
 
 Adds a [`BlueStyle`](https://github.com/invenia/BlueStyle) badge to the [`Readme`](@ref) file.
 """
-struct BlueStyleBadge <: BadgePlugin end
+@plugin struct BlueStyleBadge <: BadgePlugin end
 
 function badges(::BlueStyleBadge)
     return Badge(
@@ -25,7 +25,7 @@ end
 
 Adds a [`ColPrac`](https://github.com/SciML/ColPrac) badge to the [`Readme`](@ref) file.
 """
-struct ColPracBadge <: BadgePlugin end
+@plugin struct ColPracBadge <: BadgePlugin end
 
 function badges(::ColPracBadge)
     return Badge(

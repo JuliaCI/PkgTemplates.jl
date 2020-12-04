@@ -1,7 +1,5 @@
 @info "Running interactive tests"
 
-using PkgTemplates: @with_kw_noshow
-
 const CR = "\r"
 const LF = "\n"
 const UP = "\eOA"

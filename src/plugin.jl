@@ -57,28 +57,16 @@ If your plugin's fields have no sane defaults, then you'll need to implement
 [`prompt`](@ref) appropriately instead.
 """
 macro plugin(ex::Expr)
-    @assert ex.head === :struct "Expression must be a struct definition"
-    @assert ex.args[2] isa Expr && ex.args[2].head === :<: "Type must have a supertype"
-    T = ex.args[2].args[1]
-    @assert T isa Symbol "@plugin does not work for parametric types"
-
-    msg = "Run `using PkgTemplates: @with_kw_noshow` before using this macro"
-    @assert isdefined(__module__, Symbol("@with_kw_noshow")) msg
-    block = :(begin @with_kw_noshow $ex end)
-
-    foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do field
-        @assert field.head === :(=) "Field must have a default value"
-        name = QuoteNode(field.args[1].args[1])
-        default = field.args[2]
-        def = :(PkgTemplates.defaultkw(::Type{$T}, ::Val{$name}) = $default)
-        push!(block.args, def)
-    end
-
-    return esc(block)
+    return esc(plugin_m(ex))
 end
 
-function Base.:(==)(a::T, b::T) where T <: Plugin
-    return all(n -> getfield(a, n) == getfield(b, n), fieldnames(T))
+function plugin_m(@nospecialize(ex))
+    def = Configurations.OptionDef(ex)
+    @assert def.supertype !== nothing "Type must have a supertype"
+    for each in def.fields
+        @assert each.default !== Configurations.no_default "Field must have a default value"
+    end
+    return Configurations.codegen(def)
 end
 
 struct Disabled{P<:Plugin} end

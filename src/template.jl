@@ -69,49 +69,39 @@ julia> t = Template();
 julia> t("PkgName")
 ```
 """
-struct Template
-    authors::Vector{String}
-    dir::String
-    host::String
-    julia::VersionNumber
-    plugins::Vector{<:Plugin}
-    user::String
-end
+@option struct Template
+    authors::Vector{String} = default_authors()
+    dir::String = contractuser(Pkg.devdir())
+    host::String = "github.com"
+    julia::VersionNumber = default_version()
+    plugins::Vector{<:Plugin} = Plugin[]
+    user::String = default_user()
 
-Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
-Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
+    function Template(authors, dir, host, julia, plugins, user)
+        dir = abspath(expanduser(dir))
+        host = replace(host, r".*://" => "")
+        authors isa Vector || (authors = map(strip, split(authors, ",")))
+        plugins = collect(Any, plugins)
+        disabled = map(d -> first(typeof(d).parameters), filter(p -> p isa Disabled, plugins))
+        filter!(p -> p isa Plugin, plugins)
+        append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
+        plugins = Vector{Plugin}(sort(unique(typeof, plugins); by=string))
 
-function Template(::Val{false}; kwargs...)
-    kwargs = Dict(kwargs)
-
-    user = getkw!(kwargs, :user)
-    dir = abspath(expanduser(getkw!(kwargs, :dir)))
-    host = replace(getkw!(kwargs, :host), r".*://" => "")
-    julia = getkw!(kwargs, :julia)
-
-    authors = getkw!(kwargs, :authors)
-    authors isa Vector || (authors = map(strip, split(authors, ",")))
-
-    # User-supplied plugins come first, so that deduping the list will remove the defaults.
-    plugins = Vector{Any}(collect(getkw!(kwargs, :plugins)))
-    disabled = map(d -> first(typeof(d).parameters), filter(p -> p isa Disabled, plugins))
-    filter!(p -> p isa Plugin, plugins)
-    append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
-    plugins = Vector{Plugin}(sort(unique(typeof, plugins); by=string))
-
-    if isempty(user)
-        foreach(plugins) do p
-            needs_username(p) && throw(MissingUserException{typeof(p)}())
+        if isempty(user)
+            foreach(plugins) do p
+                needs_username(p) && throw(MissingUserException{typeof(p)}())
+            end
         end
+
+        t = new(authors, dir, host, julia, plugins, user)
+        foreach(p -> validate(p, t), plugins)
+        return t
     end
 
-    if !isempty(kwargs)
-        @warn "Unrecognized keywords were supplied, see the documentation for help" kwargs
+    function Template(; interactive::Bool=false, kwargs...)
+        interactive && return PkgTemplates.interactive(Template; kwargs...)
+        return Configurations.create(Template; kwargs...)
     end
-
-    t = Template(authors, dir, host, julia, plugins, user)
-    foreach(p -> validate(p, t), t.plugins)
-    return t
 end
 
 """
@@ -140,15 +130,6 @@ function (t::Template)(pkg::AbstractString)
     @info "New package is at $pkg_dir"
 end
 
-function Base.:(==)(a::Template, b::Template)
-    return a.authors == b.authors &&
-        a.dir == b.dir &&
-        a.host == b.host &&
-        a.julia == b.julia &&
-        a.user == b.user &&
-        all(map(==, a.plugins, b.plugins))
-end
-
 # Does the template have a plugin that satisfies some predicate?
 hasplugin(t::Template, f::Function) = any(f, t.plugins)
 hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
@@ -162,18 +143,6 @@ function getplugin(t::Template, ::Type{T}) where T <: Plugin
     i = findfirst(p -> p isa T, t.plugins)
     return i === nothing ? nothing : t.plugins[i]
 end
-
-# Get a keyword or a default value.
-getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
-
-# Default Template keyword values.
-defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
-defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
-defaultkw(::Type{Template}, ::Val{:dir}) = contractuser(Pkg.devdir())
-defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
-defaultkw(::Type{Template}, ::Val{:julia}) = default_version()
-defaultkw(::Type{Template}, ::Val{:plugins}) = Plugin[]
-defaultkw(::Type{Template}, ::Val{:user}) = default_user()
 
 function interactive(::Type{Template}; kwargs...)
     # If the user supplied any keywords themselves, don't prompt for them.

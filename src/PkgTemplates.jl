@@ -10,7 +10,8 @@ using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 using UUIDs: uuid4
 
 using Mustache: render
-using Parameters: @with_kw_noshow
+using Configurations
+using Configurations: field_default
 
 export
     Template,
@@ -49,7 +50,6 @@ abstract type Plugin end
 
 include("template.jl")
 include("plugin.jl")
-include("show.jl")
 include("interactive.jl")
 include("deprecated.jl")
 

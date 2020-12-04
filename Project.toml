@@ -4,18 +4,17 @@ authors = ["Chris de Graaf", "Invenia Technical Computing Corporation"]
 version = "0.7.14"
 
 [deps]
+Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 LibGit2 = "76f85450-5226-5b5a-8eaa-529ad045b433"
 Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
-Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 Mustache = "1"
-Parameters = "0.12"
 julia = "1"
 
 [extras]

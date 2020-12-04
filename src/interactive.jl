@@ -119,8 +119,8 @@ prompt(P::Type, T::Type, name::Symbol) = prompt(P, T, Val(name))
 
 # The trailing `nothing` is a hack for `fallback_prompt` to use, ignore it.
 function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, name}
-    tips = join([T; input_tips(T); "default=$(repr(defaultkw(P, name)))"], ", ")
-    default = defaultkw(P, name)
+    tips = join([T; input_tips(T); "default=$(repr(field_default(P, name)))"], ", ")
+    default = field_default(P, name)
     input = Base.prompt(pretty_message("Enter value for '$name' ($tips)"))
     input === nothing && throw(InterruptException())
     input = strip(input, '"')

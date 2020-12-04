@@ -17,7 +17,7 @@ Logo information for documentation.
 - `light::AbstractString`: Path to a logo file for the light (default) theme.
 - `dark::AbstractString`: Path to a logo file for the dark theme.
 """
-@with_kw_noshow struct Logo
+@option struct Logo
     light::Union{String, Nothing} = nothing
     dark::Union{String, Nothing} = nothing
 end
@@ -61,45 +61,17 @@ or `Nothing` to only support local documentation builds.
     If deploying documentation with Travis CI, don't forget to complete
     [the required configuration](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
 """
-struct Documenter{T<:DeployStyle} <: Plugin
-    assets::Vector{String}
-    logo::Logo
-    makedocs_kwargs::Dict{Symbol}
-    canonical_url::Union{Function, Nothing}
-    make_jl::String
-    index_md::String
-    devbranch::Union{String, Nothing}
+@plugin struct Documenter{T<:DeployStyle} <: Plugin
+    assets::Vector{String} = String[]
+    logo::Logo = Logo()
+    makedocs_kwargs::Dict{Symbol} = Dict{Symbol, Any}()
+    canonical_url::Union{Function, Nothing} = make_canonical(T)
+    make_jl::String = default_file("docs", "make.jl")
+    index_md::String = default_file("docs", "src", "index.md")
+    devbranch::Union{String, Nothing} = nothing
 end
 
-# Can't use @plugin because we're implementing our own no-arguments constructor.
-function Documenter{T}(;
-    assets::Vector{<:AbstractString}=String[],
-    logo::Logo=Logo(),
-    makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
-    canonical_url::Union{Function, Nothing}=make_canonical(T),
-    make_jl::AbstractString=default_file("docs", "make.jl"),
-    index_md::AbstractString=default_file("docs", "src", "index.md"),
-    devbranch::Union{String, Nothing}=nothing,
-) where T <: DeployStyle
-    return Documenter{T}(
-        assets,
-        logo,
-        makedocs_kwargs,
-        canonical_url,
-        make_jl,
-        index_md,
-        devbranch,
-    )
-end
-
-Documenter(; kwargs...) = Documenter{NoDeploy}(; kwargs...)
-
-# We have to define these manually because we didn't use @plugin.
-defaultkw(::Type{<:Documenter}, ::Val{:assets}) = String[]
-defaultkw(::Type{<:Documenter}, ::Val{:logo}) = Logo()
-defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jl")
-defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", "index.md")
-defaultkw(::Type{<:Documenter}, ::Val{:devbranch}) = nothing
+Documenter(;kwargs...) = Documenter{NoDeploy}(;kwargs...)
 
 gitignore(::Documenter) = ["/docs/build/"]
 priority(::Documenter, ::Function) = DEFAULT_PRIORITY - 1  # We need SrcDir to go first.
