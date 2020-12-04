@@ -2,13 +2,13 @@ default_user() = LibGit2.getconfig("github.user", "")
 default_version() = VersionNumber(VERSION.major)
 default_plugins() = [
     CompatHelper(),
-    ProjectFile(),
-    SrcDir(),
     Git(),
     License(),
+    ProjectFile(),
     Readme(),
-    Tests(),
+    SrcDir(),
     TagBot(),
+    Tests(),
 ]
 
 function default_authors()
@@ -74,7 +74,7 @@ julia> t("PkgName")
     dir::String = contractuser(Pkg.devdir())
     host::String = "github.com"
     julia::VersionNumber = default_version()
-    plugins::Vector{<:Plugin} = Plugin[]
+    plugins::Vector{<:Plugin} = default_plugins()
     user::String = default_user()
 
     function Template(authors, dir, host, julia, plugins, user)
