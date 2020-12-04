@@ -185,8 +185,8 @@ end
             print(
                 stdin.buffer,
                 CR, DOWN^2, CR, DONE,  # Customize user and dir
-                "~", LF,           # Enter home dir with quotes
-                "me", LF,          # Enter user with quotes
+                "\"me\"", LF,          # Enter user with quotes
+                "\"~\"", LF,           # Enter home dir with quotes
             )
             result = Template(; interactive=true) == Template(; user="me", dir="~")
             if get(ENV, "CI", "false") == "true"
