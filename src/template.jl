@@ -100,6 +100,7 @@ julia> t("PkgName")
 
     function Template(; interactive::Bool=false, kwargs...)
         interactive && return PkgTemplates.interactive(Template; kwargs...)
+        Configurations.validate_keywords(Template; kwargs...)
         return Configurations.create(Template; kwargs...)
     end
 end
