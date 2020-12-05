@@ -2,9 +2,9 @@
 
 @info "Running plugin tests"
 
-struct FileTest <: PT.FilePlugin
-    a::String
-    b::Bool
+PT.@plugin struct FileTest <: PT.FilePlugin
+    a::String = "foo"
+    b::Bool = true
 end
 
 PT.gitignore(::FileTest) = ["a", "aa", "aaa"]
@@ -16,7 +16,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
 
 @testset "Plugins" begin
     @testset "FilePlugin" begin
-        p = FileTest("foo", true)
+        p = FileTest()
         t = tpl(; plugins=[p])
 
         # The X from user_view should override the X from view.

@@ -1,9 +1,6 @@
-using Test
-using TOML
-using PkgTemplates
-using Configurations
+@info "testing TOML conversion"
 
-t = Template(;user="me")
+t = Template(;user="me", dir="~/.julia/dev")
 @test from_dict(Template, to_dict(t)) == t
 @test toml(t) == """
 user = "me"
@@ -13,7 +10,6 @@ host = "github.com"
 julia = "1.0.0"
 """
 
-t = Template(;user="me", plugins=[!Git])
 src = """
 user = "me"
 authors = ["Roger-luo <rogerluo.rl18@gmail.com> and contributors"]
@@ -31,7 +27,7 @@ julia = "1.0.0"
 """
 d = TOML.parse(src)
 
-@test from_dict(Template, d) == t
+@test from_dict(Template, d) == Template(;user="me", dir="~/.julia/dev", plugins=[!Git])
 
 # https://github.com/JuliaLang/TOML.jl/issues/13
 @test_broken toml(t) == src

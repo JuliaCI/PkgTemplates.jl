@@ -2,14 +2,15 @@ using Base: contractuser
 using Base.Filesystem: path_separator
 
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
-using Pkg: Pkg, PackageSpec, TOML
+using Pkg: Pkg, PackageSpec
 using Random: Random, randstring
 using Test: @test, @testset, @test_broken, @test_logs, @test_throws
 
 using DeepDiffs: deepdiff
 using SimpleMock: mock
 using Suppressor: @suppress
-
+using TOML
+using Configurations
 using PkgTemplates
 const PT = PkgTemplates
 

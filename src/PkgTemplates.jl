@@ -5,7 +5,8 @@ using Base: active_project, contractuser
 using Dates: month, today, year
 using InteractiveUtils: subtypes
 using LibGit2: LibGit2, GitConfig, GitReference, GitRemote, GitRepo, delete_branch
-using Pkg: Pkg, TOML, PackageSpec
+using TOML
+using Pkg: Pkg, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 using UUIDs: uuid4
 
