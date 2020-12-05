@@ -125,7 +125,7 @@ end
         @testset "Disabling default plugins" begin
             print(
                 stdin.buffer,
-                CR^2, DOWN^5, CR, DONE,  # Customize user and plugins
+                CR^3, DOWN^5, CR, DONE,  # Customize user and plugins
                 USER, LF,                # Enter user
                 SELECT_DEFAULTS,         # Pre-select default plugins
                 UP^2, CR, UP^2, CR, DONE,  # Disable TagBot and Readme
