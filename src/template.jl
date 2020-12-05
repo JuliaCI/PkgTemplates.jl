@@ -113,14 +113,16 @@ function Configurations.dictionalize(t::Template)
         "julia" => t.julia,
     )
 
+    # NOTE: we use emptry field to represent
+    # using a default value for plugin
+    # and all plugins must be listed in the TOML
+    # file.
     for plugin in t.plugins
         P = typeof(plugin)
         alias = Configurations.alias(P)
         name = isnothing(alias) ? string(nameof(P)) : alias
         plugin_dict = Configurations.dictionalize(plugin)
-        if !isempty(plugin_dict)
-            d[name] = plugin_dict
-        end
+        d[name] = plugin_dict
     end
     return d
 end
@@ -142,6 +144,19 @@ function collect_plugins!(plugins::Vector{Any}, ::Type{T}, d::AbstractDict{Strin
             push!(plugins, from_dict(each, d[name]))
         end
     end
+
+    # treat missing default plugins as disabled
+    for each in default_plugins()
+        plugin_t = typeof(each)
+        idx = findfirst(plugins) do x
+            typeof(x) == plugin_t
+        end
+
+        if idx === nothing
+            push!(plugins, !plugin_t)
+        end
+    end
+    
     return plugins
 end
 
