@@ -120,7 +120,7 @@ function Configurations.dictionalize(t::Template)
     for plugin in t.plugins
         P = typeof(plugin)
         alias = Configurations.alias(P)
-        name = isnothing(alias) ? string(nameof(P)) : alias
+        name = alias === nothing ? string(nameof(P)) : alias
         plugin_dict = Configurations.dictionalize(plugin)
         d[name] = plugin_dict
     end
@@ -139,7 +139,7 @@ function collect_plugins!(plugins::Vector{Any}, ::Type{T}, d::AbstractDict{Strin
         end
         
         alias = Configurations.alias(each)
-        name = isnothing(alias) ? string(nameof(each)) : alias
+        name = alias === nothing ? string(nameof(each)) : alias
         if name in keys(d)
             push!(plugins, from_dict(each, d[name]))
         end
