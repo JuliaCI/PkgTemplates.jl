@@ -152,7 +152,7 @@ function Configurations.from_dict_validate(::Type{Template}, d::AbstractDict{Str
     authors = _get_default(d, :authors)
     dir = _get_default(d, :dir)
     host = _get_default(d, :host)
-    julia = _get_default(d, :julia)
+    julia = VersionNumber(_get_default(d, :julia))
     plugins = collect_plugins(d)
     return Template(user, authors, dir, host, julia, plugins)
 end

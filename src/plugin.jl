@@ -84,6 +84,7 @@ end
 
 Base.print(io::IO, s::Secret) = print(io, "\${{ secrets.$(s.name) }}")
 Configurations.toml_convert(::Type, x::Secret) = x.name
+Configurations.option_convert(::Type, ::Type{Secret}, x::String) = Secret(x)
 
 """
 A simple plugin that, in general, creates a single file.
