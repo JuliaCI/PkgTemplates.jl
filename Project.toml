@@ -17,7 +17,7 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
 TOML = "1"
-Configurations = "0.7"
+Configurations = "0.8"
 Mustache = "1"
 julia = "1"
 
