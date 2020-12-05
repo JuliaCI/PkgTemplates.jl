@@ -16,7 +16,7 @@ function default_authors()
     isempty(name) && return "contributors"
     email = LibGit2.getconfig("user.email", "")
     authors = isempty(email) ? name : "$name <$email>"
-    return "$authors and contributors"
+    return ["$authors and contributors"]
 end
 
 struct MissingUserException{T} <: Exception end
@@ -78,7 +78,6 @@ julia> t("PkgName")
     plugins::Vector{<:Plugin} = default_plugins()
 
     function Template(user, authors, dir, host, julia, plugins)
-        dir = abspath(expanduser(dir))
         host = replace(host, r".*://" => "")
         authors isa Vector || (authors = map(strip, split(authors, ",")))
         plugins = collect(Any, plugins)
@@ -164,7 +163,7 @@ Generate a package named `pkg` from a [`Template`](@ref).
 """
 function (t::Template)(pkg::AbstractString)
     endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
-    pkg_dir = joinpath(t.dir, pkg)
+    pkg_dir = joinpath(abspath(expanduser(t.dir)), pkg)
     ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
     mkpath(pkg_dir)
 
