@@ -117,12 +117,15 @@ function Configurations.dictionalize(t::Template)
         P = typeof(plugin)
         alias = Configurations.alias(P)
         name = isnothing(alias) ? string(nameof(P)) : alias
-        d[name] = Configurations.dictionalize(plugin)
+        plugin_dict = Configurations.dictionalize(plugin)
+        if !isempty(plugin_dict)
+            d[name] = plugin_dict
+        end
     end
     return d
 end
 
-function _get_default(d::AbstractDict{String}, name::Symbol)
+function get_template_field(d::AbstractDict{String}, name::Symbol)
     return get(d, string(name), field_default(Template, name))
 end
 
@@ -147,11 +150,13 @@ function collect_plugins(d::AbstractDict{String})
 end
 
 function Configurations.from_dict_validate(::Type{Template}, d::AbstractDict{String})
-    user = _get_default(d, :user)
-    authors = _get_default(d, :authors)
-    dir = _get_default(d, :dir)
-    host = _get_default(d, :host)
-    julia = VersionNumber(_get_default(d, :julia))
+    user = get_template_field(d, :user)
+    authors = get_template_field(d, :authors)
+    dir = get_template_field(d, :dir)
+    host = get_template_field(d, :host)
+
+    version = get_template_field(d, :julia)
+    julia =  version isa VersionNumber ? version : VersionNumber(version)
     plugins = collect_plugins(d)
     return Template(user, authors, dir, host, julia, plugins)
 end
