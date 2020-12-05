@@ -53,7 +53,6 @@ mktempdir() do dir
         @testset "PkgTemplates.jl" begin
             include("template.jl")
             include("plugin.jl")
-            # include("show.jl")
             include("interactive.jl")
 
             if PT.git_is_installed()
