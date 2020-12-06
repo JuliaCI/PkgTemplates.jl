@@ -104,14 +104,19 @@ julia> t("PkgName")
     end
 end
 
+function get_template_field(d::AbstractDict{String}, name::Symbol)
+    return get(d, string(name), field_default(Template, name))
+end
+
 function Configurations.dictionalize(t::Template)
-    d = OrderedDict{String, Any}(
-        "user" => t.user,
-        "authors" => t.authors,
-        "dir" => t.dir,
-        "host" => t.host,
-        "julia" => t.julia,
-    )
+    d = OrderedDict{String, Any}()
+    for each in fieldnames(Template)
+        each === :plugins && continue
+        value = getfield(t, each)
+        if value != field_default(Template, each)
+            d[string(each)] = value
+        end
+    end
 
     # NOTE: we use emptry field to represent
     # using a default value for plugin
@@ -125,10 +130,6 @@ function Configurations.dictionalize(t::Template)
         d[name] = plugin_dict
     end
     return d
-end
-
-function get_template_field(d::AbstractDict{String}, name::Symbol)
-    return get(d, string(name), field_default(Template, name))
 end
 
 function collect_plugins!(plugins::Vector{Any}, ::Type{T}, d::AbstractDict{String}) where T
