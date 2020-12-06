@@ -92,7 +92,7 @@ julia> t("PkgName")
             end
         end
 
-        t = new(user, authors, dir, host, julia, plugins)
+        t = new(user, authors, normpath(dir), host, julia, plugins)
         foreach(p -> validate(p, t), plugins)
         return t
     end
