@@ -1,19 +1,16 @@
 @info "testing TOML conversion"
 
-t = Template(;user="me", authors = ["Tester <te@st.er> and contributors"])
+t = Template(;user="me")
 @test from_dict(Template, to_dict(t)) == t
 
 @test toml(t) == """
 user = "me"
-authors = ["Tester <te@st.er> and contributors"]
 """
 
 src = """
 user = "me"
 authors = ["Tester <te@st.er> and contributors"]
 dir = "a/b/c"
-host = "github.com"
-julia = "1.0.0"
 
 [CompatHelper]
 [License]
