@@ -6,7 +6,7 @@ t = Template(;user="me", authors = ["Tester <te@st.er> and contributors"], dir="
 @test toml(t) == """
 user = "me"
 authors = ["Tester <te@st.er> and contributors"]
-dir = $(normpath("~/.julia/dev"))
+dir = "$(normpath("~/.julia/dev"))"
 host = "github.com"
 julia = "1.0.0"
 """
