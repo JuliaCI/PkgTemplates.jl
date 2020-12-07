@@ -50,9 +50,11 @@ end
 # but we need to use it to avoid modifying the user's environment.
 function with_clean_gitconfig(f)
     function getconfig(key, default)
-        io = IOBuffer()
-        proc = run(pipeline(`git config --get $key`; stdout=io); wait=false)
-        success(proc) ? strip(String(take!(io))) : default
+        try
+            readchomp(`git config --get $key`)
+        catch
+            default
+        end
     end
     mktemp() do file, _io
         withenv("GIT_CONFIG" => file) do
