@@ -91,7 +91,6 @@ mktempdir() do dir
                     else
                         "Skipping reference tests, init.defaultBranch is set"
                     end
-
                 else
                     @info "Skipping reference tests" VERSION
                 end
