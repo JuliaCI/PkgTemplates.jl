@@ -62,7 +62,7 @@ tags(::GitHubActions) = "<<", ">>"
 
 badges(::GitHubActions) = Badge(
     "Build Status",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg?branch=main",
     "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions",
 )
 
