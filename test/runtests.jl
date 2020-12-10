@@ -61,9 +61,8 @@ mktempdir() do dir
 
                 # Quite a bit of output depends on the Julia version,
                 # and the test fixtures are made with Julia 1.5.
-                # These tests fail on 32-bit
                 # TODO: Keep this on the latest stable Julia version.
-                if VERSION.major == 1 && VERSION.minor == 5 && Sys.WORD_SIZE == 64
+                if VERSION.major == 1 && VERSION.minor == 5
                     include("reference.jl")
                 else
                     @info "Skipping reference tests" VERSION
