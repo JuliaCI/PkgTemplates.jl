@@ -22,7 +22,7 @@ const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to 
         x64=true,
         x86=false,
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
     )
 
 Integrates your packages with [GitHub Actions](https://github.com/features/actions).
@@ -53,7 +53,7 @@ $EXTRA_VERSIONS_DOC
     x64::Bool = true
     x86::Bool = false
     coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
 end
 
 source(p::GitHubActions) = p.file
