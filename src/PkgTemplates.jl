@@ -16,6 +16,7 @@ export
     Template,
     AppVeyor,
     BlueStyleBadge,
+    Benchmarks,
     CirrusCI,
     Citation,
     Codecov,
