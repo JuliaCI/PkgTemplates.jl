@@ -138,6 +138,7 @@ function (t::Template)(pkg::AbstractString)
     end
 
     @info "New package is at $pkg_dir"
+    return pkg_dir
 end
 
 function Base.:(==)(a::Template, b::Template)
