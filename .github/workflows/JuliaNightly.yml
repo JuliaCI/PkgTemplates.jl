@@ -13,16 +13,14 @@ jobs:
         with:
           version: nightly
           arch: x64
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         env:
-          cache-name: cache-artifacts
+          cache-name: julia-nightly-cache-artifacts
         with:
           path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          key: ${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
           restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+            ${{ env.cache-name }}-
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           git config --global user.name Tester
