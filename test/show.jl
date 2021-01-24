@@ -55,6 +55,7 @@ end
                   file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
                   destination: "README.md"
                   inline_badges: false
+                  badge_order: DataType[Documenter{GitHubActions}, Documenter{GitLabCI}, Documenter{TravisCI}, GitHubActions, GitLabCI, TravisCI, AppVeyor, DroneCI, CirrusCI, Codecov, Coveralls, BlueStyleBadge, ColPracBadge]
                 SrcDir:
                   file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
                 TagBot:
