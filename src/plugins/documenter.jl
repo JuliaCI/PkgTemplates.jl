@@ -4,7 +4,6 @@ const DOCUMENTER_DEP = PackageSpec(;
 )
 
 struct NoDeploy end
-const DeployStyle = Union{TravisCI, GitHubActions, GitLabCI, NoDeploy}
 const YesDeploy = Union{TravisCI, GitHubActions, GitLabCI}
 const GitHubPagesStyle = Union{TravisCI, GitHubActions}
 
@@ -23,7 +22,7 @@ Logo information for documentation.
 end
 
 """
-    Documenter{T<:Union{TravisCI, GitLabCI, GitHubActions, NoDeploy}}(;
+    Documenter{T}(;
         make_jl="$(contractuser(default_file("docs", "make.jl")))",
         index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
@@ -61,7 +60,7 @@ or `Nothing` to only support local documentation builds.
     If deploying documentation with Travis CI, don't forget to complete
     [the required configuration](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
 """
-struct Documenter{T<:DeployStyle} <: Plugin
+struct Documenter{T} <: Plugin
     assets::Vector{String}
     logo::Logo
     makedocs_kwargs::Dict{Symbol}
@@ -80,7 +79,7 @@ function Documenter{T}(;
     make_jl::AbstractString=default_file("docs", "make.jl"),
     index_md::AbstractString=default_file("docs", "src", "index.md"),
     devbranch::Union{String, Nothing}=nothing,
-) where T <: DeployStyle
+) where {T}
     return Documenter{T}(
         assets,
         logo,

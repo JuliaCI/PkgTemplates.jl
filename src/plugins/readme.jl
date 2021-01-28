@@ -17,6 +17,7 @@ Creates a `README` file that contains badges for other included plugins.
     file::String = default_file("README.md")
     destination::String = "README.md"
     inline_badges::Bool = false
+    badge_order::Vector{DataType} = default_badge_order()
 end
 
 source(p::Readme) = p.file
@@ -26,7 +27,7 @@ function view(p::Readme, t::Template, pkg::AbstractString)
     # Explicitly ordered badges go first.
     strings = String[]
     done = DataType[]
-    foreach(badge_order()) do T
+    foreach(p.badge_order) do T
         if hasplugin(t, T)
             append!(strings, badges(getplugin(t, T), t, pkg))
             push!(done, T)
@@ -45,7 +46,7 @@ function view(p::Readme, t::Template, pkg::AbstractString)
     )
 end
 
-badge_order() = [
+default_badge_order() = [
     Documenter{GitHubActions},
     Documenter{GitLabCI},
     Documenter{TravisCI},
