@@ -123,7 +123,7 @@ end
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Git(; ignore=["a", "b", "c"], manifest=true),
-            GitHubActions(; x86=true, linux=false, coverage=false),
+            GitHubActions(; destination="MyCI.yml", x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
             ProjectFile(; version=v"1"),

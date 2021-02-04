@@ -1,6 +1,6 @@
 # AllPlugins
 
-[![Build Status](https://github.com/tester/AllPlugins.jl/workflows/CI/badge.svg)](https://github.com/tester/AllPlugins.jl/actions)
+[![Build Status](https://github.com/tester/AllPlugins.jl/workflows/CI/badge.svg)](https://github.com/tester/AllPlugins.jl/actions?query=workflow:CI)
 [![Build Status](https://github.com/tester/AllPlugins.jl/badges/master/pipeline.svg)](https://github.com/tester/AllPlugins.jl/pipelines)
 [![Coverage](https://github.com/tester/AllPlugins.jl/badges/master/coverage.svg)](https://github.com/tester/AllPlugins.jl/commits/master)
 [![Build Status](https://travis-ci.com/tester/AllPlugins.jl.svg?branch=master)](https://travis-ci.com/tester/AllPlugins.jl)
