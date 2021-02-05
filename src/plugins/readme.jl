@@ -38,7 +38,9 @@ function view(p::Readme, t::Template, pkg::AbstractString)
     end
     # And the rest go after, in no particular order.
     foreach(setdiff(map(typeof, t.plugins), done)) do T
-        append!(strings, badges(getplugin(t, T), t, pkg))
+        if !in(T, p.badge_off)
+            append!(strings, badges(getplugin(t, T), t, pkg))
+        end
     end
 
     return Dict(
