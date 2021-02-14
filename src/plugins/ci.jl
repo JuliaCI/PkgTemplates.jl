@@ -61,11 +61,12 @@ destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
 tags(::GitHubActions) = "<<", ">>"
 
 function badges(p::GitHubActions)
-    action = first(splitext(p.destination))
+    file = read(p.file, String)
+    action_name = strip(first(match(r"name:(.*)", file).captures))
     return Badge(
         "Build Status",
-        "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/$action/badge.svg",
-        "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions?query=workflow:$action",
+        "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/$action_name/badge.svg",
+        "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions?query=workflow:$action_name",
     )
 end
 

@@ -1,6 +1,7 @@
 @info "Running reference tests"
 
 const PROMPT = get(ENV, "PT_INTERACTIVE", "false") == "true" || !haskey(ENV, "CI")
+const STATIC_GHA = joinpath(@__DIR__, "fixtures", "CustomCI.yml")
 const STATIC_TXT = joinpath(@__DIR__, "fixtures", "static.txt")
 const STATIC_PNG = joinpath(@__DIR__, "fixtures", "static.png")
 const STATIC_DOCUMENTER = [
@@ -123,7 +124,7 @@ end
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Git(; ignore=["a", "b", "c"], manifest=true),
-            GitHubActions(; destination="MyCI.yml", x86=true, linux=false, coverage=false),
+            GitHubActions(; file=STATIC_GHA, x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
             ProjectFile(; version=v"1"),

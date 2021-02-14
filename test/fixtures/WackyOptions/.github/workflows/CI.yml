@@ -1,4 +1,4 @@
-name: CI
+name: CustomCI
 on:
   - push
   - pull_request
