@@ -127,7 +127,7 @@ end
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
-            Readme(; inline_badges=true),
+            Readme(; inline_badges=true, badge_off=[Codecov]),
             TagBot(;
                 trigger="OtherUser",
                 token=Secret("MYTOKEN"),
