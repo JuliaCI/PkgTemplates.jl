@@ -94,7 +94,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         # A failure looks like: `MethodError: no method matching isless(::Symbol, ::Bool)`
         with_pkg(t) do pkg
             pkg_dir = joinpath(t.dir, pkg)
-            @test isdir(joinpath(pkg_dir), "docs")
+            @test isdir(joinpath(pkg_dir, "docs"))
         end
     end
 end
