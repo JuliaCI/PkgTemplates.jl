@@ -128,7 +128,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
     "AUTHORS" => join(t.authors, ", "),
     "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
     "HAS_ASSETS" => !isempty(p.assets),
-    "MAKEDOCS_KWARGS" => map(((k, v),) -> k => repr(v), sort(collect(p.makedocs_kwargs))),
+    "MAKEDOCS_KWARGS" => map(((k, v),) -> k => repr(v), sort(collect(p.makedocs_kwargs), by=first)),
     "PKG" => pkg,
     "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
     "USER" => t.user,
