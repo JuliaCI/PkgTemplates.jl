@@ -86,4 +86,15 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
             end
         end
     end
+
+    # https://github.com/invenia/PkgTemplates.jl/issues/275
+    @testset "makedocs_kwargs sort bug" begin
+        p = Documenter(; makedocs_kwargs=Dict(:strict => true, :checkdocs => :exports))
+        t = tpl(; plugins=[p])
+        # A failure looks like: `MethodError: no method matching isless(::Symbol, ::Bool)`
+        with_pkg(t) do pkg
+            pkg_dir = joinpath(t.dir, pkg)
+            @test isdir(joinpath(pkg_dir, "docs"))
+        end
+    end
 end
