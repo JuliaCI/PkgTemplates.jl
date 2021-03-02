@@ -128,6 +128,7 @@ end
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true, badge_off=[Codecov]),
+            RegisterAction(; prompt="gimme version"),
             TagBot(;
                 trigger="OtherUser",
                 token=Secret("MYTOKEN"),
