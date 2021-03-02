@@ -33,6 +33,7 @@ export
     NoDeploy,
     ProjectFile,
     Readme,
+    Register,
     Secret,
     SrcDir,
     TagBot,
