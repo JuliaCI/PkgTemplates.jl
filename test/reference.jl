@@ -89,7 +89,7 @@ end
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
             AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(),
-            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
+            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(), RegisterAction()
         ])
     end
 

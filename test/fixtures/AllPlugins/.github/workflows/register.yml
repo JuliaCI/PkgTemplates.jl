@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: <<&PROMPT>>
+        description: Version to register or component to bump
         required: true
 
 jobs:

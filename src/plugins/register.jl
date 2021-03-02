@@ -1,5 +1,5 @@
 """
-    Register(;
+    RegisterAction(;
         file="$(contractuser(default_file("github", "workflows", "register.yml")))",
         destination="register.yml",
         prompt="Version to register or component to bump",
@@ -13,14 +13,14 @@ Add a GitHub Action workflow for registering a package with the general registry
   relative to `.github/workflows`.
 - `prompt::AbstractString`: Prompt for workflow dispatch.
 """
-@plugin struct CompatHelper <: FilePlugin
+@plugin struct RegisterAction <: FilePlugin
     file::String = default_file("github", "workflows", "register.yml")
     destination::String = "register.yml"
     prompt::String = "Version to register or component to bump"
 end
 
-source(p::CompatHelper) = p.file
-destination(p::CompatHelper) = joinpath(".github", "workflows", p.destination)
-tags(::CompatHelper) = "<<", ">>"
+source(p::RegisterAction) = p.file
+destination(p::RegisterAction) = joinpath(".github", "workflows", p.destination)
+tags(::RegisterAction) = "<<", ">>"
 
-view(p::CompatHelper, ::Template, ::AbstractString) = Dict("PROMPT" => p.prompt)
+view(p::RegisterAction, ::Template, ::AbstractString) = Dict("PROMPT" => p.prompt)
