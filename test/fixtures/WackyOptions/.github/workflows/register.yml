@@ -5,8 +5,7 @@ on:
       version:
         description: gimme version
         required: true
-
-jobs:
+obs:
   register:
     runs-on: ubuntu-latest
     steps:
