@@ -5,7 +5,8 @@
         prompt="Version to register or component to bump",
     )
 
-Add a GitHub Action workflow for registering a package with the general registry via workflow dispatch. See https://github.com/julia-actions/RegisterAction for more information.
+Add a GitHub Actions workflow for registering a package with the General registry via workflow dispatch.
+See [here](https://github.com/julia-actions/RegisterAction) for more information.
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the workflow file.
