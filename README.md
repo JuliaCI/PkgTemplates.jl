@@ -18,7 +18,7 @@ pkg> add PkgTemplates  # Press ']' to enter the Pkg REPL mode.
 
 ## Usage
 
-### TL;DR
+### Interactive Generation
 
 You can fully customize your package interactively with:
 
