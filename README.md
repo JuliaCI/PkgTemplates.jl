@@ -18,6 +18,18 @@ pkg> add PkgTemplates  # Press ']' to enter the Pkg REPL mode.
 
 ## Usage
 
+### Interactive Generation
+
+You can fully customize your package interactively with:
+
+```julia
+using PkgTemplates
+
+generate_interactive("MyPkg")
+```
+
+### Manual creation
+
 Creating a `Template` is as simple as:
 
 ```jl
