@@ -5,6 +5,7 @@
 [![CI](https://github.com/invenia/PkgTemplates.jl/workflows/CI/badge.svg)](https://github.com/invenia/PkgTemplates.jl/actions?query=workflow%3ACI)
 [![Codecov](https://codecov.io/gh/invenia/PkgTemplates.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/PkgTemplates.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
+[![ColPrac: Contributor Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 
 **PkgTemplates creates new Julia packages in an easy, repeatable, and customizable way.**
 
@@ -70,4 +71,5 @@ For a much more detailled overview, please see the documentation.
 ## Contributing
 
 Issues and pull requests are welcome!
-For some more specific tips, see the developer documentation.
+New contributors should make sure to read the [ColPrac Contributor Guide](https://github.com/SciML/ColPrac).
+For some more PkgTemplates-specific tips, see the developer documentation.
