@@ -40,6 +40,10 @@ view(::License, t::Template, ::AbstractString) = Dict(
     "YEAR" => year(today()),
 )
 
+function isfixable(::License, pkg_dir)
+    return !any(isfile, joinpath.(pkg_dir, ("LICENSE", "LICENSE.md")))
+end
+
 function prompt(::Type{License}, ::Type, ::Val{:name})
     options = readdir(default_file("licenses"))
     # Move MIT to the top.

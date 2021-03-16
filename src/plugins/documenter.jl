@@ -161,6 +161,9 @@ function validate(p::Documenter{T}, t::Template) where T <: YesDeploy
     end
 end
 
+# Do not edit existing docs.
+isfixable(::Documenter, pkg_dir) = !isdir(joinpath(pkg_dir, "docs"))
+
 function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     pkg = basename(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")

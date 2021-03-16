@@ -38,3 +38,7 @@ function compat_version(v::VersionNumber)
         "$(v.major).$(v.minor).$(v.patch)"
     end
 end
+
+function isfixable(::ProjectFile, pkg_dir)
+    return !any(isfile, joinpath.(pkg_dir, ("Project.toml", "JuliaProject.toml")))
+end
