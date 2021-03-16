@@ -8,7 +8,7 @@ CurrentModule = PkgTemplates
 Pages = ["developer.md"]
 ```
 
-PkgTemplates can be easily extended by adding new [`Plugin`](@ref)s.
+[PkgTemplates](https://github.com/invenia/PkgTemplates.jl/) can be easily extended by adding new [`Plugin`](@ref)s.
 
 There are three types of plugins: [`Plugin`](@ref), [`FilePlugin`](@ref), and [`BadgePlugin`](@ref).
 
