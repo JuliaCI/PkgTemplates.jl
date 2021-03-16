@@ -38,7 +38,7 @@ Creating a `Template` is as simple as:
 
 ```jl
 using PkgTemplates
-t = Template()
+tpl = Template()
 ```
 
 The no-keywords constructor assumes the existence of some preexisting Git configuration (set with `git config --global`):
@@ -50,13 +50,13 @@ The no-keywords constructor assumes the existence of some preexisting Git config
 Once you have a `Template`, use it to generate a package:
 
 ```jl
-t("MyPkg")
+tpl("MyPkg")
 ```
 
 However, it's probably desirable to customize the template to your liking with various options and plugins:
 
 ```jl
-t = Template(;
+tpl = Template(;
     dir="~/code",
     plugins=[
         Git(; manifest=true, ssh=true),
