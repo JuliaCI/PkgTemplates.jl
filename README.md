@@ -66,10 +66,10 @@ t = Template(;
 
 ---
 
-For a much more detailled overview, please see the documentation.
+For a much more detailed overview, please see [the User Guide documentation](https://invenia.github.io/PkgTemplates.jl/stable/user/).
 
 ## Contributing
 
 Issues and pull requests are welcome!
 New contributors should make sure to read the [ColPrac Contributor Guide](https://github.com/SciML/ColPrac).
-For some more PkgTemplates-specific tips, see the developer documentation.
+For some more PkgTemplates-specific tips, see the [Developer Guide documentation](https://invenia.github.io/PkgTemplates.jl/stable/developer/).
