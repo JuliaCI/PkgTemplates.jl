@@ -23,9 +23,8 @@ pkg> add PkgTemplates  # Press ']' to enter the Pkg REPL mode.
 
 You can fully customize your package interactively with:
 
-```julia
+```jl
 using PkgTemplates
-
 generate_interactive("MyPkg")
 ```
 
