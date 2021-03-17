@@ -8,7 +8,7 @@ CurrentModule = PkgTemplates
 Pages = ["user.md"]
 ```
 
-Using PkgTemplates is straightforward.
+Using [PkgTemplates](https://github.com/invenia/PkgTemplates.jl/) is straightforward.
 Just create a [`Template`](@ref), and call it on a package name to generate that package:
 
 ```julia
