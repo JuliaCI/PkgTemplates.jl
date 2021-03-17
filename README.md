@@ -29,7 +29,7 @@ You can fully customize your package interactively with:
 
 ```jl
 using PkgTemplates
-generate_interactive("MyPkg")
+Template(interactive=true)("MyPkg")
 ```
 
 ### Manual creation
