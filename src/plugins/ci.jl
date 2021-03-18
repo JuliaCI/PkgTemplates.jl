@@ -62,7 +62,13 @@ tags(::GitHubActions) = "<<", ">>"
 
 function badges(p::GitHubActions)
     file = read(p.file, String)
-    action_name = strip(first(match(r"name:(.*)", file).captures))
+    name_match = match(r"name:(.*)", file)
+    action_name = if name_match !== nothing
+        strip(first(name_match.captures))
+    else
+        # If no `name` entry, GitHub sets it to file path relative to root of the repo.
+        destination(p)
+    end
     return Badge(
         "Build Status",
         "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/$action_name/badge.svg",
