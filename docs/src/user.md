@@ -86,6 +86,7 @@ ColPracBadge
 ```@docs
 Develop
 Citation
+RegisterAction
 ```
 
 ## A More Complicated Example

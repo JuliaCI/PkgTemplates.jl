@@ -89,7 +89,7 @@ end
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
             AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(),
-            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
+            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(), RegisterAction(),
         ])
     end
 
@@ -128,6 +128,7 @@ end
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true, badge_off=[Codecov]),
+            RegisterAction(; prompt="gimme version"),
             TagBot(;
                 trigger="OtherUser",
                 token=Secret("MYTOKEN"),
