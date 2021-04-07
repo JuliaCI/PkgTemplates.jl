@@ -1,3 +1,32 @@
+"""
+PkgTemplates creates new Julia packages in an easy, repeatable, and customizable way.
+
+# Usage
+You can fully customize your package interactively with:
+```
+using PkgTemplates
+Template(interactive=true)("MyPkg")
+```
+Alternatively, you can manually create a `Template` with:
+```jl
+using PkgTemplates
+tpl = Template()
+```
+
+The no-keywords constructor assumes the existence of some preexisting Git
+configuration (set with `git config --global`):
+- `user.name`: Your real name, e.g. John Smith.
+- `user.email`: Your email address, eg. john.smith@acme.corp.
+- `github.user`: Your GitHub username: e.g. john-smith.
+
+Once you have a `Template`, use it to generate a package:
+```jl
+tpl("MyPkg")
+```
+
+For a much more detailed overview, please see [the User Guide
+documentation](https://invenia.github.io/PkgTemplates.jl/stable/user/).
+"""
 module PkgTemplates
 
 using Base: active_project, contractuser
