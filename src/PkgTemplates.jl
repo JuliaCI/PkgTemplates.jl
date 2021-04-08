@@ -1,3 +1,4 @@
+@doc read(joinpath(dirname(@__DIR__), "README.md"), String)
 module PkgTemplates
 
 using Base: active_project, contractuser
