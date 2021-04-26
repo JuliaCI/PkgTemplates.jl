@@ -11,6 +11,7 @@
         gpg=nothing,
         gpg_password=nothing,
         registry=nothing,
+        registry_ssh=nothing,
         branches=nothing,
         dispatch=nothing,
         dispatch_delay=nothing,
@@ -30,6 +31,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 - `gpg::Secret`: Name of the GPG private key secret to use.
 - `gpg_password::Secret`: Name of the GPG private key password secret to use.
 - `registry::AbstractString`: Custom registry, in the format `owner/repo`.
+- `registry_ssh::Secret`: Name of the private key secret for your custom registry's deployment, e.eg. `Secret("REGISTRY_SSH_KEY")`.
 - `branches::Bool`: Whether not to enable the `branches` option.
 - `dispatch::Bool`: Whether or not to enable the `dispatch` option.
 - `dispatch_delay::Int`: Number of minutes to delay for dispatch events.
@@ -46,6 +48,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
     gpg::Union{Secret, Nothing} = nothing
     gpg_password::Union{Secret, Nothing} = nothing
     registry::Union{String, Nothing} = nothing
+    registry_ssh::Union{Secret, Nothing} = nothing
     branches::Union{Bool, Nothing} = nothing
     dispatch::Union{Bool, Nothing} = nothing
     dispatch_delay::Union{Int, Nothing} = nothing
@@ -74,6 +77,7 @@ function view(p::TagBot, ::Template, ::AbstractString)
         "GPG" => p.gpg,
         "GPG_PASSWORD" => p.gpg_password,
         "REGISTRY" => p.registry,
+        "REGISTRY_SSH" => p.registry_ssh,
         "SSH" => p.ssh,
         "SSH_PASSWORD" => p.ssh_password,
         "TOKEN" => p.token,
