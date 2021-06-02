@@ -1,7 +1,15 @@
-const DOCUMENTER_DEP = PackageSpec(;
-    name="Documenter",
-    uuid="e30172f5-a6a5-5a46-863b-614d45cd2de4",
-)
+const DOCUMENTER_UUID = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+@static if Base.VERSION >= v"1.7-"
+    const DOCUMENTER_DEP = PackageSpec(;
+        name="Documenter",
+        uuid=Base.UUID(DOCUMENTER_UUID),
+    )
+else
+    const DOCUMENTER_DEP = PackageSpec(;
+        name="Documenter",
+        uuid=DOCUMENTER_UUID,
+    )
+end
 
 struct NoDeploy end
 const YesDeploy = Union{TravisCI, GitHubActions, GitLabCI}

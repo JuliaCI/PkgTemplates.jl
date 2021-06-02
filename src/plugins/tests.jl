@@ -1,5 +1,9 @@
 const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
+@static if Base.VERSION >= v"1.7-"
+    const TEST_DEP = PackageSpec(; name="Test", uuid=Base.UUID(TEST_UUID))
+else
+    const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
+end
 
 """
     Tests(; file="$(contractuser(default_file("test", "runtests.jl")))", project=false)
