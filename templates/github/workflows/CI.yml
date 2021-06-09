@@ -69,13 +69,15 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
+      # Clone registry using git. Ref https://github.com/julia-actions/julia-runtest/pull/17
+      - run: julia -e 'using Pkg; Pkg.Registry.add("General")'
+        env:
+          JULIA_PKG_SERVER: ""
       - run: |
           julia --project=docs -e '
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
-        env:
-          JULIA_PKG_SERVER: ""
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
