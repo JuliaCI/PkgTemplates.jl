@@ -48,6 +48,8 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
+        env:
+          JULIA_PKG_SERVER: ""
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
