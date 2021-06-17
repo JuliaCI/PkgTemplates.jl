@@ -237,7 +237,9 @@ end
                 DONE,            # Customize nothing
                 "username", LF,  # Enter user after it's prompted
             )
-            mock(PT.default_user => () -> "") do _du
+
+            patch = @patch PkgTemplates.default_user() = ""
+            apply(patch) do
                 @test Template(; interactive=true) == Template(; user="username")
             end
         end
