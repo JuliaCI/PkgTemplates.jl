@@ -84,7 +84,7 @@ Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
 function Template(::Val{false}; kwargs...)
     kwargs = Dict(kwargs)
 
-    user = getkw!(kwargs, :user)
+    user = @mock getkw!(kwargs, :user)
     dir = abspath(expanduser(getkw!(kwargs, :dir)))
     host = replace(getkw!(kwargs, :host), r".*://" => "")
     julia = getkw!(kwargs, :julia)
