@@ -84,7 +84,7 @@ Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
 function Template(::Val{false}; kwargs...)
     kwargs = Dict(kwargs)
 
-    user = getkw!(kwargs, :user)
+    user = @mock getkw!(kwargs, :user)
     dir = abspath(expanduser(getkw!(kwargs, :dir)))
     host = replace(getkw!(kwargs, :host), r".*://" => "")
     julia = getkw!(kwargs, :julia)
@@ -216,7 +216,7 @@ end
 prompt(::Type{Template}, ::Type, ::Val{:pkg}) = Base.prompt("Package name")
 
 function prompt(::Type{Template}, ::Type, ::Val{:user})
-    return if isempty(default_user())
+    return if isempty(@mock default_user())
         input = Base.prompt("Enter value for 'user' (String, required)")
         input === nothing && throw(InterruptException())
         return input

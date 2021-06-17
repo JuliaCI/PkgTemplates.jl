@@ -5,11 +5,15 @@
         @testset "user" begin
             msg = sprint(showerror, PT.MissingUserException{TravisCI}())
             @test startswith(msg, "TravisCI: ")
-            mock(PT.default_user => () -> "") do _du
+
+            patch = @patch PkgTemplates.getkw!(kwargs, k) = ""
+            apply(patch) do
                 @test_throws PT.MissingUserException Template()
                 @test isempty(Template(; plugins=[!Git]).user)
             end
-            mock(PT.default_user => () -> "username") do _du
+
+            patch = @patch PkgTemplates.getkw!(kwargs, k) = "username"
+            apply(patch) do
                 @test Template().user == "username"
             end
         end
@@ -76,7 +80,9 @@
         foreach((GitHubActions, TravisCI, GitLabCI)) do T
             @test_throws ArgumentError tpl(; plugins=[Documenter{T}()])
         end
-        mock(LibGit2.getconfig => (_k, _d) -> "") do _gc
+
+        patch = @patch LibGit2.getconfig(r, n) = ""
+        apply(patch) do
             @test_throws ArgumentError tpl(; plugins=[Git()])
         end
     end
@@ -95,7 +101,9 @@ end
 
     t = tpl()
     pkg = pkgname()
-    mock(LibGit2.init => dir -> (@test isdir(dir); error())) do _init
+
+    patch = @patch LibGit2.init(pkg_dir) = error()
+    apply(patch) do
         @test_throws ErrorException @suppress t(pkg)
     end
     @test !isdir(joinpath(t.dir, pkg))

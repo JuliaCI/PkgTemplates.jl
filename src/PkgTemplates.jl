@@ -13,6 +13,8 @@ using UUIDs: uuid4
 using Mustache: render
 using Parameters: @with_kw_noshow
 
+using Mocking
+
 export
     Template,
     AppVeyor,
