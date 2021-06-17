@@ -7,12 +7,14 @@ using Random: Random, randstring
 using Test: @test, @testset, @test_broken, @test_logs, @test_throws
 
 using DeepDiffs: deepdiff
-using SimpleMock: mock
+using Mocking
 using Suppressor: @suppress
 
 using PkgTemplates
-const PT = PkgTemplates
 
+Mocking.activate()
+
+const PT = PkgTemplates
 const USER = "tester"
 
 Random.seed!(1)
