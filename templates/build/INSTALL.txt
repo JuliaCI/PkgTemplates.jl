@@ -1,0 +1,18 @@
+
+By default, install.sh installs files under $HOME/.local.
+
+To install, optionally set the following environment variables and run
+install.sh.
+
+  NAME         project name (default: {{{LIB}}})
+  SOURCE_DIR   directory whose contents to copy (default: {{{LIB}}})
+  PREFIX       destination prefix (default: $HOME/.local)
+
+Examples:
+
+  $ ./install.sh                         # install in ~/.local
+  $ SOURCE_DIR={{{LIB}}} install.sh      # install in ~/.local ({{{LIB}}} is the default)
+  $ PREFIX=/usr/local ./install.sh       # install directly in /usr/local (no symlinks)
+
+To uninstall, make sure PREFIX and NAME have the same values used during
+install and run uninstall.sh.

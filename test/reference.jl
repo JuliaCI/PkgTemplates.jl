@@ -89,7 +89,8 @@ end
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
             AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(),
-            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(), RegisterAction(),
+            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), PackageCompilerLib(),
+            TravisCI(), RegisterAction(),
         ])
     end
 
@@ -126,6 +127,7 @@ end
             GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
+            PackageCompilerLib(; lib_name="foosball"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true, badge_off=[Codecov]),
             RegisterAction(; prompt="gimme version"),
