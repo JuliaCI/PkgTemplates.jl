@@ -1,0 +1,20 @@
+name: Format suggestions
+
+on:
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: 1
+      - run: |
+          julia  -e 'using Pkg; Pkg.add("JuliaFormatter")'
+          julia  -e 'using JuliaFormatter; format(".", BlueStyle(); verbose=true)'
+      - uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: JuliaFormatter
+          fail_on_error: true
