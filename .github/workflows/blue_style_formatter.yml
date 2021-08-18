@@ -13,7 +13,8 @@ jobs:
           version: 1
       - run: |
           julia  -e 'using Pkg; Pkg.add("JuliaFormatter")'
-          julia  -e 'using JuliaFormatter; format(".", BlueStyle(); verbose=true)'
+          julia  -e 'using JuliaFormatter; format("src/", BlueStyle(); verbose=true)'
+          julia  -e 'using JuliaFormatter; format("test/", BlueStyle(); verbose=true)'
       - uses: reviewdog/action-suggester@v1
         with:
           tool_name: JuliaFormatter
