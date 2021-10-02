@@ -32,7 +32,7 @@ Creates a Git repository and a `.gitignore` file.
     ignore::Vector{String} = String[]
     name::Union{String, Nothing} = nothing
     email::Union{String, Nothing} = nothing
-    branch::String = LibGit2.getconfig("init.defaultBranch", DEFAULT_DEFAULT_BRANCH)
+    branch::String = @mock(LibGit2.getconfig("init.defaultBranch", DEFAULT_DEFAULT_BRANCH))
     ssh::Bool = false
     jl::Bool = true
     manifest::Bool = false

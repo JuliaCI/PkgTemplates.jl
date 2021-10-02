@@ -87,8 +87,8 @@ end
         )
         if PT.git_is_installed()
             with_clean_gitconfig() do
-                run(`git config --global user.name Tester`)
-                run(`git config --global user.email te@st.er`)
+                run(`git config user.name Tester`)
+                run(`git config user.email te@st.er`)
                 f()
             end
         else

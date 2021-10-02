@@ -58,10 +58,26 @@ function with_clean_gitconfig(f)
             default
         end
     end
-    mktemp() do file, _io
-        withenv("GIT_CONFIG" => file) do
-            mock(_gc -> f(), LibGit2.getconfig => getconfig)
+    patch = @patch LibGit2.getconfig(key, default) = getconfig(key, default)
+    if !Sys.iswindows()
+        mktemp() do file, _io
+            withenv("GIT_CONFIG" => file) do
+                apply(patch) do
+                    f()
+                end
+            end
         end
+    else
+        # Windows gives a permission error if an external command like `git` tries
+        # to write to the file while Julia holds the `_io` handle.
+        # So we use the less-safe tempname approach.
+        file = touch(tempname())
+        withenv("GIT_CONFIG" => file) do
+            apply(patch) do
+                f()
+            end
+        end
+        rm(file)
     end
 end
 
