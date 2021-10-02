@@ -75,7 +75,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
     excludes = Dict{String, String}[]
     p.osx && p.x86 && push!(excludes, Dict("E_OS" => "macOS-latest", "E_ARCH" => "x86"))
 
-    return Dict(
+    v = Dict(
         "ARCH" => arch,
         "EXCLUDES" => excludes,
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
@@ -87,6 +87,11 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
         "USER" => t.user,
         "VERSIONS" => collect_versions(t, p.extra_versions),
     )
+    p = getplugin(t, Git)
+    if p !== nothing
+        v["BRANCH"] = p.branch
+    end
+    return v
 end
 
 """
