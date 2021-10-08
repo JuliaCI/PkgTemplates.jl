@@ -96,9 +96,9 @@ mktempdir() do dir
                 include("git.jl")
 
                 # Quite a bit of output depends on the Julia version,
-                # and the test fixtures are made with Julia 1.6.
+                # and the test fixtures are made with Julia 1.5.
                 # TODO: Keep this on the latest stable Julia version.
-                if VERSION.major == 1 && VERSION.minor == 6
+                if VERSION.major == 1 && VERSION.minor == 5
                     # Ideally we'd use `with_clean_gitconfig`, but it's way too slow.
                     branch = LibGit2.getconfig(
                         "init.defaultBranch",

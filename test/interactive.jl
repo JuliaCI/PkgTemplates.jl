@@ -200,10 +200,10 @@ end
             print(
                 stdin.buffer,
                 DOWN^2, CR, DONE,                        # Customize extra_versions
-                "\"1.1.1\", \"^1.6\", \"nightly\"", LF,  # Enter versions with quotes
+                "\"1.1.1\", \"^1.5\", \"nightly\"", LF,  # Enter versions with quotes
             )
             @test PT.interactive(TravisCI) == TravisCI(;
-                extra_versions=["1.1.1", "^1.6", "nightly"],
+                extra_versions=["1.1.1", "^1.5", "nightly"],
             )
         end
 
