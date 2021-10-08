@@ -1,7 +1,12 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+    <<#BRANCH>>
+      - <<BRANCH>>
+    <</BRANCH>>
+    tags: '*'
+  pull_request:
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
