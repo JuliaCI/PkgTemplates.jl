@@ -42,7 +42,7 @@ end
                   ignore: String[]
                   name: nothing
                   email: nothing
-                  branch: nothing
+                  branch: "main"
                   ssh: false
                   jl: true
                   manifest: false
@@ -79,7 +79,21 @@ end
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
             """
-        test_show(rstrip(expected), sprint(show, MIME("text/plain"), tpl(; authors=USER)))
+        # `with_clean_gitconfig` requires Git to be installed, but if Git is not installed,
+        # then we probably don't need to worry about any conflicting Git config files.
+        f = () -> test_show(
+            rstrip(expected),
+            sprint(show, MIME("text/plain"), tpl(; authors=USER)),
+        )
+        if PT.git_is_installed()
+            with_clean_gitconfig() do
+                run(`git config user.name Tester`)
+                run(`git config user.email te@st.er`)
+                f()
+            end
+        else
+            f()
+        end
     end
 
     @testset "show as serialization" begin

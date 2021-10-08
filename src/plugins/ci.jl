@@ -133,7 +133,7 @@ destination(::TravisCI) = ".travis.yml"
 
 badges(::TravisCI) = Badge(
     "Build Status",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch=master",
+    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch={{{BRANCH}}}",
     "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
 )
 
@@ -154,6 +154,7 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
         "ARCH" => arch,
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "EXCLUDES" => excludes,
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => hasplugin(t, Codecov),
@@ -213,6 +214,7 @@ function view(p::AppVeyor, t::Template, pkg::AbstractString)
 
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
         "PKG" => pkg,
@@ -307,19 +309,20 @@ destination(::GitLabCI) = ".gitlab-ci.yml"
 function badges(p::GitLabCI)
     ci = Badge(
         "Build Status",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/pipeline.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/{{{BRANCH}}}/pipeline.svg",
         "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/pipelines",
     )
     cov = Badge(
         "Coverage",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/coverage.svg",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/master",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/{{{BRANCH}}}/coverage.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/{{{BRANCH}}}",
     )
     return p.coverage ? [ci, cov] : [ci]
 end
 
 function view(p::GitLabCI, t::Template, pkg::AbstractString)
     return Dict(
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "HAS_COVERAGE" => p.coverage,
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
         "HOST" => t.host,

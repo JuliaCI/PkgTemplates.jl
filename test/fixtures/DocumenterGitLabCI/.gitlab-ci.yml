@@ -4,8 +4,7 @@
       julia --project=@. -e '
         using Pkg
         Pkg.build()
-        Pkg.test({{#HAS_COVERAGE}}coverage=true{{/HAS_COVERAGE}})'
-{{#HAS_COVERAGE}}
+        Pkg.test(coverage=true)'
 .coverage:
   coverage: /Test coverage (\d+\.\d+%)/
   after_script:
@@ -17,19 +16,18 @@
         c, t = get_summary(process_folder())
         using Printf
         @printf "Test coverage %.2f%%\n" 100c / t'
-{{/HAS_COVERAGE}}
-{{#VERSIONS}}
-Julia {{{.}}}:
-  image: julia:{{{.}}}
+Julia 1.0:
+  image: julia:1.0
   extends:
     - .script
-{{#HAS_COVERAGE}}
     - .coverage
-{{/HAS_COVERAGE}}
-{{/VERSIONS}}
-{{#HAS_DOCUMENTER}}
+Julia 1.5:
+  image: julia:1.5
+  extends:
+    - .script
+    - .coverage
 pages:
-  image: julia:{{{VERSION}}}
+  image: julia:1.0
   stage: deploy
   script:
     - |
@@ -38,8 +36,8 @@ pages:
         Pkg.develop(PackageSpec(path=pwd()))
         Pkg.instantiate()
         using Documenter: doctest
-        using {{{PKG}}}
-        doctest({{{PKG}}})
+        using DocumenterGitLabCI
+        doctest(DocumenterGitLabCI)
         include("docs/make.jl")'
     - mkdir -p public
     - mv docs/build public/dev
@@ -47,5 +45,4 @@ pages:
     paths:
       - public
   only:
-    - {{{BRANCH}}}
-{{/HAS_DOCUMENTER}}
+    - main
