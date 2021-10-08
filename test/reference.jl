@@ -127,7 +127,7 @@ end
                 devbranch="foobar",
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
-            Git(; ignore=["a", "b", "c"], manifest=true),
+            Git(; ignore=["a", "b", "c"], manifest=true, branch="whackybranch"),
             GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
