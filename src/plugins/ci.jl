@@ -60,10 +60,10 @@ source(p::GitHubActions) = p.file
 destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
 tags(::GitHubActions) = "<<", ">>"
 
-badges(::GitHubActions) = Badge(
+badges(p::GitHubActions) = Badge(
     "Build Status",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg?branch={{{BRANCH}}}",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions?query=branch%3A{{{BRANCH}}}+workflow%3ACI",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions/workflows/$(p.destination)/badge.svg?branch={{{BRANCH}}}",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions/workflows/$(p.destination)?query=branch%3A{{{BRANCH}}}",
 )
 
 function view(p::GitHubActions, t::Template, pkg::AbstractString)
