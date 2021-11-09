@@ -211,6 +211,17 @@ This function **must** be implemented.
 function destination end
 
 """
+    isfixable(p::FilePlugin) -> Bool
+
+Determines whether or not [`fixup`](@ref) should update the files created by `p`.
+
+By default, returns `true` if the [`destination(p)`](@ref) file does not exist.
+Subtype of [`FilePlugin`](@ref) should implement their own method if they require
+different behaviour.
+"""
+isfixable(p::FilePlugin, pkg_dir) = !isfile(joinpath(pkg_dir, destination(p)))
+
+"""
     Badge(hover::AbstractString, image::AbstractString, link::AbstractString)
 
 Container for Markdown badge data.

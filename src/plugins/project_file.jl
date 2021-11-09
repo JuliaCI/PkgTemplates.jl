@@ -15,7 +15,9 @@ priority(::ProjectFile, ::typeof(hook)) = typemax(Int) - 5
 
 function hook(p::ProjectFile, t::Template, pkg_dir::AbstractString)
     toml = Dict(
-        "name" => basename(pkg_dir),
+        "name" => let pkg = basename(pkg_dir)
+            endswith(pkg, ".jl") ? pkg[1:end-3] : pkg
+        end,
         "uuid" => string(uuid4()),
         "authors" => t.authors,
         "version" => string(p.version),
@@ -37,4 +39,8 @@ function compat_version(v::VersionNumber)
     else
         "$(v.major).$(v.minor).$(v.patch)"
     end
+end
+
+function isfixable(::ProjectFile, pkg_dir)
+    return !any(isfile, joinpath.(pkg_dir, ("Project.toml", "JuliaProject.toml")))
 end

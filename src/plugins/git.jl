@@ -56,6 +56,16 @@ function validate(p::Git, t::Template)
     end
 end
 
+# fixup only if pkg_dir not a git repo
+function isfixable(::Git, pkg_dir)
+    try
+        r = GitRepo(pkg_dir)
+        return !isa(r, GitRepo)
+    catch
+        return true
+    end
+end
+
 # Set up the Git repository.
 function prehook(p::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(@mock LibGit2.init(pkg_dir)) do repo
