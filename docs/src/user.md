@@ -79,6 +79,7 @@ Logo
 ```@docs
 BlueStyleBadge
 ColPracBadge
+PkgEvalBadge
 ```
 
 ### Miscellaneous
