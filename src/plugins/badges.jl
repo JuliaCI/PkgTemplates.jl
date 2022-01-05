@@ -34,3 +34,18 @@ function badges(::ColPracBadge)
         "https://github.com/SciML/ColPrac",
     )
 end
+
+"""
+    PkgEvalBadge()
+
+Adds a [`PkgEval`](https://github.com/JuliaCI/PkgEval.jl) badge to the [`Readme`](@ref) file.
+"""
+struct PkgEvalBadge <: BadgePlugin end
+
+function badges(::PkgEvalBadge)
+    return Badge(
+    "PkgEval",
+    "https://juliaci.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.svg",
+    "https://juliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html"
+    )
+end
