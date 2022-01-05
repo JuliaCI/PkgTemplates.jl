@@ -45,7 +45,7 @@ struct PkgEvalBadge <: BadgePlugin end
 function badges(::PkgEvalBadge)
     return Badge(
         "PkgEval",
-        "https://juliaci.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.svg",
-        "https://juliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html"
+        "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.svg",
+        "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html"
     )
 end
