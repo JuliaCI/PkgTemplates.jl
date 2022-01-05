@@ -19,7 +19,7 @@ end
               file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
               destination: "README.md"
               inline_badges: false
-              badge_order: DataType[Documenter{GitHubActions}, Documenter{GitLabCI}, Documenter{TravisCI}, GitHubActions, GitLabCI, TravisCI, AppVeyor, DroneCI, CirrusCI, Codecov, Coveralls, BlueStyleBadge, ColPracBadge]
+              badge_order: DataType[Documenter{GitHubActions}, Documenter{GitLabCI}, Documenter{TravisCI}, GitHubActions, GitLabCI, TravisCI, AppVeyor, DroneCI, CirrusCI, Codecov, Coveralls, BlueStyleBadge, ColPracBadge, PkgEvalBadge]
               badge_off: DataType[]
             """
         test_show(rstrip(expected), sprint(show, MIME("text/plain"), Readme()))

@@ -76,6 +76,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @testset "$BadgeType" for (BadgeType, text) in (
             BlueStyleBadge => "BlueStyle",
             ColPracBadge => "ColPrac",
+            PkgEvalBadge => "PkgEval",
         )
             @test BadgeType <: PT.BadgePlugin
             t = tpl(; plugins=[BadgeType()])
