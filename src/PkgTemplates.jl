@@ -34,6 +34,7 @@ export
     License,
     Logo,
     NoDeploy,
+    PackageCompiler,
     ProjectFile,
     Readme,
     RegisterAction,
