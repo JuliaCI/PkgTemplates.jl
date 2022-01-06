@@ -40,6 +40,10 @@ jobs:
           - os: ubuntu-latest
             version: 1.5
             arch: x64
+          # Add 1.7.1 to run the reference tests
+          - os: ubuntu-latest
+            version: 1.7.1
+            arch: x64
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1

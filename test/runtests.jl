@@ -102,7 +102,7 @@ mktempdir() do dir
                 # Quite a bit of output depends on the Julia version,
                 # and the test fixtures are made with Julia 1.7.
                 # TODO: Keep this on the latest stable Julia version.
-                if VERSION.major == 1 && VERSION.minor == 7
+                if VERSION == v"1.7.1"
                     # Ideally we'd use `with_clean_gitconfig`, but it's way too slow.
                     branch = LibGit2.getconfig(
                         "init.defaultBranch",
