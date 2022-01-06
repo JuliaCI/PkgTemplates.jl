@@ -21,8 +21,19 @@ function hook(p::ProjectFile, t::Template, pkg_dir::AbstractString)
         "version" => string(p.version),
         "compat" => Dict("julia" => compat_version(t.julia)),
     )
-    open(io -> TOML.print(io, toml), joinpath(pkg_dir, "Project.toml"), "w")
+    write_project(joinpath(pkg_dir, "Project.toml"), toml)
 end
+
+# Taken from:
+# https://github.com/JuliaLang/Pkg.jl/blob/2341a067973467949653928ab9f49d98cae6057e/src/project.jl#L175-L177
+_project_key_order = ["name", "uuid", "keywords", "license", "desc", "deps", "compat"]
+project_key_order(key::String) =
+    something(findfirst(x -> x == key, _project_key_order), length(_project_key_order) + 1)
+
+write_project(path::AbstractString, dict) =
+    open(io -> write_project(io, dict), path; write = true)
+write_project(io::IO, dict) =
+    TOML.print(io, dict, sorted = true, by = key -> (project_key_order(key), key))
 
 """
     compat_version(v::VersionNumber) -> String

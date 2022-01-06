@@ -65,7 +65,7 @@ function pin_documenter(project_dir::AbstractString)
     toml = joinpath(project_dir, "Project.toml")
     project = TOML.parsefile(toml)
     filter!(p -> p.first == "Documenter", project["deps"])
-    open(io -> TOML.print(io, project), toml, "w")
+    PT.write_project(toml, project)
 end
 
 function test_all(pkg::AbstractString; kwargs...)
