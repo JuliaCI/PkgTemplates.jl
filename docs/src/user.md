@@ -87,6 +87,7 @@ ColPracBadge
 Develop
 Citation
 RegisterAction
+PackageCompilerLib
 ```
 
 ## A More Complicated Example
@@ -124,6 +125,21 @@ Template(;
     ],
 )
 ```
+
+Here's one that generates code to build a C library using PackageCompiler.jl.
+
+```julia
+Template(;
+    user="my-username",
+    dir="~/MyLib",
+    authors="Wiley Coyote",
+    julia=v"1.6",
+    plugins=[
+        PackageCompilerLib(lib_name="mylib"),
+    ],
+)
+```
+
 
 ## Custom Template Files
 
