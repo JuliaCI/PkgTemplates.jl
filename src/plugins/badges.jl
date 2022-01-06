@@ -38,7 +38,7 @@ end
 """
     PkgEvalBadge()
 
-Adds a [`PkgEval`](https://github.com/JuliaCI/PkgEval.jl) badge to the [`Readme`](@ref) file.
+Adds a [`PkgEval` badge](https://github.com/JuliaCI/NanosoldierReports#pkgeval-reports) to the [`Readme`](@ref) file.
 """
 struct PkgEvalBadge <: BadgePlugin end
 
