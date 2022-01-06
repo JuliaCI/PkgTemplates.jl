@@ -16,7 +16,7 @@ priority(::ProjectFile, ::typeof(hook)) = typemax(Int) - 5
 function hook(p::ProjectFile, t::Template, pkg_dir::AbstractString)
     toml = Dict(
         "name" => basename(pkg_dir),
-        "uuid" => string(uuid4()),
+        "uuid" => string(@mock uuid4()),
         "authors" => t.authors,
         "version" => string(p.version),
         "compat" => Dict("julia" => compat_version(t.julia)),

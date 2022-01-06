@@ -1,10 +1,11 @@
-using Base: contractuser
+using Base: UUID, contractuser
 using Base.Filesystem: path_separator
 
 using LibGit2: LibGit2, GitCommit, GitRemote, GitRepo
 using Pkg: Pkg, PackageSpec, TOML
 using Random: Random, randstring
 using Test: @test, @testset, @test_broken, @test_logs, @test_throws
+using UUIDs: uuid4
 
 using DeepDiffs: deepdiff
 using Mocking
@@ -27,7 +28,10 @@ pkgname() = titlecase(randstring('A':'Z', 16))
 
 # Create a randomly named package with a template, and delete it afterwards.
 function with_pkg(f::Function, t::Template, pkg::AbstractString=pkgname())
-    @suppress t(pkg)
+    patch = @patch uuid4() = UUID("c51a4d33-e9a4-4efb-a257-e0de888ecc28")
+    @suppress apply(patch) do
+        t(pkg)
+    end 
     try
         f(pkg)
     finally
