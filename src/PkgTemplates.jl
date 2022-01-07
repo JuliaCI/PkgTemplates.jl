@@ -34,6 +34,7 @@ export
     License,
     Logo,
     NoDeploy,
+    PkgEvalBadge,
     ProjectFile,
     Readme,
     RegisterAction,

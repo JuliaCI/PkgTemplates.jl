@@ -131,6 +131,7 @@ end
             GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
+            PkgEvalBadge(),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true, badge_off=[Codecov]),
             RegisterAction(; prompt="gimme version"),
