@@ -48,7 +48,6 @@ function view(p::Readme, t::Template, pkg::AbstractString)
         "HAS_CITATION" => hasplugin(t, Citation) && getplugin(t, Citation).readme,
         "HAS_INLINE_BADGES" => !isempty(strings) && p.inline_badges,
         "PKG" => pkg,
-        "PKG1" => first(pkg) # for PkgEval badge, need first character
     )
 end
 

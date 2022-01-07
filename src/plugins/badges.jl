@@ -49,3 +49,7 @@ function badges(::PkgEvalBadge)
         "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html"
     )
 end
+
+function view(::PkgEvalBadge, t::Template, pkg::AbstractString)
+    return Dict("PKG1" => first(pkg), "PKG" => pkg)
+end
