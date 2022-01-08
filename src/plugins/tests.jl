@@ -54,10 +54,9 @@ function add_test_dependency(pkg_dir::AbstractString)
     toml = TOML.parsefile(path)
     get!(toml, "extras", Dict())["Test"] = TEST_UUID
     get!(toml, "targets", Dict())["test"] = ["Test"]
-    open(io -> TOML.print(io, toml), path, "w")
+    write_project(path, toml)
 
     # Generate the manifest by updating the project.
-    # This also ensures that keys in Project.toml are sorted properly.
     touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
     with_project(Pkg.update, pkg_dir)
 end
