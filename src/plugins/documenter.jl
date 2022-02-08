@@ -108,12 +108,12 @@ badges(::Documenter{<:GitHubPagesStyle}) = [
     Badge(
         "Stable",
         "https://img.shields.io/badge/docs-stable-blue.svg",
-        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/stable",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/stable/",
     ),
     Badge(
         "Dev",
         "https://img.shields.io/badge/docs-dev-blue.svg",
-        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/dev",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/dev/",
     ),
 ]
 badges(::Documenter{GitLabCI}) = Badge(
