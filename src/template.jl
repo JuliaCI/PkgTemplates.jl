@@ -184,7 +184,7 @@ function interactive(::Type{Template}; kwargs...)
     # Make sure we don't try to show a menu with < 2 options.
     isempty(customizable) && return Template(; kwargs...)
     just_one = length(customizable) == 1
-    just_one && push(customizable, "None")
+    just_one && push!(customizable, "None")
 
     try
         println("Template keywords to customize:")
