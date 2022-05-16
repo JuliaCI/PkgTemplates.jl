@@ -65,6 +65,7 @@ jobs:
   docs:
     name: Documentation
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
