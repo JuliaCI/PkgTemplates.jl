@@ -125,6 +125,7 @@ end
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
                 devbranch="foobar",
+                edit_link=:commit,
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Git(; ignore=["a", "b", "c"], manifest=true, branch="whackybranch"),
