@@ -36,7 +36,11 @@ jobs:
           - os: windows-latest
             arch: x86
         include:
-          # Add 1.7.2 to run the reference tests
+          # Add specific version used to run the reference tests.
+          # Must be kept in sync with version check in `test/runtests.jl`,
+          # and with the branch protection rules on the repository which
+          # require this specific job to pass on all PRs
+          # (see Settings > Branches > Branch protection rules).
           - os: ubuntu-latest
             version: 1.7.2
             arch: x64
