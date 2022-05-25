@@ -169,10 +169,12 @@ end
             print(
                 stdin.buffer,
                 DOWN^2, CR,        # Select GitLabCI
-                DOWN^3, CR, DONE,  # Customize index_md
+                DOWN^2, CR,        # Customize edit_link
+                DOWN, CR, DONE,    # Customize index_md
+                ":commit", LF,     # Enter edit_link
                 "x.txt", LF,       # Enter index file
             )
-            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
+            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; edit_link=:commit, index_md="x.txt")
 
             print(
                 stdin.buffer,

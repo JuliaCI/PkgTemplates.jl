@@ -93,8 +93,10 @@ function convert_input(P::Type, ::Type{Union{T, Nothing}}, s::AbstractString) wh
 end
 
 function convert_input(P::Type, ::Type{Union{T, Symbol, Nothing}}, s::AbstractString) where T
-    return if startswith(s, ":") || startswith(s, "Symbol(\"")
-        Symbol(s)
+    # Assume inputs starting with ':' char are intended as Symbols, if a plugin accept symbols.
+    # i.e. assume the set of valid Symbols the plugin expects can be spelt starting with ':'.
+    return if startswith(s, ":")
+        Symbol(s[2:end])  # skip ':'
     else
         convert_input(P, Union{T,Nothing}, s)
     end
