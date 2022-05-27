@@ -11,6 +11,7 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://tester.github.io/DocumenterGitHubActions.jl",
+        edit_link="main",
         assets=String[],
     ),
     pages=[

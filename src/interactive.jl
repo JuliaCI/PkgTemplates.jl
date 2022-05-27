@@ -92,6 +92,16 @@ function convert_input(P::Type, ::Type{Union{T, Nothing}}, s::AbstractString) wh
     return s == "nothing" ? nothing : convert_input(P, T, s)
 end
 
+function convert_input(P::Type, ::Type{Union{T, Symbol, Nothing}}, s::AbstractString) where T
+    # Assume inputs starting with ':' char are intended as Symbols, if a plugin accept symbols.
+    # i.e. assume the set of valid Symbols the plugin expects can be spelt starting with ':'.
+    return if startswith(s, ":")
+        Symbol(chop(s, head=1, tail=0))  # remove ':'
+    else
+        convert_input(P, Union{T,Nothing}, s)
+    end
+end
+
 function convert_input(::Type, ::Type{Bool}, s::AbstractString)
     s = lowercase(s)
     return if startswith(s, 't') || startswith(s, 'y')
