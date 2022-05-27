@@ -217,7 +217,7 @@ prompt(::Type{Template}, ::Type, ::Val{:pkg}) = Base.prompt("Package name")
 
 function prompt(::Type{Template}, ::Type, ::Val{:user})
     return if isempty(@mock default_user())
-        input = Base.prompt("Enter value for 'user' (String, required)")
+        input = Base.prompt("Enter value for 'user' (required)")
         input === nothing && throw(InterruptException())
         return input
     else
