@@ -122,6 +122,11 @@ function convert_input(P::Type, T::Type{<:Vector}, s::AbstractString)
     return map(x -> convert_input(P, eltype(T), x), xs)
 end
 
+# how would the user type `x` in interactive mode?
+input_string(x) = string(x)
+input_string(x::AbstractString) = isempty(x) ? repr(x) : String(x)
+input_string(x::Symbol) = repr(x)
+
 """
     prompt(::Type{P}, ::Type{T}, ::Val{name::Symbol}) -> Any
 
@@ -132,8 +137,8 @@ prompt(P::Type, T::Type, name::Symbol) = prompt(P, T, Val(name))
 
 # The trailing `nothing` is a hack for `fallback_prompt` to use, ignore it.
 function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, name}
-    tips = join([input_tips(T); "default=$(repr(defaultkw(P, name)))"], ", ")
     default = defaultkw(P, name)
+    tips = join([input_tips(T); "default=$(input_string(default))"], ", ")
     input = Base.prompt(pretty_message("Enter value for '$name' ($tips)"))
     input === nothing && throw(InterruptException())
     input = strip(input, '"')
