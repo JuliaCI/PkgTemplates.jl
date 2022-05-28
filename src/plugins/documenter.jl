@@ -232,7 +232,7 @@ function interactive(::Type{Documenter})
 end
 
 function prompt(::Type{<:Documenter}, ::Type{Logo}, ::Val{:logo})
-    light = Base.prompt("Enter value for 'logo.light' (default=nothing)")
-    dark = Base.prompt("Enter value for 'logo.dark' (default=nothing)")
+    light = Base.prompt("Enter value for 'logo.light' (default: nothing)")
+    dark = Base.prompt("Enter value for 'logo.dark' (default: nothing)")
     return Logo(; light=light, dark=dark)
 end
