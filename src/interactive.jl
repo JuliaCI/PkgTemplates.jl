@@ -69,11 +69,14 @@ end
 Provide some extra tips to users on how to structure their input for the type `T`,
 for example if multiple delimited values are expected.
 """
-input_tips(::Type{Vector{T}}) where T = ["comma-delimited", input_tips(T)...]
-input_tips(::Type{Nothing}) = String[]
-input_tips(::Type{Union{T, Nothing}}) where T = ["'nothing' for nothing", input_tips(T)...]
+input_tips(::Type{Vector{T}}) where T = [input_tips(T)..., "comma-delimited"]
+input_tips(::Type{Union{T, Nothing}}) where T = [input_tips(T)..., input_tips(Nothing)...]
+input_tips(::Type{Nothing}) = ["'nothing' for nothing"]
 input_tips(::Type{Secret}) = ["name only"]
-input_tips(::Type) = String[]
+# Show expected input type as a tip if it's anything other than `String`
+input_tips(::Type{T}) where T = String[string(T)]
+input_tips(::Type{String}) = String[]
+input_tips(::Type{<:Signed}) = ["Int"]  # Specific Int type likely not important
 
 """
     convert_input(::Type{P}, ::Type{T}, s::AbstractString) -> T
@@ -119,6 +122,11 @@ function convert_input(P::Type, T::Type{<:Vector}, s::AbstractString)
     return map(x -> convert_input(P, eltype(T), x), xs)
 end
 
+# how would the user type `x` in interactive mode?
+input_string(x) = string(x)
+input_string(x::AbstractString) = isempty(x) ? repr(x) : String(x)
+input_string(x::Symbol) = repr(x)
+
 """
     prompt(::Type{P}, ::Type{T}, ::Val{name::Symbol}) -> Any
 
@@ -129,8 +137,8 @@ prompt(P::Type, T::Type, name::Symbol) = prompt(P, T, Val(name))
 
 # The trailing `nothing` is a hack for `fallback_prompt` to use, ignore it.
 function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, name}
-    tips = join([T; input_tips(T); "default=$(repr(defaultkw(P, name)))"], ", ")
     default = defaultkw(P, name)
+    tips = join([input_tips(T); "default: $(input_string(default))"], ", ")
     input = Base.prompt(pretty_message("Enter value for '$name' ($tips)"))
     input === nothing && throw(InterruptException())
     input = strip(input, '"')

@@ -47,13 +47,16 @@ end
     end
 
     @testset "input_tips" begin
-        @test isempty(PT.input_tips(Int))
+        @test isempty(PT.input_tips(String))
+        @test PT.input_tips(Int) == ["Int"]
+        @test PT.input_tips(Bool) == ["Bool"]
+        @test PT.input_tips(Symbol) == ["Symbol"]
         @test PT.input_tips(Vector{String}) == ["comma-delimited"]
         @test PT.input_tips(Union{Vector{String}, Nothing}) ==
-            ["'nothing' for nothing", "comma-delimited"]
+            ["comma-delimited", "'nothing' for nothing"]
         @test PT.input_tips(Union{String, Nothing}) == ["'nothing' for nothing"]
         @test PT.input_tips(Union{Vector{Secret}, Nothing}) ==
-            ["'nothing' for nothing", "comma-delimited", "name only"]
+            ["name only", "comma-delimited", "'nothing' for nothing"]
     end
 
     @testset "Interactive name/type pair collection" begin
