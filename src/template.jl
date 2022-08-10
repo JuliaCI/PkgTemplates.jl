@@ -120,7 +120,7 @@ end
 Generate a package named `pkg` from a [`Template`](@ref).
 """
 function (t::Template)(pkg::AbstractString)
-    endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
+    pkg = _valid_pkg_name(pkg)
     pkg_dir = joinpath(t.dir, pkg)
     ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
     mkpath(pkg_dir)
@@ -138,6 +138,16 @@ function (t::Template)(pkg::AbstractString)
     end
 
     @info "New package is at $pkg_dir"
+end
+
+function _valid_pkg_name(pkg::AbstractString)
+    if endswith(pkg, ".jl")
+        pkg = splitext(pkg)[1]
+    end
+    if repr(Symbol(pkg)) ≠ ":$(pkg)"
+        error("The package name is invalid")
+    end
+    return pkg
 end
 
 function Base.:(==)(a::Template, b::Template)
