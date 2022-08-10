@@ -5,7 +5,7 @@ on:
     <<#BRANCH>>
       - <<BRANCH>>
     <</BRANCH>>
-    tags: '*'
+    tags: ['*']
   pull_request:
 concurrency:
   # Skip intermediate builds: always.

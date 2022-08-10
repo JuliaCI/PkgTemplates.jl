@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - whackybranch
-    tags: '*'
+    tags: ['*']
   pull_request:
 concurrency:
   # Skip intermediate builds: always.
