@@ -57,6 +57,5 @@ function add_test_dependency(pkg_dir::AbstractString)
     write_project(path, toml)
 
     # Generate the manifest by updating the project.
-    touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
     with_project(Pkg.update, pkg_dir)
 end
