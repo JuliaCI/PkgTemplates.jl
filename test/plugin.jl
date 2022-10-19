@@ -88,7 +88,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         end
     end
 
-    # https://github.com/invenia/PkgTemplates.jl/issues/275
+    # https://github.com/JuliaCI/PkgTemplates.jl/issues/275
     @testset "makedocs_kwargs sort bug" begin
         p = Documenter(; makedocs_kwargs=Dict(:strict => true, :checkdocs => :exports))
         t = tpl(; plugins=[p])
