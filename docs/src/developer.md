@@ -11,7 +11,7 @@ Pages = ["developer.md"]
 Issues and pull requests are welcome!
 New contributors should make sure to read the [ColPrac Contributor Guide](https://github.com/SciML/ColPrac).
 
-[PkgTemplates](https://github.com/invenia/PkgTemplates.jl/) can be easily extended by adding new [`Plugin`](@ref)s.
+[PkgTemplates](https://github.com/JuliaCI/PkgTemplates.jl/) can be easily extended by adding new [`Plugin`](@ref)s.
 
 There are three types of plugins: [`Plugin`](@ref), [`FilePlugin`](@ref), and [`BadgePlugin`](@ref).
 
