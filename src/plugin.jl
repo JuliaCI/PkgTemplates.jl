@@ -316,7 +316,7 @@ function gen_file(file::AbstractString, text::AbstractString)
 end
 
 """
-    render_file(file::AbstractString view::Dict{<:AbstractString}, tags=nothing) -> String
+    render_file(file::AbstractString, view::Dict{<:AbstractString}, tags=nothing) -> String
 
 Render a template file with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters,
