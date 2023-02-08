@@ -88,7 +88,7 @@ end
 
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
-            AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(),
+            AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(), CodeOwners(),
             Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(), RegisterAction(),
         ])
     end
@@ -117,6 +117,7 @@ end
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),
             Citation(; readme=true),
             Codecov(; file=STATIC_TXT),
+            CodeOwners(; owners=["*"=>["@invenia"], "README.md"=>["@documentation","@oxinabox"]]),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
             Documenter{GitHubActions}(;

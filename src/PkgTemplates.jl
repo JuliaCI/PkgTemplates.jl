@@ -22,6 +22,7 @@ export
     CirrusCI,
     Citation,
     Codecov,
+    CodeOwners,
     ColPracBadge,
     CompatHelper,
     Coveralls,
