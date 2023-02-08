@@ -94,7 +94,14 @@ mktempdir() do dir
             include("template.jl")
             include("plugin.jl")
             include("show.jl")
-            include("interactive.jl")
+
+            if VERSION < v"1.8"
+                # Interactive tests disabled on Julia Version >= 1.8 due to:
+                # https://github.com/JuliaCI/PkgTemplates.jl/issues/370
+                include("interactive.jl")
+            else
+                @info "Skipping interactive tests (requiring <v\"1.8\")" VERSION
+            end
 
             if PT.git_is_installed()
                 include("git.jl")
