@@ -33,7 +33,7 @@ function PkgTemplates.validate(p::CodeOwners, ::Template)
         contains(pattern, r"\s") && throw(ArgumentError(("Pattern ($pattern) must not contain whitespace")))
         for subowner in subowners
             contains(subowner, r"\s") && throw(ArgumentError("Owner name ($subowner) must not contain whitespace"))
-            startswith(subowner, "@") || throw(ArgumentError("Owner name ($subowner) must start with @"))
+            '@' ∈ subowner || throw(ArgumentError("Owner name ($subowner) must be `@user` or `email@domain.com`"))
         end
     end
 end
