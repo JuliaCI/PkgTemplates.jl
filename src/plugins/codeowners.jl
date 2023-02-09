@@ -1,6 +1,6 @@
 """
     CodeOwners <: Plugin
-    CodeOwners(; fallback_owner)
+    CodeOwners(; owners)
 
 A plugin which created GitLab/GitHub compatible CODEOWNERS files.
 owners should be a vector of patterns mapped to a vector of owner names.
