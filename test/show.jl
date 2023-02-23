@@ -51,7 +51,7 @@ end
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
                 ProjectFile:
-                  version: v"0.1.0"
+                  version: v"1.0.0-DEV"
                 Readme:
                   file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
                   destination: "README.md"
