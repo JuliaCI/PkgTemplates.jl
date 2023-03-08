@@ -1,5 +1,5 @@
 """
-    ProjectFile(; version=v"0.1.0")
+    ProjectFile(; version=v"1.0.0-DEV")
 
 Creates a `Project.toml`.
 
@@ -7,7 +7,7 @@ Creates a `Project.toml`.
 - `version::VersionNumber`: The initial version of created packages.
 """
 @plugin struct ProjectFile <: Plugin
-    version::VersionNumber = v"0.1.0"
+    version::VersionNumber = v"1.0.0-DEV"
 end
 
 # Other plugins like Tests will modify this file.

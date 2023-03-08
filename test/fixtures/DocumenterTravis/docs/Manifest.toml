@@ -31,7 +31,7 @@ version = "0.24.2"
 [[deps.DocumenterTravis]]
 path = ".."
 uuid = "c51a4d33-e9a4-4efb-a257-e0de888ecc28"
-version = "0.1.0"
+version = "1.0.0-DEV"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
