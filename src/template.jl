@@ -9,6 +9,7 @@ default_plugins() = [
     Readme(),
     Tests(),
     TagBot(),
+    Dependabot(),
 ]
 
 function default_authors()

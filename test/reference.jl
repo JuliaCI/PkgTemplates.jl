@@ -89,7 +89,8 @@ end
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
             AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(), CodeOwners(),
-            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(), RegisterAction(),
+            Dependabot(), Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
+            RegisterAction(),
         ])
     end
 
@@ -120,6 +121,7 @@ end
             CodeOwners(; owners=["*"=>["@user"], "README.md"=>["@group","user@example.com"]]),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
+            Dependabot(),
             Documenter{GitHubActions}(;
                 assets=[STATIC_TXT],
                 logo=Logo(; light=STATIC_PNG),
