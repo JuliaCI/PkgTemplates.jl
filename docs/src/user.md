@@ -44,7 +44,6 @@ Git
 CompatHelper
 TagBot
 Secret
-Dependabot
 ```
 
 ### Continuous Integration (CI)
@@ -56,6 +55,7 @@ AppVeyor
 CirrusCI
 DroneCI
 GitHubActions
+Dependabot
 GitLabCI
 TravisCI
 ```
