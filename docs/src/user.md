@@ -55,7 +55,6 @@ AppVeyor
 CirrusCI
 DroneCI
 GitHubActions
-Dependabot
 GitLabCI
 TravisCI
 ```
@@ -86,6 +85,7 @@ PkgEvalBadge
 ### Miscellaneous
 
 ```@docs
+Dependabot
 Develop
 Citation
 RegisterAction
