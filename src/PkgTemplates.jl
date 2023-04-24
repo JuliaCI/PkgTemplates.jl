@@ -26,6 +26,7 @@ export
     ColPracBadge,
     CompatHelper,
     Coveralls,
+    Dependabot,
     Develop,
     Documenter,
     DroneCI,
