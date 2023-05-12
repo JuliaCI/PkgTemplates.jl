@@ -48,7 +48,7 @@ end
                   manifest: false
                   gpgsign: false
                 GitHubActions:
-                  file: \"~/.julia/dev/PkgTemplates/templates/github/workflows/CI.yml\"
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CI.yml"))"
                   destination: \"CI.yml\"
                   linux: true
                   osx: false
@@ -56,7 +56,7 @@ end
                   x64: true
                   x86: false
                   coverage: true
-                  extra_versions: [\"1.0\", \"1.7\", \"nightly\"]
+                  extra_versions: [\"1.0\", \"$(VERSION.major).$(VERSION.minor)\", \"nightly\"]
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
