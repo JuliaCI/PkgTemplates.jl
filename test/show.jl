@@ -47,6 +47,16 @@ end
                   jl: true
                   manifest: false
                   gpgsign: false
+                GitHubActions:
+                  file: \"~/.julia/dev/PkgTemplates/templates/github/workflows/CI.yml\"
+                  destination: \"CI.yml\"
+                  linux: true
+                  osx: false
+                  windows: false
+                  x64: true
+                  x86: false
+                  coverage: true
+                  extra_versions: [\"1.0\", \"1.7\", \"nightly\"]
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
