@@ -41,6 +41,7 @@ Tests
 Readme
 License
 Git
+GitHubActions
 CompatHelper
 TagBot
 Secret
@@ -54,7 +55,6 @@ These plugins will create the configuration files of common CI services for you.
 AppVeyor
 CirrusCI
 DroneCI
-GitHubActions
 GitLabCI
 TravisCI
 ```

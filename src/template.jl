@@ -9,6 +9,7 @@ default_plugins() = [
     Readme(),
     Tests(),
     TagBot(),
+    GitHubActions(),
 ]
 
 function default_authors()

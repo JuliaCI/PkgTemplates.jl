@@ -47,6 +47,16 @@ end
                   jl: true
                   manifest: false
                   gpgsign: false
+                GitHubActions:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CI.yml"))"
+                  destination: \"CI.yml\"
+                  linux: true
+                  osx: false
+                  windows: false
+                  x64: true
+                  x86: false
+                  coverage: true
+                  extra_versions: [\"1.0\", \"$(VERSION.major).$(VERSION.minor)\", \"nightly\"]
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"

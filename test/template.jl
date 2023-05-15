@@ -9,7 +9,7 @@
             patch = @patch PkgTemplates.getkw!(kwargs, k) = ""
             apply(patch) do
                 @test_throws PT.MissingUserException Template()
-                @test isempty(Template(; plugins=[!Git]).user)
+                @test isempty(Template(; plugins=[!Git, !GitHubActions]).user)
             end
 
             patch = @patch PkgTemplates.getkw!(kwargs, k) = "username"
@@ -78,7 +78,7 @@
 
     @testset "validate" begin
         foreach((GitHubActions, TravisCI, GitLabCI)) do T
-            @test_throws ArgumentError tpl(; plugins=[Documenter{T}()])
+            @test_throws ArgumentError tpl(; plugins=[!GitHubActions, Documenter{T}()])
         end
 
         patch = @patch LibGit2.getconfig(r, n) = ""
