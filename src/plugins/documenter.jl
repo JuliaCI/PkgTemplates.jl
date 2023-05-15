@@ -111,7 +111,7 @@ defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", 
 defaultkw(::Type{<:Documenter}, ::Val{:devbranch}) = nothing
 defaultkw(::Type{<:Documenter}, ::Val{:edit_link}) = :devbranch
 
-gitignore(::Documenter) = ["/docs/build/"]
+gitignore(::Documenter) = ["/docs/build/", "/docs/Manifest.toml"]
 priority(::Documenter, ::Function) = DEFAULT_PRIORITY - 1  # We need SrcDir to go first.
 
 badges(::Documenter) = Badge[]
