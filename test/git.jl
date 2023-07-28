@@ -1,7 +1,7 @@
 @info "Running Git tests"
 
-@testset "Git repositories" begin
-    @testset "Does not create Git repo" begin
+@testset verbose = true "Git repositories" begin
+    @testset verbose = true "Does not create Git repo" begin
         t = tpl(; plugins=[!Git])
         with_pkg(t) do pkg
             pkg_dir = joinpath(t.dir, pkg)
@@ -9,7 +9,7 @@
         end
     end
 
-    @testset "Creates Git repo" begin
+    @testset verbose = true "Creates Git repo" begin
         t = tpl(; plugins=[Git()])
         with_pkg(t) do pkg
             pkg_dir = joinpath(t.dir, pkg)
@@ -17,7 +17,7 @@
         end
     end
 
-    @testset "With HTTPS" begin
+    @testset verbose = true "With HTTPS" begin
         t = tpl(; plugins=[Git(; ssh=false)])
         with_pkg(t) do pkg
             LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
@@ -27,7 +27,7 @@
         end
     end
 
-    @testset "With SSH" begin
+    @testset verbose = true "With SSH" begin
         t = tpl(; plugins=[Git(; ssh=true)])
         with_pkg(t) do pkg
             LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
@@ -37,7 +37,7 @@
         end
     end
 
-    @testset "Without .jl suffix" begin
+    @testset verbose = true "Without .jl suffix" begin
         t = tpl(; plugins=[Git(; jl=false)])
         with_pkg(t) do pkg
             LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
@@ -47,7 +47,7 @@
         end
     end
 
-    @testset "With custom name/email" begin
+    @testset verbose = true "With custom name/email" begin
         t = tpl(; plugins=[Git(; name="me", email="a@b.c")])
         with_pkg(t) do pkg
             LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
@@ -57,7 +57,7 @@
         end
     end
 
-    @testset "Default branches" begin
+    @testset verbose = true "Default branches" begin
         with_clean_gitconfig() do
             @test Git().branch == PT.DEFAULT_DEFAULT_BRANCH
             run(`git config init.defaultBranch foo`)
@@ -72,7 +72,7 @@
         end
     end
 
-    @testset "Adds version to commit message" begin
+    @testset verbose = true "Adds version to commit message" begin
         # We're careful to avoid a Pkg.update as it triggers Cassette#130.
         t = tpl(; plugins=[Git(), !Tests])
 

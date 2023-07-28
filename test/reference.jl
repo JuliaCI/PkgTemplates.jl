@@ -81,12 +81,12 @@ function test_all(pkg::AbstractString; kwargs...)
     end
 end
 
-@testset "Reference tests" begin
-    @testset "Default package" begin
+@testset verbose = true "Reference tests" begin
+    @testset verbose = true "Default package" begin
         test_all("Basic"; authors=USER)
     end
 
-    @testset "All plugins" begin
+    @testset verbose = true "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
             AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(), CodeOwners(),
             Dependabot(), Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
@@ -94,25 +94,25 @@ end
         ])
     end
 
-    @testset "Documenter (TravisCI)" begin
+    @testset verbose = true "Documenter (TravisCI)" begin
         test_all("DocumenterTravis"; authors=USER, plugins=[
             Documenter{TravisCI}(), TravisCI(),
         ])
     end
 
-    @testset "Documenter (GitHubActions)" begin
+    @testset verbose = true "Documenter (GitHubActions)" begin
         test_all("DocumenterGitHubActions"; authors=USER, plugins=[
             Documenter{GitHubActions}(), GitHubActions(),
         ])
     end
 
-    @testset "Documenter (GitLabCI)" begin
+    @testset verbose = true "Documenter (GitLabCI)" begin
         test_all("DocumenterGitLabCI"; authors=USER, plugins=[
             Documenter{GitLabCI}(), GitLabCI(),
         ])
     end
 
-    @testset "Wacky options" begin
+    @testset verbose = true "Wacky options" begin
         test_all("WackyOptions"; authors=USER, julia=v"1.2", host="x.com", plugins=[
             AppVeyor(; x86=true, coverage=true, extra_versions=[v"1.1"]),
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),

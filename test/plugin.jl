@@ -14,8 +14,8 @@ PT.badges(::FileTest) = PT.Badge("{{X}}", "{{Y}}", "{{Z}}")
 PT.view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 0, "Y" => 2)
 PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3)
 
-@testset "Plugins" begin
-    @testset "FilePlugin" begin
+@testset verbose = true "Plugins" begin
+    @testset verbose = true "FilePlugin" begin
         p = FileTest("foo", true)
         t = tpl(; plugins=[p])
 
@@ -32,7 +32,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         end
     end
 
-    @testset "Tests Project.toml warning on Julia < 1.2" begin
+    @testset verbose = true "Tests Project.toml warning on Julia < 1.2" begin
         p = Tests(; project=true)
         @test_logs (:warn, r"The project option is set") tpl(; julia=v"1", plugins=[p])
         @test_logs (:warn, r"The project option is set") tpl(; julia=v"1.1", plugins=[p])
@@ -40,14 +40,14 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @test_logs tpl(; julia=v"1.3", plugins=[p])
     end
 
-    @testset "CI versions" begin
+    @testset verbose = true "CI versions" begin
         t = tpl(; julia=v"1")
         @test PT.collect_versions(t, ["1.0", "1.5", "nightly"]) == ["1.0", "1.5", "nightly"]
         t = tpl(; julia=v"2")
         @test PT.collect_versions(t, ["1.0", "1.5", "nightly"]) == ["2.0", "nightly"]
     end
 
-    @testset "Equality" begin
+    @testset verbose = true "Equality" begin
         a = FileTest("foo", true)
         b = FileTest("foo", true)
         @test a == b
@@ -55,7 +55,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @test a != c
     end
 
-    @testset "Validations" begin
+    @testset verbose = true "Validations" begin
         t = tpl()
         p = TravisCI(; file="/does/not/exist")
         @test_throws ArgumentError PT.validate(p, t)
@@ -67,13 +67,13 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @test_throws ArgumentError PT.validate(p, t)
     end
 
-    @testset "Custom badge plugins" begin
+    @testset verbose = true "Custom badge plugins" begin
         t = tpl(; plugins=[!Readme, BlueStyleBadge()])
         with_pkg(t) do pkg
             pkg_dir = joinpath(t.dir, pkg)
             @test !isfile(joinpath(pkg_dir, "README.md"))
         end
-        @testset "$BadgeType" for (BadgeType, text) in (
+        @testset verbose = true "$BadgeType" for (BadgeType, text) in (
             BlueStyleBadge => "BlueStyle",
             ColPracBadge => "ColPrac",
             PkgEvalBadge => "PkgEval",
@@ -89,7 +89,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
     end
 
     # https://github.com/JuliaCI/PkgTemplates.jl/issues/275
-    @testset "makedocs_kwargs sort bug" begin
+    @testset verbose = true "makedocs_kwargs sort bug" begin
         p = Documenter(; makedocs_kwargs=Dict(:strict => true, :checkdocs => :exports))
         t = tpl(; plugins=[p])
         # A failure looks like: `MethodError: no method matching isless(::Symbol, ::Bool)`

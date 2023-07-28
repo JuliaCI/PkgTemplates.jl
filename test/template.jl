@@ -1,8 +1,8 @@
 @info "Running template tests"
 
-@testset "Template" begin
-    @testset "Template constructor" begin
-        @testset "user" begin
+@testset verbose = true "Template" begin
+    @testset verbose = true "Template constructor" begin
+        @testset verbose = true "user" begin
             msg = sprint(showerror, PT.MissingUserException{TravisCI}())
             @test startswith(msg, "TravisCI: ")
 
@@ -18,24 +18,24 @@
             end
         end
 
-        @testset "authors" begin
+        @testset verbose = true "authors" begin
             @test tpl(; authors=["a"]).authors == ["a"]
             @test tpl(; authors="a").authors == ["a"]
             @test tpl(; authors="a,b").authors == ["a", "b"]
             @test tpl(; authors="a, b").authors == ["a", "b"]
         end
 
-        @testset "host" begin
+        @testset verbose = true "host" begin
             @test tpl(; host="https://foo.com").host == "foo.com"
         end
 
-        @testset "dir" begin
+        @testset verbose = true "dir" begin
             @test tpl(; dir="/foo/bar").dir == joinpath(path_separator, "foo", "bar")
             @test tpl(; dir="foo").dir == abspath("foo")
             @test tpl(; dir="~/foo").dir == abspath(expanduser("~/foo"))
         end
 
-        @testset "plugins" begin
+        @testset verbose = true "plugins" begin
             function test_plugins(plugins, expected)
                 t = tpl(; plugins=plugins)
                 @test all(map(==, sort(t.plugins; by=string), sort(expected; by=string)))
@@ -52,13 +52,13 @@
             test_plugins([!Git], setdiff(defaults, [default_g]))
         end
 
-        @testset "Unsupported keywords warning" begin
+        @testset verbose = true "Unsupported keywords warning" begin
             @test_logs tpl()
             @test_logs (:warn, r"Unrecognized keywords were supplied") tpl(; x=1, y=2)
         end
     end
 
-    @testset "Equality" begin
+    @testset verbose = true "Equality" begin
         a = tpl()
         b = tpl()
         @test a == b
@@ -66,7 +66,7 @@
         @test a != c
     end
 
-    @testset "hasplugin" begin
+    @testset verbose = true "hasplugin" begin
         t = tpl(; plugins=[TravisCI(), Documenter{TravisCI}()])
         @test PT.hasplugin(t, typeof(first(PT.default_plugins())))
         @test PT.hasplugin(t, Documenter)
@@ -76,7 +76,7 @@
         @test !PT.hasplugin(t, Citation)
     end
 
-    @testset "validate" begin
+    @testset verbose = true "validate" begin
         foreach((GitHubActions, TravisCI, GitLabCI)) do T
             @test_throws ArgumentError tpl(; plugins=[!GitHubActions, Documenter{T}()])
         end
@@ -88,7 +88,7 @@
     end
 end
 
-@testset "Package generation errors" begin
+@testset verbose = true "Package generation errors" begin
     mktempdir() do dir
         t = tpl(; dir=dirname(dir))
         @test_throws ArgumentError t(basename(dir))

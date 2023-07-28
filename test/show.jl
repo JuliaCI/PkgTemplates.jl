@@ -12,8 +12,8 @@ function test_show(expected::AbstractString, observed::AbstractString)
     end
 end
 
-@testset "Show methods" begin
-    @testset "Plugins" begin
+@testset verbose = true "Show methods" begin
+    @testset verbose = true "Plugins" begin
         expected = """
             Readme:
               file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
@@ -25,7 +25,7 @@ end
         test_show(rstrip(expected), sprint(show, MIME("text/plain"), Readme()))
     end
 
-    @testset "Template" begin
+    @testset verbose = true "Template" begin
         expected = """
             Template:
               authors: ["$USER"]
@@ -106,7 +106,7 @@ end
         end
     end
 
-    @testset "show as serialization" begin
+    @testset verbose = true "show as serialization" begin
         t1 = tpl()
         t2 = eval(Meta.parse(sprint(show, t1)))
         @test t1 == t2

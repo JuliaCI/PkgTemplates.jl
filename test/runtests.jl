@@ -90,7 +90,7 @@ mktempdir() do dir
     Pkg.activate(dir)
     pushfirst!(DEPOT_PATH, dir)
     try
-        @testset "PkgTemplates.jl" begin
+        @testset verbose = true "PkgTemplates.jl" begin
             include("template.jl")
             include("plugin.jl")
             include("show.jl")

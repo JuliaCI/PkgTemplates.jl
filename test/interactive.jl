@@ -22,8 +22,8 @@ struct FromString
     s::String
 end
 
-@testset "Interactive mode" begin
-    @testset "Input conversion" begin
+@testset verbose = true "Interactive mode" begin
+    @testset verbose = true "Input conversion" begin
         generic(T, x) = PT.convert_input(PT.Plugin, T, x)
         @test generic(String, "foo") == "foo"
         @test generic(Float64, "1.23") == 1.23
@@ -46,7 +46,7 @@ end
         @test_throws ArgumentError generic(Bool, "hello")
     end
 
-    @testset "input_tips" begin
+    @testset verbose = true "input_tips" begin
         @test isempty(PT.input_tips(String))
         @test PT.input_tips(Int) == ["Int"]
         @test PT.input_tips(Bool) == ["Bool"]
@@ -59,7 +59,7 @@ end
             ["name only", "comma-delimited", "'nothing' for nothing"]
     end
 
-    @testset "Interactive name/type pair collection" begin
+    @testset verbose = true "Interactive name/type pair collection" begin
         name = gensym()
         @eval begin
             PT.@plugin struct $name <: PT.Plugin
@@ -73,8 +73,8 @@ end
         end
     end
 
-    @testset "Simulated inputs" begin
-        @testset "Default template" begin
+    @testset verbose = true "Simulated inputs" begin
+        @testset verbose = true "Default template" begin
             print(
                 stdin.buffer,
                 CR,        # Select user
@@ -84,7 +84,7 @@ end
             @test Template(; interactive=true) == Template(; user=USER)
         end
 
-        @testset "Custom options, accept defaults" begin
+        @testset verbose = true "Custom options, accept defaults" begin
             print(
                 stdin.buffer,
                 ALL, DONE,        # Customize all fields
@@ -101,7 +101,7 @@ end
             readavailable(stdin.buffer)
         end
 
-        @testset "Custom options, custom values" begin
+        @testset verbose = true "Custom options, custom values" begin
             nversions = VERSION.minor + 1
             print(
                 stdin.buffer,
@@ -127,7 +127,7 @@ end
             readavailable(stdin.buffer)
         end
 
-        @testset "Disabling default plugins" begin
+        @testset verbose = true "Disabling default plugins" begin
             print(
                 stdin.buffer,
                 CR, DOWN^5, CR, DONE,    # Customize user and plugins
@@ -143,7 +143,7 @@ end
             readavailable(stdin.buffer)
         end
 
-        @testset "Plugins" begin
+        @testset verbose = true "Plugins" begin
             print(
                 stdin.buffer,
                 ALL, DONE,       # Customize all fields
@@ -188,7 +188,7 @@ end
             @test PT.interactive(License) == License(; destination="COPYING", name="MIT")
         end
 
-        @testset "Quotes" begin
+        @testset verbose = true "Quotes" begin
             print(
                 stdin.buffer,
                 CR, DOWN^2, CR, DONE,  # Customize user and dir
@@ -212,7 +212,7 @@ end
             )
         end
 
-        @testset "Union{T, Nothing} weirdness" begin
+        @testset verbose = true "Union{T, Nothing} weirdness" begin
             print(
                 stdin.buffer,
                 DOWN, CR, DONE,  # Customize changelog
@@ -228,7 +228,7 @@ end
             @test PT.interactive(TagBot) == TagBot(; changelog=nothing)
         end
 
-        @testset "Only one field" begin
+        @testset verbose = true "Only one field" begin
             print(
                 stdin.buffer,
                 DOWN, CR, DONE,  # Select "None" option
@@ -236,7 +236,7 @@ end
             @test PT.interactive(Codecov) == Codecov()
         end
 
-        @testset "Missing user" begin
+        @testset verbose = true "Missing user" begin
             print(
                 stdin.buffer,
                 DONE,            # Customize nothing
@@ -249,7 +249,7 @@ end
             end
         end
 
-        @testset "Interrupts" begin
+        @testset verbose = true "Interrupts" begin
             print(
                 stdin.buffer,
                 SIGINT,  # Send keyboard interrupt
