@@ -33,6 +33,7 @@ export
     Git,
     GitHubActions,
     GitLabCI,
+    JuliaFormatter,
     License,
     Logo,
     NoDeploy,
