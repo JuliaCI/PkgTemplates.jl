@@ -388,7 +388,7 @@ Failing tests  will give you the option to review and accept changes to the fixt
 ### Running reference tests locally
 
 In the file `test/runtests.jl`, there is a variable called `REFERENCE_JULIA_VERSION`, currently set to `v"1.7.2"`.
-If you use any other Julia version (even the latest stable one) to launch the test suite, the reference tests mentioned above will not be run, and you will miss a crucial correctness check for your code.
+If you use any other Julia version (even the latest stable one) to launch the test suite, the reference tests mentioned above will not run, and you will miss a crucial correctness check for your code.
 Therefore, we strongly suggest you test PkgTemplates locally against Julia 1.7.2.
 This version can be easily installed and started with [juliaup](https://github.com/JuliaLang/juliaup):
 
