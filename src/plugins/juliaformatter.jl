@@ -1,7 +1,7 @@
 """
     JuliaFormatter(;
         file="$(contractuser(default_file(".JuliaFormatter.toml")))",
-        style=""
+        style="nostyle"
     )
 
 Create a `.JuliaFormatter.toml` file, used by [JuliaFormatter.jl](https://github.com/domluna/JuliaFormatter.jl) and the Julia VSCode extension to configure automatic code formatting.
@@ -10,11 +10,17 @@ This file can be entirely customized by the user, see the [JuliaFormatter.jl doc
 
 ## Keyword Arguments
 - `file::String`: Template file for `.JuliaFormatter.toml`.
-- `style::Union{Nothing,String}`: Style name, defaults to the empty string `""` for no style but can also be one of `("sciml", "blue", "yas")` for a preconfigured style.
+- `style::String`: Style name, defaults to `"nostyle"` for an empty style but can also be one of `("sciml", "blue", "yas")` for a fully preconfigured style.
 """
 @plugin struct JuliaFormatter <: FilePlugin
     file::String = default_file(".JuliaFormatter.toml")
-    style::String = ""
+    style::String = "nostyle"
+end
+
+function validate(p::JuliaFormatter, t::Template)
+    if p.style ∉ ("nostyle", "blue", "sciml", "yas")
+        throw(ArgumentError("""JuliaFormatter style must be either "nostyle", "blue", "sciml" or "yas"."""))
+    end
 end
 
 source(p::JuliaFormatter) = p.file
@@ -22,12 +28,18 @@ destination(::JuliaFormatter) = ".JuliaFormatter.toml"
 
 function view(p::JuliaFormatter, t::Template, pkg::AbstractString)
     d = Dict{String,String}()
-    if p.style == ""
+    if p.style == "nostyle"
         d["STYLE"] = ""
-    elseif p.style in ("blue", "sciml", "yas")
-        d["STYLE"] = """style = \"$(p.style)\""""
     else
-        throw(ArgumentError("Formatting style not recognized"))
+        d["STYLE"] = """style = \"$(p.style)\""""
     end
     return d
+end
+
+function prompt(::Type{JuliaFormatter}, ::Type{String}, ::Val{:style})
+    options = ["nostyle", "blue", "sciml", "yas"]
+    menu = RadioMenu(options; pagesize=length(options))
+    println("Select a JuliaFormatter style:")
+    idx = request(menu)
+    return options[idx]
 end
