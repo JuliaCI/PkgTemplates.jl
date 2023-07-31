@@ -88,6 +88,7 @@ end
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
+                  aqua: false
             """
         # `with_clean_gitconfig` requires Git to be installed, but if Git is not installed,
         # then we probably don't need to worry about any conflicting Git config files.
