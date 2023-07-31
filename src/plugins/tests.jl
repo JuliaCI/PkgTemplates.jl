@@ -42,7 +42,7 @@ function view(p::Tests, ::Template, pkg::AbstractString)
             @testset verbose = true "Code quality (Aqua.jl)" begin
                 Aqua.test_all($pkg)
             end
-        """[begin:end-1]
+        """[1:end-1]
     else
         d["AQUA_IMPORT"] = ""
         d["AQUA_TESTSET"] = ""
