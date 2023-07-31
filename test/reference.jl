@@ -153,7 +153,7 @@ end
                 dispatch=true,
                 dispatch_delay=20,
             ),
-            Tests(; project=true),
+            Tests(; project=true, aqua=true),
             TravisCI(;
                 coverage=false,
                 windows=false,
