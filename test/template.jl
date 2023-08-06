@@ -58,9 +58,9 @@
             test_plugins([g, g2], union(setdiff(defaults, [default_g]), [g, g2]))
 
             # Duplicated non-default plugins are supported
-            s1 = Secret("foo")
-            s2 = Secret("foo2")
-            test_plugins([s1, s2], union(defaults, [s1, s2]))
+            c1 = Citation()
+            c2 = Citation()
+            test_plugins([c1, c2], vcat(defaults, [c1, c2]))
         end
 
         @testset "Unsupported keywords warning" begin
