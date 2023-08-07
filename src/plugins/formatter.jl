@@ -1,5 +1,5 @@
 """
-    JuliaFormatter(;
+    Formatter(;
         file="$(contractuser(default_file(".JuliaFormatter.toml")))",
         style="nostyle"
     )
@@ -12,21 +12,21 @@ This file can be entirely customized by the user, see the [JuliaFormatter.jl doc
 - `file::String`: Template file for `.JuliaFormatter.toml`.
 - `style::String`: Style name, defaults to `"nostyle"` for an empty style but can also be one of `("sciml", "blue", "yas")` for a fully preconfigured style.
 """
-@plugin struct JuliaFormatter <: FilePlugin
+@plugin struct Formatter <: FilePlugin
     file::String = default_file(".JuliaFormatter.toml")
     style::String = "nostyle"
 end
 
-function validate(p::JuliaFormatter, t::Template)
+function validate(p::Formatter, t::Template)
     if p.style ∉ ("nostyle", "blue", "sciml", "yas")
         throw(ArgumentError("""JuliaFormatter style must be either "nostyle", "blue", "sciml" or "yas"."""))
     end
 end
 
-source(p::JuliaFormatter) = p.file
-destination(::JuliaFormatter) = ".JuliaFormatter.toml"
+source(p::Formatter) = p.file
+destination(::Formatter) = ".JuliaFormatter.toml"
 
-function view(p::JuliaFormatter, t::Template, pkg::AbstractString)
+function view(p::Formatter, t::Template, pkg::AbstractString)
     d = Dict{String,String}()
     if p.style == "nostyle"
         d["STYLE"] = ""
@@ -36,7 +36,7 @@ function view(p::JuliaFormatter, t::Template, pkg::AbstractString)
     return d
 end
 
-function prompt(::Type{JuliaFormatter}, ::Type{String}, ::Val{:style})
+function prompt(::Type{Formatter}, ::Type{String}, ::Val{:style})
     options = ["nostyle", "blue", "sciml", "yas"]
     menu = RadioMenu(options; pagesize=length(options))
     println("Select a JuliaFormatter style:")
