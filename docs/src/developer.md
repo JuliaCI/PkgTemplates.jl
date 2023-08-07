@@ -385,6 +385,18 @@ Check them to make sure that they contain exactly what you would expect!
 For changes to existing plugins, update the plugin options appropriately in the "Wacky options" test set.
 Failing tests  will give you the option to review and accept changes to the fixtures, updating the files automatically for you.
 
+### Running reference tests locally
+
+In the file `test/runtests.jl`, there is a variable called `REFERENCE_JULIA_VERSION`, currently set to `v"1.7.2"`.
+If you use any other Julia version (even the latest stable one) to launch the test suite, the reference tests mentioned above will not run, and you will miss a crucial correctness check for your code.
+Therefore, we strongly suggest you test PkgTemplates locally against Julia 1.7.2.
+This version can be easily installed and started with [juliaup](https://github.com/JuliaLang/juliaup):
+
+```bash
+juliaup add 1.7.2
+julia +1.7.2
+```
+
 ### Updating "Show" Tests
 
 Depending on what you've changed, the tests in `test/show.jl` might fail.
