@@ -9,6 +9,7 @@ const AQUA_DEP = PackageSpec(; name="Aqua", uuid=AQUA_UUID)
         file="$(contractuser(default_file("test", "runtests.jl")))",
         project=false,
         aqua=false,
+        aqua_kwargs=NamedTuple(),
     )
 
 Sets up testing for packages.
@@ -19,6 +20,7 @@ Sets up testing for packages.
   See [the Pkg docs](https://julialang.github.io/Pkg.jl/v1/creating-packages/#Test-specific-dependencies-in-Julia-1.2-and-above-1)
   for more details.
 - `aqua::Bool`: Whether or not to add quality tests with [Aqua.jl](https://github.com/JuliaTesting/Aqua.jl).
+- `aqua_kwargs::NamedTuple`: Which keyword arguments to supply to Aqua tests (many people use `ambiguities=false` for example)
 
 !!! note
     Managing test dependencies with `test/Project.toml` is only supported
@@ -28,6 +30,7 @@ Sets up testing for packages.
     file::String = default_file("test", "runtests.jl")
     project::Bool = false
     aqua::Bool = false
+    aqua_kwargs::NamedTuple = NamedTuple()  # type-unstable
 end
 
 source(p::Tests) = p.file
@@ -36,11 +39,16 @@ destination(::Tests) = joinpath("test", "runtests.jl")
 function view(p::Tests, ::Template, pkg::AbstractString)
     d = Dict("PKG" => pkg)
     if p.aqua
+        if isempty(p.aqua_kwargs)
+            kwargs_str = ""
+        else
+            kwargs_str = "; " * strip(string(p.aqua_kwargs), ['(', ')'])
+        end
         d["AQUA_IMPORT"] = ", Aqua"
         d["AQUA_TESTSET"] = """
 
             @testset verbose = true "Code quality (Aqua.jl)" begin
-                Aqua.test_all($pkg)
+                Aqua.test_all($pkg$kwargs_str)
             end
         """[1:end-1]
     else
@@ -56,6 +64,23 @@ function validate(p::Tests, t::Template)
             "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
             "but a Julia version older than 1.2 ($(t.julia)) is supported by the template",
         )
+    aqua_kwargs_names = (
+        :ambiguities,
+        :unbound_args,
+        :undefined_exports,
+        :piracy,
+        :project_extras,
+        :stale_deps,
+        :deps_compat,
+        :project_toml_formatting,
+    )
+    for (key, val) in pairs(p.aqua_kwargs)
+        if !(val isa Bool)
+            throw(ArgumentError("Aqua keyword arguments must have boolean values"))
+        elseif !(key in aqua_kwargs_names)
+            throw(ArgumentError("Aqua keyword arguments must belong to $aqua_kwargnames"))
+        end
+    end
 end
 
 function hook(p::Tests, t::Template, pkg_dir::AbstractString)
