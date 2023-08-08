@@ -88,9 +88,22 @@ end
 
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
-            AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(), CodeOwners(),
-            Dependabot(), Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
+            AppVeyor(),
+            CirrusCI(),
+            Citation(),
+            CodeOwners(),
+            Codecov(),
+            CompatHelper(),
+            Coveralls(),
+            Dependabot(),
+            Develop(),
+            Documenter(),
+            DroneCI(),
+            Formatter(),
+            GitHubActions(),
+            GitLabCI(),
             RegisterAction(),
+            TravisCI(),
         ])
     end
 
@@ -131,6 +144,7 @@ end
                 edit_link=:commit,
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
+            Formatter(; style="blue"),
             Git(; ignore=["a", "b", "c"], manifest=true, branch="whackybranch"),
             GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),

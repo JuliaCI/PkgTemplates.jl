@@ -30,6 +30,7 @@ export
     Develop,
     Documenter,
     DroneCI,
+    Formatter,
     Git,
     GitHubActions,
     GitLabCI,
