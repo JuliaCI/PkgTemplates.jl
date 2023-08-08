@@ -11,8 +11,8 @@ For details on the general syntax, see
 
 There are a few extra restrictions:
 
-- Before using this macro, you must have imported `@with_kw_noshow`
-  via `using PkgTemplates: @with_kw_noshow`
+- Before using this macro, you must have imported `@with_kw_noshow` and `PkgTemplates` must
+  be in scope: `using PkgTemplates: PkgTemplates, @with_kw_noshow, @plugin`.
 - The type must be a subtype of [`Plugin`](@ref) (or one of its abstract subtypes)
 - The type cannot be parametric
 - All fields must have default values
@@ -20,7 +20,7 @@ There are a few extra restrictions:
 ## Example
 
 ```julia
-using PkgTemplates: @plugin, @with_kw_noshow, Plugin
+using PkgTemplates: PkgTemplates, @plugin, @with_kw_noshow, Plugin
 @plugin struct MyPlugin <: Plugin
     x::String = "hello!"
     y::Union{Int, Nothing} = nothing
