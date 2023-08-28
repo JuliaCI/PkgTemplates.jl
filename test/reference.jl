@@ -74,12 +74,9 @@ function test_all(pkg::AbstractString; kwargs...)
         pkg_dir = joinpath(t.dir, pkg)
         PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
         foreach(readlines(`git -C $pkg_dir ls-files`)) do f
-            if !contains(f, "Manifest.toml")
-                # Don't check Manifest: versions of packages like Aqua may vary
-                reference = joinpath(@__DIR__, "fixtures", pkg, f)
-                comparison = joinpath(pkg_dir, f)
-                test_reference(reference, comparison)
-            end
+            reference = joinpath(@__DIR__, "fixtures", pkg, f)
+            comparison = joinpath(pkg_dir, f)
+            test_reference(reference, comparison)
         end
     end
 end
@@ -158,7 +155,7 @@ end
             ),
             Tests(;
                 project=true,
-                aqua=true,
+                aqua_version=v"0.6.5",
                 aqua_kwargs=(; ambiguities=false, unbound_args=true),
             ),
             TravisCI(;
