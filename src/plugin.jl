@@ -231,7 +231,7 @@ end
 Base.string(b::Badge) = "[![$(b.hover)]($(b.image))]($(b.link))"
 
 # Format a plugin's badges as a list of strings, with all substitutions applied.
-function badges(p::Plugin, t::Template, pkg::AbstractString)
+function badges(p::Plugin, t::Template, pkg::AbstractString) #TODO-HR: this may need to be pkg_dir instead....
     bs = badges(p)
     bs isa Vector || (bs = [bs])
     return map(b -> render_text(string(b), combined_view(p, t, pkg)), bs)
@@ -267,8 +267,8 @@ prehook(::Plugin, ::Template, ::AbstractString) = nothing
 Stage 2 of the package generation pipeline (the "main" stage, in general).
 At this point, the [`prehook`](@ref)s have run, but not the [`posthook`](@ref)s.
 
-`pkg_dir` is the directory in which the package is being generated
-(so `basename(pkg_dir)` is the package name).
+`pkg_dir` is the directory in which the package is being generated; [`pkg_name_from_pkg_dir`](@ref)`
+will return the package name.
 
 !!! note
     You usually shouldn't implement this function for [`FilePlugin`](@ref)s.
@@ -293,7 +293,7 @@ end
 
 function hook(p::FilePlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
-    pkg = basename(pkg_dir)
+    pkg = pkg_name_from_pkg_dir(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p, t, pkg)
     gen_file(path, text)
@@ -345,6 +345,18 @@ If you are implementing a plugin that uses the `user` field of a [`Template`](@r
 you should implement this function and return `true`.
 """
 needs_username(::Plugin) = false
+
+"""
+    pkg_name_from_pkg_dir(pkg_dir::AbstractString)
+
+Return package name of package at `pkg_dir`, i.e., `basename(pkg_dir)` excluding any
+`.jl` suffix, if present. For example, `foo/bar/Whee.jl` and `foo/bar/Whee` both
+return `Whee`.
+"""
+function pkg_name_from_pkg_dir(pkg_dir::AbstractString)
+    pkg = basename(pkg_dir)
+    return endswith(pkg, ".jl") ? pkg[1:end-3] : pkg
+end
 
 include(joinpath("plugins", "project_file.jl"))
 include(joinpath("plugins", "src_dir.jl"))
