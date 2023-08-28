@@ -199,7 +199,7 @@ end
             if get(ENV, "CI", "false") == "true"
                 @test_broken result
             else
-                @test_broken result
+                @test result
             end
 
             print(
