@@ -70,13 +70,18 @@ end
 
 function test_all(pkg::AbstractString; kwargs...)
     t = tpl(; kwargs...)
-    with_pkg(t, pkg) do pkg
-        pkg_dir = joinpath(t.dir, pkg)
-        PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
-        foreach(readlines(`git -C $pkg_dir ls-files`)) do f
-            reference = joinpath(@__DIR__, "fixtures", pkg, f)
-            comparison = joinpath(pkg_dir, f)
-            test_reference(reference, comparison)
+
+    # Ensure that the same output is generated (with the exception of the generated directory)
+    # regardless of whether the user passes in Foo.jl or Foo
+    for pkg_name in [pkg, pkg * ".jl"]
+        with_pkg(t, pkg_name) do pkg_name
+            pkg_dir = joinpath(t.dir, pkg_name)
+            PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
+            foreach(readlines(`git -C $pkg_dir ls-files`)) do f
+                reference = joinpath(@__DIR__, "fixtures", pkg, f)
+                comparison = joinpath(pkg_dir, f)
+                test_reference(reference, comparison)
+            end
         end
     end
 end

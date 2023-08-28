@@ -231,7 +231,7 @@ end
 Base.string(b::Badge) = "[![$(b.hover)]($(b.image))]($(b.link))"
 
 # Format a plugin's badges as a list of strings, with all substitutions applied.
-function badges(p::Plugin, t::Template, pkg::AbstractString) #TODO-HR: this may need to be pkg_dir instead....
+function badges(p::Plugin, t::Template, pkg::AbstractString)
     bs = badges(p)
     bs isa Vector || (bs = [bs])
     return map(b -> render_text(string(b), combined_view(p, t, pkg)), bs)
