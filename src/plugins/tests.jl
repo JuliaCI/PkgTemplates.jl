@@ -111,7 +111,7 @@ end
 function make_test_project(p::Tests, pkg_dir::AbstractString)
     with_project(() -> Pkg.add(TEST_DEP), joinpath(pkg_dir, "test"))
     if !isnothing(p.aqua_version)
-        with_project(() -> Pkg.add(; AQUA_DEP.name, AQUA_DEP.uuid, version=p.aqua_version), joinpath(pkg_dir, "test"))
+        with_project(() -> Pkg.add(; name=AQUA_DEP.name, uuid=AQUA_DEP.uuid, version=p.aqua_version), joinpath(pkg_dir, "test"))
     end
 end
 
