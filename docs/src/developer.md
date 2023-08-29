@@ -107,7 +107,7 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
 )
 
 function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
-    pkg = pkg_name_from_pkg_dir(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
     make = render_file(p.make_jl, combined_view(p, t, pkg), tags(p))
@@ -186,7 +186,7 @@ end
 function prehook(::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
         LibGit2.commit(repo, "Initial commit")
-        pkg = pkg_name_from_pkg_dir(pkg_dir)
+        pkg = pkg_name(pkg_dir)
         url = "https://$(t.host)/$(t.user)/$pkg.jl"
         close(GitRemote(repo, "origin", url))
     end
@@ -287,7 +287,7 @@ end
 
 function hook(p::FilePlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
-    pkg = pkg_name_from_pkg_dir(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p, t, pkg)
     gen_file(path, text)

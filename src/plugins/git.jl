@@ -66,7 +66,7 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
             end
         end
         commit(p, repo, pkg_dir, "Initial commit")
-        pkg = pkg_name_from_pkg_dir(pkg_dir)
+        pkg = pkg_name(pkg_dir)
         suffix = p.jl ? ".jl" : ""
         url = if p.ssh
             "git@$(t.host):$(t.user)/$pkg$suffix.git"

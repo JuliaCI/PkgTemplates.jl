@@ -267,7 +267,7 @@ prehook(::Plugin, ::Template, ::AbstractString) = nothing
 Stage 2 of the package generation pipeline (the "main" stage, in general).
 At this point, the [`prehook`](@ref)s have run, but not the [`posthook`](@ref)s.
 
-`pkg_dir` is the directory in which the package is being generated; [`pkg_name_from_pkg_dir`](@ref)`
+`pkg_dir` is the directory in which the package is being generated; [`pkg_name`](@ref)`
 will return the package name.
 
 !!! note
@@ -293,7 +293,7 @@ end
 
 function hook(p::FilePlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
-    pkg = pkg_name_from_pkg_dir(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p, t, pkg)
     gen_file(path, text)
@@ -347,13 +347,13 @@ you should implement this function and return `true`.
 needs_username(::Plugin) = false
 
 """
-    pkg_name_from_pkg_dir(pkg_dir::AbstractString)
+    pkg_name(pkg_dir::AbstractString)
 
 Return package name of package at `pkg_dir`, i.e., `basename(pkg_dir)` excluding any
 `.jl` suffix, if present. For example, `foo/bar/Whee.jl` and `foo/bar/Whee` both
 return `Whee`.
 """
-function pkg_name_from_pkg_dir(pkg_dir::AbstractString)
+function pkg_name(pkg_dir::AbstractString)
     pkg = basename(pkg_dir)
     return endswith(pkg, ".jl") ? pkg[1:end-3] : pkg
 end
