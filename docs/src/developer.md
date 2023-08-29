@@ -107,12 +107,12 @@ view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
 )
 
 function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
-    pkg = basename(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
     make = render_file(p.make_jl, combined_view(p, t, pkg), tags(p))
     gen_file(joinpath(docs_dir, "make.jl"), make)
-    
+
     index = render_file(p.index_md, combined_view(p, t, pkg), tags(p))
     gen_file(joinpath(docs_dir, "src", "index.md"), index)
 
@@ -186,7 +186,7 @@ end
 function prehook(::Git, t::Template, pkg_dir::AbstractString)
     LibGit2.with(LibGit2.init(pkg_dir)) do repo
         LibGit2.commit(repo, "Initial commit")
-        pkg = basename(pkg_dir)
+        pkg = pkg_name(pkg_dir)
         url = "https://$(t.host)/$(t.user)/$pkg.jl"
         close(GitRemote(repo, "origin", url))
     end
@@ -287,7 +287,7 @@ end
 
 function hook(p::FilePlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
-    pkg = basename(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p, t, pkg)
     gen_file(path, text)
@@ -375,7 +375,7 @@ Here are some testing tips to ensure that your PR goes through as smoothly as po
 ### Updating Reference Tests & Fixtures
 
 If you've added or modified plugins, you should update the reference tests and the associated test fixtures.
-In `test/reference.jl`, you'll find a "Reference tests" test set that basically generates a bunch of packages, and then checks each file against a reference file, which is stored somewhere in `test/fixtures`. 
+In `test/reference.jl`, you'll find a "Reference tests" test set that basically generates a bunch of packages, and then checks each file against a reference file, which is stored somewhere in `test/fixtures`.
 Note the reference tests only run on one specific version of Julia; check `test/runtests.jl` to see the current version used.
 
 For new plugins, you should add an instance of your plugin to the "All plugins" and "Wacky options" test sets, then run the tests with `Pkg.test`.
