@@ -74,9 +74,12 @@ function test_all(pkg::AbstractString; kwargs...)
         pkg_dir = joinpath(t.dir, pkg)
         PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
         foreach(readlines(`git -C $pkg_dir ls-files`)) do f
-            reference = joinpath(@__DIR__, "fixtures", pkg, f)
-            comparison = joinpath(pkg_dir, f)
-            test_reference(reference, comparison)
+            if !contains(f, "Manifest.toml")
+                # Don't check Manifest: versions of dependencies may vary
+                reference = joinpath(@__DIR__, "fixtures", pkg, f)
+                comparison = joinpath(pkg_dir, f)
+                test_reference(reference, comparison)
+            end
         end
     end
 end
@@ -118,7 +121,7 @@ end
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),
             Citation(; readme=true),
             Codecov(; file=STATIC_TXT),
-            CodeOwners(; owners=["*"=>["@user"], "README.md"=>["@group","user@example.com"]]),
+            CodeOwners(; owners=["*" => ["@user"], "README.md" => ["@group", "user@example.com"]]),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
             Dependabot(),
@@ -128,7 +131,7 @@ end
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
                 devbranch="foobar",
-                edit_link=:commit,
+                edit_link=:commit
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Git(; ignore=["a", "b", "c"], manifest=true, branch="whackybranch"),
@@ -151,7 +154,7 @@ end
                 registry="Foo/Bar",
                 branches=false,
                 dispatch=true,
-                dispatch_delay=20,
+                dispatch_delay=20
             ),
             Tests(; project=true),
             TravisCI(;
@@ -159,7 +162,7 @@ end
                 windows=false,
                 x86=true,
                 arm64=true,
-                extra_versions=["1.1"],
+                extra_versions=["1.1"]
             ),
         ])
     end

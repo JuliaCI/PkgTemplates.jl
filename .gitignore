@@ -3,3 +3,7 @@
 *.jl.cov
 *.jl.mem
 /Manifest.toml
+/test/fixtures/*/Manifest.toml
+/test/fixtures/*/docs/Manifest.toml
+/test/fixtures/*/test/Manifest.toml
+/test/fixtures/*/benchmark/Manifest.toml
