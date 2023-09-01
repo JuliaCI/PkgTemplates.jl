@@ -78,9 +78,12 @@ function test_all(pkg::AbstractString; kwargs...)
             pkg_dir = joinpath(t.dir, pkg_name)
             PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
             foreach(readlines(`git -C $pkg_dir ls-files`)) do f
-                reference = joinpath(@__DIR__, "fixtures", pkg, f)
-                comparison = joinpath(pkg_dir, f)
-                test_reference(reference, comparison)
+                # Don't check test Manifest: versions of dependencies may vary
+                if !contains(f, joinpath("test", "Manifest.toml"))
+                    reference = joinpath(@__DIR__, "fixtures", pkg, f)
+                    comparison = joinpath(pkg_dir, f)
+                    test_reference(reference, comparison)
+                end
             end
         end
     end
