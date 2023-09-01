@@ -175,7 +175,11 @@ end
                 dispatch=true,
                 dispatch_delay=20,
             ),
-            Tests(; project=true),
+            Tests(;
+                project=true,
+                aqua=true,
+                aqua_kwargs=(; ambiguities=false, unbound_args=true),
+            ),
             TravisCI(;
                 coverage=false,
                 windows=false,
