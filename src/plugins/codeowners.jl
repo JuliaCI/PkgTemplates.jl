@@ -21,8 +21,7 @@ function render_plugin(p::CodeOwners)
     join((pattern * " " * join(subowners, " ") for (pattern, subowners) in p.owners), "\n")
 end
 
-function PkgTemplates.hook(p::CodeOwners, t::Template, pkg_dir::AbstractString)
-    pkg = basename(pkg_dir)
+function PkgTemplates.hook(p::CodeOwners, ::Template, pkg_dir::AbstractString)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p)
     PkgTemplates.gen_file(path, text)

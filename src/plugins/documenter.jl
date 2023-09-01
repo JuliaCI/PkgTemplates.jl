@@ -181,7 +181,7 @@ function validate(p::Documenter{T}, t::Template) where T <: YesDeploy
 end
 
 function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
-    pkg = basename(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
     # Generate files.

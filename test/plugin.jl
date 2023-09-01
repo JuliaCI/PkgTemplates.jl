@@ -98,4 +98,13 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
             @test isdir(joinpath(pkg_dir, "docs"))
         end
     end
+
+    @testset "`pkg_name`" begin
+        using PkgTemplates: pkg_name
+        @test pkg_name("foo/bar/Whee.jl") == "Whee"
+        @test pkg_name("foo/bar/Whee") == "Whee"
+        @test pkg_name("Whee") == "Whee"
+        # Only the final suffix is removed---we don't correct for user error
+        @test pkg_name("Whee.jl.jl") == "Whee.jl"
+    end
 end
