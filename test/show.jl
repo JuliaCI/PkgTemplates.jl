@@ -88,7 +88,7 @@ end
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
-                  aqua_version: nothing
+                  aqua: false
                   aqua_kwargs: NamedTuple()
             """
         # `with_clean_gitconfig` requires Git to be installed, but if Git is not installed,

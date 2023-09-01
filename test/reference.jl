@@ -177,7 +177,7 @@ end
             ),
             Tests(;
                 project=true,
-                aqua_version=v"0.6.5",
+                aqua=true,
                 aqua_kwargs=(; ambiguities=false, unbound_args=true),
             ),
             TravisCI(;
