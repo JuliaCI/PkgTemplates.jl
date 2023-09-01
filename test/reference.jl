@@ -70,6 +70,7 @@ end
 
 function test_all(pkg::AbstractString; kwargs...)
     t = tpl(; kwargs...)
+
     # Ensure that the same output is generated (with the exception of the generated directory)
     # regardless of whether the user passes in Foo.jl or Foo
     for pkg_name in [pkg, pkg * ".jl"]
@@ -138,7 +139,7 @@ end
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),
             Citation(; readme=true),
             Codecov(; file=STATIC_TXT),
-            CodeOwners(; owners=["*" => ["@user"], "README.md" => ["@group", "user@example.com"]]),
+            CodeOwners(; owners=["*"=>["@user"], "README.md"=>["@group","user@example.com"]]),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
             Dependabot(),
@@ -148,7 +149,7 @@ end
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
                 devbranch="foobar",
-                edit_link=:commit
+                edit_link=:commit,
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
             Formatter(; style="blue"),
@@ -172,7 +173,7 @@ end
                 registry="Foo/Bar",
                 branches=false,
                 dispatch=true,
-                dispatch_delay=20
+                dispatch_delay=20,
             ),
             Tests(; project=true),
             TravisCI(;
@@ -180,7 +181,7 @@ end
                 windows=false,
                 x86=true,
                 arm64=true,
-                extra_versions=["1.1"]
+                extra_versions=["1.1"],
             ),
         ])
     end
