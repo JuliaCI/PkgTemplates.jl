@@ -19,7 +19,7 @@ Sets up testing for packages.
 - `project::Bool`: Whether or not to create a new project for tests (`test/Project.toml`).
   See [the Pkg docs](https://julialang.github.io/Pkg.jl/v1/creating-packages/#Test-specific-dependencies-in-Julia-1.2-and-above-1)
   for more details.
-- `aqua::Bool`: Controls whether or not to add quality tests with [Aqua.jl](https://github.com/JuliaTesting/Aqua.jl). 
+- `aqua::Bool`: Controls whether or not to add quality tests with [Aqua.jl](https://github.com/JuliaTesting/Aqua.jl).
 - `aqua_kwargs::NamedTuple`: Which keyword arguments to supply to Aqua tests (many people use `ambiguities=false` for example)
 
 !!! note
@@ -115,7 +115,6 @@ function add_test_dependency(p::Tests, pkg_dir::AbstractString)
     write_project(path, toml)
 
     # Generate the manifest by updating the project.
-    touch(joinpath(pkg_dir, "Manifest.toml"))  # File must exist to be modified by Pkg.
     with_project(Pkg.update, pkg_dir)
 end
 
