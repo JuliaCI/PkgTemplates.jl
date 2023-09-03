@@ -103,7 +103,6 @@ function posthook(p::Git, ::Template, pkg_dir::AbstractString)
     # Ensure that the manifest exists if it's going to be committed.
     manifest = joinpath(pkg_dir, "Manifest.toml")
     if p.manifest && !isfile(manifest)
-        touch(manifest)
         with_project(Pkg.update, pkg_dir)
     end
 
