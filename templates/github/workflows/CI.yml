@@ -75,19 +75,20 @@ jobs:
         with:
           version: '1'
       - name: Configure doc environment
+        shell: julia --project=docs --color=yes {0}
         run: |
-          julia --project=docs/ -e '
-            using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.instantiate()'
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.instantiate()
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
-          julia --project=docs -e '
-            using Documenter: DocMeta, doctest
-            using <<&PKG>>
-            DocMeta.setdocmeta!(<<&PKG>>, :DocTestSetup, :(using <<&PKG>>); recursive=true)
-            doctest(<<&PKG>>)'
+      - name: Run doctests
+        shell: julia --project=docs --color=yes {0}
+        run: |
+          using Documenter: DocMeta, doctest
+          using <<&PKG>>
+          DocMeta.setdocmeta!(<<&PKG>>, :DocTestSetup, :(using <<&PKG>>); recursive=true)
+          doctest(<<&PKG>>)
   <</HAS_DOCUMENTER>>
