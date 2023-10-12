@@ -41,7 +41,7 @@ using PkgTemplates
 tpl = Template()
 ```
 
-The no-keywords constructor assumes the existence of some preexisting Git configuration (set with `git config --global`):
+The no-keywords constructor assumes the existence of some preexisting Git configuration (show configuration using `git config --list` and set with `git config --global`):
 
 - `user.name`: Your real name, e.g. John Smith.
 - `user.email`: Your email address, eg. john.smith@acme.corp.
@@ -56,6 +56,7 @@ tpl("MyPkg")
 However, it's probably desirable to customize the template to your liking with various options and plugins:
 
 ```jl
+using PkgTemplates
 tpl = Template(;
     dir="~/code",
     plugins=[
