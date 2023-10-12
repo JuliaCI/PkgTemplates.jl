@@ -124,7 +124,7 @@ end
 Generate a package named `pkg` from a [`Template`](@ref).
 """
 function (t::Template)(pkg::AbstractString)
-    pkg = _valid_pkg_name(pkg)
+    _valid_pkg_name(pkg)
     pkg_dir = joinpath(t.dir, pkg)
     ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
     mkpath(pkg_dir)
@@ -151,7 +151,6 @@ function _valid_pkg_name(pkg::AbstractString)
     if repr(Symbol(pkg)) ≠ ":$(pkg)"
         throw(ArgumentError("The package name is invalid"))
     end
-    return pkg
 end
 
 function Base.:(==)(a::Template, b::Template)
