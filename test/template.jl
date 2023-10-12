@@ -118,4 +118,12 @@ end
         @test_throws ErrorException @suppress t(pkg)
     end
     @test !isdir(joinpath(t.dir, pkg))
+
+    mktempdir() do dir
+        t = tpl(; dir=dir)
+        @test_throws ArgumentError t("42Foo.jl")
+        @test_throws ArgumentError t("42Foo")
+        @test_throws ArgumentError t("Foo Bar.jl")
+        @test_throws ArgumentError t("Foo Bar")
+    end
 end
