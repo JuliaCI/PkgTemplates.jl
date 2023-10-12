@@ -9,6 +9,7 @@ default_plugins() = [
     Readme(),
     Tests(),
     TagBot(),
+    GitHubActions(),
 ]
 
 function default_authors()
@@ -92,12 +93,15 @@ function Template(::Val{false}; kwargs...)
     authors = getkw!(kwargs, :authors)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
 
-    # User-supplied plugins come first, so that deduping the list will remove the defaults.
     plugins = Vector{Any}(collect(getkw!(kwargs, :plugins)))
     disabled = map(d -> first(typeof(d).parameters), filter(p -> p isa Disabled, plugins))
     filter!(p -> p isa Plugin, plugins)
-    append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
-    plugins = Vector{Plugin}(sort(unique(typeof, plugins); by=string))
+    # Remove a default if the user has specified (or disabled) a plugin of that type.
+    defaults = filter(default_plugins()) do p
+        !(typeof(p) in vcat(typeof.(plugins), disabled))
+    end
+    append!(plugins, defaults)
+    plugins = Vector{Plugin}(sort(plugins; by=string))
 
     if isempty(user)
         foreach(plugins) do p
@@ -194,7 +198,7 @@ function interactive(::Type{Template}; kwargs...)
     # Make sure we don't try to show a menu with < 2 options.
     isempty(customizable) && return Template(; kwargs...)
     just_one = length(customizable) == 1
-    just_one && push(customizable, "None")
+    just_one && push!(customizable, :none)
 
     try
         println("Template keywords to customize:")
