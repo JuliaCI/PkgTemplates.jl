@@ -149,7 +149,7 @@ function _valid_pkg_name(pkg::AbstractString)
         pkg = splitext(pkg)[1]
     end
     if repr(Symbol(pkg)) ≠ ":$(pkg)"
-        error("The package name is invalid")
+        throw(ArgumentError("The package name is invalid"))
     end
     return pkg
 end
