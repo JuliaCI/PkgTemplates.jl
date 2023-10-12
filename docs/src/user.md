@@ -8,7 +8,7 @@ CurrentModule = PkgTemplates
 Pages = ["user.md"]
 ```
 
-Using PkgTemplates is straightforward.
+Using [PkgTemplates](https://github.com/JuliaCI/PkgTemplates.jl/) is straightforward.
 Just create a [`Template`](@ref), and call it on a package name to generate that package:
 
 ```julia
@@ -41,6 +41,7 @@ Tests
 Readme
 License
 Git
+GitHubActions
 CompatHelper
 TagBot
 Secret
@@ -54,7 +55,6 @@ These plugins will create the configuration files of common CI services for you.
 AppVeyor
 CirrusCI
 DroneCI
-GitHubActions
 GitLabCI
 TravisCI
 ```
@@ -79,13 +79,16 @@ Logo
 ```@docs
 BlueStyleBadge
 ColPracBadge
+PkgEvalBadge
 ```
 
 ### Miscellaneous
 
 ```@docs
+Dependabot
 Develop
 Citation
+RegisterAction
 ```
 
 ## A More Complicated Example
@@ -95,7 +98,7 @@ Here are a few example templates that use the options and plugins explained abov
 This one includes plugins suitable for a project hosted on GitHub, and some other customizations:
 
 ```julia
-Template(; 
+Template(;
     user="my-username",
     dir="~/code",
     authors="Acme Corp",
@@ -128,7 +131,7 @@ Template(;
 
 !!! note "Templates vs Templating"
     This documentation refers plenty to [`Template`](@ref)s, the package's main type, but it also refers to "template files" and "text templating", which are plaintext files with placeholders to be filled with data, and the technique of filling those placeholders with data, respectively.
-    
+
     These concepts should be familiar if you've used [Jinja](https://palletsprojects.com/p/jinja) or [Mustache](https://mustache.github.io) (Mustache is the particular flavour used by PkgTemplates, via [Mustache.jl](https://github.com/jverzani/Mustache.jl)).
     Please keep the difference between these two things in mind!
 
@@ -142,7 +145,7 @@ Here's an example template file:
 Hello, {{{name}}}.
 
 {{#weather}}
-It's {{{weather}}} outside. 
+It's {{{weather}}} outside.
 {{/weather}}
 {{^weather}}
 I don't know what the weather outside is.

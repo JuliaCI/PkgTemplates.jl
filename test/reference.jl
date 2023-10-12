@@ -65,18 +65,26 @@ function pin_documenter(project_dir::AbstractString)
     toml = joinpath(project_dir, "Project.toml")
     project = TOML.parsefile(toml)
     filter!(p -> p.first == "Documenter", project["deps"])
-    open(io -> TOML.print(io, project), toml, "w")
+    PT.write_project(toml, project)
 end
 
 function test_all(pkg::AbstractString; kwargs...)
     t = tpl(; kwargs...)
-    with_pkg(t, pkg) do pkg
-        pkg_dir = joinpath(t.dir, pkg)
-        PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
-        foreach(readlines(`git -C $pkg_dir ls-files`)) do f
-            reference = joinpath(@__DIR__, "fixtures", pkg, f)
-            comparison = joinpath(pkg_dir, f)
-            test_reference(reference, comparison)
+
+    # Ensure that the same output is generated (with the exception of the generated directory)
+    # regardless of whether the user passes in Foo.jl or Foo
+    for pkg_name in [pkg, pkg * ".jl"]
+        with_pkg(t, pkg_name) do pkg_name
+            pkg_dir = joinpath(t.dir, pkg_name)
+            PT.hasplugin(t, Documenter) && pin_documenter(joinpath(pkg_dir, "docs"))
+            foreach(readlines(`git -C $pkg_dir ls-files`)) do f
+                # Don't check test Manifest: versions of dependencies may vary
+                if !contains(f, joinpath("test", "Manifest.toml"))
+                    reference = joinpath(@__DIR__, "fixtures", pkg, f)
+                    comparison = joinpath(pkg_dir, f)
+                    test_reference(reference, comparison)
+                end
+            end
         end
     end
 end
@@ -88,8 +96,22 @@ end
 
     @testset "All plugins" begin
         test_all("AllPlugins"; authors=USER, plugins=[
-            AppVeyor(), CirrusCI(), Citation(), Codecov(), CompatHelper(), Coveralls(),
-            Develop(), Documenter(), DroneCI(), GitHubActions(), GitLabCI(), TravisCI(),
+            AppVeyor(),
+            CirrusCI(),
+            Citation(),
+            CodeOwners(),
+            Codecov(),
+            CompatHelper(),
+            Coveralls(),
+            Dependabot(),
+            Develop(),
+            Documenter(),
+            DroneCI(),
+            Formatter(),
+            GitHubActions(),
+            GitLabCI(),
+            RegisterAction(),
+            TravisCI(),
         ])
     end
 
@@ -105,6 +127,11 @@ end
         ])
     end
 
+    @testset "Documenter (GitLabCI)" begin
+        test_all("DocumenterGitLabCI"; authors=USER, plugins=[
+            Documenter{GitLabCI}(), GitLabCI(),
+        ])
+    end
 
     @testset "Wacky options" begin
         test_all("WackyOptions"; authors=USER, julia=v"1.2", host="x.com", plugins=[
@@ -112,22 +139,28 @@ end
             CirrusCI(; image="freebsd-123", coverage=false, extra_versions=["1.3"]),
             Citation(; readme=true),
             Codecov(; file=STATIC_TXT),
+            CodeOwners(; owners=["*"=>["@user"], "README.md"=>["@group","user@example.com"]]),
             CompatHelper(; cron="0 0 */3 * *"),
             Coveralls(; file=STATIC_TXT),
+            Dependabot(),
             Documenter{GitHubActions}(;
                 assets=[STATIC_TXT],
                 logo=Logo(; light=STATIC_PNG),
                 makedocs_kwargs=Dict(:foo => "bar", :bar => "baz"),
                 canonical_url=(_t, _pkg) -> "http://example.com",
                 devbranch="foobar",
+                edit_link=:commit,
             ),
             DroneCI(; amd64=false, arm=true, arm64=true, extra_versions=["1.3"]),
-            Git(; ignore=["a", "b", "c"], manifest=true),
+            Formatter(; style="blue"),
+            Git(; ignore=["a", "b", "c"], manifest=true, branch="whackybranch"),
             GitHubActions(; x86=true, linux=false, coverage=false),
             GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
             License(; name="ISC"),
+            PkgEvalBadge(),
             ProjectFile(; version=v"1"),
-            Readme(; inline_badges=true),
+            Readme(; inline_badges=true, badge_off=[Codecov]),
+            RegisterAction(; prompt="gimme version"),
             TagBot(;
                 trigger="OtherUser",
                 token=Secret("MYTOKEN"),
@@ -142,7 +175,11 @@ end
                 dispatch=true,
                 dispatch_delay=20,
             ),
-            Tests(; project=true),
+            Tests(;
+                project=true,
+                aqua=true,
+                aqua_kwargs=(; ambiguities=false, unbound_args=true),
+            ),
             TravisCI(;
                 coverage=false,
                 windows=false,

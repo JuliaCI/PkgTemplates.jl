@@ -11,6 +11,7 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="http://example.com",
+        edit_link=:commit,
         assets=[
             "assets/static.txt",
         ],

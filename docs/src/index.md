@@ -4,7 +4,7 @@ CurrentModule = PkgTemplates
 
 # PkgTemplates
 
-**PkgTemplates creates new Julia packages in an easy, repeatable, and customizable way.**
+**[PkgTemplates](https://github.com/JuliaCI/PkgTemplates.jl/) creates new Julia packages in an easy, repeatable, and customizable way.**
 
 ## Documentation
 
