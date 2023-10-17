@@ -4,3 +4,4 @@
 *.jl.mem
 /Manifest.toml
 /test/fixtures/*/test/Manifest.toml
+/docs/Manifest.toml

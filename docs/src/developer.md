@@ -164,6 +164,7 @@ render_text
 gen_file
 combined_view
 tags
+pkg_name
 ```
 
 For more information on text templating, see the [`FilePlugin` Walkthrough](@ref) and the section on [Custom Template Files](@ref).
