@@ -179,6 +179,7 @@ end
                 project=true,
                 aqua=true,
                 aqua_kwargs=(; ambiguities=false, unbound_args=true),
+                jet=true,
             ),
             TravisCI(;
                 coverage=false,

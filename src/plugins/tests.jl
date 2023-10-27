@@ -4,12 +4,16 @@ const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
 const AQUA_UUID = "4c88cf16-eb10-579e-8560-4a9242c79595"
 const AQUA_DEP = PackageSpec(; name="Aqua", uuid=AQUA_UUID)
 
+const JET_UUID = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+const JET_DEP = PackageSpec(; name="JET", uuid=JET_UUID)
+
 """
     Tests(;
         file="$(contractuser(default_file("test", "runtests.jl")))",
         project=false,
         aqua=false,
         aqua_kwargs=NamedTuple(),
+        jet=false,
     )
 
 Sets up testing for packages.
@@ -21,6 +25,7 @@ Sets up testing for packages.
   for more details.
 - `aqua::Bool`: Controls whether or not to add quality tests with [Aqua.jl](https://github.com/JuliaTesting/Aqua.jl).
 - `aqua_kwargs::NamedTuple`: Which keyword arguments to supply to Aqua tests (many people use `ambiguities=false` for example)
+- `jet::Bool`: Controls whether or not to add a linting test with [JET.jl](https://github.com/aviatesk/JET.jl) (works best on type-stable code)
 
 !!! note
     Managing test dependencies with `test/Project.toml` is only supported
@@ -31,6 +36,7 @@ Sets up testing for packages.
     project::Bool = false
     aqua::Bool = false
     aqua_kwargs::NamedTuple = NamedTuple()
+    jet::Bool = false
 end
 
 source(p::Tests) = p.file
@@ -53,6 +59,17 @@ function view(p::Tests, ::Template, pkg::AbstractString)
     else
         d["AQUA_IMPORT"] = ""
         d["AQUA_TESTSET"] = ""
+    end
+    if p.jet
+        d["JET_IMPORT"] = "\nusing JET"
+        d["JET_TESTSET"] = """
+        @testset "Code linting (JET.jl)" begin
+                JET.test_package($pkg; target_defined_modules = true)
+            end
+            """
+    else
+        d["JET_IMPORT"] = ""
+        d["JET_TESTSET"] = ""
     end
     return d
 end
@@ -100,6 +117,9 @@ function make_test_project(p::Tests, pkg_dir::AbstractString)
     if p.aqua
         with_project(() -> Pkg.add(AQUA_DEP), joinpath(pkg_dir, "test"))
     end
+    if p.jet
+        with_project(() -> Pkg.add(JET_DEP), joinpath(pkg_dir, "test"))
+    end
 end
 
 # Add Test as a test-only dependency.
@@ -107,11 +127,25 @@ function add_test_dependency(p::Tests, pkg_dir::AbstractString)
     # Add the dependency manually since there's no programmatic way to add to [extras].
     path = joinpath(pkg_dir, "Project.toml")
     toml = TOML.parsefile(path)
+    
     get!(toml, "extras", Dict())["Test"] = TEST_UUID
     if p.aqua
         get!(toml, "extras", Dict())["Aqua"] = AQUA_UUID
     end
-    get!(toml, "targets", Dict())["test"] = p.aqua ? ["Aqua", "Test"] : ["Test"]
+    if p.jet
+        get!(toml, "extras", Dict())["JET"] = JET_UUID
+    end
+    
+    targets = String[]
+    if p.aqua
+        push!(targets, "Aqua")
+    end
+    if p.jet
+        push!(targets, "JET")
+    end
+    push!(targets, "Test")
+    get!(toml, "targets", Dict())["test"] = targets
+    
     write_project(path, toml)
 
     # Generate the manifest by updating the project.
