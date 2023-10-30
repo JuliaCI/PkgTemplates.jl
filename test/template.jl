@@ -9,7 +9,7 @@
             patch = @patch PkgTemplates.getkw!(kwargs, k) = ""
             apply(patch) do
                 @test_throws PT.MissingUserException Template()
-                @test isempty(Template(; plugins=[!Git]).user)
+                @test isempty(Template(; plugins=[!Git, !GitHubActions]).user)
             end
 
             patch = @patch PkgTemplates.getkw!(kwargs, k) = "username"
@@ -44,12 +44,23 @@
             defaults = PT.default_plugins()
             test_plugins([], defaults)
             test_plugins([Citation()], union(defaults, [Citation()]))
+
             # Overriding a default plugin.
             default_g = defaults[findfirst(p -> p isa Git, defaults)]
             g = Git(; ssh=true)
             test_plugins([g], union(setdiff(defaults, [default_g]), [g]))
+
             # Disabling a default plugin.
             test_plugins([!Git], setdiff(defaults, [default_g]))
+
+            # Duplicated default plugins are supported
+            g2 = Git(; branch="foo")
+            test_plugins([g, g2], union(setdiff(defaults, [default_g]), [g, g2]))
+
+            # Duplicated non-default plugins are supported
+            c1 = Citation()
+            c2 = Citation()
+            test_plugins([c1, c2], vcat(defaults, [c1, c2]))
         end
 
         @testset "Unsupported keywords warning" begin
@@ -78,7 +89,7 @@
 
     @testset "validate" begin
         foreach((GitHubActions, TravisCI, GitLabCI)) do T
-            @test_throws ArgumentError tpl(; plugins=[Documenter{T}()])
+            @test_throws ArgumentError tpl(; plugins=[!GitHubActions, Documenter{T}()])
         end
 
         patch = @patch LibGit2.getconfig(r, n) = ""
