@@ -49,8 +49,8 @@ A configuration used to generate packages.
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
-  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref), and
-  [`TagBot`](@ref).
+  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref),
+  [`TagBot`](@ref) and [`GitHubActions`](@ref).
   To disable a default plugin, pass in the negated type: `!PluginType`.
   To override a default plugin instead of disabling it, pass in your own instance.
 
