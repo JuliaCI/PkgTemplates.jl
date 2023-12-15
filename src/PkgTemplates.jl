@@ -1,3 +1,4 @@
+@doc read(joinpath(dirname(@__DIR__), "README.md"), String)
 module PkgTemplates
 
 using Base: active_project, contractuser
@@ -12,6 +13,8 @@ using UUIDs: uuid4
 using Mustache: render
 using Parameters: @with_kw_noshow
 
+using Mocking
+
 export
     Template,
     AppVeyor,
@@ -19,12 +22,15 @@ export
     CirrusCI,
     Citation,
     Codecov,
+    CodeOwners,
     ColPracBadge,
     CompatHelper,
     Coveralls,
+    Dependabot,
     Develop,
     Documenter,
     DroneCI,
+    Formatter,
     Git,
     GitHubActions,
     GitLabCI,
@@ -32,8 +38,10 @@ export
     Logo,
     NoDeploy,
     PkgBenchmark,
+    PkgEvalBadge,
     ProjectFile,
     Readme,
+    RegisterAction,
     Secret,
     SrcDir,
     TagBot,

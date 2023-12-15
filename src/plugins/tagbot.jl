@@ -21,7 +21,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the workflow file.
 - `destination::AbstractString`: Destination of the workflow file, relative to `.github/workflows`.
-- `trigger::AbstractString`: Username of the trigger user for custom regsitries.
+- `trigger::AbstractString`: Username of the trigger user for custom registries.
 - `token::Secret`: Name of the token secret to use.
 - `ssh::Secret`: Name of the SSH private key secret to use.
 - `ssh_password::Secret`: Name of the SSH key password secret to use.

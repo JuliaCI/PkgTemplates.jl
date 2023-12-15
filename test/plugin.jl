@@ -76,6 +76,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @testset "$BadgeType" for (BadgeType, text) in (
             BlueStyleBadge => "BlueStyle",
             ColPracBadge => "ColPrac",
+            PkgEvalBadge => "PkgEval",
         )
             @test BadgeType <: PT.BadgePlugin
             t = tpl(; plugins=[BadgeType()])
@@ -85,5 +86,25 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
                 @test occursin(text, read(joinpath(pkg_dir, "README.md"), String))
             end
         end
+    end
+
+    # https://github.com/JuliaCI/PkgTemplates.jl/issues/275
+    @testset "makedocs_kwargs sort bug" begin
+        p = Documenter(; makedocs_kwargs=Dict(:strict => true, :checkdocs => :exports))
+        t = tpl(; plugins=[p])
+        # A failure looks like: `MethodError: no method matching isless(::Symbol, ::Bool)`
+        with_pkg(t) do pkg
+            pkg_dir = joinpath(t.dir, pkg)
+            @test isdir(joinpath(pkg_dir, "docs"))
+        end
+    end
+
+    @testset "`pkg_name`" begin
+        using PkgTemplates: pkg_name
+        @test pkg_name("foo/bar/Whee.jl") == "Whee"
+        @test pkg_name("foo/bar/Whee") == "Whee"
+        @test pkg_name("Whee") == "Whee"
+        # Only the final suffix is removed---we don't correct for user error
+        @test pkg_name("Whee.jl.jl") == "Whee.jl"
     end
 end

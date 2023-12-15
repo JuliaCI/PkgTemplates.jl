@@ -8,27 +8,25 @@ jobs:
     name: Julia Nightly - Ubuntu - x64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
           version: nightly
           arch: x64
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         env:
-          cache-name: cache-artifacts
+          cache-name: julia-nightly-cache-artifacts
         with:
           path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          key: ${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
           restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+            ${{ env.cache-name }}-
       - uses: julia-actions/julia-buildpkg@latest
       - run: |
           git config --global user.name Tester
           git config --global user.email te@st.er
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3
         with:
-          file: lcov.info
+          files: lcov.info

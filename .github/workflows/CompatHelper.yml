@@ -6,6 +6,8 @@ on:
 jobs:
   CompatHelper:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Pkg.add("CompatHelper")
         run: julia -e 'using Pkg; Pkg.add("CompatHelper")'

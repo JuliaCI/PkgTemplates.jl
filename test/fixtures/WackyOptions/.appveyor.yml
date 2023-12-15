@@ -9,7 +9,7 @@ cache:
   - '%USERPROFILE%\.julia\artifacts'
 branches:
   only:
-    - master
+    - whackybranch
     - /release-.*/
 notifications:
   - provider: Email
