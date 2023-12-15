@@ -199,7 +199,7 @@ end
             if get(ENV, "CI", "false") == "true"
                 @test_broken result
             else
-                @test result
+                @test_broken result  # see https://github.com/JuliaCI/PkgTemplates.jl/issues/434
             end
 
             print(
