@@ -9,3 +9,4 @@
 [![Build Status](https://api.cirrus-ci.com/github/tester/AllPlugins.jl.svg)](https://cirrus-ci.com/github/tester/AllPlugins.jl)
 [![Coverage](https://codecov.io/gh/tester/AllPlugins.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/tester/AllPlugins.jl)
 [![Coverage](https://coveralls.io/repos/github/tester/AllPlugins.jl/badge.svg?branch=main)](https://coveralls.io/github/tester/AllPlugins.jl?branch=main)
+[![PkgEval](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/A/AllPlugins.svg)](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/A/AllPlugins.html)

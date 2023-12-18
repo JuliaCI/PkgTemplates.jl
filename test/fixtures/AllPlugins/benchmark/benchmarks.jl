@@ -1,4 +1,4 @@
-using WackyOptions
+using AllPlugins
 using BenchmarkTools
 
 SUITE = BenchmarkGroup()
