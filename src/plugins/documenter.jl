@@ -28,7 +28,9 @@ end
         assets=String[],
         logo=Logo(),
         canonical_url=make_canonical(T),
-        makedocs_kwargs=Dict{Symbol, Any}(),
+        devbranch=nothing,
+        edit_link=:devbranch,
+        makedocs_kwargs=Dict{Symbol,Any}(),
     )
 
 Sets up documentation generation via [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
@@ -53,8 +55,13 @@ or `Nothing` to only support local documentation builds.
   The default value will compute GitHub Pages and GitLab Pages URLs
   for [`TravisCI`](@ref) and [`GitLabCI`](@ref), respectively.
   If set to `nothing`, no canonical URL is set.
-- `makedocs_kwargs::Dict{Symbol}`: Extra keyword arguments to be inserted into `makedocs`.
+- `edit_link::Union{AbstractString, Symbol, Nothing}`: Branch, tag or commit that the
+  "Edit on…" link will point to. Defaults to the branch identified by `devbranch`.
+  If `edit_link=:commit`, then the link will point to the latest commit when docs are built.
+  If `edit_link=nothing`, then the "Edit on…" link will be hidden altogether.
 - `devbranch::Union{AbstractString, Nothing}`: Branch that will trigger docs deployment.
+  If `nothing`, then the default branch according to the `Template` will be used.
+- `makedocs_kwargs::Dict{Symbol,Any}`: Extra keyword arguments to be inserted into `makedocs`.
 
 !!! note
     If deploying documentation with Travis CI, don't forget to complete
@@ -68,6 +75,7 @@ struct Documenter{T} <: Plugin
     make_jl::String
     index_md::String
     devbranch::Union{String, Nothing}
+    edit_link::Union{String, Symbol, Nothing}
 end
 
 # Can't use @plugin because we're implementing our own no-arguments constructor.
@@ -78,7 +86,8 @@ function Documenter{T}(;
     canonical_url::Union{Function, Nothing}=make_canonical(T),
     make_jl::AbstractString=default_file("docs", "make.jl"),
     index_md::AbstractString=default_file("docs", "src", "index.md"),
-    devbranch::Union{String, Nothing}=nothing,
+    devbranch::Union{AbstractString, Nothing}=nothing,
+    edit_link::Union{AbstractString, Symbol, Nothing}=:devbranch,
 ) where {T}
     return Documenter{T}(
         assets,
@@ -88,6 +97,7 @@ function Documenter{T}(;
         make_jl,
         index_md,
         devbranch,
+        edit_link,
     )
 end
 
@@ -99,8 +109,9 @@ defaultkw(::Type{<:Documenter}, ::Val{:logo}) = Logo()
 defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jl")
 defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", "index.md")
 defaultkw(::Type{<:Documenter}, ::Val{:devbranch}) = nothing
+defaultkw(::Type{<:Documenter}, ::Val{:edit_link}) = :devbranch
 
-gitignore(::Documenter) = ["/docs/build/"]
+gitignore(::Documenter) = ["/docs/build/", "/docs/Manifest.toml"]
 priority(::Documenter, ::Function) = DEFAULT_PRIORITY - 1  # We need SrcDir to go first.
 
 badges(::Documenter) = Badge[]
@@ -108,12 +119,12 @@ badges(::Documenter{<:GitHubPagesStyle}) = [
     Badge(
         "Stable",
         "https://img.shields.io/badge/docs-stable-blue.svg",
-        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/stable",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/stable/",
     ),
     Badge(
         "Dev",
         "https://img.shields.io/badge/docs-dev-blue.svg",
-        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/dev",
+        "https://{{{USER}}}.github.io/{{{PKG}}}.jl/dev/",
     ),
 ]
 badges(::Documenter{GitLabCI}) = Badge(
@@ -123,17 +134,25 @@ badges(::Documenter{GitLabCI}) = Badge(
     "https://{{{USER}}}.gitlab.io/{{{PKG}}}.jl/dev",
 )
 
-view(p::Documenter, t::Template, pkg::AbstractString) = Dict(
-    "ASSETS" => map(basename, p.assets),
-    "AUTHORS" => join(t.authors, ", "),
-    "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
-    "HAS_ASSETS" => !isempty(p.assets),
-    "MAKEDOCS_KWARGS" => map(((k, v),) -> k => repr(v), sort(collect(p.makedocs_kwargs), by=first)),
-    "PKG" => pkg,
-    "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
-    "USER" => t.user,
-    "BRANCH" => p.devbranch === nothing ? default_branch(t) : p.devbranch,
-)
+function view(p::Documenter, t::Template, pkg::AbstractString)
+    devbranch = p.devbranch === nothing ? default_branch(t) : p.devbranch
+    return Dict(
+        "ASSETS" => map(basename, p.assets),
+        "AUTHORS" => join(t.authors, ", "),
+        "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
+        "HAS_ASSETS" => !isempty(p.assets),
+        "MAKEDOCS_KWARGS" => map(((k, v),) -> k => repr(v), sort(collect(p.makedocs_kwargs), by=first)),
+        "PKG" => pkg,
+        "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
+        "USER" => t.user,
+        "BRANCH" => devbranch,
+        "EDIT_LINK" => p.edit_link == :devbranch ? _quoted(devbranch) : _quoted(p.edit_link),
+    )
+end
+
+# So both Symbol and Strings get interpolated correctly into `{{{s}}}`.
+_quoted(s::AbstractString) = string('"', s, '"')
+_quoted(s::Symbol) = repr(s)
 
 function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractString)
     base = invoke(view, Tuple{Documenter, Template, AbstractString}, p, t, pkg)
@@ -162,7 +181,7 @@ function validate(p::Documenter{T}, t::Template) where T <: YesDeploy
 end
 
 function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
-    pkg = basename(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     docs_dir = joinpath(pkg_dir, "docs")
 
     # Generate files.
@@ -213,7 +232,7 @@ function interactive(::Type{Documenter})
 end
 
 function prompt(::Type{<:Documenter}, ::Type{Logo}, ::Val{:logo})
-    light = Base.prompt("Enter value for 'logo.light' (String, default=nothing)")
-    dark = Base.prompt("Enter value for 'logo.dark' (String, default=nothing)")
+    light = Base.prompt("Enter value for 'logo.light' (default: nothing)")
+    dark = Base.prompt("Enter value for 'logo.dark' (default: nothing)")
     return Logo(; light=light, dark=dark)
 end

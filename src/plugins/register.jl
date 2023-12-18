@@ -1,7 +1,7 @@
 """
     RegisterAction(;
-        file="$(contractuser(default_file("github", "workflows", "register.yml")))",
-        destination="register.yml",
+        file="$(contractuser(default_file("github", "workflows", "Register.yml")))",
+        destination="Register.yml",
         prompt="Version to register or component to bump",
     )
 
@@ -15,8 +15,8 @@ See [here](https://github.com/julia-actions/RegisterAction) for more information
 - `prompt::AbstractString`: Prompt for workflow dispatch.
 """
 @plugin struct RegisterAction <: FilePlugin
-    file::String = default_file("github", "workflows", "register.yml")
-    destination::String = "register.yml"
+    file::String = default_file("github", "workflows", "Register.yml")
+    destination::String = "Register.yml"
     prompt::String = "Version to register or component to bump"
 end
 

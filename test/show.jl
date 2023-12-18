@@ -47,11 +47,21 @@ end
                   jl: true
                   manifest: false
                   gpgsign: false
+                GitHubActions:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CI.yml"))"
+                  destination: \"CI.yml\"
+                  linux: true
+                  osx: false
+                  windows: false
+                  x64: true
+                  x86: false
+                  coverage: true
+                  extra_versions: [\"1.0\", \"$(VERSION.major).$(VERSION.minor)\", \"nightly\"]
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
                 ProjectFile:
-                  version: v"0.1.0"
+                  version: v"1.0.0-DEV"
                 Readme:
                   file: "$(joinpath(TEMPLATES_DIR, "README.md"))"
                   destination: "README.md"
@@ -78,6 +88,9 @@ end
                 Tests:
                   file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
                   project: false
+                  aqua: false
+                  aqua_kwargs: NamedTuple()
+                  jet: false
             """
         # `with_clean_gitconfig` requires Git to be installed, but if Git is not installed,
         # then we probably don't need to worry about any conflicting Git config files.
