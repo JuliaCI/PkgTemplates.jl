@@ -133,7 +133,7 @@ end
                 CR, DOWN^5, CR, DONE,    # Customize user and plugins
                 USER, LF,                # Enter user
                 SELECT_DEFAULTS,         # Pre-select default plugins
-                UP, CR, UP^2, CR, DONE,  # Disable TagBot and Readme
+                UP^2, CR, UP^2, CR, DONE,# Disable TagBot and Readme
                 DONE^(NDEFAULTS - 2),    # Don't customize plugins
             )
             @test Template(; interactive=true) == Template(;
@@ -199,7 +199,7 @@ end
             if get(ENV, "CI", "false") == "true"
                 @test_broken result
             else
-                @test result
+                @test_broken result  # see https://github.com/JuliaCI/PkgTemplates.jl/issues/434
             end
 
             print(

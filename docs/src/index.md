@@ -14,6 +14,10 @@ If you want to **create new plugins**, see the [Developer Guide](developer.md).
 
 if you're trying to **migrate from an older version of PkgTemplates**, see [Migrating To PkgTemplates 0.7+](migrating.md).
 
+```@docs
+PkgTemplates
+```
+
 ## Index
 
 ```@index

@@ -41,6 +41,7 @@ Tests
 Readme
 License
 Git
+GitHubActions
 CompatHelper
 TagBot
 Secret
@@ -55,7 +56,6 @@ These plugins will create the configuration files of common CI services for you.
 AppVeyor
 CirrusCI
 DroneCI
-GitHubActions
 GitLabCI
 TravisCI
 ```
@@ -71,12 +71,17 @@ Coveralls
 
 ### Documentation
 
+These plugins will help you build a documentation website.
+
 ```@docs
 Documenter
 Logo
 ```
 
 ### Badges
+
+These plugins will add badges to the README.
+
 ```@docs
 BlueStyleBadge
 ColPracBadge
@@ -89,6 +94,9 @@ PkgEvalBadge
 Develop
 Citation
 RegisterAction
+Formatter
+CodeOwners
+PkgBenchmark
 ```
 
 ## A More Complicated Example

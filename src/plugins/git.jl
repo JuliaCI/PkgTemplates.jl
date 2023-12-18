@@ -66,7 +66,7 @@ function prehook(p::Git, t::Template, pkg_dir::AbstractString)
             end
         end
         commit(p, repo, pkg_dir, "Initial commit")
-        pkg = basename(pkg_dir)
+        pkg = pkg_name(pkg_dir)
         suffix = p.jl ? ".jl" : ""
         url = if p.ssh
             "git@$(t.host):$(t.user)/$pkg$suffix.git"
@@ -103,7 +103,6 @@ function posthook(p::Git, ::Template, pkg_dir::AbstractString)
     # Ensure that the manifest exists if it's going to be committed.
     manifest = joinpath(pkg_dir, "Manifest.toml")
     if p.manifest && !isfile(manifest)
-        touch(manifest)
         with_project(Pkg.update, pkg_dir)
     end
 
