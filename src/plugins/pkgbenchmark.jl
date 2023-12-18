@@ -3,7 +3,11 @@
 
 Sets up a [PkgBenchmark.jl](https://github.com/JuliaCI/PkgBenchmark.jl) benchmark suite.
 
-You may also need to create an environment in the `benchmark` subfolder, in which you `pkg> dev` the current package.
+To ensure benchmark reproducibility, you will need to manually create an environment in the `benchmark` subfolder (for which the `Manifest.toml` is committed to version control).
+In this environment, you should at the very least:
+
+- `pkg> add BenchmarkTools`
+- `pkg> dev` your new package.
 
 ## Keyword Arguments
 - `file::AbstractString`: Template file for `benchmarks.jl`.
