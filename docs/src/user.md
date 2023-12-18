@@ -96,6 +96,7 @@ Citation
 RegisterAction
 Formatter
 CodeOwners
+PkgBenchmark
 ```
 
 ## A More Complicated Example
