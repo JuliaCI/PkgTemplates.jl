@@ -9,6 +9,7 @@ const DOWN = "\eOB"
 const ALL = "a"
 const NONE = "n"
 const DONE = "d"
+const SIGINT = "\x03"
 
 # Because the plugin selection dialog prints directly to stdin in the same way
 # as we do here, and our input prints happen first, we're going to need to insert
@@ -46,13 +47,16 @@ end
     end
 
     @testset "input_tips" begin
-        @test isempty(PT.input_tips(Int))
+        @test isempty(PT.input_tips(String))
+        @test PT.input_tips(Int) == ["Int"]
+        @test PT.input_tips(Bool) == ["Bool"]
+        @test PT.input_tips(Symbol) == ["Symbol"]
         @test PT.input_tips(Vector{String}) == ["comma-delimited"]
         @test PT.input_tips(Union{Vector{String}, Nothing}) ==
-            ["'nothing' for nothing", "comma-delimited"]
+            ["comma-delimited", "'nothing' for nothing"]
         @test PT.input_tips(Union{String, Nothing}) == ["'nothing' for nothing"]
         @test PT.input_tips(Union{Vector{Secret}, Nothing}) ==
-            ["'nothing' for nothing", "comma-delimited", "name only"]
+            ["name only", "comma-delimited", "'nothing' for nothing"]
     end
 
     @testset "Interactive name/type pair collection" begin
@@ -126,10 +130,10 @@ end
         @testset "Disabling default plugins" begin
             print(
                 stdin.buffer,
-                CR, DOWN^5, CR, DONE,  # Customize user and plugins
+                CR, DOWN^5, CR, DONE,    # Customize user and plugins
                 USER, LF,                # Enter user
                 SELECT_DEFAULTS,         # Pre-select default plugins
-                UP, CR, UP^2, CR, DONE,  # Disable TagBot and Readme
+                UP^3, CR, UP^2, CR, DONE,# Disable TagBot and Readme
                 DONE^(NDEFAULTS - 2),    # Don't customize plugins
             )
             @test Template(; interactive=true) == Template(;
@@ -156,7 +160,7 @@ end
             @test PT.interactive(TravisCI) == TravisCI(;
                 arm64=true,
                 coverage=false,
-                extra_versions=[v"1.1", v"1.2"],
+                extra_versions=["1.1", "v1.2"],
                 file="x.txt",
                 linux=true,
                 osx=false,
@@ -167,11 +171,13 @@ end
 
             print(
                 stdin.buffer,
-                DOWN^2, CR,      # Select GitLabCI
-                DOWN, CR, DONE,  # Customize index_md
-                "x.txt", LF,     # Enter index file
+                DOWN^2, CR,        # Select GitLabCI
+                DOWN^2, CR,        # Customize edit_link
+                DOWN, CR, DONE,    # Customize index_md
+                ":commit", LF,     # Enter edit_link
+                "x.txt", LF,       # Enter index file
             )
-            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
+            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; edit_link=:commit, index_md="x.txt")
 
             print(
                 stdin.buffer,
@@ -180,6 +186,30 @@ end
                 CR,                  # Choose MIT for name (it's at the top)
             )
             @test PT.interactive(License) == License(; destination="COPYING", name="MIT")
+        end
+
+        @testset "Quotes" begin
+            print(
+                stdin.buffer,
+                CR, DOWN^2, CR, DONE,  # Customize user and dir
+                "\"me\"", LF,          # Enter user with quotes
+                "\"~\"", LF,           # Enter home dir with quotes
+            )
+            result = Template(; interactive=true) == Template(; user="me", dir="~")
+            if get(ENV, "CI", "false") == "true"
+                @test_broken result
+            else
+                @test_broken result  # see https://github.com/JuliaCI/PkgTemplates.jl/issues/434
+            end
+
+            print(
+                stdin.buffer,
+                DOWN^2, CR, DONE,                        # Customize extra_versions
+                "\"1.1.1\", \"^1.5\", \"nightly\"", LF,  # Enter versions with quotes
+            )
+            @test PT.interactive(TravisCI) == TravisCI(;
+                extra_versions=["1.1.1", "^1.5", "nightly"],
+            )
         end
 
         @testset "Union{T, Nothing} weirdness" begin
@@ -204,6 +234,27 @@ end
                 DOWN, CR, DONE,  # Select "None" option
             )
             @test PT.interactive(Codecov) == Codecov()
+        end
+
+        @testset "Missing user" begin
+            print(
+                stdin.buffer,
+                DONE,            # Customize nothing
+                "username", LF,  # Enter user after it's prompted
+            )
+
+            patch = @patch PkgTemplates.default_user() = ""
+            apply(patch) do
+                @test Template(; interactive=true) == Template(; user="username")
+            end
+        end
+
+        @testset "Interrupts" begin
+            print(
+                stdin.buffer,
+                SIGINT,  # Send keyboard interrupt
+            )
+            @test Template(; interactive=true) === nothing
         end
 
         println()

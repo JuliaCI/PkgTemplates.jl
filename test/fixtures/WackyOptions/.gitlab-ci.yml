@@ -5,28 +5,7 @@
         using Pkg
         Pkg.build()
         Pkg.test()'
-Julia 0.6:
-  image: julia:0.6
-  extends:
-    - .script
 Julia 1.2:
   image: julia:1.2
   extends:
     - .script
-pages:
-  image: julia:1.2
-  stage: deploy
-  script:
-    - |
-      julia --project=docs -e '
-        using Pkg
-        Pkg.develop(PackageSpec(path=pwd()))
-        Pkg.instantiate()
-        include("docs/make.jl")'
-    - mkdir -p public
-    - mv docs/build public/dev
-  artifacts:
-    paths:
-      - public
-  only:
-    - master

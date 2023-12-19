@@ -2,7 +2,7 @@
 environment:
   matrix:
     - julia_version: 1.0
-    - julia_version: 1.4
+    - julia_version: 1.7
     - julia_version: nightly
 platform:
   - x64
@@ -13,7 +13,7 @@ matrix:
     - julia_version: nightly
 branches:
   only:
-    - master
+    - main
     - /release-.*/
 notifications:
   - provider: Email

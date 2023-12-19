@@ -2,9 +2,9 @@
     TagBot(;
         file="$(contractuser(default_file("github", "workflows", "TagBot.yml")))",
         destination="TagBot.yml",
-        cron="0 0 * * *",
+        trigger="JuliaTagBot",
         token=Secret("GITHUB_TOKEN"),
-        ssh=nothing,
+        ssh=Secret("DOCUMENTER_KEY"),
         ssh_password=nothing,
         changelog=nothing,
         changelog_ignore=nothing,
@@ -21,7 +21,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 ## Keyword Arguments
 - `file::AbstractString`: Template file for the workflow file.
 - `destination::AbstractString`: Destination of the workflow file, relative to `.github/workflows`.
-- `cron::AbstractString`: Cron expression for the schedule interval.
+- `trigger::AbstractString`: Username of the trigger user for custom registries.
 - `token::Secret`: Name of the token secret to use.
 - `ssh::Secret`: Name of the SSH private key secret to use.
 - `ssh_password::Secret`: Name of the SSH key password secret to use.
@@ -37,9 +37,9 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 @plugin struct TagBot <: FilePlugin
     file::String = default_file("github", "workflows", "TagBot.yml")
     destination::String = "TagBot.yml"
-    cron::String = "0 0 * * *"
+    trigger::String = "JuliaTagBot"
     token::Secret = Secret("GITHUB_TOKEN")
-    ssh::Union{Secret, Nothing} = nothing
+    ssh::Union{Secret, Nothing} = Secret("DOCUMENTER_KEY")
     ssh_password::Union{Secret, Nothing} = nothing
     changelog::Union{String, Nothing} = nothing
     changelog_ignore::Union{Vector{String}, Nothing} = nothing
@@ -68,7 +68,7 @@ function view(p::TagBot, ::Template, ::AbstractString)
         "BRANCHES" => p.branches === nothing ? nothing : string(p.branches),
         "CHANGELOG" => changelog,
         "CHANGELOG_IGNORE" => ignore,
-        "CRON" => p.cron,
+        "TRIGGER" => p.trigger,
         "DISPATCH" => p.dispatch === nothing ? nothing : string(p.dispatch),
         "DISPATCH_DELAY" => p.dispatch_delay,
         "GPG" => p.gpg,

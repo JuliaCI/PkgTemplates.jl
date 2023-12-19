@@ -57,10 +57,27 @@
         end
     end
 
+    @testset "Default branches" begin
+        with_clean_gitconfig() do
+            @test Git().branch == PT.DEFAULT_DEFAULT_BRANCH
+            run(`git config init.defaultBranch foo`)
+            @test Git().branch == "foo"
+        end
+
+        t = tpl(; plugins=[Git(; branch="main")])
+        with_pkg(t) do pkg
+            LibGit2.with(GitRepo(joinpath(t.dir, pkg))) do repo
+                @test LibGit2.branch(repo) == "main"
+            end
+        end
+    end
+
     @testset "Adds version to commit message" begin
         # We're careful to avoid a Pkg.update as it triggers Cassette#130.
         t = tpl(; plugins=[Git(), !Tests])
-        mock(PT.version_of => _p -> v"1.2.3") do _i
+
+        patch = @patch PkgTemplates.version_of(t) = v"1.2.3"
+        apply(patch) do
             with_pkg(t) do pkg
                 pkg_dir = joinpath(t.dir, pkg)
                 LibGit2.with(GitRepo(pkg_dir)) do repo

@@ -1,0 +1,48 @@
+.script:
+  script:
+    - |
+      julia --project=@. -e '
+        using Pkg
+        Pkg.build()
+        Pkg.test(coverage=true)'
+.coverage:
+  coverage: /Test coverage (\d+\.\d+%)/
+  after_script:
+    - |
+      julia -e '
+        using Pkg
+        Pkg.add("Coverage")
+        using Coverage
+        c, t = get_summary(process_folder())
+        using Printf
+        @printf "Test coverage %.2f%%\n" 100c / t'
+Julia 1.0:
+  image: julia:1.0
+  extends:
+    - .script
+    - .coverage
+Julia 1.7:
+  image: julia:1.7
+  extends:
+    - .script
+    - .coverage
+pages:
+  image: julia:1.0
+  stage: deploy
+  script:
+    - |
+      julia --project=docs -e '
+        using Pkg
+        Pkg.develop(PackageSpec(path=pwd()))
+        Pkg.instantiate()
+        using Documenter: doctest
+        using DocumenterGitLabCI
+        doctest(DocumenterGitLabCI)
+        include("docs/make.jl")'
+    - mkdir -p public
+    - mv docs/build public/dev
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

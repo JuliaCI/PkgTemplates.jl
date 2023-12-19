@@ -40,11 +40,71 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @test_logs tpl(; julia=v"1.3", plugins=[p])
     end
 
+    @testset "CI versions" begin
+        t = tpl(; julia=v"1")
+        @test PT.collect_versions(t, ["1.0", "1.5", "nightly"]) == ["1.0", "1.5", "nightly"]
+        t = tpl(; julia=v"2")
+        @test PT.collect_versions(t, ["1.0", "1.5", "nightly"]) == ["2.0", "nightly"]
+    end
+
     @testset "Equality" begin
         a = FileTest("foo", true)
         b = FileTest("foo", true)
         @test a == b
         c = FileTest("foo", false)
         @test a != c
+    end
+
+    @testset "Validations" begin
+        t = tpl()
+        p = TravisCI(; file="/does/not/exist")
+        @test_throws ArgumentError PT.validate(p, t)
+        p = Documenter(; assets=["/does/not/exist"])
+        @test_throws ArgumentError PT.validate(p, t)
+        p = Documenter(; logo=Logo(; light="/does/not/exist"))
+        @test_throws ArgumentError PT.validate(p, t)
+        p = Documenter{TravisCI}()
+        @test_throws ArgumentError PT.validate(p, t)
+    end
+
+    @testset "Custom badge plugins" begin
+        t = tpl(; plugins=[!Readme, BlueStyleBadge()])
+        with_pkg(t) do pkg
+            pkg_dir = joinpath(t.dir, pkg)
+            @test !isfile(joinpath(pkg_dir, "README.md"))
+        end
+        @testset "$BadgeType" for (BadgeType, text) in (
+            BlueStyleBadge => "BlueStyle",
+            ColPracBadge => "ColPrac",
+            PkgEvalBadge => "PkgEval",
+        )
+            @test BadgeType <: PT.BadgePlugin
+            t = tpl(; plugins=[BadgeType()])
+            @test PT.hasplugin(t, BadgeType)
+            with_pkg(t) do pkg
+                pkg_dir = joinpath(t.dir, pkg)
+                @test occursin(text, read(joinpath(pkg_dir, "README.md"), String))
+            end
+        end
+    end
+
+    # https://github.com/JuliaCI/PkgTemplates.jl/issues/275
+    @testset "makedocs_kwargs sort bug" begin
+        p = Documenter(; makedocs_kwargs=Dict(:strict => true, :checkdocs => :exports))
+        t = tpl(; plugins=[p])
+        # A failure looks like: `MethodError: no method matching isless(::Symbol, ::Bool)`
+        with_pkg(t) do pkg
+            pkg_dir = joinpath(t.dir, pkg)
+            @test isdir(joinpath(pkg_dir, "docs"))
+        end
+    end
+
+    @testset "`pkg_name`" begin
+        using PkgTemplates: pkg_name
+        @test pkg_name("foo/bar/Whee.jl") == "Whee"
+        @test pkg_name("foo/bar/Whee") == "Whee"
+        @test pkg_name("Whee") == "Whee"
+        # Only the final suffix is removed---we don't correct for user error
+        @test pkg_name("Whee.jl.jl") == "Whee.jl"
     end
 end

@@ -1,10 +1,11 @@
+@doc read(joinpath(dirname(@__DIR__), "README.md"), String)
 module PkgTemplates
 
 using Base: active_project, contractuser
 
 using Dates: month, today, year
 using InteractiveUtils: subtypes
-using LibGit2: LibGit2, GitConfig, GitRemote, GitRepo
+using LibGit2: LibGit2, GitConfig, GitReference, GitRemote, GitRepo, delete_branch
 using Pkg: Pkg, TOML, PackageSpec
 using REPL.TerminalMenus: MultiSelectMenu, RadioMenu, request
 using UUIDs: uuid4
@@ -12,24 +13,35 @@ using UUIDs: uuid4
 using Mustache: render
 using Parameters: @with_kw_noshow
 
+using Mocking
+
 export
     Template,
     AppVeyor,
+    BlueStyleBadge,
     CirrusCI,
     Citation,
-    DroneCI,
     Codecov,
+    CodeOwners,
+    ColPracBadge,
     CompatHelper,
     Coveralls,
+    Dependabot,
     Develop,
     Documenter,
+    DroneCI,
+    Formatter,
     Git,
     GitHubActions,
     GitLabCI,
     License,
+    Logo,
     NoDeploy,
+    PkgBenchmark,
+    PkgEvalBadge,
     ProjectFile,
     Readme,
+    RegisterAction,
     Secret,
     SrcDir,
     TagBot,

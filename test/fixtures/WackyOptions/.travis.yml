@@ -3,11 +3,9 @@ language: julia
 notifications:
   email: false
 julia:
-  - 1.1
   - 1.2
 os:
   - linux
-  - osx
 arch:
   - x64
   - x86
@@ -17,8 +15,3 @@ cache:
     - ~/.julia/artifacts
 jobs:
   fast_finish: true
-  exclude:
-    - arch: x86
-      os: osx
-    - arch: arm64
-      os: osx

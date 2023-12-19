@@ -4,12 +4,10 @@ notifications:
   email: false
 julia:
   - 1.0
-  - 1.4
+  - 1.7
   - nightly
 os:
   - linux
-  - osx
-  - windows
 arch:
   - x64
 cache:
@@ -22,10 +20,20 @@ jobs:
   include:
     - stage: Documentation
       julia: 1
-      script: |
+      script:
+      - |
+        julia --project=docs -e '
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.instantiate()'
+      - |
         julia --project=docs -e '
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
+          using Documenter: DocMeta, doctest
+          using DocumenterTravis
+          DocMeta.setdocmeta!(DocumenterTravis, :DocTestSetup, :(using DocumenterTravis); recursive=true)
+          doctest(DocumenterTravis)
           include("docs/make.jl")'
       after_success: skip

@@ -1,7 +1,6 @@
 # Documentation: https://github.com/JuliaCI/Appveyor.jl
 environment:
   matrix:
-    - julia_version: 1.1
     - julia_version: 1.2
 platform:
   - x64
@@ -10,7 +9,7 @@ cache:
   - '%USERPROFILE%\.julia\artifacts'
 branches:
   only:
-    - master
+    - whackybranch
     - /release-.*/
 notifications:
   - provider: Email
