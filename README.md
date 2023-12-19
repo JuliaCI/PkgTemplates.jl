@@ -32,6 +32,8 @@ using PkgTemplates
 Template(interactive=true)("MyPkg")
 ```
 
+This will prompt you to select options, displaying the default settings in parentheses.
+
 ### Manual creation
 
 Creating a `Template` is as simple as:
