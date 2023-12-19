@@ -60,10 +60,10 @@ source(p::GitHubActions) = p.file
 destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
 tags(::GitHubActions) = "<<", ">>"
 
-badges(::GitHubActions) = Badge(
+badges(p::GitHubActions) = Badge(
     "Build Status",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions/workflows/$(p.destination)/badge.svg?branch={{{BRANCH}}}",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions/workflows/$(p.destination)?query=branch%3A{{{BRANCH}}}",
 )
 
 function view(p::GitHubActions, t::Template, pkg::AbstractString)
@@ -75,7 +75,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
     excludes = Dict{String, String}[]
     p.osx && p.x86 && push!(excludes, Dict("E_OS" => "macOS-latest", "E_ARCH" => "x86"))
 
-    return Dict(
+    v = Dict(
         "ARCH" => arch,
         "EXCLUDES" => excludes,
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
@@ -87,6 +87,11 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
         "USER" => t.user,
         "VERSIONS" => collect_versions(t, p.extra_versions),
     )
+    p = getplugin(t, Git)
+    if p !== nothing
+        v["BRANCH"] = p.branch
+    end
+    return v
 end
 
 """
@@ -133,8 +138,8 @@ destination(::TravisCI) = ".travis.yml"
 
 badges(::TravisCI) = Badge(
     "Build Status",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch=master",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
+    "https://app.travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch={{{BRANCH}}}",
+    "https://app.travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
 )
 
 function view(p::TravisCI, t::Template, pkg::AbstractString)
@@ -154,6 +159,7 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
         "ARCH" => arch,
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "EXCLUDES" => excludes,
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => hasplugin(t, Codecov),
@@ -213,6 +219,7 @@ function view(p::AppVeyor, t::Template, pkg::AbstractString)
 
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
         "PKG" => pkg,
@@ -307,19 +314,20 @@ destination(::GitLabCI) = ".gitlab-ci.yml"
 function badges(p::GitLabCI)
     ci = Badge(
         "Build Status",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/pipeline.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/{{{BRANCH}}}/pipeline.svg",
         "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/pipelines",
     )
     cov = Badge(
         "Coverage",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/coverage.svg",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/master",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/{{{BRANCH}}}/coverage.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/{{{BRANCH}}}",
     )
     return p.coverage ? [ci, cov] : [ci]
 end
 
 function view(p::GitLabCI, t::Template, pkg::AbstractString)
     return Dict(
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "HAS_COVERAGE" => p.coverage,
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
         "HOST" => t.host,

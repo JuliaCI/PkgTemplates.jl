@@ -13,6 +13,9 @@ makedocs(;
 {{#CANONICAL}}
         canonical="{{{CANONICAL}}}",
 {{/CANONICAL}}
+{{#EDIT_LINK}}
+        edit_link={{{EDIT_LINK}}},
+{{/EDIT_LINK}}
         assets={{^HAS_ASSETS}}String{{/HAS_ASSETS}}[{{^HAS_ASSETS}}],{{/HAS_ASSETS}}
 {{#ASSETS}}
             "assets/{{{.}}}",

@@ -47,5 +47,5 @@ pages:
     paths:
       - public
   only:
-    - master
+    - {{{BRANCH}}}
 {{/HAS_DOCUMENTER}}
