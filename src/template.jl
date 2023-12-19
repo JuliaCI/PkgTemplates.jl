@@ -10,6 +10,7 @@ default_plugins() = [
     Tests(),
     TagBot(),
     GitHubActions(),
+    Dependabot(),
 ]
 
 function default_authors()

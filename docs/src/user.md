@@ -45,6 +45,7 @@ GitHubActions
 CompatHelper
 TagBot
 Secret
+Dependabot
 ```
 
 ### Continuous Integration (CI)
@@ -90,7 +91,6 @@ PkgEvalBadge
 ### Miscellaneous
 
 ```@docs
-Dependabot
 Develop
 Citation
 RegisterAction
