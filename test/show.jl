@@ -38,6 +38,8 @@ end
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CompatHelper.yml"))"
                   destination: "CompatHelper.yml"
                   cron: "0 0 * * *"
+                Dependabot:
+                  file: "$(joinpath(TEMPLATES_DIR, "github", "dependabot.yml"))"
                 Git:
                   ignore: String[]
                   name: nothing

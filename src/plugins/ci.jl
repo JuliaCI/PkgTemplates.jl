@@ -138,8 +138,8 @@ destination(::TravisCI) = ".travis.yml"
 
 badges(::TravisCI) = Badge(
     "Build Status",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch={{{BRANCH}}}",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
+    "https://app.travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch={{{BRANCH}}}",
+    "https://app.travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
 )
 
 function view(p::TravisCI, t::Template, pkg::AbstractString)
