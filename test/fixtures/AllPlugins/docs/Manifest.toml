@@ -1,12 +1,12 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.1"
+julia_version = "1.7.2"
 manifest_format = "2.0"
 
 [[deps.AllPlugins]]
 path = ".."
 uuid = "c51a4d33-e9a4-4efb-a257-e0de888ecc28"
-version = "0.1.0"
+version = "1.0.0-DEV"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
