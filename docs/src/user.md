@@ -270,7 +270,7 @@ Another strategy is to write the string representation of the template to a Juli
 const t = Template(; #= ... =#)
 open("template.jl", "w") do io
     println(io, "using PkgTemplates")
-    sprint(show, io, t)
+    print(io, t)
 end
 ```
 
