@@ -118,6 +118,8 @@ end
     (::Template)(pkg::AbstractString)
 
 Generate a package named `pkg` from a [`Template`](@ref).
+
+Return the path to the package directory.
 """
 function (t::Template)(pkg::AbstractString)
     endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
