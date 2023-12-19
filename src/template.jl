@@ -207,7 +207,7 @@ function interactive(::Type{Template}; kwargs...)
         println("Template keywords to customize:")
         menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
         customize = customizable[sort!(collect(request(menu)))]
-        just_one && lastindex(customizable) in customize && return Template(; kwargs...)
+        just_one && last(customizable) in customize && return Template(; kwargs...)
 
         # Prompt for each keyword.
         foreach(customize) do k
