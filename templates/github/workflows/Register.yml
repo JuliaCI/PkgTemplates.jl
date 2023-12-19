@@ -3,11 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: gimme version
+        description: <<&PROMPT>>
         required: true
 jobs:
   register:
     runs-on: ubuntu-latest
+    permissions:
+        contents: write
     steps:
       - uses: julia-actions/RegisterAction@latest
         with:
