@@ -26,11 +26,15 @@ function interactive(T::Type)
     just_one = length(pairs) == 1
     just_one && push!(pairs, :None => Nothing)
 
-    menu = MultiSelectMenu(
-        collect(map(pair -> string(first(pair)), pairs));
-        pagesize=length(pairs),
-    )
     println("$(nameof(T)) keywords to customize:")
+    opts = map(first.(pairs)) do k
+        if k != :None
+            "$k ($(repr(defaultkw(T, k))))"
+        else
+            "$k"
+        end
+    end
+    menu = MultiSelectMenu(opts; pagesize=length(pairs))
     customize = sort!(collect(request(menu)))
 
     # If the "None" option was selected, don't customize anything.
