@@ -8,7 +8,6 @@ makedocs(;
     authors="tester",
     sitename="DocumenterTravis.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://tester.github.io/DocumenterTravis.jl",
         edit_link="main",
         assets=String[],

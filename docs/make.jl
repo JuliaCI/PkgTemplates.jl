@@ -7,7 +7,6 @@ makedocs(;
     sitename="PkgTemplates.jl",
     format=Documenter.HTML(;
         repolink="https://github.com/JuliaCI/PkgTemplates.jl",
-        prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://juliaci.github.io/PkgTemplates.jl",
         assets=String[],
     ),

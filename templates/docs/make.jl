@@ -8,7 +8,6 @@ makedocs(;
     authors="{{{AUTHORS}}}",
     sitename="{{{PKG}}}.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
 {{#CANONICAL}}
         canonical="{{{CANONICAL}}}",
 {{/CANONICAL}}

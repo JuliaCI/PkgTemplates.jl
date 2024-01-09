@@ -8,7 +8,6 @@ makedocs(;
     authors="tester",
     sitename="WackyOptions.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
         canonical="http://example.com",
         edit_link=:commit,
         assets=[
