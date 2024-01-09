@@ -6,7 +6,6 @@ DocMeta.setdocmeta!(WackyOptions, :DocTestSetup, :(using WackyOptions); recursiv
 makedocs(;
     modules=[WackyOptions],
     authors="tester",
-    repo="https://x.com/tester/WackyOptions.jl/blob/{commit}{path}#{line}",
     sitename="WackyOptions.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
