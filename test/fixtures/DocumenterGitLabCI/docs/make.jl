@@ -6,10 +6,8 @@ DocMeta.setdocmeta!(DocumenterGitLabCI, :DocTestSetup, :(using DocumenterGitLabC
 makedocs(;
     modules=[DocumenterGitLabCI],
     authors="tester",
-    repo="https://github.com/tester/DocumenterGitLabCI.jl/blob/{commit}{path}#{line}",
     sitename="DocumenterGitLabCI.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://tester.gitlab.io/DocumenterGitLabCI.jl",
         edit_link="main",
         assets=String[],
