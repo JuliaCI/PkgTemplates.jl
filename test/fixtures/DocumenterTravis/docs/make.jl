@@ -6,7 +6,6 @@ DocMeta.setdocmeta!(DocumenterTravis, :DocTestSetup, :(using DocumenterTravis); 
 makedocs(;
     modules=[DocumenterTravis],
     authors="tester",
-    repo="https://github.com/tester/DocumenterTravis.jl/blob/{commit}{path}#{line}",
     sitename="DocumenterTravis.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
