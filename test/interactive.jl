@@ -85,6 +85,7 @@ end
         end
 
         @testset "Custom options, accept defaults" begin
+            nversions_to_compat = PkgTemplates.default_version().minor
             print(
                 stdin.buffer,
                 ALL, DONE,        # Customize all fields
@@ -92,7 +93,7 @@ end
                 LF,               # Enter authors
                 LF,               # Enter dir
                 CR,               # Enter host
-                CR,               # Enter julia
+                DOWN^nversions_to_compat, CR,               # Enter julia
                 SELECT_DEFAULTS,  # Pre-select default plugins
                 DONE,             # Select no additional plugins
                 DONE^NDEFAULTS,   # Don't customize plugins

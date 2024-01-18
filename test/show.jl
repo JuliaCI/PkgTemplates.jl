@@ -31,7 +31,7 @@ end
               authors: ["$USER"]
               dir: "$(contractuser(Pkg.devdir()))"
               host: "github.com"
-              julia: v"1.0.0"
+              julia: v"1.6.7"
               user: "$USER"
               plugins:
                 CompatHelper:
@@ -58,7 +58,7 @@ end
                   x64: true
                   x86: false
                   coverage: true
-                  extra_versions: [\"1.0\", \"$(VERSION.major).$(VERSION.minor)\", \"nightly\"]
+                  extra_versions: [\"1.6\", \"$(VERSION.major).$(VERSION.minor)\", \"nightly\"]
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"

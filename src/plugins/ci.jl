@@ -404,8 +404,9 @@ function collect_versions(t::Template, versions::Vector)
     vs = map(v -> lstrip(v, 'v'), [format_version(t.julia); custom])
     filter!(vs) do v
         # Throw away any versions lower than the template's minimum.
+        # but v1.6 should be accepted as a CI number even when t.julia = v1.6.7
         try
-            VersionNumber(v) >= t.julia
+            Base.thisminor(VersionNumber(v)) >= Base.thisminor(t.julia)
         catch e
             e isa ArgumentError || rethrow()
             true
