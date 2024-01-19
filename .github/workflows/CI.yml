@@ -21,6 +21,7 @@ jobs:
       matrix:
         version:
           - "1.0"  # LTS
+          - "1.7"  # interactive tests require <= 1.8
           - "1"    # Latest Release
         os:
           - ubuntu-latest
@@ -42,7 +43,7 @@ jobs:
           # require this specific job to pass on all PRs
           # (see Settings > Branches > Branch protection rules).
           - os: ubuntu-latest
-            version: 1.7.2
+            version: 1.10.0
             arch: x64
     steps:
       - uses: actions/checkout@v4

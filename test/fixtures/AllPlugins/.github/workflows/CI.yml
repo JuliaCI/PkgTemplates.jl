@@ -24,7 +24,7 @@ jobs:
       matrix:
         version:
           - '1.0'
-          - '1.7'
+          - '1.10'
           - 'nightly'
         os:
           - ubuntu-latest
