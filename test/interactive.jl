@@ -97,7 +97,7 @@ end
                 DONE,             # Select no additional plugins
                 DONE^NDEFAULTS,   # Don't customize plugins
             )
-            @test Template(; interactive=true) == Template(; user="user")
+            @test Template(; interactive=true) == Template(; user="user", julia=v"1.0.0")
             readavailable(stdin.buffer)
         end
 

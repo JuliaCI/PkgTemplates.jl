@@ -21,7 +21,7 @@ jobs:
       matrix:
         version:
           - "1.0"  # LTS
-          - "1.7"  # interactive tests require <= 1.8
+          - "1.7" # interactive tests require <= 1.8
           - "1"    # Latest Release
         os:
           - ubuntu-latest
