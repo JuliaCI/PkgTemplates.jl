@@ -71,7 +71,8 @@ jobs:
       - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
-
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
   slack:
     name: Notify Slack Failure
     needs: test
