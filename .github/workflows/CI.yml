@@ -72,7 +72,7 @@ jobs:
         with:
           files: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
+          fail_ci_if_error: false
   slack:
     name: Notify Slack Failure
     needs: test

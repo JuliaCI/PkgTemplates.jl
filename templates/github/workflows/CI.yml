@@ -61,7 +61,7 @@ jobs:
         with:
           files: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
+          fail_ci_if_error: false
       <</HAS_CODECOV>>
       <<#HAS_COVERALLS>>
       - uses: julia-actions/julia-uploadcoveralls@v1
