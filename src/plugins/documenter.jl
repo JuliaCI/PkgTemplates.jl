@@ -37,6 +37,15 @@ Sets up documentation generation via [Documenter.jl](https://github.com/JuliaDoc
 Documentation deployment depends on `T`, where `T` is some supported CI plugin,
 or `Nothing` to only support local documentation builds.
 
+!!! note
+    If you are deploying documentation with GitHub Actions or Travis CI, don't forget to complete
+    [the required configuration](https://documenter.juliadocs.org/stable/man/hosting/#Hosting-Documentation).
+    In particular, you may need to run
+    ```julia
+    using DocumenterTools; DocumenterTools.genkeys(user="MyUser", repo="MyPackage.jl")
+    ```
+    and follow the instructions there.
+
 ## Supported Type Parameters
 - `GitHubActions`: Deploys documentation to [GitHub Pages](https://pages.github.com)
   with the help of [`GitHubActions`](@ref).
@@ -62,10 +71,6 @@ or `Nothing` to only support local documentation builds.
 - `devbranch::Union{AbstractString, Nothing}`: Branch that will trigger docs deployment.
   If `nothing`, then the default branch according to the `Template` will be used.
 - `makedocs_kwargs::Dict{Symbol,Any}`: Extra keyword arguments to be inserted into `makedocs`.
-
-!!! note
-    If deploying documentation with Travis CI, don't forget to complete
-    [the required configuration](https://juliadocs.github.io/Documenter.jl/stable/man/hosting/#SSH-Deploy-Keys-1).
 """
 struct Documenter{T} <: Plugin
     assets::Vector{String}
