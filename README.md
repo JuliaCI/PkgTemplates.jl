@@ -63,9 +63,9 @@ tpl = Template(;
     dir="~/code",
     plugins=[
         Git(; manifest=true, ssh=true),
+        GitHubActions(; x86=true),
         Codecov(),
-        TravisCI(; x86=true),
-        Documenter{TravisCI}(),
+        Documenter{GitHubActions}(),
     ],
 )
 ```
