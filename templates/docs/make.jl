@@ -1,3 +1,5 @@
+insert!(LOAD_PATH, 1, joinpath(@__DIR__, ".."))
+
 using {{{PKG}}}
 using Documenter
 
