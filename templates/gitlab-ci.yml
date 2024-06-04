@@ -1,3 +1,4 @@
+{{{FILE_PREFIX}}}
 .script:
   script:
     - |
