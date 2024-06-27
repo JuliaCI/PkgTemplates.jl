@@ -7,7 +7,7 @@ Strings are left in their original form.
 format_version(v::VersionNumber) = "$(v.major).$(v.minor)"
 format_version(v::AbstractString) = string(v)
 
-const ALLOWED_FAILURES = ["nightly"]
+const ALLOWED_FAILURES = ["nightly"]  # TODO: Update this list with new RCs.
 const DEFAULT_CI_VERSIONS = map(format_version, [default_version(), VERSION, "nightly"])
 const DEFAULT_CI_VERSIONS_GITHUB = map(format_version, [default_version(), VERSION, "pre"])
 const DEFAULT_CI_VERSIONS_NO_PRERELEASE = map(format_version, [default_version(), VERSION])
