@@ -58,7 +58,7 @@ end
                   x64: true
                   x86: false
                   coverage: true
-                  extra_versions: [\"1.6\", \"$(VERSION.major).$(VERSION.minor)\", \"nightly\"]
+                  extra_versions: [\"1.6\", \"$(VERSION.major).$(VERSION.minor)\", \"pre\"]
                 License:
                   path: "$(joinpath(LICENSES_DIR, "MIT"))"
                   destination: "LICENSE"
