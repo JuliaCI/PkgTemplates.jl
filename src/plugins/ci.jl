@@ -9,7 +9,8 @@ format_version(v::AbstractString) = string(v)
 
 const ALLOWED_FAILURES = ["nightly"]  # TODO: Update this list with new RCs.
 const DEFAULT_CI_VERSIONS = map(format_version, [default_version(), VERSION, "nightly"])
-const DEFAULT_CI_VERSIONS_NO_NIGHTLY = map(format_version, [default_version(), VERSION])
+const DEFAULT_CI_VERSIONS_GITHUB = map(format_version, [default_version(), VERSION, "pre"])
+const DEFAULT_CI_VERSIONS_NO_PRERELEASE = map(format_version, [default_version(), VERSION])
 const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to test, as strings or `VersionNumber`s."
 
 """
@@ -22,7 +23,7 @@ const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to 
         x64=true,
         x86=false,
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS,
+        extra_versions=$DEFAULT_CI_VERSIONS_GITHUB,
     )
 
 Integrates your packages with [GitHub Actions](https://github.com/features/actions).
@@ -53,7 +54,7 @@ $EXTRA_VERSIONS_DOC
     x64::Bool = true
     x86::Bool = false
     coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_GITHUB
 end
 
 source(p::GitHubActions) = p.file
@@ -153,7 +154,7 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     if p.arm64
         p.osx && push!(excludes, Dict("E_OS" => "osx", "E_ARCH" => "arm64"))
         p.windows && push!(excludes, Dict("E_OS" => "windows", "E_ARCH" => "arm64"))
-        "nightly" in versions && push!(excludes, Dict("E_JULIA" => "nightly", "E_ARCH" => "arm64"))
+        "pre" in versions && push!(excludes, Dict("E_JULIA" => "pre", "E_ARCH" => "arm64"))
     end
 
     return Dict(
@@ -283,7 +284,7 @@ end
     GitLabCI(;
         file="$(contractuser(default_file("gitlab-ci.yml")))",
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_PRERELEASE,
     )
 
 Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci).
@@ -304,7 +305,7 @@ See [`Documenter`](@ref) for more information.
     file::String = default_file("gitlab-ci.yml")
     coverage::Bool = true
     # Nightly has no Docker image.
-    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_PRERELEASE
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
@@ -344,7 +345,7 @@ end
         amd64=true,
         arm=false,
         arm64=false,
-        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_PRERELEASE,
     )
 
 Integrates your packages with [Drone CI](https://drone.io).
@@ -367,7 +368,7 @@ $EXTRA_VERSIONS_DOC
     amd64::Bool = true
     arm::Bool = false
     arm64::Bool = false
-    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_PRERELEASE
 end
 
 source(p::DroneCI) = p.file
