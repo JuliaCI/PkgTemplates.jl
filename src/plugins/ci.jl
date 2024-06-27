@@ -54,7 +54,7 @@ $EXTRA_VERSIONS_DOC
     x64::Bool = true
     x86::Bool = false
     coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_GITHUB
 end
 
 source(p::GitHubActions) = p.file
