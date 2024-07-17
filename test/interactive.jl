@@ -47,13 +47,16 @@ end
     end
 
     @testset "input_tips" begin
-        @test isempty(PT.input_tips(Int))
+        @test isempty(PT.input_tips(String))
+        @test PT.input_tips(Int) == ["Int"]
+        @test PT.input_tips(Bool) == ["Bool"]
+        @test PT.input_tips(Symbol) == ["Symbol"]
         @test PT.input_tips(Vector{String}) == ["comma-delimited"]
         @test PT.input_tips(Union{Vector{String}, Nothing}) ==
-            ["'nothing' for nothing", "comma-delimited"]
+            ["comma-delimited", "'nothing' for nothing"]
         @test PT.input_tips(Union{String, Nothing}) == ["'nothing' for nothing"]
         @test PT.input_tips(Union{Vector{Secret}, Nothing}) ==
-            ["'nothing' for nothing", "comma-delimited", "name only"]
+            ["name only", "comma-delimited", "'nothing' for nothing"]
     end
 
     @testset "Interactive name/type pair collection" begin
@@ -94,7 +97,7 @@ end
                 DONE,             # Select no additional plugins
                 DONE^NDEFAULTS,   # Don't customize plugins
             )
-            @test Template(; interactive=true) == Template(; user="user")
+            @test Template(; interactive=true) == Template(; user="user", julia=v"1.0.0")
             readavailable(stdin.buffer)
         end
 
@@ -127,10 +130,10 @@ end
         @testset "Disabling default plugins" begin
             print(
                 stdin.buffer,
-                CR, DOWN^5, CR, DONE,  # Customize user and plugins
+                CR, DOWN^5, CR, DONE,    # Customize user and plugins
                 USER, LF,                # Enter user
                 SELECT_DEFAULTS,         # Pre-select default plugins
-                UP, CR, UP^2, CR, DONE,  # Disable TagBot and Readme
+                UP^3, CR, UP^2, CR, DONE,# Disable TagBot and Readme
                 DONE^(NDEFAULTS - 2),    # Don't customize plugins
             )
             @test Template(; interactive=true) == Template(;
@@ -168,11 +171,13 @@ end
 
             print(
                 stdin.buffer,
-                DOWN^2, CR,      # Select GitLabCI
-                DOWN^2, CR, DONE,  # Customize index_md
-                "x.txt", LF,     # Enter index file
+                DOWN^2, CR,        # Select GitLabCI
+                DOWN^2, CR,        # Customize edit_link
+                DOWN, CR, DONE,    # Customize index_md
+                ":commit", LF,     # Enter edit_link
+                "x.txt", LF,       # Enter index file
             )
-            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; index_md="x.txt")
+            @test PT.interactive(Documenter) == Documenter{GitLabCI}(; edit_link=:commit, index_md="x.txt")
 
             print(
                 stdin.buffer,
@@ -194,7 +199,7 @@ end
             if get(ENV, "CI", "false") == "true"
                 @test_broken result
             else
-                @test result
+                @test_broken result  # see https://github.com/JuliaCI/PkgTemplates.jl/issues/434
             end
 
             print(
@@ -237,7 +242,9 @@ end
                 DONE,            # Customize nothing
                 "username", LF,  # Enter user after it's prompted
             )
-            mock(PT.default_user => () -> "") do _du
+
+            patch = @patch PkgTemplates.default_user() = ""
+            apply(patch) do
                 @test Template(; interactive=true) == Template(; user="username")
             end
         end
@@ -245,7 +252,7 @@ end
         @testset "Interrupts" begin
             print(
                 stdin.buffer,
-                SIGINT,        # Send keyboard interrupt
+                SIGINT,  # Send keyboard interrupt
             )
             @test Template(; interactive=true) === nothing
         end

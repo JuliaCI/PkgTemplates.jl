@@ -11,8 +11,8 @@ For details on the general syntax, see
 
 There are a few extra restrictions:
 
-- Before using this macro, you must have imported `@with_kw_noshow`
-  via `using PkgTemplates: @with_kw_noshow`
+- Before using this macro, you must have imported `@with_kw_noshow` and `PkgTemplates` must
+  be in scope: `using PkgTemplates: PkgTemplates, @with_kw_noshow, @plugin`.
 - The type must be a subtype of [`Plugin`](@ref) (or one of its abstract subtypes)
 - The type cannot be parametric
 - All fields must have default values
@@ -20,7 +20,7 @@ There are a few extra restrictions:
 ## Example
 
 ```julia
-using PkgTemplates: @plugin, @with_kw_noshow, Plugin
+using PkgTemplates: PkgTemplates, @plugin, @with_kw_noshow, Plugin
 @plugin struct MyPlugin <: Plugin
     x::String = "hello!"
     y::Union{Int, Nothing} = nothing
@@ -278,8 +278,8 @@ prehook(::Plugin, ::Template, ::AbstractString) = nothing
 Stage 2 of the package generation pipeline (the "main" stage, in general).
 At this point, the [`prehook`](@ref)s have run, but not the [`posthook`](@ref)s.
 
-`pkg_dir` is the directory in which the package is being generated
-(so `basename(pkg_dir)` is the package name).
+`pkg_dir` is the directory in which the package is being generated; [`pkg_name`](@ref)`
+will return the package name.
 
 !!! note
     You usually shouldn't implement this function for [`FilePlugin`](@ref)s.
@@ -304,7 +304,7 @@ end
 
 function hook(p::FilePlugin, t::Template, pkg_dir::AbstractString)
     source(p) === nothing && return
-    pkg = basename(pkg_dir)
+    pkg = pkg_name(pkg_dir)
     path = joinpath(pkg_dir, destination(p))
     text = render_plugin(p, t, pkg)
     gen_file(path, text)
@@ -327,7 +327,7 @@ function gen_file(file::AbstractString, text::AbstractString)
 end
 
 """
-    render_file(file::AbstractString view::Dict{<:AbstractString}, tags=nothing) -> String
+    render_file(file::AbstractString, view::Dict{<:AbstractString}, tags=nothing) -> String
 
 Render a template file with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters,
@@ -357,6 +357,18 @@ you should implement this function and return `true`.
 """
 needs_username(::Plugin) = false
 
+"""
+    pkg_name(pkg_dir::AbstractString)
+
+Return package name of package at `pkg_dir`, i.e., `basename(pkg_dir)` excluding any
+`.jl` suffix, if present. For example, `foo/bar/Whee.jl` and `foo/bar/Whee` both
+return `Whee`.
+"""
+function pkg_name(pkg_dir::AbstractString)
+    pkg = basename(pkg_dir)
+    return endswith(pkg, ".jl") ? pkg[1:end-3] : pkg
+end
+
 include(joinpath("plugins", "project_file.jl"))
 include(joinpath("plugins", "src_dir.jl"))
 include(joinpath("plugins", "tests.jl"))
@@ -366,9 +378,13 @@ include(joinpath("plugins", "git.jl"))
 include(joinpath("plugins", "tagbot.jl"))
 include(joinpath("plugins", "develop.jl"))
 include(joinpath("plugins", "coverage.jl"))
+include(joinpath("plugins", "codeowners.jl"))
 include(joinpath("plugins", "ci.jl"))
 include(joinpath("plugins", "compat_helper.jl"))
 include(joinpath("plugins", "citation.jl"))
 include(joinpath("plugins", "documenter.jl"))
 include(joinpath("plugins", "badges.jl"))
 include(joinpath("plugins", "register.jl"))
+include(joinpath("plugins", "dependabot.jl"))
+include(joinpath("plugins", "formatter.jl"))
+include(joinpath("plugins", "pkgbenchmark.jl"))

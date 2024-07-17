@@ -7,6 +7,11 @@ on:
     branches: [master]
     tags: ["*"]
   pull_request:
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -16,6 +21,7 @@ jobs:
       matrix:
         version:
           - "1.0"  # LTS
+          - "1.7" # interactive tests require <= 1.8
           - "1"    # Latest Release
         os:
           - ubuntu-latest
@@ -31,17 +37,21 @@ jobs:
           - os: windows-latest
             arch: x86
         include:
-          # Add a 1.5 job because that's what Invenia actually uses
+          # Add specific version used to run the reference tests.
+          # Must be kept in sync with version check in `test/runtests.jl`,
+          # and with the branch protection rules on the repository which
+          # require this specific job to pass on all PRs
+          # (see Settings > Branches > Branch protection rules).
           - os: ubuntu-latest
-            version: 1.5
+            version: 1.10.0
             arch: x64
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         env:
           cache-name: cache-artifacts
         with:
@@ -58,18 +68,19 @@ jobs:
           git config --global user.email te@st.er
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v4
         with:
-          file: lcov.info
-
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
   slack:
     name: Notify Slack Failure
     needs: test
     runs-on: ubuntu-latest
     if: always() && github.event_name == 'schedule'
     steps:
-      - uses: technote-space/workflow-conclusion-action@v2
-      - uses: voxmedia/github-action-slack-notify-build@v1
+      - uses: technote-space/workflow-conclusion-action@v3
+      - uses: voxmedia/github-action-slack-notify-build@v2
         if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
           channel: nightly-dev
@@ -82,8 +93,8 @@ jobs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: '1'
       - run: |
@@ -102,5 +113,6 @@ jobs:
             doctest(PkgTemplates)'
       - run: julia --project=docs docs/make.jl
         env:
+          JULIA_PKG_SERVER: ""
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}

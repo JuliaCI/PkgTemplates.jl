@@ -1,5 +1,5 @@
 default_user() = LibGit2.getconfig("github.user", "")
-default_version() = VersionNumber(VERSION.major)
+default_version() = v"1.6.7"  # LTS as of Jan 2024, see https://julialang.org/downloads/#long_term_support_release
 default_plugins() = [
     CompatHelper(),
     ProjectFile(),
@@ -9,6 +9,8 @@ default_plugins() = [
     Readme(),
     Tests(),
     TagBot(),
+    GitHubActions(),
+    Dependabot(),
 ]
 
 function default_authors()
@@ -48,8 +50,8 @@ A configuration used to generate packages.
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
-  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref), and
-  [`TagBot`](@ref).
+  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref),
+  [`TagBot`](@ref) and [`GitHubActions`](@ref).
   To disable a default plugin, pass in the negated type: `!PluginType`.
   To override a default plugin instead of disabling it, pass in your own instance.
 
@@ -84,7 +86,7 @@ Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
 function Template(::Val{false}; kwargs...)
     kwargs = Dict(kwargs)
 
-    user = getkw!(kwargs, :user)
+    user = @mock getkw!(kwargs, :user)
     dir = abspath(expanduser(getkw!(kwargs, :dir)))
     host = replace(getkw!(kwargs, :host), r".*://" => "")
     julia = getkw!(kwargs, :julia)
@@ -92,12 +94,15 @@ function Template(::Val{false}; kwargs...)
     authors = getkw!(kwargs, :authors)
     authors isa Vector || (authors = map(strip, split(authors, ",")))
 
-    # User-supplied plugins come first, so that deduping the list will remove the defaults.
     plugins = Vector{Any}(collect(getkw!(kwargs, :plugins)))
     disabled = map(d -> first(typeof(d).parameters), filter(p -> p isa Disabled, plugins))
     filter!(p -> p isa Plugin, plugins)
-    append!(plugins, filter(p -> !(typeof(p) in disabled), default_plugins()))
-    plugins = Vector{Plugin}(sort(unique(typeof, plugins); by=string))
+    # Remove a default if the user has specified (or disabled) a plugin of that type.
+    defaults = filter(default_plugins()) do p
+        !(typeof(p) in vcat(typeof.(plugins), disabled))
+    end
+    append!(plugins, defaults)
+    plugins = Vector{Plugin}(sort(plugins; by=string))
 
     if isempty(user)
         foreach(plugins) do p
@@ -118,9 +123,11 @@ end
     (::Template)(pkg::AbstractString)
 
 Generate a package named `pkg` from a [`Template`](@ref).
+
+Return the path to the package directory.
 """
 function (t::Template)(pkg::AbstractString)
-    endswith(pkg, ".jl") && (pkg = pkg[1:end-3])
+    _valid_pkg_name(pkg)
     pkg_dir = joinpath(t.dir, pkg)
     ispath(pkg_dir) && throw(ArgumentError("$pkg_dir already exists"))
     mkpath(pkg_dir)
@@ -138,6 +145,16 @@ function (t::Template)(pkg::AbstractString)
     end
 
     @info "New package is at $pkg_dir"
+    return pkg_dir
+end
+
+function _valid_pkg_name(pkg::AbstractString)
+    if endswith(pkg, ".jl")
+        pkg = splitext(pkg)[1]
+    end
+    if repr(Symbol(pkg)) ≠ ":$(pkg)"
+        throw(ArgumentError("The package name is invalid"))
+    end
 end
 
 function Base.:(==)(a::Template, b::Template)
@@ -184,13 +201,14 @@ function interactive(::Type{Template}; kwargs...)
     # Make sure we don't try to show a menu with < 2 options.
     isempty(customizable) && return Template(; kwargs...)
     just_one = length(customizable) == 1
-    just_one && push(customizable, "None")
+    just_one && push!(customizable, :none)
 
     try
         println("Template keywords to customize:")
-        menu = MultiSelectMenu(map(string, customizable); pagesize=length(customizable))
+        opts = map(k -> "$k ($(repr(defaultkw(Template, k))))" , customizable)
+        menu = MultiSelectMenu(opts; pagesize=length(customizable))
         customize = customizable[sort!(collect(request(menu)))]
-        just_one && lastindex(customizable) in customize && return Template(; kwargs...)
+        just_one && last(customizable) in customize && return Template(; kwargs...)
 
         # Prompt for each keyword.
         foreach(customize) do k
@@ -216,8 +234,8 @@ end
 prompt(::Type{Template}, ::Type, ::Val{:pkg}) = Base.prompt("Package name")
 
 function prompt(::Type{Template}, ::Type, ::Val{:user})
-    return if isempty(default_user())
-        input = Base.prompt("Enter value for 'user' (String, required)")
+    return if isempty(@mock default_user())
+        input = Base.prompt("Enter value for 'user' (required)")
         input === nothing && throw(InterruptException())
         return input
     else

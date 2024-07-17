@@ -6,13 +6,14 @@ DocMeta.setdocmeta!({{{PKG}}}, :DocTestSetup, :(using {{{PKG}}}); recursive=true
 makedocs(;
     modules=[{{{PKG}}}],
     authors="{{{AUTHORS}}}",
-    repo="https://{{{REPO}}}/blob/{commit}{path}#{line}",
     sitename="{{{PKG}}}.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
 {{#CANONICAL}}
         canonical="{{{CANONICAL}}}",
 {{/CANONICAL}}
+{{#EDIT_LINK}}
+        edit_link={{{EDIT_LINK}}},
+{{/EDIT_LINK}}
         assets={{^HAS_ASSETS}}String{{/HAS_ASSETS}}[{{^HAS_ASSETS}}],{{/HAS_ASSETS}}
 {{#ASSETS}}
             "assets/{{{.}}}",

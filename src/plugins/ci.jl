@@ -9,7 +9,8 @@ format_version(v::AbstractString) = string(v)
 
 const ALLOWED_FAILURES = ["nightly"]  # TODO: Update this list with new RCs.
 const DEFAULT_CI_VERSIONS = map(format_version, [default_version(), VERSION, "nightly"])
-const DEFAULT_CI_VERSIONS_NO_NIGHTLY = map(format_version, [default_version(), VERSION])
+const DEFAULT_CI_VERSIONS_GITHUB = map(format_version, [default_version(), VERSION, "pre"])
+const DEFAULT_CI_VERSIONS_NO_PRERELEASE = map(format_version, [default_version(), VERSION])
 const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to test, as strings or `VersionNumber`s."
 
 """
@@ -22,7 +23,7 @@ const EXTRA_VERSIONS_DOC = "- `extra_versions::Vector`: Extra Julia versions to 
         x64=true,
         x86=false,
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS,
+        extra_versions=$DEFAULT_CI_VERSIONS_GITHUB,
     )
 
 Integrates your packages with [GitHub Actions](https://github.com/features/actions).
@@ -53,17 +54,17 @@ $EXTRA_VERSIONS_DOC
     x64::Bool = true
     x86::Bool = false
     coverage::Bool = true
-    extra_versions::Vector = DEFAULT_CI_VERSIONS
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_GITHUB
 end
 
 source(p::GitHubActions) = p.file
 destination(p::GitHubActions) = joinpath(".github", "workflows", p.destination)
 tags(::GitHubActions) = "<<", ">>"
 
-badges(::GitHubActions) = Badge(
+badges(p::GitHubActions) = Badge(
     "Build Status",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/workflows/CI/badge.svg",
-    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions/workflows/$(p.destination)/badge.svg?branch={{{BRANCH}}}",
+    "https://github.com/{{{USER}}}/{{{PKG}}}.jl/actions/workflows/$(p.destination)?query=branch%3A{{{BRANCH}}}",
 )
 
 function view(p::GitHubActions, t::Template, pkg::AbstractString)
@@ -75,7 +76,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
     excludes = Dict{String, String}[]
     p.osx && p.x86 && push!(excludes, Dict("E_OS" => "macOS-latest", "E_ARCH" => "x86"))
 
-    return Dict(
+    v = Dict(
         "ARCH" => arch,
         "EXCLUDES" => excludes,
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
@@ -87,6 +88,11 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
         "USER" => t.user,
         "VERSIONS" => collect_versions(t, p.extra_versions),
     )
+    p = getplugin(t, Git)
+    if p !== nothing
+        v["BRANCH"] = p.branch
+    end
+    return v
 end
 
 """
@@ -133,8 +139,8 @@ destination(::TravisCI) = ".travis.yml"
 
 badges(::TravisCI) = Badge(
     "Build Status",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch=master",
-    "https://travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
+    "https://app.travis-ci.com/{{{USER}}}/{{{PKG}}}.jl.svg?branch={{{BRANCH}}}",
+    "https://app.travis-ci.com/{{{USER}}}/{{{PKG}}}.jl",
 )
 
 function view(p::TravisCI, t::Template, pkg::AbstractString)
@@ -148,12 +154,13 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     if p.arm64
         p.osx && push!(excludes, Dict("E_OS" => "osx", "E_ARCH" => "arm64"))
         p.windows && push!(excludes, Dict("E_OS" => "windows", "E_ARCH" => "arm64"))
-        "nightly" in versions && push!(excludes, Dict("E_JULIA" => "nightly", "E_ARCH" => "arm64"))
+        "pre" in versions && push!(excludes, Dict("E_JULIA" => "pre", "E_ARCH" => "arm64"))
     end
 
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
         "ARCH" => arch,
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "EXCLUDES" => excludes,
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => hasplugin(t, Codecov),
@@ -213,6 +220,7 @@ function view(p::AppVeyor, t::Template, pkg::AbstractString)
 
     return Dict(
         "ALLOW_FAILURES" => allow_failures,
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "HAS_ALLOW_FAILURES" => !isempty(allow_failures),
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
         "PKG" => pkg,
@@ -276,7 +284,7 @@ end
     GitLabCI(;
         file="$(contractuser(default_file("gitlab-ci.yml")))",
         coverage=true,
-        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_PRERELEASE,
     )
 
 Integrates your packages with [GitLab CI](https://docs.gitlab.com/ce/ci).
@@ -297,7 +305,7 @@ See [`Documenter`](@ref) for more information.
     file::String = default_file("gitlab-ci.yml")
     coverage::Bool = true
     # Nightly has no Docker image.
-    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_PRERELEASE
 end
 
 gitignore(p::GitLabCI) = p.coverage ? COVERAGE_GITIGNORE : String[]
@@ -307,19 +315,20 @@ destination(::GitLabCI) = ".gitlab-ci.yml"
 function badges(p::GitLabCI)
     ci = Badge(
         "Build Status",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/pipeline.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/{{{BRANCH}}}/pipeline.svg",
         "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/pipelines",
     )
     cov = Badge(
         "Coverage",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/master/coverage.svg",
-        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/master",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/badges/{{{BRANCH}}}/coverage.svg",
+        "https://{{{HOST}}}/{{{USER}}}/{{{PKG}}}.jl/commits/{{{BRANCH}}}",
     )
     return p.coverage ? [ci, cov] : [ci]
 end
 
 function view(p::GitLabCI, t::Template, pkg::AbstractString)
     return Dict(
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
         "HAS_COVERAGE" => p.coverage,
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitLabCI}),
         "HOST" => t.host,
@@ -336,7 +345,7 @@ end
         amd64=true,
         arm=false,
         arm64=false,
-        extra_versions=$DEFAULT_CI_VERSIONS_NO_NIGHTLY,
+        extra_versions=$DEFAULT_CI_VERSIONS_NO_PRERELEASE,
     )
 
 Integrates your packages with [Drone CI](https://drone.io).
@@ -359,7 +368,7 @@ $EXTRA_VERSIONS_DOC
     amd64::Bool = true
     arm::Bool = false
     arm64::Bool = false
-    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_NIGHTLY
+    extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_PRERELEASE
 end
 
 source(p::DroneCI) = p.file
@@ -396,8 +405,9 @@ function collect_versions(t::Template, versions::Vector)
     vs = map(v -> lstrip(v, 'v'), [format_version(t.julia); custom])
     filter!(vs) do v
         # Throw away any versions lower than the template's minimum.
+        # but v1.6 should be accepted as a CI number even when t.julia = v1.6.7
         try
-            VersionNumber(v) >= t.julia
+            Base.thisminor(VersionNumber(v)) >= Base.thisminor(t.julia)
         catch e
             e isa ArgumentError || rethrow()
             true

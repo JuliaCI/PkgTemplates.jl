@@ -1,10 +1,10 @@
 name = "Basic"
-uuid = "5b7e9947-ddc0-4b3f-9b55-0d8042f74170"
+uuid = "c51a4d33-e9a4-4efb-a257-e0de888ecc28"
 authors = ["tester"]
-version = "0.1.0"
+version = "1.0.0-DEV"
 
 [compat]
-julia = "1"
+julia = "1.6.7"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
