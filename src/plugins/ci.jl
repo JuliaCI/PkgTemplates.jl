@@ -81,7 +81,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
         "EXCLUDES" => excludes,
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
         "HAS_COVERALLS" => p.coverage && hasplugin(t, Coveralls),
-        "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitHubActions}),
+        "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitHubActions}) && !hasplugin(t, Quarto),
         "HAS_QUARTO" => hasplugin(t, Quarto),
         "HAS_EXCLUDES" => !isempty(excludes),
         "OS" => os,

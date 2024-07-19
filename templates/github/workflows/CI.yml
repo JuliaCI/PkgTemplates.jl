@@ -102,7 +102,7 @@ jobs:
           doctest(<<&PKG>>)
   <</HAS_DOCUMENTER>>
   <<#HAS_QUARTO>>
-    docs:
+  docs:
     name: Documentation
     runs-on: ubuntu-latest
     permissions:
