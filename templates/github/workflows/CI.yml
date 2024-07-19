@@ -101,3 +101,50 @@ jobs:
           DocMeta.setdocmeta!(<<&PKG>>, :DocTestSetup, :(using <<&PKG>>); recursive=true)
           doctest(<<&PKG>>)
   <</HAS_DOCUMENTER>>
+  <<#HAS_QUARTO>>
+    docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write # needed to allow julia-actions/cache to proactively delete old caches that it has created
+      contents: write
+      statuses: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.5.54
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v2
+      - name: Cache Quarto
+        id: cache-quarto
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-quarto
+        with:
+          path: _freeze
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('*.qmd') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+      - name: Configure doc environment
+        shell: julia --project=docs --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.instantiate()
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: "Documenter rendering (including Quarto)"
+        run: "docs/make.jl --quarto"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+      - name: Run doctests
+        shell: julia --project=docs --color=yes {0}
+        run: |
+          using Documenter: DocMeta, doctest
+          using <<&PKG>>
+          DocMeta.setdocmeta!(<<&PKG>>, :DocTestSetup, :(using <<&PKG>>); recursive=true)
+          doctest(<<&PKG>>)
+  <</HAS_QUARTO>>

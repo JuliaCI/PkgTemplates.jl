@@ -40,6 +40,7 @@ export
     PkgBenchmark,
     PkgEvalBadge,
     ProjectFile,
+    Quarto,
     Readme,
     RegisterAction,
     Secret,
