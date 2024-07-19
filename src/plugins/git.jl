@@ -87,7 +87,7 @@ end
 function hook(p::Git, t::Template, pkg_dir::AbstractString)
     ignore = mapreduce(gitignore, vcat, t.plugins)
     # Only ignore manifests at the repo root.
-    p.manifest || "Manifest.toml" in ignore || push!(ignore, "/Manifest.toml")
+    p.manifest || "Manifest.toml" in ignore || push!(ignore, "/Manifest*.toml")
     unique!(sort!(ignore))
     gen_file(joinpath(pkg_dir, ".gitignore"), join(ignore, "\n"))
 end

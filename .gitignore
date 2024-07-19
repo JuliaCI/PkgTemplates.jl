@@ -2,6 +2,6 @@
 *.jl.*.cov
 *.jl.cov
 *.jl.mem
-/Manifest.toml
-/test/fixtures/*/test/Manifest.toml
-/docs/Manifest.toml
+/Manifest*.toml
+/test/fixtures/*/test/Manifest*.toml
+/docs/Manifest*.toml
