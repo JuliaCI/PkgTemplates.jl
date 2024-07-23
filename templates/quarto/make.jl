@@ -12,6 +12,7 @@ Render the documentation using Quarto with optional arguments
 Arguments
 * `--help`              - print this help and exit without rendering the documentation
 * `--prettyurls`        – toggle the prettyurls part to true (which is otherwise only true on CI)
+* `--project`           - specify the project name (default: `$(@__DIR__)`)
 * `--quarto`            – run the Quarto notebooks from the `tutorials/` folder before generating the documentation
   this has to be run locally at least once for the `tutorials/*.md` files to exist that are included in
   the documentation (see `--exclude-tutorials`) for the alternative.
@@ -24,7 +25,19 @@ Arguments
     exit(0)
 end
 
-# (a) Did someone say render?
+# (a) Specify project
+using Pkg
+if any(contains.(ARGS, "--project")) 
+    @assert sum(contains.(ARGS, "--project")) == 1 "Only one environment can be specified using the `--project` argument."
+    _path =
+        ARGS[findall(contains.(ARGS, "--project"))][1] |>
+        x -> replace(x, "--project=" => "")
+    Pkg.activate(_path)
+else
+    Pkg.activate(@__DIR__)
+end
+
+# (b) Did someone say render?
 if "--quarto" ∈ ARGS
     @info "Rendering Quarto"
     run(`quarto render $(@__DIR__)`)
