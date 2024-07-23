@@ -39,8 +39,10 @@ end
 
 # (b) Did someone say render?
 if "--quarto" ∈ ARGS
-    @info "Rendering Quarto"
-    run(`quarto render $(@__DIR__)`)
+    @info "Rendering README"
+    run(`quarto render $(joinpath(@__DIR__, "..", "README.qmd"))`)
+    @info "Rendering docs"
+    run(`quarto render $(joinpath(@__DIR__, "src"))`)
 end
 
 using {{{PKG}}}
