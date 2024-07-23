@@ -12,6 +12,10 @@
     config::String = default_file("quarto", "_quarto.yml")
 end
 
+function isfixable(::Quarto, pkg_dir)
+    return true
+end
+
 PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString) = Dict(
     "AUTHORS" => join(t.authors, ", "),
     "PKG" => pkg,
@@ -45,6 +49,7 @@ function PkgTemplates.hook(p::Quarto, t::Template, pkg_dir::AbstractString)
     # Make.jl:
     makejl = render_file(p.make_jl, combined_view(p, t, pkg), tags(p))
     gen_file(joinpath(docs_dir, "make.jl"), makejl)
+    run(`chmod u+x $(joinpath(docs_dir, "make.jl"))`)       # turn into executable
 
     # Config file:
     config = render_file(p.config, combined_view(p, t, pkg), tags(p))
