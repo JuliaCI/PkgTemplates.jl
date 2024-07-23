@@ -1,4 +1,4 @@
-#!/usr/bin/env Julia
+#!/usr/bin/env julia
 #
 #
 
