@@ -1,5 +1,5 @@
 """
-    PkgBenchmark(; file="$(contractuser(default_file("benchmark", "benchmarks.jl")))")
+    PkgBenchmark(; file="$(contractuser(default_file("benchmark", "benchmarks.jlt")))")
 
 Sets up a [PkgBenchmark.jl](https://github.com/JuliaCI/PkgBenchmark.jl) benchmark suite.
 
@@ -13,7 +13,7 @@ In this environment, you should at the very least:
 - `file::AbstractString`: Template file for `benchmarks.jl`.
 """
 @plugin struct PkgBenchmark <: FilePlugin
-    file::String = default_file("benchmark", "benchmarks.jl")
+    file::String = default_file("benchmark", "benchmarks.jlt")
 end
 
 source(p::PkgBenchmark) = p.file

@@ -71,7 +71,7 @@ end
                   badge_order: DataType[Documenter{GitHubActions}, Documenter{GitLabCI}, Documenter{TravisCI}, GitHubActions, GitLabCI, TravisCI, AppVeyor, DroneCI, CirrusCI, Codecov, Coveralls, BlueStyleBadge, ColPracBadge, PkgEvalBadge]
                   badge_off: DataType[]
                 SrcDir:
-                  file: "$(joinpath(TEMPLATES_DIR, "src", "module.jl"))"
+                  file: "$(joinpath(TEMPLATES_DIR, "src", "module.jlt"))"
                 TagBot:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "TagBot.yml"))"
                   destination: "TagBot.yml"
@@ -88,7 +88,7 @@ end
                   dispatch: nothing
                   dispatch_delay: nothing
                 Tests:
-                  file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jl"))"
+                  file: "$(joinpath(TEMPLATES_DIR, "test", "runtests.jlt"))"
                   project: false
                   aqua: false
                   aqua_kwargs: NamedTuple()

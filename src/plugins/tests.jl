@@ -9,7 +9,7 @@ const JET_DEP = PackageSpec(; name="JET", uuid=JET_UUID)
 
 """
     Tests(;
-        file="$(contractuser(default_file("test", "runtests.jl")))",
+        file="$(contractuser(default_file("test", "runtests.jlt")))",
         project=false,
         aqua=false,
         aqua_kwargs=NamedTuple(),
@@ -32,7 +32,7 @@ Sets up testing for packages.
     in Julia 1.2 and later.
 """
 @plugin struct Tests <: FilePlugin
-    file::String = default_file("test", "runtests.jl")
+    file::String = default_file("test", "runtests.jlt")
     project::Bool = false
     aqua::Bool = false
     aqua_kwargs::NamedTuple = NamedTuple()
