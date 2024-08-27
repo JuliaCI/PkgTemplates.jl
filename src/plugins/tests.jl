@@ -94,7 +94,7 @@ function validate(p::Tests, t::Template)
         if !(val isa Bool)
             throw(ArgumentError("Aqua keyword arguments must have boolean values"))
         elseif !(key in aqua_kwargs_names)
-            throw(ArgumentError("Aqua keyword arguments must belong to $aqua_kwargnames"))
+            throw(ArgumentError("Aqua keyword arguments must belong to $aqua_kwarg_names"))
         end
     end
 end
