@@ -16,12 +16,24 @@ function isfixable(::Quarto, pkg_dir)
     return true
 end
 
-PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString) = Dict(
-    "AUTHORS" => join(t.authors, ", "),
-    "PKG" => pkg,
-    "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
-    "USER" => t.user,
-)
+function PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString)
+
+    v = Dict{AbstractString,Any}()
+
+    # Inherit view from Readme plugin:
+    if PkgTemplates.hasplugin(t, Readme)
+        p_readme = t.plugins[findall(typeof.(t.plugins) .<: Readme)][1]
+        v = merge(v, combined_view(p_readme, t, pkg))        
+    end
+
+    # Inherit view from Documenter plugin:
+    if PkgTemplates.hasplugin(t, Documenter)
+        p_doc = t.plugins[findall(typeof.(t.plugins) .<: Documenter)][1]
+        v = merge(v, combined_view(p_doc, t, pkg))
+    end
+
+    return v
+end
 
 function PkgTemplates.validate(p::Quarto, t::Template)
     if PkgTemplates.hasplugin(t, Documenter)
@@ -39,14 +51,11 @@ function PkgTemplates.hook(p::Quarto, t::Template, pkg_dir::AbstractString)
     ispath(assets_dir) || mkpath(assets_dir)
 
     # Readme file:
-    if PkgTemplates.hasplugin(t, Readme)
-        p_readme = t.plugins[findall(typeof.(t.plugins) .<: Readme)][1]
-        v = merge(combined_view(p, t, pkg), combined_view(p_readme, t, pkg))        # merge views from both plugins
-    else
-        v = combined_view(p, t, pkg)
-    end
-    readme = render_file(p.readme_qmd, v, tags(p))
-    gen_file(joinpath(pkg_dir, "README.qmd"), readme)
+    readme = render_file(p.readme_qmd, combined_view(p, t, pkg), tags(p))
+    _file = joinpath(pkg_dir, "README.qmd")
+    gen_file(_file, readme)
+    @info "Rendering README"
+    run(`quarto render $_file`)
 
     # Index file:
     index = render_file(p.index_qmd, combined_view(p, t, pkg), tags(p))
