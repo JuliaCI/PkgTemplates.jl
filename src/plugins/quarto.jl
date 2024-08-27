@@ -12,10 +12,13 @@
     config::String = default_file("quarto", "_quarto.yml")
 end
 
-function isfixable(::Quarto, pkg_dir)
-    return true
-end
+isfixable(::Quarto, pkg_dir) = true
 
+"""
+    PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString)
+
+Overloads the `view` function for the Quarto plugin. The Quarto plugin inherits its view from the `Readme` and `Documenter` plugins. 
+"""
 function PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString)
 
     v = Dict{AbstractString,Any}()
@@ -35,6 +38,11 @@ function PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString)
     return v
 end
 
+"""
+    PkgTemplates.validate(p::Quarto, t::Template)
+
+Overloads the `validate` function for the Quarto plugin. The method asserts that the `Documenter` plugin (if used) is pointing to the same `make.jl` template file as the `Quarto` plugin.
+"""
 function PkgTemplates.validate(p::Quarto, t::Template)
     if PkgTemplates.hasplugin(t, Documenter)
         # Overwrite make.jl file path (dirty solution)
@@ -43,6 +51,16 @@ function PkgTemplates.validate(p::Quarto, t::Template)
     end
 end
 
+"""
+    PkgTemplates.hook(p::Quarto, t::Template, pkg_dir::AbstractString)
+
+Overloads the `hook` function for the Quarto plugin. The Quarto plugin does the following:
+    
+1. It adds a `README.qmd` file and renders a `README.md` file from it (locally).
+2. It adds an `index.qmd` file to the `docs/src/` folder (to be rendered remotely).
+3. It generates a custom `make.jl` for using Documenter.jl with Quarto.
+4. It adds a `_quarto.yml` file that configures Quarto for use with Documenter.jl.
+"""
 function PkgTemplates.hook(p::Quarto, t::Template, pkg_dir::AbstractString)
 
     pkg = pkg_name(pkg_dir)
