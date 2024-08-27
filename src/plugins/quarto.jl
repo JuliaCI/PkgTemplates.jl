@@ -39,7 +39,7 @@ function PkgTemplates.validate(p::Quarto, t::Template)
     if PkgTemplates.hasplugin(t, Documenter)
         # Overwrite make.jl file path (dirty solution)
         doc_plugin = t.plugins[findall(typeof.(t.plugins) .<: Documenter)][1]
-        @assert doc_plugin.make_jl == p.make_jl "make.jl file path mismatch between Quarto and Documenter plugin. When using the Quarto plugin, make sure that the Documenter plugin points to $(p.make_jl)"
+        @assert doc_plugin.make_jl == p.make_jl "make.jl file path mismatch between Quarto and Documenter plugin. When using the Quarto plugin, make sure that the Documenter plugin points to $(p.make_jl), i.e. use `Documenter(make_jl=Quarto().make_jl)`"
     end
 end
 
@@ -52,10 +52,22 @@ function PkgTemplates.hook(p::Quarto, t::Template, pkg_dir::AbstractString)
 
     # Readme file:
     readme = render_file(p.readme_qmd, combined_view(p, t, pkg), tags(p))
-    _file = joinpath(pkg_dir, "README.qmd")
-    gen_file(_file, readme)
+    path = joinpath(pkg_dir, "README.qmd")
+    mkd_path = replace(path, ".qmd" => ".md")
+    if isfile(path)
+        path_fixed = replace(path, ".qmd" => "_fixed.qmd")
+        @warn "README file already exists at $path. Generating a fixed but empty version from template at $path_fixed. You will most likely just have to copy and paste the content from the existing README into the fixed version and then overwrite $path with $path_fixed."
+        gen_file(path_fixed, readme)
+    elseif isfile(mkd_path)
+        backup_path = replace(mkd_path, ".md" => "_backup.md") 
+        run(`cp $mkd_path $backup_path`)
+        @warn "Existing `README.md` (markdown) file found and backed up as $backup_path. You may have to copy existing contents into the newly generated Quarto file at $path."
+        gen_file(path, readme)
+    else
+        gen_file(path, readme)
+    end
     @info "Rendering README"
-    run(`quarto render $_file`)
+    run(`quarto render $path`)
 
     # Index file:
     index = render_file(p.index_qmd, combined_view(p, t, pkg), tags(p))
