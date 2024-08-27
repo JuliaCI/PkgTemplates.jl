@@ -23,8 +23,29 @@ Creates a `README` file that contains badges for other included plugins.
     badge_off::Vector{typeof(Plugin)} = []
 end
 
+
+isfixable(p::Readme, pkg_dir) = true
 source(p::Readme) = p.file
 destination(p::Readme) = p.destination
+
+"""
+    hook(p::Readme, t::Template, pkg_dir::AbstractString)
+
+Overloads the `hook` function for the `Readme` file plugin. In case `fixup` is used and there is an existing README, a new README is proposed that complies with the template, but it the existing one is not overwritten.
+"""
+function hook(p::Readme, t::Template, pkg_dir::AbstractString)
+    source(p) === nothing && return
+    pkg = pkg_name(pkg_dir)
+    path = joinpath(pkg_dir, destination(p))
+    text = render_plugin(p, t, pkg)
+    if isfile(path)
+        path_fixed = replace(path, ".md" => "_fixed.md")
+        @warn "README file already exists at $path. Generating a fixed but empty version from template at $path_fixed. You will most likely just have to copy and paste the content from the existing README into the fixed version and then overwrite $path with $path_fixed."
+        gen_file(path_fixed, text)
+    else
+        gen_file(path, text)
+    end
+end
 
 function view(p::Readme, t::Template, pkg::AbstractString)
     # Explicitly ordered badges go first.
@@ -63,5 +84,5 @@ default_badge_order() = [
     CirrusCI,
     Codecov,
     Coveralls,
-    subtypes(BadgePlugin)...
+    subtypes(BadgePlugin)...,
 ]
