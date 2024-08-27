@@ -39,7 +39,13 @@ function PkgTemplates.hook(p::Quarto, t::Template, pkg_dir::AbstractString)
     ispath(assets_dir) || mkpath(assets_dir)
 
     # Readme file:
-    readme = render_file(p.readme_qmd, combined_view(p, t, pkg), tags(p))
+    if PkgTemplates.hasplugin(t, Readme)
+        p_readme = t.plugins[findall(typeof.(t.plugins) .<: Readme)][1]
+        v = merge(combined_view(p, t, pkg), combined_view(p_readme, t, pkg))        # merge views from both plugins
+    else
+        v = combined_view(p, t, pkg)
+    end
+    readme = render_file(p.readme_qmd, v, tags(p))
     gen_file(joinpath(pkg_dir, "README.qmd"), readme)
 
     # Index file:
