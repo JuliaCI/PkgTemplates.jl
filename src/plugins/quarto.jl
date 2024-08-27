@@ -23,7 +23,7 @@ function PkgTemplates.view(p::Quarto, t::Template, pkg::AbstractString)
     # Inherit view from Readme plugin:
     if PkgTemplates.hasplugin(t, Readme)
         p_readme = t.plugins[findall(typeof.(t.plugins) .<: Readme)][1]
-        v = merge(v, combined_view(p_readme, t, pkg))        
+        v = merge(v, combined_view(p_readme, t, pkg))
     end
 
     # Inherit view from Documenter plugin:

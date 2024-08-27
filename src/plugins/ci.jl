@@ -73,7 +73,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
     p.osx && push!(os, "macOS-latest")
     p.windows && push!(os, "windows-latest")
     arch = filter(a -> getfield(p, Symbol(a)), ["x64", "x86"])
-    excludes = Dict{String, String}[]
+    excludes = Dict{String,String}[]
     p.osx && p.x86 && push!(excludes, Dict("E_OS" => "macOS-latest", "E_ARCH" => "x86"))
 
     v = Dict(
@@ -81,7 +81,8 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
         "EXCLUDES" => excludes,
         "HAS_CODECOV" => p.coverage && hasplugin(t, Codecov),
         "HAS_COVERALLS" => p.coverage && hasplugin(t, Coveralls),
-        "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitHubActions}) && !hasplugin(t, Quarto),
+        "HAS_DOCUMENTER" =>
+            hasplugin(t, Documenter{GitHubActions}) && !hasplugin(t, Quarto),
         "HAS_QUARTO" => hasplugin(t, Quarto),
         "HAS_EXCLUDES" => !isempty(excludes),
         "OS" => os,
@@ -150,7 +151,7 @@ function view(p::TravisCI, t::Template, pkg::AbstractString)
     versions = collect_versions(t, p.extra_versions)
     allow_failures = filter(in(versions), ALLOWED_FAILURES)
 
-    excludes = Dict{String, String}[]
+    excludes = Dict{String,String}[]
     p.x86 && p.osx && push!(excludes, Dict("E_OS" => "osx", "E_ARCH" => "x86"))
     if p.arm64
         p.osx && push!(excludes, Dict("E_OS" => "osx", "E_ARCH" => "arm64"))
@@ -417,7 +418,7 @@ function collect_versions(t::Template, versions::Vector)
     return sort(unique(vs))
 end
 
-const AllCI = Union{AppVeyor, GitHubActions, TravisCI, CirrusCI, GitLabCI, DroneCI}
+const AllCI = Union{AppVeyor,GitHubActions,TravisCI,CirrusCI,GitLabCI,DroneCI}
 
 """
     is_ci(::Plugin) -> Bool

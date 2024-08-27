@@ -1,5 +1,6 @@
 const DEFAULT_PRIORITY = 1000
-const DEFAULT_TEMPLATE_DIR = Ref{String}(joinpath(dirname(dirname(pathof(PkgTemplates))), "templates"))
+const DEFAULT_TEMPLATE_DIR =
+    Ref{String}(joinpath(dirname(dirname(pathof(PkgTemplates))), "templates"))
 
 """
     @plugin struct ... end
@@ -64,7 +65,11 @@ macro plugin(ex::Expr)
 
     msg = "Run `using PkgTemplates: @with_kw_noshow` before using this macro"
     @assert isdefined(__module__, Symbol("@with_kw_noshow")) msg
-    block = :(begin @with_kw_noshow $ex end)
+    block = :(
+        begin
+            @with_kw_noshow $ex
+        end
+    )
 
     foreach(filter(arg -> arg isa Expr, ex.args[3].args)) do field
         @assert field.head === :(=) "Field must have a default value"
@@ -77,7 +82,7 @@ macro plugin(ex::Expr)
     return esc(block)
 end
 
-function Base.:(==)(a::T, b::T) where T <: Plugin
+function Base.:(==)(a::T, b::T) where {T<:Plugin}
     return all(n -> getfield(a, n) == getfield(b, n), fieldnames(T))
 end
 
@@ -122,7 +127,7 @@ but you can always call it yourself as part of your [`hook`](@ref) implementatio
 
 By default, an empty `Dict` is returned.
 """
-view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
+view(::Plugin, ::Template, ::AbstractString) = Dict{String,Any}()
 
 """
     user_view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
@@ -132,7 +137,7 @@ The same as [`view`](@ref), but for use by package *users* for extension.
 Values returned by this function will override those from [`view`](@ref)
 when the keys are the same.
 """
-user_view(::Plugin, ::Template, ::AbstractString) = Dict{String, Any}()
+user_view(::Plugin, ::Template, ::AbstractString) = Dict{String,Any}()
 
 """
     combined_view(::Plugin, ::Template, pkg::AbstractString) -> Dict{String, Any}
@@ -296,7 +301,7 @@ At this point, both the [`prehook`](@ref)s and [`hook`](@ref)s have run.
 """
 posthook(::Plugin, ::Template, ::AbstractString) = nothing
 
-function validate(p::T, ::Template) where T <: FilePlugin
+function validate(p::T, ::Template) where {T<:FilePlugin}
     src = source(p)
     src === nothing && return
     isfile(src) || throw(ArgumentError("$(nameof(T)): The file $src does not exist"))
@@ -333,7 +338,7 @@ Render a template file with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters,
 or `nothing` to use the default delimiters.
 """
-function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
+function render_file(file::AbstractString, view::Dict{<:AbstractString}, tags = nothing)
     return render_text(read(file, String), view, tags)
 end
 
@@ -344,8 +349,8 @@ Render some text with the data in `view`.
 `tags` should be a tuple of two strings, which are the opening and closing delimiters,
 or `nothing` to use the default delimiters.
 """
-function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags=nothing)
-    return tags === nothing ? render(text, view) : render(text, view; tags=tags)
+function render_text(text::AbstractString, view::Dict{<:AbstractString}, tags = nothing)
+    return tags === nothing ? render(text, view) : render(text, view; tags = tags)
 end
 
 """

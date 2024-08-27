@@ -1,11 +1,11 @@
 const TEST_UUID = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-const TEST_DEP = PackageSpec(; name="Test", uuid=TEST_UUID)
+const TEST_DEP = PackageSpec(; name = "Test", uuid = TEST_UUID)
 
 const AQUA_UUID = "4c88cf16-eb10-579e-8560-4a9242c79595"
-const AQUA_DEP = PackageSpec(; name="Aqua", uuid=AQUA_UUID)
+const AQUA_DEP = PackageSpec(; name = "Aqua", uuid = AQUA_UUID)
 
 const JET_UUID = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
-const JET_DEP = PackageSpec(; name="JET", uuid=JET_UUID)
+const JET_DEP = PackageSpec(; name = "JET", uuid = JET_UUID)
 
 """
     Tests(;
@@ -76,7 +76,9 @@ end
 
 function validate(p::Tests, t::Template)
     invoke(validate, Tuple{FilePlugin,Template}, p, t)
-    p.project && t.julia < v"1.2" && @warn string(
+    p.project &&
+        t.julia < v"1.2" &&
+        @warn string(
             "Tests: The project option is set to create a project (supported in Julia 1.2 and later) ",
             "but a Julia version older than 1.2 ($(t.julia)) is supported by the template",
         )
@@ -127,7 +129,7 @@ function add_test_dependency(p::Tests, pkg_dir::AbstractString)
     # Add the dependency manually since there's no programmatic way to add to [extras].
     path = joinpath(pkg_dir, "Project.toml")
     toml = TOML.parsefile(path)
-    
+
     get!(toml, "extras", Dict())["Test"] = TEST_UUID
     if p.aqua
         get!(toml, "extras", Dict())["Aqua"] = AQUA_UUID
@@ -135,7 +137,7 @@ function add_test_dependency(p::Tests, pkg_dir::AbstractString)
     if p.jet
         get!(toml, "extras", Dict())["JET"] = JET_UUID
     end
-    
+
     targets = String[]
     if p.aqua
         push!(targets, "Aqua")
@@ -145,7 +147,7 @@ function add_test_dependency(p::Tests, pkg_dir::AbstractString)
     end
     push!(targets, "Test")
     get!(toml, "targets", Dict())["test"] = targets
-    
+
     write_project(path, toml)
 
     # Generate the manifest by updating the project.

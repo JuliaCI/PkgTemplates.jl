@@ -6,7 +6,7 @@ function fixup(tpl::Template, pkg_dir)
     fixable = filter(p -> isfixable(p, pkg_dir), tpl.plugins)
     foreach((prehook, hook, posthook)) do h
         @info "Running $(nameof(h))s"
-        foreach(sort(fixable; by=p -> priority(p, h), rev=true)) do p
+        foreach(sort(fixable; by = p -> priority(p, h), rev = true)) do p
             h(p, tpl, pkg_dir)
         end
     end
