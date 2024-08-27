@@ -29,6 +29,3 @@ view(::SrcDir, ::Template, pkg::AbstractString) = Dict("PKG" => pkg)
 function prehook(p::SrcDir, ::Template, pkg_dir::AbstractString)
     p.destination = joinpath("src", pkg_name(pkg_dir) * ".jl")
 end
-
-# TODO: should this return `true` if `src/` exists but `src/pkg_name.jl` doesn't?
-isfixable(p::SrcDir, pkg_dir) = false

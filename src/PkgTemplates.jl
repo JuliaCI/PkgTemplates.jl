@@ -45,8 +45,7 @@ export Template,
     SrcDir,
     TagBot,
     Tests,
-    TravisCI,
-    fixup
+    TravisCI
 
 """
 Plugins are PkgTemplates' source of customization and extensibility.
@@ -56,19 +55,10 @@ When implementing a new plugin, subtype this type to have full control over its 
 """
 abstract type Plugin end
 
-"""
-    isfixable(::Plugin, pkg_dir) -> Bool
-
-Determines whether or not the plugin can be updated on an existing project via
-[`fixup`](@ref).
-"""
-isfixable(::Plugin, pkg_dir) = false
-
 include("template.jl")
 include("plugin.jl")
 include("show.jl")
 include("interactive.jl")
-include("fixup.jl")
 include("deprecated.jl")
 
 # Run some function with a project activated at the given path.
