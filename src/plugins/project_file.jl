@@ -29,7 +29,10 @@ end
 
 function project_key_order(key::String)
     _project_key_order = ["name", "uuid", "keywords", "license", "desc", "deps", "compat"]
-    return something(findfirst(x -> x == key, _project_key_order), length(_project_key_order) + 1)
+    return something(
+        findfirst(x -> x == key, _project_key_order),
+        length(_project_key_order) + 1,
+    )
 end
 
 write_project(path::AbstractString, dict) =

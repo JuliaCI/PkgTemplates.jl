@@ -29,10 +29,16 @@ end
 
 function PkgTemplates.validate(p::CodeOwners, ::Template)
     for (pattern, subowners) in p.owners
-        contains(pattern, r"\s") && throw(ArgumentError(("Pattern ($pattern) must not contain whitespace")))
+        contains(pattern, r"\s") &&
+            throw(ArgumentError(("Pattern ($pattern) must not contain whitespace")))
         for subowner in subowners
-            contains(subowner, r"\s") && throw(ArgumentError("Owner name ($subowner) must not contain whitespace"))
-            '@' ∈ subowner || throw(ArgumentError("Owner name ($subowner) must be `@user` or `email@domain.com`"))
+            contains(subowner, r"\s") &&
+                throw(ArgumentError("Owner name ($subowner) must not contain whitespace"))
+            '@' ∈ subowner || throw(
+                ArgumentError(
+                    "Owner name ($subowner) must be `@user` or `email@domain.com`",
+                ),
+            )
         end
     end
 end

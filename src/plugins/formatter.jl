@@ -19,7 +19,11 @@ end
 
 function validate(p::Formatter, t::Template)
     if p.style ∉ ("nostyle", "blue", "sciml", "yas")
-        throw(ArgumentError("""JuliaFormatter style must be either "nostyle", "blue", "sciml" or "yas"."""))
+        throw(
+            ArgumentError(
+                """JuliaFormatter style must be either "nostyle", "blue", "sciml" or "yas".""",
+            ),
+        )
     end
 end
 
@@ -38,7 +42,7 @@ end
 
 function prompt(::Type{Formatter}, ::Type{String}, ::Val{:style})
     options = ["nostyle", "blue", "sciml", "yas"]
-    menu = RadioMenu(options; pagesize=length(options))
+    menu = RadioMenu(options; pagesize = length(options))
     println("Select a JuliaFormatter style:")
     idx = request(menu)
     return options[idx]

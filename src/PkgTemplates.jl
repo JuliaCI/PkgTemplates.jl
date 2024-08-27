@@ -1,5 +1,4 @@
-@doc read(joinpath(dirname(@__DIR__), "README.md"), String)
-module PkgTemplates
+@doc read(joinpath(dirname(@__DIR__), "README.md"), String) module PkgTemplates
 
 using Base: active_project, contractuser
 
@@ -15,8 +14,7 @@ using Parameters: @with_kw_noshow
 
 using Mocking
 
-export
-    Template,
+export Template,
     AppVeyor,
     BlueStyleBadge,
     CirrusCI,

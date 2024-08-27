@@ -32,7 +32,7 @@ function fixup(tpl::Template, pkg_dir)
 
     # Back up in temporary directory:
     backup = joinpath(tempdir(), splitpath(pkg_dir)[end])
-    if !isdir(backup) 
+    if !isdir(backup)
         @info "Fixing up the package at $pkg_dir might require overwriting files.\nThe current state of the package is backed up at $backup. Hit ENTER to continue."
         readline()
         run(`cp -r $pkg_dir $backup`)
@@ -45,7 +45,7 @@ function fixup(tpl::Template, pkg_dir)
     fixable = filter(p -> isfixable(p, pkg_dir), tpl.plugins)
     foreach((prehook, hook, posthook)) do h
         @info "Running $(nameof(h))s"
-        foreach(sort(fixable; by=p -> priority(p, h), rev=true)) do p
+        foreach(sort(fixable; by = p -> priority(p, h), rev = true)) do p
             h(p, tpl, pkg_dir)
         end
     end

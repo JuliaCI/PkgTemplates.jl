@@ -30,8 +30,8 @@ Creates a Git repository and a `.gitignore` file.
 """
 @plugin struct Git <: Plugin
     ignore::Vector{String} = String[]
-    name::Union{String, Nothing} = nothing
-    email::Union{String, Nothing} = nothing
+    name::Union{String,Nothing} = nothing
+    email::Union{String,Nothing} = nothing
     branch::String = @mock(LibGit2.getconfig("init.defaultBranch", DEFAULT_DEFAULT_BRANCH))
     ssh::Bool = false
     jl::Bool = true
@@ -51,7 +51,9 @@ function validate(p::Git, t::Template)
     foreach((:name, :email)) do k
         user_k = "user.$k"
         if getproperty(p, k) === nothing && isempty(@mock LibGit2.getconfig(user_k, ""))
-            throw(ArgumentError("Git: Global Git config is missing required value '$user_k'"))
+            throw(
+                ArgumentError("Git: Global Git config is missing required value '$user_k'"),
+            )
         end
     end
 end
@@ -128,7 +130,7 @@ end
 
 function commit(p::Git, repo::GitRepo, pkg_dir::AbstractString, msg::AbstractString)
     if p.gpgsign
-        run(pipeline(`git -C $pkg_dir commit -S --allow-empty -m $msg`; stdout=devnull))
+        run(pipeline(`git -C $pkg_dir commit -S --allow-empty -m $msg`; stdout = devnull))
     else
         LibGit2.commit(repo, msg)
     end
@@ -138,7 +140,7 @@ needs_username(::Git) = true
 
 function git_is_installed()
     return try
-        run(pipeline(`git --version`; stdout=devnull))
+        run(pipeline(`git --version`; stdout = devnull))
         true
     catch
         false

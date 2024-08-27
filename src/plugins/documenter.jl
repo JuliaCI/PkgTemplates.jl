@@ -1,11 +1,9 @@
-const DOCUMENTER_DEP = PackageSpec(;
-    name="Documenter",
-    uuid="e30172f5-a6a5-5a46-863b-614d45cd2de4",
-)
+const DOCUMENTER_DEP =
+    PackageSpec(; name = "Documenter", uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4")
 
 struct NoDeploy end
-const YesDeploy = Union{TravisCI, GitHubActions, GitLabCI}
-const GitHubPagesStyle = Union{TravisCI, GitHubActions}
+const YesDeploy = Union{TravisCI,GitHubActions,GitLabCI}
+const GitHubPagesStyle = Union{TravisCI,GitHubActions}
 
 """
     Logo(; light=nothing, dark=nothing)
@@ -17,8 +15,8 @@ Logo information for documentation.
 - `dark::AbstractString`: Path to a logo file for the dark theme.
 """
 @with_kw_noshow struct Logo
-    light::Union{String, Nothing} = nothing
-    dark::Union{String, Nothing} = nothing
+    light::Union{String,Nothing} = nothing
+    dark::Union{String,Nothing} = nothing
 end
 
 """
@@ -76,23 +74,23 @@ struct Documenter{T} <: Plugin
     assets::Vector{String}
     logo::Logo
     makedocs_kwargs::Dict{Symbol}
-    canonical_url::Union{Function, Nothing}
+    canonical_url::Union{Function,Nothing}
     make_jl::String
     index_md::String
-    devbranch::Union{String, Nothing}
-    edit_link::Union{String, Symbol, Nothing}
+    devbranch::Union{String,Nothing}
+    edit_link::Union{String,Symbol,Nothing}
 end
 
 # Can't use @plugin because we're implementing our own no-arguments constructor.
 function Documenter{T}(;
-    assets::Vector{<:AbstractString}=String[],
-    logo::Logo=Logo(),
-    makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
-    canonical_url::Union{Function, Nothing}=make_canonical(T),
-    make_jl::AbstractString=default_file("docs", "make.jl"),
-    index_md::AbstractString=default_file("docs", "src", "index.md"),
-    devbranch::Union{AbstractString, Nothing}=nothing,
-    edit_link::Union{AbstractString, Symbol, Nothing}=:devbranch,
+    assets::Vector{<:AbstractString} = String[],
+    logo::Logo = Logo(),
+    makedocs_kwargs::Dict{Symbol} = Dict{Symbol,Any}(),
+    canonical_url::Union{Function,Nothing} = make_canonical(T),
+    make_jl::AbstractString = default_file("docs", "make.jl"),
+    index_md::AbstractString = default_file("docs", "src", "index.md"),
+    devbranch::Union{AbstractString,Nothing} = nothing,
+    edit_link::Union{AbstractString,Symbol,Nothing} = :devbranch,
 ) where {T}
     return Documenter{T}(
         assets,
@@ -146,12 +144,14 @@ function view(p::Documenter, t::Template, pkg::AbstractString)
         "AUTHORS" => join(t.authors, ", "),
         "CANONICAL" => p.canonical_url === nothing ? nothing : p.canonical_url(t, pkg),
         "HAS_ASSETS" => !isempty(p.assets),
-        "MAKEDOCS_KWARGS" => map(((k, v),) -> k => repr(v), sort(collect(p.makedocs_kwargs), by=first)),
+        "MAKEDOCS_KWARGS" =>
+            map(((k, v),) -> k => repr(v), sort(collect(p.makedocs_kwargs), by = first)),
         "PKG" => pkg,
         "REPO" => "$(t.host)/$(t.user)/$pkg.jl",
         "USER" => t.user,
         "BRANCH" => devbranch,
-        "EDIT_LINK" => p.edit_link == :devbranch ? _quoted(devbranch) : _quoted(p.edit_link),
+        "EDIT_LINK" =>
+            p.edit_link == :devbranch ? _quoted(devbranch) : _quoted(p.edit_link),
     )
 end
 
@@ -160,7 +160,7 @@ _quoted(s::AbstractString) = string('"', s, '"')
 _quoted(s::Symbol) = repr(s)
 
 function view(p::Documenter{<:GitHubPagesStyle}, t::Template, pkg::AbstractString)
-    base = invoke(view, Tuple{Documenter, Template, AbstractString}, p, t, pkg)
+    base = invoke(view, Tuple{Documenter,Template,AbstractString}, p, t, pkg)
     return merge(base, Dict("HAS_DEPLOY" => true))
 end
 
@@ -176,8 +176,8 @@ function validate(p::Documenter, ::Template)
     end
 end
 
-function validate(p::Documenter{T}, t::Template) where T <: YesDeploy
-    invoke(validate, Tuple{Documenter, Template}, p, t)
+function validate(p::Documenter{T}, t::Template) where {T<:YesDeploy}
+    invoke(validate, Tuple{Documenter,Template}, p, t)
     if !hasplugin(t, T)
         name = nameof(T)
         s = "Documenter: The $name plugin must be included for docs deployment to be set up"
@@ -214,7 +214,7 @@ function hook(p::Documenter, t::Template, pkg_dir::AbstractString)
     # Create the documentation project.
     with_project(docs_dir) do
         Pkg.add(DOCUMENTER_DEP)
-        cd(() -> Pkg.develop(PackageSpec(; path="..")), docs_dir)
+        cd(() -> Pkg.develop(PackageSpec(; path = "..")), docs_dir)
     end
 end
 
@@ -233,7 +233,7 @@ end
 
 function interactive(::Type{Documenter})
     styles = [NoDeploy, TravisCI, GitLabCI, GitHubActions]
-    menu = RadioMenu(map(string, styles); pagesize=length(styles))
+    menu = RadioMenu(map(string, styles); pagesize = length(styles))
     println("Documenter deploy style:")
     idx = request(menu)
     return interactive(Documenter{styles[idx]})
@@ -242,5 +242,5 @@ end
 function prompt(::Type{<:Documenter}, ::Type{Logo}, ::Val{:logo})
     light = Base.prompt("Enter value for 'logo.light' (default: nothing)")
     dark = Base.prompt("Enter value for 'logo.dark' (default: nothing)")
-    return Logo(; light=light, dark=dark)
+    return Logo(; light = light, dark = dark)
 end
