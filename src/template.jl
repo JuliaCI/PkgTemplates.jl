@@ -22,7 +22,7 @@ function default_authors()
 end
 
 struct MissingUserException{T} <: Exception end
-function Base.showerror(io::IO, ::MissingUserException{T}) where T
+function Base.showerror(io::IO, ::MissingUserException{T}) where {T}
     s = """$(nameof(T)): Git hosting service username is required, set one with keyword `user="<username>"`"""
     print(io, s)
 end
@@ -80,7 +80,7 @@ struct Template
     user::String
 end
 
-Template(; interactive::Bool=false, kwargs...) = Template(Val(interactive); kwargs...)
+Template(; interactive::Bool = false, kwargs...) = Template(Val(interactive); kwargs...)
 Template(::Val{true}; kwargs...) = interactive(Template; kwargs...)
 
 function Template(::Val{false}; kwargs...)
@@ -102,7 +102,7 @@ function Template(::Val{false}; kwargs...)
         !(typeof(p) in vcat(typeof.(plugins), disabled))
     end
     append!(plugins, defaults)
-    plugins = Vector{Plugin}(sort(plugins; by=string))
+    plugins = Vector{Plugin}(sort(plugins; by = string))
 
     if isempty(user)
         foreach(plugins) do p
@@ -135,12 +135,12 @@ function (t::Template)(pkg::AbstractString)
     try
         foreach((prehook, hook, posthook)) do h
             @info "Running $(nameof(h))s"
-            foreach(sort(t.plugins; by=p -> priority(p, h), rev=true)) do p
+            foreach(sort(t.plugins; by = p -> priority(p, h), rev = true)) do p
                 h(p, t, pkg_dir)
             end
         end
     catch
-        rm(pkg_dir; recursive=true, force=true)
+        rm(pkg_dir; recursive = true, force = true)
         rethrow()
     end
 
@@ -159,23 +159,23 @@ end
 
 function Base.:(==)(a::Template, b::Template)
     return a.authors == b.authors &&
-        a.dir == b.dir &&
-        a.host == b.host &&
-        a.julia == b.julia &&
-        a.user == b.user &&
-        all(map(==, a.plugins, b.plugins))
+           a.dir == b.dir &&
+           a.host == b.host &&
+           a.julia == b.julia &&
+           a.user == b.user &&
+           all(map(==, a.plugins, b.plugins))
 end
 
 # Does the template have a plugin that satisfies some predicate?
 hasplugin(t::Template, f::Function) = any(f, t.plugins)
-hasplugin(t::Template, ::Type{T}) where T <: Plugin = hasplugin(t, p -> p isa T)
+hasplugin(t::Template, ::Type{T}) where {T<:Plugin} = hasplugin(t, p -> p isa T)
 
 """
     getplugin(t::Template, ::Type{T<:Plugin}) -> Union{T, Nothing}
 
 Get the plugin of type `T` from the template `t`, if it's present.
 """
-function getplugin(t::Template, ::Type{T}) where T <: Plugin
+function getplugin(t::Template, ::Type{T}) where {T<:Plugin}
     i = findfirst(p -> p isa T, t.plugins)
     return i === nothing ? nothing : t.plugins[i]
 end
@@ -184,7 +184,7 @@ end
 getkw!(kwargs, k) = pop!(kwargs, k, defaultkw(Template, k))
 
 # Default Template keyword values.
-defaultkw(::Type{T}, s::Symbol) where T = defaultkw(T, Val(s))
+defaultkw(::Type{T}, s::Symbol) where {T} = defaultkw(T, Val(s))
 defaultkw(::Type{Template}, ::Val{:authors}) = default_authors()
 defaultkw(::Type{Template}, ::Val{:dir}) = contractuser(Pkg.devdir())
 defaultkw(::Type{Template}, ::Val{:host}) = "github.com"
@@ -194,7 +194,7 @@ defaultkw(::Type{Template}, ::Val{:user}) = default_user()
 
 function interactive(::Type{Template}; kwargs...)
     # If the user supplied any keywords themselves, don't prompt for them.
-    kwargs = Dict{Symbol, Any}(kwargs)
+    kwargs = Dict{Symbol,Any}(kwargs)
     options = [:user, :authors, :dir, :host, :julia, :plugins]
     customizable = setdiff(options, keys(kwargs))
 
@@ -205,8 +205,8 @@ function interactive(::Type{Template}; kwargs...)
 
     try
         println("Template keywords to customize:")
-        opts = map(k -> "$k ($(repr(defaultkw(Template, k))))" , customizable)
-        menu = MultiSelectMenu(opts; pagesize=length(customizable))
+        opts = map(k -> "$k ($(repr(defaultkw(Template, k))))", customizable)
+        menu = MultiSelectMenu(opts; pagesize = length(customizable))
         customize = customizable[sort!(collect(request(menu)))]
         just_one && last(customizable) in customize && return Template(; kwargs...)
 
@@ -245,7 +245,7 @@ end
 
 function prompt(::Type{Template}, ::Type, ::Val{:host})
     hosts = ["github.com", "gitlab.com", "bitbucket.org", "Other"]
-    menu = RadioMenu(hosts; pagesize=length(hosts))
+    menu = RadioMenu(hosts; pagesize = length(hosts))
     println("Select Git repository hosting service:")
     idx = request(menu)
     return if idx == lastindex(hosts)
@@ -258,7 +258,7 @@ end
 function prompt(::Type{Template}, ::Type, ::Val{:julia})
     versions = map(format_version, VersionNumber.(1, 0:VERSION.minor))
     push!(versions, "Other")
-    menu = RadioMenu(map(string, versions); pagesize=length(versions))
+    menu = RadioMenu(map(string, versions); pagesize = length(versions))
     println("Select minimum Julia version:")
     idx = request(menu)
     return if idx == lastindex(versions)
@@ -276,7 +276,7 @@ function prompt(::Type{Template}, ::Type, ::Val{:plugins})
     ndefaults = length(defaults)
     # Put the defaults first.
     options = unique!([defaults; concretes(Plugin)])
-    menu = MultiSelectMenu(map(T -> string(nameof(T)), options); pagesize=length(options))
+    menu = MultiSelectMenu(map(T -> string(nameof(T)), options); pagesize = length(options))
     println("Select plugins:")
     # Pre-select the default plugins and move the cursor to the first non-default.
     # To make this better, we need julia#30043.

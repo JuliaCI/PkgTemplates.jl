@@ -9,5 +9,5 @@ for more details.
 struct Develop <: Plugin end
 
 function posthook(::Develop, ::Template, pkg_dir::AbstractString)
-    Pkg.develop(PackageSpec(; path=pkg_dir))
+    Pkg.develop(PackageSpec(; path = pkg_dir))
 end

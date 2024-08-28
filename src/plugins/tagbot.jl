@@ -39,16 +39,16 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
     destination::String = "TagBot.yml"
     trigger::String = "JuliaTagBot"
     token::Secret = Secret("GITHUB_TOKEN")
-    ssh::Union{Secret, Nothing} = Secret("DOCUMENTER_KEY")
-    ssh_password::Union{Secret, Nothing} = nothing
-    changelog::Union{String, Nothing} = nothing
-    changelog_ignore::Union{Vector{String}, Nothing} = nothing
-    gpg::Union{Secret, Nothing} = nothing
-    gpg_password::Union{Secret, Nothing} = nothing
-    registry::Union{String, Nothing} = nothing
-    branches::Union{Bool, Nothing} = nothing
-    dispatch::Union{Bool, Nothing} = nothing
-    dispatch_delay::Union{Int, Nothing} = nothing
+    ssh::Union{Secret,Nothing} = Secret("DOCUMENTER_KEY")
+    ssh_password::Union{Secret,Nothing} = nothing
+    changelog::Union{String,Nothing} = nothing
+    changelog_ignore::Union{Vector{String},Nothing} = nothing
+    gpg::Union{Secret,Nothing} = nothing
+    gpg_password::Union{Secret,Nothing} = nothing
+    registry::Union{String,Nothing} = nothing
+    branches::Union{Bool,Nothing} = nothing
+    dispatch::Union{Bool,Nothing} = nothing
+    dispatch_delay::Union{Int,Nothing} = nothing
 end
 
 source(p::TagBot) = p.file
