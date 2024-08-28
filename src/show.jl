@@ -7,14 +7,14 @@ function Base.show(io::IO, m::MIME"text/plain", t::Template)
         print(io, "  plugins: None")
     else
         print(io, repeat(' ', 2), "plugins:")
-        foreach(sort(t.plugins; by=string)) do p
+        foreach(sort(t.plugins; by = string)) do p
             println(io)
             show(IOContext(io, :indent => 4), m, p)
         end
     end
 end
 
-function Base.show(io::IO, ::MIME"text/plain", p::T) where T <: Plugin
+function Base.show(io::IO, ::MIME"text/plain", p::T) where {T<:Plugin}
     indent = get(io, :indent, 0)
     print(io, repeat(' ', indent), nameof(T))
     ns = fieldnames(T)

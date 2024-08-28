@@ -1,0 +1,16 @@
+project:
+  title: "{{{PKG}}}.jl"
+  execute-dir: project
+  render:
+    - "*.qmd"
+    - "!docs/src/*.md"
+crossref:
+  fig-prefix: Figure
+  tbl-prefix: Table
+resource-path: 
+  - docs/src/assets
+format: 
+  commonmark:
+    variant: -raw_html+tex_math_dollars
+    wrap: preserve
+    mermaid-format: png

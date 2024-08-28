@@ -46,7 +46,7 @@ function badges(::PkgEvalBadge)
     return Badge(
         "PkgEval",
         "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.svg",
-        "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.html"
+        "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.html",
     )
 end
 

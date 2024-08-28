@@ -4,8 +4,8 @@
 Shortcut for `Template(; interactive=true)(pkg)`.
 If no package name is supplied, you will be prompted for one.
 """
-function generate(pkg::AbstractString=prompt(Template, String, :pkg))
-    t = Template(; interactive=true)
+function generate(pkg::AbstractString = prompt(Template, String, :pkg))
+    t = Template(; interactive = true)
     t(pkg)
     return t
 end
@@ -17,7 +17,7 @@ Interactively create a plugin of type `T`. Implement this method and ignore othe
 related functions only if you want completely custom behaviour.
 """
 function interactive(T::Type)
-    pairs = Vector{Pair{Symbol, Type}}(interactive_pairs(T))
+    pairs = Vector{Pair{Symbol,Type}}(interactive_pairs(T))
 
     # There must be at least 2 MultiSelectMenu options.
     # If there are none, return immediately.
@@ -34,13 +34,13 @@ function interactive(T::Type)
             "$k"
         end
     end
-    menu = MultiSelectMenu(opts; pagesize=length(pairs))
+    menu = MultiSelectMenu(opts; pagesize = length(pairs))
     customize = sort!(collect(request(menu)))
 
     # If the "None" option was selected, don't customize anything.
     just_one && lastindex(pairs) in customize && return T()
 
-    kwargs = Dict{Symbol, Any}()
+    kwargs = Dict{Symbol,Any}()
     foreach(pairs[customize]) do (name, F)
         kwargs[name] = prompt(T, F, name)
     end
@@ -64,7 +64,7 @@ function pretty_message(s::AbstractString)
         r"Array{(.*?),1}" => s"Vector{\1}",
         r"Union{Nothing, (.*?)}" => s"Union{\1, Nothing}",
     ]
-    return reduce((s, p) -> replace(s, p), replacements; init=s)
+    return reduce((s, p) -> replace(s, p), replacements; init = s)
 end
 
 """
@@ -73,12 +73,12 @@ end
 Provide some extra tips to users on how to structure their input for the type `T`,
 for example if multiple delimited values are expected.
 """
-input_tips(::Type{Vector{T}}) where T = [input_tips(T)..., "comma-delimited"]
-input_tips(::Type{Union{T, Nothing}}) where T = [input_tips(T)..., input_tips(Nothing)...]
+input_tips(::Type{Vector{T}}) where {T} = [input_tips(T)..., "comma-delimited"]
+input_tips(::Type{Union{T,Nothing}}) where {T} = [input_tips(T)..., input_tips(Nothing)...]
 input_tips(::Type{Nothing}) = ["'nothing' for nothing"]
 input_tips(::Type{Secret}) = ["name only"]
 # Show expected input type as a tip if it's anything other than `String`
-input_tips(::Type{T}) where T = String[string(T)]
+input_tips(::Type{T}) where {T} = String[string(T)]
 input_tips(::Type{String}) = String[]
 input_tips(::Type{<:Signed}) = ["Int"]  # Specific Int type likely not important
 
@@ -91,7 +91,7 @@ A default implementation of `T(s)` exists.
 convert_input(::Type, T::Type{<:Real}, s::AbstractString) = parse(T, s)
 convert_input(::Type, T::Type, s::AbstractString) = T(s)
 
-function convert_input(P::Type, ::Type{Union{T, Nothing}}, s::AbstractString) where T
+function convert_input(P::Type, ::Type{Union{T,Nothing}}, s::AbstractString) where {T}
     # This is kind of sketchy because technically, there might be some other input
     # whose value we want to instantiate with the string "nothing",
     # but I think that would be a pretty rare occurrence.
@@ -99,11 +99,15 @@ function convert_input(P::Type, ::Type{Union{T, Nothing}}, s::AbstractString) wh
     return s == "nothing" ? nothing : convert_input(P, T, s)
 end
 
-function convert_input(P::Type, ::Type{Union{T, Symbol, Nothing}}, s::AbstractString) where T
+function convert_input(
+    P::Type,
+    ::Type{Union{T,Symbol,Nothing}},
+    s::AbstractString,
+) where {T}
     # Assume inputs starting with ':' char are intended as Symbols, if a plugin accept symbols.
     # i.e. assume the set of valid Symbols the plugin expects can be spelt starting with ':'.
     return if startswith(s, ":")
-        Symbol(chop(s, head=1, tail=0))  # remove ':'
+        Symbol(chop(s, head = 1, tail = 0))  # remove ':'
     else
         convert_input(P, Union{T,Nothing}, s)
     end
@@ -140,7 +144,7 @@ Implement this method to customize particular fields of particular types.
 prompt(P::Type, T::Type, name::Symbol) = prompt(P, T, Val(name))
 
 # The trailing `nothing` is a hack for `fallback_prompt` to use, ignore it.
-function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, name}
+function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing = nothing) where {T,name}
     default = defaultkw(P, name)
     tips = join([input_tips(T); "default: $(input_string(default))"], ", ")
     input = Base.prompt(pretty_message("Enter value for '$name' ($tips)"))
@@ -170,8 +174,9 @@ function prompt(P::Type, ::Type{T}, ::Val{name}, ::Nothing=nothing) where {T, na
 end
 
 # Compute all the concrete subtypes of T.
-concretes_rec(T::Type) = isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T))...) : Any[T]
-concretes(T::Type) = sort!(concretes_rec(T); by=nameof)
+concretes_rec(T::Type) =
+    isabstracttype(T) ? vcat(map(concretes_rec, subtypes(T))...) : Any[T]
+concretes(T::Type) = sort!(concretes_rec(T); by = nameof)
 
 # Compute name => type pairs for T's interactive options.
 function interactive_pairs(T::Type)
@@ -181,7 +186,7 @@ function interactive_pairs(T::Type)
     prepend!(pairs, reverse(customizable(T)))
     uniqueby!(first, pairs)
     filter!(p -> last(p) !== NotCustomizable, pairs)
-    sort!(pairs; by=first)
+    sort!(pairs; by = first)
 
     return pairs
 end

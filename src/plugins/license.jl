@@ -18,9 +18,9 @@ struct License <: FilePlugin
 end
 
 function License(;
-    name::AbstractString="MIT",
-    path::Union{AbstractString, Nothing}=nothing,
-    destination::AbstractString="LICENSE",
+    name::AbstractString = "MIT",
+    path::Union{AbstractString,Nothing} = nothing,
+    destination::AbstractString = "LICENSE",
 )
     if path === nothing
         path = default_file("licenses", name)
@@ -35,17 +35,15 @@ defaultkw(::Type{License}, ::Val{:destination}) = "LICENSE"
 
 source(p::License) = p.path
 destination(p::License) = p.destination
-view(::License, t::Template, ::AbstractString) = Dict(
-    "AUTHORS" => join(t.authors, ", "),
-    "YEAR" => year(today()),
-)
+view(::License, t::Template, ::AbstractString) =
+    Dict("AUTHORS" => join(t.authors, ", "), "YEAR" => year(today()))
 
 function prompt(::Type{License}, ::Type, ::Val{:name})
     options = readdir(default_file("licenses"))
     # Move MIT to the top.
     deleteat!(options, findfirst(==("MIT"), options))
     pushfirst!(options, "MIT")
-    menu = RadioMenu(options; pagesize=length(options))
+    menu = RadioMenu(options; pagesize = length(options))
     println("Select a license:")
     idx = request(menu)
     return options[idx]
