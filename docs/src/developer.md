@@ -80,7 +80,7 @@ To understand how they're implemented, let's look at simplified versions of two 
 
 ```julia
 @plugin struct Documenter <: Plugin
-    make_jl::String = default_file("docs", "make.jl")
+    make_jl::String = default_file("docs", "make.jlt")
     index_md::String = default_file("docs", "src", "index.md")
 end
 
@@ -306,7 +306,7 @@ The plugin implements its own `hook`, but uses `invoke` to avoid duplicating the
 
 ```julia
 @plugin struct Tests <: FilePlugin
-    file::String = default_file("runtests.jl")
+    file::String = default_file("runtests.jlt")
 end
 
 source(p::Tests) = p.file

@@ -23,7 +23,7 @@ end
 
 """
     Documenter{T}(;
-        make_jl="$(contractuser(default_file("docs", "make.jl")))",
+        make_jl="$(contractuser(default_file("docs", "make.jlt")))",
         index_md="$(contractuser(default_file("docs", "src", "index.md")))",
         assets=String[],
         logo=Logo(),
@@ -89,7 +89,7 @@ function Documenter{T}(;
     logo::Logo=Logo(),
     makedocs_kwargs::Dict{Symbol}=Dict{Symbol, Any}(),
     canonical_url::Union{Function, Nothing}=make_canonical(T),
-    make_jl::AbstractString=default_file("docs", "make.jl"),
+    make_jl::AbstractString=default_file("docs", "make.jlt"),
     index_md::AbstractString=default_file("docs", "src", "index.md"),
     devbranch::Union{AbstractString, Nothing}=nothing,
     edit_link::Union{AbstractString, Symbol, Nothing}=:devbranch,
@@ -111,7 +111,7 @@ Documenter(; kwargs...) = Documenter{NoDeploy}(; kwargs...)
 # We have to define these manually because we didn't use @plugin.
 defaultkw(::Type{<:Documenter}, ::Val{:assets}) = String[]
 defaultkw(::Type{<:Documenter}, ::Val{:logo}) = Logo()
-defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jl")
+defaultkw(::Type{<:Documenter}, ::Val{:make_jl}) = default_file("docs", "make.jlt")
 defaultkw(::Type{<:Documenter}, ::Val{:index_md}) = default_file("docs", "src", "index.md")
 defaultkw(::Type{<:Documenter}, ::Val{:devbranch}) = nothing
 defaultkw(::Type{<:Documenter}, ::Val{:edit_link}) = :devbranch

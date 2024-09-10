@@ -1,5 +1,5 @@
 """
-    SrcDir(; file="$(contractuser(default_file("src", "module.jl")))")
+    SrcDir(; file="$(contractuser(default_file("src", "module.jlt")))")
 
 Creates a module entrypoint.
 
@@ -7,7 +7,7 @@ Creates a module entrypoint.
 - `file::AbstractString`: Template file for `src/<module>.jl`.
 """
 @plugin mutable struct SrcDir <: FilePlugin
-    file::String = default_file("src", "module.jl")
+    file::String = default_file("src", "module.jlt")
     destination::String = ""
 end
 
