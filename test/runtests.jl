@@ -110,7 +110,7 @@ mktempdir() do dir
                 # and the test fixtures are made with Julia 1.10.0
                 # TODO: Keep this on the latest stable Julia version, and update
                 # the version used by the corresponding CI job at the same time.
-                REFERENCE_VERSION = v"1.10.0"
+                REFERENCE_VERSION = v"1.10.6"
                 if VERSION == REFERENCE_VERSION
                     # Ideally we'd use `with_clean_gitconfig`, but it's way too slow.
                     branch = LibGit2.getconfig(

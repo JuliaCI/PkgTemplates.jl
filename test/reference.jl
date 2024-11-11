@@ -32,7 +32,9 @@ function test_reference(reference, comparison)
     println("Reference: $reference")
     println("Comparison: $comparison")
     update = false
-    if PROMPT
+    if haskey(ENV, "UPDATE_REFERENCE_FILES")
+        copy_file(comparison, reference)
+    elseif PROMPT
         while true
             println("Update reference file? [y/n]")
             answer = lowercase(strip(readline()))
