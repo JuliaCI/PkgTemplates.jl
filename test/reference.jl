@@ -32,7 +32,7 @@ function test_reference(reference, comparison)
     println("Reference: $reference")
     println("Comparison: $comparison")
     update = false
-    if haskey(ENV, "UPDATE_REFERENCE_FILES")
+    if haskey(ENV, "JULIA_REFERENCETESTS_UPDATE")
         copy_file(comparison, reference)
     elseif PROMPT
         while true
