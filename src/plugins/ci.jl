@@ -83,6 +83,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
         "HAS_COVERALLS" => p.coverage && hasplugin(t, Coveralls),
         "HAS_DOCUMENTER" => hasplugin(t, Documenter{GitHubActions}),
         "HAS_EXCLUDES" => !isempty(excludes),
+        "HAS_RUNIC" => hasplugin(t, Runic{GitHubActions}),
         "OS" => os,
         "PKG" => pkg,
         "USER" => t.user,

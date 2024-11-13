@@ -43,3 +43,11 @@ function prompt(::Type{Formatter}, ::Type{String}, ::Val{:style})
     idx = request(menu)
     return options[idx]
 end
+
+struct Runic{T} <: Plugin end
+
+function validate(::Runic{T}, ::Template) where {T}
+    if T !== GitHubActions
+        throw(ArgumentError("Only GitHubActions is supported for Runic at the moment."))
+    end
+end

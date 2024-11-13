@@ -42,6 +42,7 @@ export
     ProjectFile,
     Readme,
     RegisterAction,
+    Runic,
     Secret,
     SrcDir,
     TagBot,

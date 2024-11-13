@@ -114,6 +114,7 @@ end
             PkgEvalBadge(),
             RegisterAction(),
             TravisCI(),
+            Runic{GitHubActions}(),
         ])
     end
 
