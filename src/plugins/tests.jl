@@ -127,6 +127,8 @@ function add_test_dependency(p::Tests, pkg_dir::AbstractString)
     # Add the dependency manually since there's no programmatic way to add to [extras].
     path = joinpath(pkg_dir, "Project.toml")
     toml = TOML.parsefile(path)
+
+    get!(toml, "compat", Dict())["Test"] = "1"
     
     get!(toml, "extras", Dict())["Test"] = TEST_UUID
     if p.aqua
