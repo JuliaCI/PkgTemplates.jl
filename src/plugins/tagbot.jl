@@ -30,7 +30,7 @@ Adds GitHub release support via [TagBot](https://github.com/JuliaRegistries/TagB
 - `gpg::Secret`: Name of the GPG private key secret to use.
 - `gpg_password::Secret`: Name of the GPG private key password secret to use.
 - `registry::AbstractString`: Custom registry, in the format `owner/repo`.
-- `branches::Bool`: Whether not to enable the `branches` option.
+- `branches::Bool`: Whether or not to enable the `branches` option.
 - `dispatch::Bool`: Whether or not to enable the `dispatch` option.
 - `dispatch_delay::Int`: Number of minutes to delay for dispatch events.
 """
