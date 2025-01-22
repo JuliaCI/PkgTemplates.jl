@@ -46,8 +46,12 @@ end
 
 struct Runic{T} <: Plugin end
 
-function validate(::Runic{T}, ::Template) where {T}
-    if T !== GitHubActions
-        throw(ArgumentError("Only GitHubActions is supported for Runic at the moment."))
+Runic() = Runic{GitHubActions}()
+
+function validate(::Runic{T}, t::Template) where {T}
+    if T === GitHubActions
+        hasplugin(t, T) || throw(ArgumentError("Runic: The GitHubActions plugin must be included"))
+    else
+        throw(ArgumentError("Runic: Only GitHubActions is supported at the moment"))
     end
 end
