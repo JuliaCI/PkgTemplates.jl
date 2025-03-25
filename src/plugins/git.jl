@@ -2,7 +2,7 @@ const DEFAULT_DEFAULT_BRANCH = "main"
 
 """
     Git(;
-        ignore=String[],
+        ignore=["repl_history.jl"],
         name=nothing,
         email=nothing,
         branch=LibGit2.getconfig("init.defaultBranch", "$DEFAULT_DEFAULT_BRANCH")
@@ -29,7 +29,7 @@ Creates a Git repository and a `.gitignore` file.
   and for you to have a GPG key associated with your committer identity.
 """
 @plugin struct Git <: Plugin
-    ignore::Vector{String} = String[]
+    ignore::Vector{String} = ["repl_history.jl"]
     name::Union{String, Nothing} = nothing
     email::Union{String, Nothing} = nothing
     branch::String = @mock(LibGit2.getconfig("init.defaultBranch", DEFAULT_DEFAULT_BRANCH))
