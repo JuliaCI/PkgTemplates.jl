@@ -41,7 +41,7 @@ end
                 Dependabot:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "dependabot.yml"))"
                 Git:
-                  ignore: String[]
+                  ignore: ["repl_history.jl"]
                   name: nothing
                   email: nothing
                   branch: "main"
