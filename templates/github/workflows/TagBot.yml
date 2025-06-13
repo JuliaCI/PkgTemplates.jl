@@ -22,7 +22,12 @@ permissions:
   statuses: read
 jobs:
   TagBot:
+    {{#REGISTRY}}
+    if: github.event_name == 'workflow_dispatch' || github.actor == '{{{TRIGGER}}}' || (github.event_name == 'repository_dispatch' && github.event.client_payload.repository == '{{{REGISTRY}}}')
+    {{/REGISTRY}}
+    {{^REGISTRY}}
     if: github.event_name == 'workflow_dispatch' || github.actor == '{{{TRIGGER}}}'
+    {{/REGISTRY}}
     runs-on: ubuntu-latest
     steps:
       - uses: JuliaRegistries/TagBot@v1
