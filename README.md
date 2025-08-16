@@ -13,11 +13,11 @@
 
 Install with the Julia package manager [Pkg](https://pkgdocs.julialang.org/), just like any other registered Julia package:
 
-```jl
+```julia
 pkg> add PkgTemplates  # Press ']' to enter the Pkg REPL mode.
 ```
 or
-```jl
+```julia
 julia> using Pkg; Pkg.add("PkgTemplates")
 ```
 
@@ -27,7 +27,7 @@ julia> using Pkg; Pkg.add("PkgTemplates")
 
 You can fully customize your package interactively with:
 
-```jl
+```julia
 using PkgTemplates
 Template(interactive=true)("MyPkg")
 ```
@@ -38,7 +38,7 @@ This will prompt you to select options, displaying the default settings in paren
 
 Creating a `Template` is as simple as:
 
-```jl
+```julia
 using PkgTemplates
 tpl = Template()
 ```
@@ -51,13 +51,13 @@ The no-keywords constructor assumes the existence of some preexisting Git config
 
 Once you have a `Template`, use it to generate a package:
 
-```jl
+```julia
 tpl("MyPkg")
 ```
 
 However, it's probably desirable to customize the template to your liking with various options and plugins:
 
-```jl
+```julia
 using PkgTemplates
 tpl = Template(;
     dir="~/code",
