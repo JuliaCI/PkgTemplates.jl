@@ -2,7 +2,6 @@
 environment:
   matrix:
     - julia_version: 1.10
-    - julia_version: 1.6
     - julia_version: nightly
 platform:
   - x64
