@@ -305,6 +305,7 @@ See [`Documenter`](@ref) for more information.
 @plugin struct GitLabCI <: FilePlugin
     file::String = default_file("gitlab-ci.yml")
     coverage::Bool = true
+    file_prefix::String = ""
     # Nightly has no Docker image.
     extra_versions::Vector = DEFAULT_CI_VERSIONS_NO_PRERELEASE
 end
@@ -337,6 +338,7 @@ function view(p::GitLabCI, t::Template, pkg::AbstractString)
         "USER" => t.user,
         "VERSION" => format_version(t.julia),
         "VERSIONS" => collect_versions(t, p.extra_versions),
+        "FILE_PREFIX" => p.file_prefix,
     )
 end
 
