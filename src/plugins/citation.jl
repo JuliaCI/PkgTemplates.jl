@@ -22,6 +22,7 @@ view(::Citation, t::Template, pkg::AbstractString) = Dict(
     "MONTH" => month(today()),
     "PKG" => pkg,
     "URL" => "https://$(t.host)/$(t.user)/$pkg.jl",
+    "VERSION" => "v$(first([p for p in t.plugins if p isa ProjectFile]).version)",
     "YEAR" => year(today()),
 )
 
