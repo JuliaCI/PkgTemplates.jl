@@ -1,5 +1,5 @@
 default_user() = LibGit2.getconfig("github.user", "")
-default_version() = v"1.6.7"  # LTS as of Jan 2024, see https://julialang.org/downloads/#long_term_support_release
+default_version() = v"1.10.10"  # LTS as of June 2025, see https://julialang.org/downloads/#long_term_support_release
 default_plugins() = [
     CompatHelper(),
     ProjectFile(),
