@@ -75,6 +75,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         end
         @testset "$BadgeType" for (BadgeType, text) in (
             BlueStyleBadge => "BlueStyle",
+            SciMLStyleBadge => "SciMLStyle",
             ColPracBadge => "ColPrac",
             PkgEvalBadge => "PkgEval",
         )
