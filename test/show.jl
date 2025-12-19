@@ -34,10 +34,6 @@ end
               julia: v"1.10.10"
               user: "$USER"
               plugins:
-                CompatHelper:
-                  file: "$(joinpath(TEMPLATES_DIR, "github", "workflows", "CompatHelper.yml"))"
-                  destination: "CompatHelper.yml"
-                  cron: "0 0 * * *"
                 Dependabot:
                   file: "$(joinpath(TEMPLATES_DIR, "github", "dependabot.yml"))"
                 Git:
