@@ -160,7 +160,7 @@ end
             Formatter(; style="blue"),
             Git(; ignore=["a", "b", "c"], manifest=true, branch="whackybranch"),
             GitHubActions(; x86=true, linux=false, coverage=false),
-            GitLabCI(; coverage=false, extra_versions=[v"0.6"]),
+            GitLabCI(; coverage=false, extra_versions=[v"0.6"], file_prefix=""),
             License(; name="ISC"),
             ProjectFile(; version=v"1"),
             Readme(; inline_badges=true, badge_off=[Codecov]),
