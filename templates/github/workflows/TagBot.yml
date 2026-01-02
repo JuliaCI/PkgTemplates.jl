@@ -16,6 +16,10 @@ jobs:
         with:
           token: {{{TOKEN}}}
           {{#SSH}}
+          # For commits that modify workflow files: SSH key enables tagging, but
+          # releases require manual creation. For full automation of such commits,
+          # use a PAT with `workflow` scope instead of GITHUB_TOKEN.
+          # See: https://github.com/JuliaRegistries/TagBot#commits-that-modify-workflow-files
           ssh: {{{SSH}}}
           {{/SSH}}
           {{#SSH_PASSWORD}}
