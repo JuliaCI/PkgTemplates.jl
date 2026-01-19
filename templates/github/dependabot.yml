@@ -2,6 +2,14 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/" # Location of package manifests
+    directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "julia"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # groups: # uncomment to group all Julia package updates into a single PR
+    #   all-julia-packages:
+    #     patterns:
+    #       - "*"
