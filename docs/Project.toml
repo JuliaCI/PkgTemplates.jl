@@ -4,3 +4,4 @@ PkgTemplates = "14b8a8f1-9102-5b29-a752-f990bacb7fe1"
 
 [compat]
 Documenter = "1"
+PkgTemplates = "0.7.59"
