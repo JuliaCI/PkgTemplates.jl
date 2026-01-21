@@ -1,7 +1,6 @@
 default_user() = LibGit2.getconfig("github.user", "")
 default_version() = v"1.10.10"  # LTS as of June 2025, see https://julialang.org/downloads/#long_term_support_release
 default_plugins() = [
-    CompatHelper(),
     ProjectFile(),
     SrcDir(),
     Git(),
@@ -50,7 +49,7 @@ A configuration used to generate packages.
 ### Template Plugins
 - `plugins::Vector{<:Plugin}=Plugin[]`: A list of [`Plugin`](@ref)s used by the template.
   The default plugins are [`ProjectFile`](@ref), [`SrcDir`](@ref), [`Tests`](@ref),
-  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`CompatHelper`](@ref),
+  [`Readme`](@ref), [`License`](@ref), [`Git`](@ref), [`Dependabot`](@ref),
   [`TagBot`](@ref) and [`GitHubActions`](@ref).
   To disable a default plugin, pass in the negated type: `!PluginType`.
   To override a default plugin instead of disabling it, pass in your own instance.

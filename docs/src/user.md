@@ -42,10 +42,9 @@ Readme
 License
 Git
 GitHubActions
-CompatHelper
+Dependabot
 TagBot
 Secret
-Dependabot
 ```
 
 ### Continuous Integration (CI)
@@ -97,6 +96,7 @@ RegisterAction
 Formatter
 CodeOwners
 PkgBenchmark
+CompatHelper
 ```
 
 ## A More Complicated Example
