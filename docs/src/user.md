@@ -83,6 +83,7 @@ These plugins will add badges to the README.
 
 ```@docs
 BlueStyleBadge
+SciMLStyleBadge
 ColPracBadge
 PkgEvalBadge
 ```
