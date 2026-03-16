@@ -45,10 +45,30 @@ function prompt(::Type{License}, ::Type, ::Val{:name})
     # Move MIT to the top.
     deleteat!(options, findfirst(==("MIT"), options))
     pushfirst!(options, "MIT")
-    menu = RadioMenu(options; pagesize=length(options))
-    println("Select a license:")
+    menu = RadioMenu(map(license_display_name, options); pagesize=length(options))
+    println("Select a license (abbreviation - full name):")
     idx = request(menu)
     return options[idx]
 end
 
 customizable(::Type{License}) = (:name => String,)
+
+function license_display_name(name::AbstractString)
+    full_name = get(LICENSE_NAMES, name, name)
+    return full_name == name ? name : "$(name) - $(full_name)"
+end
+
+const LICENSE_NAMES = Dict(
+    "AGPL-3.0+" => "GNU Affero General Public License v3.0 or later",
+    "ASL" => "Apache License 2.0",
+    "BSD2" => "BSD 2-Clause License",
+    "BSD3" => "BSD 3-Clause License",
+    "EUPL-1.2+" => "European Union Public Licence 1.2 or later",
+    "GPL-2.0+" => "GNU General Public License v2.0 or later",
+    "GPL-3.0+" => "GNU General Public License v3.0 or later",
+    "ISC" => "ISC License",
+    "LGPL-2.1+" => "GNU Lesser General Public License v2.1 or later",
+    "LGPL-3.0+" => "GNU Lesser General Public License v3.0 or later",
+    "MIT" => "MIT License",
+    "MPL" => "Mozilla Public License 2.0",
+)
