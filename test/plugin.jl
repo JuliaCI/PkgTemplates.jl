@@ -2,6 +2,8 @@
 
 @info "Running plugin tests"
 
+using Test: @test_deprecated
+
 struct FileTest <: PT.FilePlugin
     a::String
     b::Bool
@@ -106,5 +108,17 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
         @test pkg_name("Whee") == "Whee"
         # Only the final suffix is removed---we don't correct for user error
         @test pkg_name("Whee.jl.jl") == "Whee.jl"
+    end
+
+    @testset "License aliases" begin
+        # Backward-compatibility: legacy license names should still work, but emit a depwarn.
+        apache = PT.default_file("licenses", "Apache-2.0")
+        @test isfile(apache)
+
+        p = @test_deprecated License(; name="ASL")
+        @test PT.source(p) == apache
+
+        # SPDX identifiers should work without warnings.
+        @test_logs License(; name="Apache-2.0")
     end
 end
