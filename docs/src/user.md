@@ -112,7 +112,7 @@ Template(;
     authors="Acme Corp",
     julia=v"1.1",
     plugins=[
-        License(; name="MPL"),
+        License(; name="MPL-2.0"),
         Git(; manifest=true, ssh=true),
         GitHubActions(; x86=true),
         Codecov(),
