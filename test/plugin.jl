@@ -113,7 +113,7 @@ PT.user_view(::FileTest, ::Template, ::AbstractString) = Dict("X" => 1, "Z" => 3
     @testset "License aliases" begin
         # Backward-compatibility: legacy license names should still work, but emit a depwarn.
         apache = PT.default_file("licenses", "Apache-2.0")
-        @test isfile(apache)
+        @assert isfile(apache)
 
         p = @test_deprecated License(; name="ASL")
         @test PT.source(p) == apache
