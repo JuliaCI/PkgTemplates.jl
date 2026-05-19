@@ -35,17 +35,13 @@ badges(p::DowngradeDependencyTests) = p.badge ? Badge(
 ) : Badge[]
 
 function view(p::DowngradeDependencyTests, t::Template, pkg::AbstractString)
-    v = Dict(
+    return Dict(
         "PKG" => pkg,
         "USER" => t.user,
         "SKIP" => join(p.skip, ","),
         "HAS_SKIP" => !isempty(p.skip),
+        "BRANCH" => something(default_branch(t), DEFAULT_DEFAULT_BRANCH),
     )
-    git = getplugin(t, Git)
-    if git !== nothing
-        v["BRANCH"] = git.branch
-    end
-    return v
 end
 
 needs_username(::DowngradeDependencyTests) = true
