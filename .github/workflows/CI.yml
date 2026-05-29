@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "1.0"  # LTS
+          - "1.0"
           - "1.7" # interactive tests require <= 1.8
           - "1"    # Latest Release
         os:
@@ -36,6 +36,9 @@ jobs:
             arch: x86
           - os: windows-latest
             arch: x86
+          # Exclude macOS-latest x64 to prevent it running by default for all versions
+          - os: macOS-latest
+            arch: x64
         include:
           # Add specific version used to run the reference tests.
           # Must be kept in sync with version check in `test/runtests.jl`,
@@ -45,9 +48,20 @@ jobs:
           - os: ubuntu-latest
             version: 1.10.6
             arch: x64
+          # Intel macOS runner for older Julia versions
+          - version: "1.0"
+            os: macos-15-intel
+            arch: x64
+          - version: "1.7"
+            os: macos-15-intel
+            arch: x64
+          # Apple Silicon macOS runner for latest Julia version (aarch64)
+          - version: "1"
+            os: macOS-latest
+            arch: aarch64
     steps:
       - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
@@ -79,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: '1'
       - run: |
