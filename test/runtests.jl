@@ -109,7 +109,8 @@ mktempdir() do dir
                 # Quite a bit of output depends on the Julia version,
                 # and the test fixtures are made with Julia 1.10.0
                 # TODO: Keep this on the latest stable Julia version, and update
-                # the version used by the corresponding CI job at the same time.
+                # the version used by the corresponding CI jobs in both `CI.yml` 
+                # and `dependabot-fixtures.yml` at the same time.
                 REFERENCE_VERSION = v"1.10.6"
                 if VERSION == REFERENCE_VERSION
                     # Ideally we'd use `with_clean_gitconfig`, but it's way too slow.

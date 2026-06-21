@@ -32,8 +32,13 @@ function test_reference(reference, comparison)
     println("Reference: $reference")
     println("Comparison: $comparison")
     update = false
-    if haskey(ENV, "JULIA_REFERENCETESTS_UPDATE")
+    if get(ENV, "JULIA_REFERENCETESTS_UPDATE", nothing) == "true"
         copy_file(comparison, reference)
+        if get(ENV, "CI", nothing) == "true"
+            @warn "The reference files have been updated, test therefore skipped. Please review the diff!"
+            @test true
+            return
+        end
     elseif PROMPT
         while true
             println("Update reference file? [y/n]")
