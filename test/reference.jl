@@ -38,6 +38,11 @@ function test_reference(reference, comparison)
         while true
             println("Update reference file? [y/n]")
             answer = lowercase(strip(readline()))
+            if isempty(answer)
+                # EOF: stdin is not connected (e.g. Pkg.test() subprocess).
+                @warn "stdin is not interactive, skipping reference file update"
+                break
+            end
             if startswith(answer, "y") || startswith(answer, "n")
                 # If the user chooses to update the reference file,
                 # replace its contents with the comparison file.
