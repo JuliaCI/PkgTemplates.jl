@@ -94,6 +94,7 @@ mktempdir() do dir
             include("template.jl")
             include("plugin.jl")
             include("show.jl")
+            include("parse_ci.jl")
 
             if VERSION < v"1.8"
                 # Interactive tests disabled on Julia Version >= 1.8 due to:
@@ -107,10 +108,10 @@ mktempdir() do dir
                 include("git.jl")
 
                 # Quite a bit of output depends on the Julia version,
-                # and the test fixtures are made with Julia 1.10.0
+                # and the test fixtures are made with Julia 1.10.6
                 # TODO: Keep this on the latest stable Julia version, and update
                 # the version used by the corresponding CI jobs in both `CI.yml` 
-                # and `dependabot-fixtures.yml` at the same time.
+                # and `DependabotFixturesUpdate.yml` at the same time.
                 REFERENCE_VERSION = v"1.10.6"
                 if VERSION == REFERENCE_VERSION
                     # Ideally we'd use `with_clean_gitconfig`, but it's way too slow.
@@ -118,7 +119,9 @@ mktempdir() do dir
                         "init.defaultBranch",
                         PT.DEFAULT_DEFAULT_BRANCH,
                     )
-                    if branch == PT.DEFAULT_DEFAULT_BRANCH
+                    if get(ENV, "PT_SKIP_REFERENCE_TESTS", "false") == "true"
+                        @info "Skipping reference tests (PT_SKIP_REFERENCE_TESTS=true)"
+                    elseif branch == PT.DEFAULT_DEFAULT_BRANCH
                         include("reference.jl")
                     else
                         "Skipping reference tests, init.defaultBranch is set"

@@ -57,6 +57,7 @@ When implementing a new plugin, subtype this type to have full control over its 
 """
 abstract type Plugin end
 
+include("parse_ci_actions.jl")
 include("template.jl")
 include("plugin.jl")
 include("show.jl")

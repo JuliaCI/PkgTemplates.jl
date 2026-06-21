@@ -1,0 +1,67 @@
+name: Update Fixtures on Dependabot PR
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-fixtures:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Checkout the PR branch so we can commit and push back to it
+          ref: ${{ github.head_ref }}
+      
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1.10.6' # Exact version required for PkgTemplates reference tests
+
+      - uses: actions/cache@v5
+        with:
+          path: ~/.julia/artifacts
+          key: ubuntu-latest-test-artifacts-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ubuntu-latest-test-artifacts-
+
+      - uses: julia-actions/julia-buildpkg@latest
+
+      - name: Configure Git for PkgTemplates tests
+        run: |
+          git config --global user.name Tester
+          git config --global user.email te@st.er
+
+      - name: Run tests and update fixtures
+        env:
+          JULIA_REFERENCETESTS_UPDATE: "true"
+        run: |
+          julia --project=@. -e 'using Pkg; Pkg.test()'
+
+      - name: Commit and push changes
+        id: auto-commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only proceed if there are changes in the test/fixtures/ directory
+          if [[ -n $(git status --porcelain test/fixtures/) ]]; then
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git add test/fixtures/
+            git commit -m "Auto-update test fixtures [skip ci]"
+            git push
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Warn maintainers
+        if: steps.auto-commit.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "⚠️ **Notice for Maintainers:** Dependabot updated the CI actions, which caused the reference fixtures to be out of sync. This workflow automatically updated the fixtures in \`test/fixtures/\` and pushed the changes to this branch. **Please review the fixture diffs** in this PR to ensure the changes are expected before merging."
