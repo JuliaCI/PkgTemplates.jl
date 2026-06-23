@@ -24,12 +24,12 @@ end
 
 split_versions(results) = Dict{String, String}(split(r, "@", limit=2)[1] => r for r in results)
 
-function extract_ci_actions_versions()
-    base_dir = dirname(@__DIR__)
-    files_to_parse = [
-        joinpath(base_dir, ".github", "workflows", "CI.yml"),
-        joinpath(base_dir, ".github", "workflows", "TriggerDependabotUpdate.yml")
-    ]
+yml_files = [
+    joinpath(dirname(@__DIR__), ".github", "workflows", "CI.yml"),
+    joinpath(dirname(@__DIR__), ".github", "workflows", "TriggerDependabotUpdate.yml")
+]
+
+function extract_ci_actions_versions(files_to_parse = yml_files)
     results = String[]
     for f in files_to_parse
         if isfile(f)
