@@ -97,6 +97,7 @@ Formatter
 CodeOwners
 PkgBenchmark
 CompatHelper
+DowngradeDependencyTests
 ```
 
 ## A More Complicated Example

@@ -10,6 +10,7 @@
             apply(patch) do
                 @test_throws PT.MissingUserException Template()
                 @test isempty(Template(; plugins=[!Git, !GitHubActions]).user)
+                @test_throws PT.MissingUserException{DowngradeDependencyTests} Template(; plugins=[!Git, DowngradeDependencyTests()])
             end
 
             patch = @patch PkgTemplates.getkw!(kwargs, k) = "username"
