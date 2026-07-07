@@ -21,6 +21,21 @@ function badges(::BlueStyleBadge)
 end
 
 """
+    SciMLStyleBadge()
+
+Adds a [`SciMLStyle`](https://github.com/SciML/SciMLStyle) badge to the [`Readme`](@ref) file.
+"""
+struct SciMLStyleBadge <: BadgePlugin end
+
+function badges(::SciMLStyleBadge)
+    return Badge(
+        "Code Style: SciML",
+        "https://img.shields.io/badge/code_style-SciML-9558b2.svg",
+        "https://github.com/SciML/SciMLStyle",
+    )
+end
+
+"""
     ColPracBadge()
 
 Adds a [`ColPrac`](https://github.com/SciML/ColPrac) badge to the [`Readme`](@ref) file.
