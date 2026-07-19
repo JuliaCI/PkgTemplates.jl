@@ -1,0 +1,27 @@
+name: Template Actions Versions Tracker
+
+# This workflow is deliberately designed to never run automatically.
+# Its sole purpose is to trigger Dependabot PR to update CI actions versions
+# that are not used in PkgTemplates' own CI.yml.
+# The updated actions' versions will be used internally by PkgTemplates when 
+# generating packages.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  track-actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harmless run
+        run: echo "This workflow is just for Dependabot to track template dependencies."
+      
+      # We use `if: false` so these steps are entirely skipped if the workflow is ever triggered manually.
+      - uses: julia-actions/cache@v3
+        if: false
+      - uses: julia-actions/julia-docdeploy@v1
+        if: false
+      - uses: julia-actions/julia-uploadcoveralls@v1
+        if: false
+      - uses: fredrikekre/runic-action@v1
+        if: false
