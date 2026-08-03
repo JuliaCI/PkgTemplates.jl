@@ -43,6 +43,7 @@ export
     Readme,
     RegisterAction,
     Runic,
+    SciMLStyleBadge,
     Secret,
     SrcDir,
     TagBot,
