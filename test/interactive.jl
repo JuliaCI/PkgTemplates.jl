@@ -185,7 +185,11 @@ end
                 "COPYING", LF,       # Enter destination
                 CR,                  # Choose MIT for name (it's at the top)
             )
-            @test PT.interactive(License) == License(; destination="COPYING", name="MIT")
+            license = @suppress PT.interactive(License)
+            @test occursin("Select a license (abbreviation - full name):", license.output)
+            @test occursin("MIT - MIT License", license.output)
+            @test occursin("ASL - Apache License 2.0", license.output)
+            @test license.ret == License(; destination="COPYING", name="MIT")
         end
 
         @testset "Quotes" begin
