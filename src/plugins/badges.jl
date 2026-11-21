@@ -38,18 +38,18 @@ end
 """
     PkgEvalBadge()
 
-Adds a [`PkgEval` badge](https://github.com/JuliaCI/NanosoldierReports#pkgeval-reports) to the [`Readme`](@ref) file.
+Adds a [`PkgEval` badge](https://perf.julialang.org/pkgeval) to the [`Readme`](@ref) file.
 """
 struct PkgEvalBadge <: BadgePlugin end
 
 function badges(::PkgEvalBadge)
     return Badge(
         "PkgEval",
-        "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.svg",
-        "https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/{{{PKG1}}}/{{{PKG}}}.html"
+        "https://perf.julialang.org/badges/pkgeval/{{{PKG}}}.svg",
+        "https://perf.julialang.org/pkgeval/{{{PKG}}}"
     )
 end
 
 function view(::PkgEvalBadge, t::Template, pkg::AbstractString)
-    return Dict("PKG1" => first(pkg), "PKG" => pkg)
+    return Dict("PKG" => pkg)
 end
