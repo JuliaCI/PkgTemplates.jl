@@ -1,5 +1,5 @@
 name: CI
-# Run on master, tags, or any pull request
+# Run on master, tags, any pull request, and manual triggering
 on:
   schedule:
     - cron: '0 2 * * *'  # Daily at 2 AM UTC (8 PM CST)
@@ -7,6 +7,7 @@ on:
     branches: [master]
     tags: ["*"]
   pull_request:
+  workflow_dispatch:
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
@@ -16,6 +17,8 @@ jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
+    env:
+      PT_SKIP_REFERENCE_TESTS: ${{ github.actor == 'dependabot[bot]' && 'true' || 'false' }}
     strategy:
       fail-fast: false
       matrix:
@@ -60,7 +63,7 @@ jobs:
             os: macOS-latest
             arch: aarch64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
@@ -92,7 +95,7 @@ jobs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v3
         with:
           version: '1'

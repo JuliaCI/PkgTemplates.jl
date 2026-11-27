@@ -93,6 +93,7 @@ function view(p::GitHubActions, t::Template, pkg::AbstractString)
     if p !== nothing
         v["BRANCH"] = p.branch
     end
+    merge!(v, CI_ACTIONS)
     return v
 end
 
